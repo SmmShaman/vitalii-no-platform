@@ -34,10 +34,12 @@ const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID")!;
 
 const GEMINI_API_KEY = Deno.env.get("GOOGLE_API_KEY") || "";
 const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY") || "";
+const NVIDIA_API_KEY = Deno.env.get("NVIDIA_API_KEY") || "";
 const SERPER_API_KEY = Deno.env.get("SERPER_API_KEY") || "";
 
 // LLM provider override (set via query param or api_settings)
-let LLM_PROVIDER = "gemini"; // default
+// Priority: nvidia (best quality) → gemini (fallback) → groq (last resort)
+let LLM_PROVIDER = NVIDIA_API_KEY ? "nvidia" : "gemini";
 
 // ── Telegram Helpers ──
 
@@ -116,8 +118,58 @@ function formatDateNorwegian(dateStr: string): string {
 // ── LLM Helper ──
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
+  // NVIDIA Llama 3.1 405B — primary (best quality, OpenAI-compatible)
+  if (LLM_PROVIDER === "nvidia" && NVIDIA_API_KEY) {
+    try {
+      console.log(`🤖 NVIDIA Llama 3.1 405B`);
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 90000); // 90s timeout
+      let resp: Response;
+      try {
+        resp = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+          method: "POST",
+          signal: controller.signal,
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${NVIDIA_API_KEY}`,
+          },
+          body: JSON.stringify({
+            model: "meta/llama-3.1-405b-instruct",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: userPrompt },
+            ],
+            temperature: 0.7,
+            max_tokens: maxTokens,
+            response_format: { type: "json_object" },
+          }),
+        });
+      } finally {
+        clearTimeout(timeout);
+      }
+      if (!resp.ok) {
+        const errText = await resp.text().catch(() => "");
+        if (resp.status === 429 || resp.status === 402) {
+          console.warn(`⚠️ NVIDIA quota exhausted (${resp.status}), falling back to Gemini`);
+          LLM_PROVIDER = "gemini";
+          return callAI(systemPrompt, userPrompt, maxTokens);
+        }
+        throw new Error(`NVIDIA: ${resp.status} ${errText.substring(0, 200)}`);
+      }
+      const data = await resp.json();
+      return data.choices?.[0]?.message?.content?.trim() || "";
+    } catch (e: any) {
+      if (e.message?.includes("NVIDIA:")) throw e;
+      const reason = e.name === "AbortError" ? "timeout (90s)" : e.message;
+      console.warn(`⚠️ NVIDIA ${reason}, falling back to Gemini`);
+      LLM_PROVIDER = "gemini";
+      return callAI(systemPrompt, userPrompt, maxTokens);
+    }
+  }
+
   if (LLM_PROVIDER === "gemini" && GEMINI_API_KEY) {
     const MAX_RETRIES = 3;
+    let quotaExhausted = false;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
         console.log(`🤖 Gemini 2.5 Flash Lite (attempt ${attempt + 1}/${MAX_RETRIES + 1})`);
@@ -145,6 +197,12 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
             console.warn(`⚠️ Gemini ${status}, retrying in ${delay}ms...`);
             await new Promise(r => setTimeout(r, delay));
             continue;
+          }
+          if (status === 429) {
+            // Daily quota exhausted — fall back to Groq
+            console.warn(`⚠️ Gemini quota exhausted after ${attempt + 1} attempts, falling back to Groq`);
+            quotaExhausted = true;
+            break;
           }
           throw new Error(`Gemini: ${status} ${errText.substring(0, 200)}`);
         }
@@ -174,10 +232,11 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
         throw e;
       }
     }
-    throw new Error("Gemini: all retries exhausted");
+    if (!quotaExhausted) throw new Error("Gemini: all retries exhausted");
+    // fall through to Groq fallback
   }
 
-  if (LLM_PROVIDER === "groq" && GROQ_API_KEY) {
+  if ((LLM_PROVIDER === "groq" || LLM_PROVIDER === "gemini") && GROQ_API_KEY) {
     console.log("🤖 Using Groq (Llama 4 Scout)");
     const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
@@ -192,7 +251,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
           { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
-        max_tokens: maxTokens,
+        max_tokens: Math.min(maxTokens, 8192),
         response_format: { type: "json_object" },
       }),
     });
@@ -1578,7 +1637,7 @@ Return JSON:
   const aiResponse = await callAI(
     systemPrompt,
     `Create visual scenario for ${displayDate} (${detailedScripts.length} detailed articles):\n\n${articleInfo}`,
-    12000,
+    6000,
   );
   let scenario: any;
   try {
@@ -3269,9 +3328,9 @@ Deno.serve(async (req) => {
     const messageId = body.message_id ? Number(body.message_id) : undefined;
     const youtubePrivacy = body.youtube_privacy || url.searchParams.get("youtube_privacy") || "public";
 
-    // LLM provider override: gemini (default) or groq
+    // LLM provider override: nvidia (default if key set), gemini, or groq
     const llmParam = body.llm_provider || url.searchParams.get("llm_provider") || "";
-    if (llmParam === "gemini" || llmParam === "groq") LLM_PROVIDER = llmParam;
+    if (llmParam === "nvidia" || llmParam === "gemini" || llmParam === "groq") LLM_PROVIDER = llmParam;
     console.log(`🤖 LLM Provider: ${LLM_PROVIDER}, YouTube: ${youtubePrivacy}`);
 
     switch (action || body.action) {

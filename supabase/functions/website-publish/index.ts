@@ -65,8 +65,20 @@ serve(async (req) => {
     }
 
     const title = news.original_title || ''
-    const content = news.original_content || ''
+    let content = news.original_content || ''
     const sourceUrl = news.rss_source_url || news.original_url || ''
+
+    // Supplement short RSS teasers with rss_analysis data already in DB
+    if (content.length < 500 && news.rss_analysis) {
+      const ra = news.rss_analysis
+      const points = Array.isArray(ra.key_points) ? ra.key_points.join(' ') : ''
+      const summary = ra.summary || ''
+      const extra = [summary, points].filter(Boolean).join(' ')
+      if (extra) {
+        content = content ? `${content}\n\n${extra}` : extra
+        console.log(`📎 Supplemented short content (${content.length} chars total from rss_analysis)`)
+      }
+    }
 
     // Determine language: 'smart' mode uses Norwegian for Norway articles
     let targetLang = rewriteLang
@@ -140,7 +152,7 @@ ${VOICE_JOURNALISM}`
           { role: 'user', content: systemPrompt }
         ],
         temperature: 0.5,
-        max_tokens: 8000
+        max_tokens: 2500
       })
     })
 
@@ -161,7 +173,12 @@ ${VOICE_JOURNALISM}`
     const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
     if (!jsonMatch) throw new Error('Failed to parse AI response')
 
-    const rewritten = JSON.parse(jsonMatch[0])
+    // Sanitize literal control characters inside JSON string values (Groq sometimes emits raw newlines)
+    const jsonSanitized = jsonMatch[0].replace(
+      /("(?:[^"\\]|\\.)*")/gs,
+      (m) => m.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t'),
+    )
+    const rewritten = JSON.parse(jsonSanitized)
 
     // Validate all 3 languages present
     for (const lang of ['en', 'no', 'ua']) {

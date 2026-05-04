@@ -1,19 +1,28 @@
 /**
- * LLM Router Shim — NVIDIA NIM (primary, 40 RPM free) → Gemini (fallback)
+ * LLM Router Shim — Groq (primary, round-robin keys) → Gemini → NVIDIA NIM (fallback)
  * Drop-in replacement for Azure OpenAI calls.
  *
- * Features: timeout (25s), error categorization, retry on 429/503.
- *
- * Usage:
- *   import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
- *   const response = await azureFetch('gemini', { method: 'POST', ... })
+ * Provider order: Groq (300+ t/s, round-robin across up to 3 keys) → Gemini → NVIDIA NIM
  */
 
 const NVIDIA_API_KEY = Deno.env.get('NVIDIA_API_KEY') || ''
 const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY') || ''
-const NVIDIA_MODEL = Deno.env.get('NVIDIA_MODEL') || 'mistralai/mistral-small-4-119b-2603'
+const NVIDIA_MODEL = Deno.env.get('NVIDIA_MODEL') || 'meta/llama-3.1-70b-instruct'
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash'
-const FETCH_TIMEOUT_MS = 25_000
+const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'llama-3.1-8b-instant'
+const FETCH_TIMEOUT_MS = 50_000
+
+// Collect all configured Groq keys (GROQ_API_KEY, GROQ_API_KEY_2, GROQ_API_KEY_3)
+const GROQ_KEYS: string[] = [
+  Deno.env.get('GROQ_API_KEY') || '',
+  Deno.env.get('GROQ_API_KEY_2') || '',
+  Deno.env.get('GROQ_API_KEY_3') || '',
+].filter(k => k.length > 0)
+
+// Pick a random Groq key to distribute load
+function pickGroqKey(): string {
+  return GROQ_KEYS[Math.floor(Math.random() * GROQ_KEYS.length)]
+}
 
 /** Fetch with AbortController timeout */
 async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = FETCH_TIMEOUT_MS): Promise<globalThis.Response> {
@@ -26,11 +35,6 @@ async function fetchWithTimeout(url: string, options: RequestInit, timeoutMs = F
   }
 }
 
-/** Check if error is transient (worth retrying) */
-function isTransientError(status: number): boolean {
-  return status === 429 || status === 502 || status === 503 || status === 504
-}
-
 export async function azureFetch(
   _url: string,
   options: RequestInit,
@@ -40,8 +44,117 @@ export async function azureFetch(
   const temperature = body.temperature ?? 0.5
   const maxTokens = body.max_tokens ?? 8000
 
-  // Try NVIDIA NIM first (free, 40 RPM) — with one retry on transient errors
+  const systemMsg = messages.find(m => m.role === 'system')?.content || ''
+  const expectsJson = /json/i.test(systemMsg)
+
+  // ── Provider 1: Groq (fastest — 300+ tokens/sec, round-robin across keys) ──
+  if (GROQ_KEYS.length > 0) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const groqBody: Record<string, unknown> = {
+          model: GROQ_MODEL,
+          messages,
+          temperature,
+          max_tokens: Math.min(maxTokens, 8192),
+        }
+        if (expectsJson) groqBody.response_format = { type: 'json_object' }
+
+        const groqRes = await fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${pickGroqKey()}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(groqBody),
+        })
+
+        if (groqRes.ok) {
+          const groqData = await groqRes.json()
+          let text = groqData?.choices?.[0]?.message?.content?.trim() || ''
+          if (text) {
+            if (text.startsWith('```')) {
+              text = text.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
+            }
+            console.log(`🟢 Groq (${GROQ_MODEL}) — ${text.length} chars`)
+            return new Response(JSON.stringify({
+              choices: [{ message: { content: text, role: 'assistant' }, finish_reason: 'stop' }],
+              usage: groqData.usage || { total_tokens: 0 },
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+          }
+        }
+
+        const status = groqRes.status
+        const errText = await groqRes.text().catch(() => '')
+        console.warn(`⚠️ Groq failed (${status}): ${errText.substring(0, 200)}`)
+
+        if ((status === 429 || status === 503) && attempt === 0) {
+          await new Promise(r => setTimeout(r, 3000))
+          continue
+        }
+        break
+      } catch (e) {
+        const msg = (e as Error).message
+        if (msg.includes('aborted') && attempt === 0) {
+          console.warn(`⚠️ Groq timeout, retrying...`)
+          continue
+        }
+        console.warn(`⚠️ Groq error: ${msg}`)
+        break
+      }
+    }
+  }
+
+  // ── Provider 2: Gemini ──
+  if (GOOGLE_API_KEY) {
+    console.log(`🟡 Fallback to Gemini (${GEMINI_MODEL})`)
+
+    const parts = messages.map(m => m.content).join('\n\n')
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GOOGLE_API_KEY}`
+
+    const generationConfig: Record<string, unknown> = { temperature, maxOutputTokens: maxTokens }
+    if (expectsJson) {
+      generationConfig.responseMimeType = 'application/json'
+    }
+
+    try {
+      const geminiRes = await fetchWithTimeout(geminiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: parts }] }],
+          generationConfig,
+        }),
+      })
+
+      if (geminiRes.ok) {
+        const geminiData = await geminiRes.json()
+        let text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+
+        if (!text) {
+          const blockReason = geminiData?.candidates?.[0]?.finishReason || geminiData?.promptFeedback?.blockReason || 'unknown'
+          console.warn(`⚠️ Gemini returned empty text. Reason: ${blockReason}`)
+        } else {
+          if (text.startsWith('```')) {
+            text = text.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
+          }
+          console.log(`🟡 Gemini (${GEMINI_MODEL}) — ${text.length} chars`)
+          return new Response(JSON.stringify({
+            choices: [{ message: { content: text, role: 'assistant' }, finish_reason: 'stop' }],
+            usage: { total_tokens: 0 },
+          }), { status: 200, headers: { 'Content-Type': 'application/json' } })
+        }
+      } else {
+        const err = await geminiRes.text()
+        console.warn(`⚠️ Gemini failed (${geminiRes.status}): ${err.substring(0, 200)}`)
+      }
+    } catch (e) {
+      console.warn(`⚠️ Gemini error: ${(e as Error).message}`)
+    }
+  }
+
+  // ── Provider 3: NVIDIA NIM (slow on free tier, last resort) ──
   if (NVIDIA_API_KEY) {
+    console.log(`🔵 Fallback to NVIDIA NIM (${NVIDIA_MODEL})`)
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
         const nvidiaRes = await fetchWithTimeout('https://integrate.api.nvidia.com/v1/chat/completions', {
@@ -60,46 +173,33 @@ export async function azureFetch(
 
         if (nvidiaRes.ok) {
           const nvidiaData = await nvidiaRes.json()
-          const text = nvidiaData?.choices?.[0]?.message?.content?.trim() || ''
+          let text = nvidiaData?.choices?.[0]?.message?.content?.trim() || ''
 
           if (text) {
-            console.log(`🟢 NVIDIA NIM (${NVIDIA_MODEL.split('/')[1]}) — ${text.length} chars`)
-
-            // Strip markdown code fences if present
-            let cleaned = text
-            if (cleaned.startsWith('```')) {
-              cleaned = cleaned.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
+            if (text.startsWith('```')) {
+              text = text.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
             }
-
+            console.log(`🔵 NVIDIA NIM (${NVIDIA_MODEL.split('/')[1]}) — ${text.length} chars`)
             return new Response(JSON.stringify({
-              choices: [{
-                message: { content: cleaned, role: 'assistant' },
-                finish_reason: 'stop',
-              }],
+              choices: [{ message: { content: text, role: 'assistant' }, finish_reason: 'stop' }],
               usage: nvidiaData.usage || { total_tokens: 0 },
-            }), {
-              status: 200,
-              headers: { 'Content-Type': 'application/json' },
-            })
+            }), { status: 200, headers: { 'Content-Type': 'application/json' } })
           }
         }
 
-        // Retry on transient errors, fallback on permanent
         const status = nvidiaRes.status
         const errText = await nvidiaRes.text().catch(() => '')
         console.warn(`⚠️ NVIDIA NIM failed (${status}): ${errText.substring(0, 200)}`)
 
-        if (isTransientError(status) && attempt === 0) {
-          const delay = status === 429 ? 5000 : 2000
-          console.log(`🔄 Retrying NVIDIA in ${delay}ms (${status} transient)...`)
-          await new Promise(r => setTimeout(r, delay))
+        if ((status === 429 || status === 503) && attempt === 0) {
+          await new Promise(r => setTimeout(r, 5000))
           continue
         }
-        break // permanent error — fall through to Gemini
+        break
       } catch (e) {
         const msg = (e as Error).message
         if (msg.includes('aborted') && attempt === 0) {
-          console.warn(`⚠️ NVIDIA NIM timeout, retrying...`)
+          console.warn(`⚠️ NVIDIA NIM timeout on attempt 1, retrying...`)
           continue
         }
         console.warn(`⚠️ NVIDIA NIM error: ${msg}`)
@@ -108,64 +208,5 @@ export async function azureFetch(
     }
   }
 
-  // Fallback: Gemini
-  if (!GOOGLE_API_KEY) {
-    throw new Error('Neither NVIDIA_API_KEY nor GOOGLE_API_KEY configured')
-  }
-
-  console.log(`🟡 Fallback to Gemini (${GEMINI_MODEL})`)
-
-  // Detect if caller expects JSON
-  const systemMsg = messages.find(m => m.role === 'system')?.content || ''
-  const expectsJson = /json/i.test(systemMsg)
-
-  const parts = messages.map(m => m.content).join('\n\n')
-
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GOOGLE_API_KEY}`
-
-  const generationConfig: Record<string, unknown> = { temperature, maxOutputTokens: maxTokens }
-  if (expectsJson) {
-    generationConfig.responseMimeType = 'application/json'
-  }
-
-  const geminiRes = await fetchWithTimeout(geminiUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: parts }] }],
-      generationConfig,
-    }),
-  })
-
-  if (!geminiRes.ok) {
-    const err = await geminiRes.text()
-    console.error('❌ Gemini API error:', err.substring(0, 300))
-    return new Response(JSON.stringify({ error: { message: `Gemini error: ${err.slice(0, 200)}` } }), {
-      status: geminiRes.status,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-
-  const geminiData = await geminiRes.json()
-  let text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || ''
-
-  if (!text) {
-    const blockReason = geminiData?.candidates?.[0]?.finishReason || geminiData?.promptFeedback?.blockReason || 'unknown'
-    console.error('⚠️ Gemini returned empty text. Reason:', blockReason)
-  }
-
-  if (text.startsWith('```')) {
-    text = text.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
-  }
-
-  return new Response(JSON.stringify({
-    choices: [{
-      message: { content: text, role: 'assistant' },
-      finish_reason: 'stop',
-    }],
-    usage: { total_tokens: 0 },
-  }), {
-    status: 200,
-    headers: { 'Content-Type': 'application/json' },
-  })
+  throw new Error('All LLM providers failed (Groq / Gemini / NVIDIA)')
 }
