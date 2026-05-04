@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { HUMANIZER_SOCIAL, VOICE_SOCIAL } from '../_shared/humanizer-prompt.ts'
+import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -88,12 +89,11 @@ FINAL CHECK: Before outputting, re-read each post and ask yourself "What makes t
 Return ONLY valid JSON without markdown code fences:
 {"linkedin_post": "...", "instagram_caption": "...", "facebook_post": "..."}`
 
-async function generatePostsWithGemini(
+async function generatePostsWithAI(
   feature: DbFeature,
   featureNum: number,
   totalFeatures: number,
   lang: 'en' | 'no',
-  googleApiKey: string,
 ): Promise<{ linkedin_post: string; instagram_caption: string; facebook_post: string } | null> {
   const featureData = {
     title: lang === 'en' ? feature.title_en : feature.title_no,
@@ -109,41 +109,50 @@ async function generatePostsWithGemini(
     total_features: totalFeatures,
   }
 
-  const userMsg = MASTER_PROMPT + '\n\nGenerate posts for this feature:\n' + JSON.stringify(featureData, null, 2)
+  const userMsg = 'Generate posts for this feature:\n' + JSON.stringify(featureData, null, 2)
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${googleApiKey}`,
-    {
+  try {
+    const res = await azureFetch('_', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: userMsg }] }],
-        generationConfig: { temperature: 0.5, maxOutputTokens: 8000 },
+        messages: [
+          { role: 'system', content: MASTER_PROMPT },
+          { role: 'user', content: userMsg },
+        ],
+        temperature: 0.5,
+        max_tokens: 4000,
       }),
-    },
-  )
+    })
 
-  if (!res.ok) {
-    console.error('Gemini API error:', res.status, await res.text())
-    return null
-  }
+    if (!res.ok) {
+      console.error('AI error:', res.status, await res.text())
+      return null
+    }
 
-  const data = await res.json()
-  // Gemini 2.5 Flash thinking model may return multiple parts — find the non-thought part
-  const parts: Array<{text?: string; thought?: boolean}> = data?.candidates?.[0]?.content?.parts || []
-  const responsePart = parts.find(p => !p.thought) || parts[0]
-  const text = responsePart?.text || ''
-  if (!text) {
-    console.error('Empty Gemini response, parts count:', parts.length)
-    return null
-  }
-  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-  console.log('Gemini response preview:', cleaned.slice(0, 150))
+    const data = await res.json()
+    const text = data?.choices?.[0]?.message?.content?.trim() || ''
+    if (!text) {
+      console.error('Empty AI response')
+      return null
+    }
 
-  try {
-    return JSON.parse(cleaned)
-  } catch {
-    console.error('Failed to parse Gemini response:', cleaned.slice(0, 500))
+    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+    console.log('AI response preview:', cleaned.slice(0, 150))
+
+    // Sanitize control characters inside JSON strings (Groq sometimes emits literal newlines)
+    const sanitized = cleaned.replace(/("(?:[^"\\]|\\.)*")/gs, (m) =>
+      m.replace(/\n/g, '\\n').replace(/\r/g, '\\r').replace(/\t/g, '\\t'),
+    )
+
+    try {
+      return JSON.parse(sanitized)
+    } catch {
+      console.error('Failed to parse AI response:', cleaned.slice(0, 500))
+      return null
+    }
+  } catch (e) {
+    console.error('AI call failed:', (e as Error).message)
     return null
   }
 }
@@ -256,15 +265,13 @@ serve(async (req) => {
     const titleField = lang === 'en' ? 'title_en' : 'title_no'
     console.log(`Feature ${featureNum}/${featureOrder.length}: ${nextId} — ${feature[titleField]}`)
 
-    // Generate posts with Gemini AI
-    let aiPosts = googleApiKey
-      ? await generatePostsWithGemini(feature, featureNum, featureOrder.length, lang, googleApiKey)
-      : null
+    // Generate posts with AI (Groq → Gemini → NVIDIA via shim)
+    const aiPosts = await generatePostsWithAI(feature, featureNum, featureOrder.length, lang)
 
     if (aiPosts) {
-      console.log('Gemini generated posts successfully')
+      console.log('AI generated posts successfully')
     } else {
-      console.log('Gemini failed or no key, using fallback templates')
+      console.log('AI failed, using fallback templates')
     }
 
     const results: Record<string, { ok: boolean; url?: string; error?: string }> = {}
