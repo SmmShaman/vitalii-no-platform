@@ -166,14 +166,13 @@ async function saveArticle(article, analysis, source) {
   const rows = await dbQuery(`
     INSERT INTO public.news (
       original_title, original_content, original_url,
-      image_url, source_id, rss_source_url, source_type,
+      image_url, rss_source_url, source_type,
       rss_analysis, auto_publish_status, created_at
     ) VALUES (
       ${sq(article.title)},
       ${sq(article.description)},
       ${sq(article.url)},
       ${sq(article.imageUrl || null)},
-      ${sq(source.id)},
       ${sq(source.rss_url)},
       'rss',
       ${sq(JSON.stringify({
