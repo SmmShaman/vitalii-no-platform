@@ -11,35 +11,50 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Auto-reject stale news
         id: reject
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
         run: |
-          echo "🤖 Starting auto-reject of stale news..."
-          echo "Time: $(date -u '+%Y-%m-%d %H:%M UTC')"
+          echo "🤖 Auto-reject stale news — $(date -u '+%H:%M UTC')"
 
-          RESULT=$(curl -s -X POST "$SUPABASE_URL/functions/v1/auto-reject-stale-news" \
-            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
-            -H "Content-Type: application/json" \
-            --max-time 60)
+          node --input-type=module << 'EOF'
+          import { dbQuery, sq } from './scripts/bypass/db.mjs'
 
-          echo "Result: $RESULT"
+          const cutoff48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()
 
-          SUCCESS=$(echo "$RESULT" | jq -r '.success // false')
-          REJECTED=$(echo "$RESULT" | jq -r '.rejected_count // 0')
+          // Reject pending articles older than 48h
+          const pendingRejected = await dbQuery(`
+            UPDATE public.news
+            SET pre_moderation_status = 'rejected',
+                rejection_reason = 'Auto-rejected: pending for more than 48 hours'
+            WHERE pre_moderation_status = 'pending'
+              AND created_at < ${sq(cutoff48h)}
+            RETURNING id
+          `)
 
-          echo "rejected=$REJECTED" >> $GITHUB_OUTPUT
+          // Reject approved-but-unpublished articles older than 48h
+          const approvedRejected = await dbQuery(`
+            UPDATE public.news
+            SET pre_moderation_status = 'rejected',
+                rejection_reason = 'Auto-rejected: approved but not published within 48 hours'
+            WHERE pre_moderation_status = 'approved'
+              AND (is_published = false OR is_published IS NULL)
+              AND (published_at IS NULL)
+              AND created_at < ${sq(cutoff48h)}
+            RETURNING id
+          `)
 
-          if [ "$SUCCESS" = "true" ]; then
-            echo "✅ Auto-reject completed successfully"
-            echo "📊 Rejected: $REJECTED stale news items"
-          else
-            echo "❌ Auto-reject failed"
-            echo "$RESULT" | jq '.'
-            exit 1
-          fi
+          const total = (pendingRejected?.length || 0) + (approvedRejected?.length || 0)
+          console.log(`📊 Rejected ${pendingRejected?.length || 0} pending + ${approvedRejected?.length || 0} approved-stale = ${total} total`)
+          console.log(`REJECTED_COUNT=${total}`)
+          EOF
 
       - name: Summary
         if: always()
@@ -47,6 +62,5 @@ jobs:
           echo "## Auto-reject Stale News Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Time:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "- **Rejected count:** ${{ steps.reject.outputs.rejected }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "News items that were approved but not published within 48 hours are automatically rejected." >> $GITHUB_STEP_SUMMARY
+          echo "News items pending or approved but not published within 48 hours are automatically rejected." >> $GITHUB_STEP_SUMMARY
