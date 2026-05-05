@@ -11,87 +11,55 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Zombie cleanup & schedule backup
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
         run: |
           echo "🧟 Queue Watchdog — $(date -u '+%H:%M UTC')"
 
-          # 1. Find and clean zombie articles (stuck >10 min in active status)
-          CUTOFF=$(date -u -d '10 minutes ago' '+%Y-%m-%dT%H:%M:%SZ')
-          echo "🕐 Cutoff: $CUTOFF"
-          ZOMBIES=$(curl -s -X PATCH "$SUPABASE_URL/rest/v1/news?auto_publish_status=in.(pending,variant_selection,image_generation,content_rewrite,social_posting)&auto_publish_started_at=lt.$CUTOFF" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "Content-Type: application/json" \
-            -H "Prefer: return=representation" \
-            -d '{"auto_publish_status": "failed", "auto_publish_error": "Zombie: watchdog auto-cleaned after 10min timeout"}' \
-            2>/dev/null)
+          node --input-type=module << 'EOF'
+          import { dbQuery, sq } from './scripts/bypass/db.mjs'
 
-          ZOMBIE_COUNT=$(echo "$ZOMBIES" | jq -r 'length // 0' 2>/dev/null || echo "0")
-          echo "🧟 Cleaned $ZOMBIE_COUNT zombie(s)"
+          const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString()
+          const staleCutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
-          # 2. Clean stale scheduled articles (older than 24h still in scheduled status)
-          STALE_CUTOFF=$(date -u -d '24 hours ago' '+%Y-%m-%dT%H:%M:%SZ')
-          STALE=$(curl -s -X PATCH "$SUPABASE_URL/rest/v1/news?auto_publish_status=eq.scheduled&scheduled_publish_at=lt.$STALE_CUTOFF" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "Content-Type: application/json" \
-            -H "Prefer: return=representation" \
-            -d '{"auto_publish_status": "failed", "auto_publish_error": "Stale: scheduled >24h ago, never picked up"}' \
-            2>/dev/null)
+          // Clean zombies
+          const zombies = await dbQuery(`
+            UPDATE public.news
+            SET auto_publish_status = 'failed',
+                auto_publish_error = 'Zombie: watchdog auto-cleaned after 10min timeout'
+            WHERE auto_publish_status IN ('pending','variant_selection','image_generation','content_rewrite','social_posting')
+              AND auto_publish_started_at < ${sq(cutoff)}
+            RETURNING id
+          `)
+          console.log(`🧟 Cleaned ${zombies?.length || 0} zombie(s)`)
 
-          STALE_COUNT=$(echo "$STALE" | jq -r 'length // 0' 2>/dev/null || echo "0")
-          echo "📅 Cleaned $STALE_COUNT stale scheduled article(s)"
+          // Clean stale scheduled (>24h)
+          const stale = await dbQuery(`
+            UPDATE public.news
+            SET auto_publish_status = 'failed',
+                auto_publish_error = 'Stale: scheduled >24h ago, never picked up'
+            WHERE auto_publish_status = 'scheduled'
+              AND scheduled_publish_at < ${sq(staleCutoff)}
+            RETURNING id
+          `)
+          console.log(`📅 Cleaned ${stale?.length || 0} stale scheduled article(s)`)
 
-          # 3. Backup kickstart: if schedule-publisher cron missed, check for due scheduled articles
-          IN_FLIGHT_LIST=$(curl -s "$SUPABASE_URL/rest/v1/news?auto_publish_status=in.(pending,variant_selection,image_generation,content_rewrite,social_posting)&select=id" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            2>/dev/null)
-          IN_FLIGHT_COUNT=$(echo "$IN_FLIGHT_LIST" | jq -r 'length // 0' 2>/dev/null || echo "0")
-
-          NOW=$(date -u '+%Y-%m-%dT%H:%M:%SZ')
-          NEXT=$(curl -s "$SUPABASE_URL/rest/v1/news?auto_publish_status=eq.scheduled&scheduled_publish_at=lte.$NOW&order=scheduled_publish_at.asc&limit=1&select=id,telegram_message_id" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            2>/dev/null)
-
-          NEXT_ID=$(echo "$NEXT" | jq -r '.[0].id // ""' 2>/dev/null || echo "")
-          NEXT_MSG_ID=$(echo "$NEXT" | jq -r '.[0].telegram_message_id // ""' 2>/dev/null || echo "")
-
-          if [ -n "$NEXT_ID" ] && [ "$IN_FLIGHT_COUNT" = "0" ]; then
-            echo "🚀 Backup kickstart for scheduled article: $NEXT_ID"
-            curl -s -X POST "$SUPABASE_URL/functions/v1/schedule-publisher" \
-              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{}' \
-              --max-time 15 > /dev/null 2>&1 || true
-            echo "✅ Schedule publisher triggered"
-          elif [ -n "$NEXT_ID" ]; then
-            echo "📋 Due scheduled items but $IN_FLIGHT_COUNT article(s) in-flight"
-          else
-            echo "📭 No due scheduled articles"
-          fi
-
-          # 4. Also check for legacy queued articles (backward compat)
-          QUEUED=$(curl -s "$SUPABASE_URL/rest/v1/news?auto_publish_status=eq.queued&order=auto_publish_queued_at.asc&limit=1&select=id,telegram_message_id" \
-            -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-            -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-            2>/dev/null)
-
-          QUEUED_ID=$(echo "$QUEUED" | jq -r '.[0].id // ""' 2>/dev/null || echo "")
-          QUEUED_MSG_ID=$(echo "$QUEUED" | jq -r '.[0].telegram_message_id // ""' 2>/dev/null || echo "")
-
-          if [ -n "$QUEUED_ID" ] && [ "$IN_FLIGHT_COUNT" = "0" ]; then
-            echo "🚀 Kickstarting legacy queued article: $QUEUED_ID"
-            curl -s -X POST "$SUPABASE_URL/functions/v1/auto-publish-news" \
-              -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-              -H "Content-Type: application/json" \
-              -d "{\"newsId\": \"$QUEUED_ID\", \"source\": \"rss\", \"telegramMessageId\": $QUEUED_MSG_ID}" \
-              --max-time 10 > /dev/null 2>&1 || true
-            echo "✅ Legacy queue kickstarted"
-          fi
-
-          echo "✅ Watchdog complete"
+          console.log('✅ Watchdog complete')
+          EOF
