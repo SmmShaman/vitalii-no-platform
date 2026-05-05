@@ -10,6 +10,10 @@ const corsHeaders = {
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const CF_API_TOKEN = Deno.env.get('CF_API_TOKEN') ?? ''
+const CF_ACCOUNT_ID = Deno.env.get('CF_ACCOUNT_ID') ?? '1438e8d03009209c4a82ea4c28bdb358'
+const R2_BUCKET = 'news-images'
+const R2_PUBLIC_BASE = `https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev`
 const VERSION = '2026-03-31-v13-pro-primary'
 
 // Image generation models in priority order (all use generateContent API)
@@ -1367,8 +1371,6 @@ async function processImageWithAI(imageBase64: string, prompt: string, apiKey: s
  * Upload processed image to Supabase Storage
  */
 async function uploadProcessedImage(base64Image: string): Promise<string> {
-  const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-
   // Convert base64 to Uint8Array
   const binaryString = atob(base64Image)
   const bytes = new Uint8Array(binaryString.length)
@@ -1378,23 +1380,22 @@ async function uploadProcessedImage(base64Image: string): Promise<string> {
 
   const fileName = `processed/${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`
 
-  const { data, error } = await supabase.storage
-    .from('news-images')
-    .upload(fileName, bytes, {
-      contentType: 'image/jpeg',
-      upsert: false,
-      cacheControl: '31536000'
-    })
+  // Upload to Cloudflare R2 via API
+  const r2Url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects/${fileName}`
+  const res = await fetch(r2Url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `Bearer ${CF_API_TOKEN}`,
+      'Content-Type': 'image/jpeg',
+    },
+    body: bytes,
+  })
 
-  if (error) {
-    console.error('Failed to upload processed image:', error.message, JSON.stringify(error))
-    throw new Error('Failed to upload processed image')
+  if (!res.ok) {
+    const err = await res.text()
+    console.error('Failed to upload to R2:', res.status, err)
+    throw new Error('Failed to upload processed image to R2')
   }
 
-  // Get public URL
-  const { data: urlData } = supabase.storage
-    .from('news-images')
-    .getPublicUrl(fileName)
-
-  return urlData.publicUrl
+  return `${R2_PUBLIC_BASE}/${fileName}`
 }
