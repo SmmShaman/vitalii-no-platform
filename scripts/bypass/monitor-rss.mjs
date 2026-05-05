@@ -126,26 +126,76 @@ Score 1-4: opinion, duplicate topic, clickbait, or off-topic`,
 
 // ── Telegram notification ─────────────────────────────────────────────────
 
-async function sendToTelegram(newsId, title, sourceName, score, summary, imageUrl) {
-  if (!TG_TOKEN || !TG_CHAT) return
-  const emoji = score >= 8 ? '🟢' : score >= 6 ? '🟡' : '🔴'
-  const text = `${emoji} <b>${escapeHtml(title)}</b>\n\n📌 ${escapeHtml(sourceName)} · ${score}/10\n\n${escapeHtml(summary?.substring(0, 300) || '')}`
+const CATEGORY_SHORT = {
+  technology: '💻 Tech', ai: '🤖 AI', business: '📼 Business',
+  norway: '🇳🇴 Norway', politics: '🏛 Politics', science: '🔬 Science', other: '📰 Other',
+}
 
-  const method = imageUrl ? 'sendPhoto' : 'sendMessage'
-  const payload = imageUrl
-    ? { chat_id: TG_CHAT, photo: imageUrl, caption: text, parse_mode: 'HTML' }
-    : { chat_id: TG_CHAT, text, parse_mode: 'HTML' }
+function getShortSummary(summary, maxWords = 9) {
+  if (!summary) return ''
+  const first = summary.split(/[.!?]/)[0]?.trim() || summary
+  const words = first.split(/\s+/)
+  return words.length <= maxWords ? first : words.slice(0, maxWords).join(' ') + '...'
+}
+
+function buildKeyboard(newsId) {
+  return {
+    inline_keyboard: [
+      [
+        { text: '🚀 EN', callback_data: `pr_ane_${newsId}` },
+        { text: '🚀 NO', callback_data: `pr_ann_${newsId}` },
+        { text: '🚀 UA', callback_data: `pr_anu_${newsId}` },
+      ],
+      [
+        { text: '📝 EN', callback_data: `pr_abe_${newsId}` },
+        { text: '📝 NO', callback_data: `pr_abn_${newsId}` },
+        { text: '📝 UA', callback_data: `pr_abu_${newsId}` },
+      ],
+      [
+        { text: '🔧 Вручну', callback_data: `manual_${newsId}` },
+        { text: '❌ Skip', callback_data: `reject_${newsId}` },
+      ],
+    ],
+  }
+}
+
+async function sendToTelegram(newsId, title, sourceName, score, summary, imageUrl, articleUrl, analysis) {
+  if (!TG_TOKEN || !TG_CHAT) return
+  const relevanceEmoji = score >= 7 ? '🟢' : score >= 5 ? '🟡' : '🔴'
+  const categoryShort = CATEGORY_SHORT[analysis?.category] || '📰 Other'
+  const shortSummary = getShortSummary(summary)
+  const keyPoints = (analysis?.key_points || []).map(p => `• ${escapeHtml(p)}`).join('\n')
+  const action = (analysis?.recommended_action || 'skip').toUpperCase()
+  const skipReason = analysis?.skip_reason ? `\nℹ️ ${escapeHtml(analysis.skip_reason)}` : ''
+  const url = articleUrl || ''
+
+  const expandable = `<blockquote expandable>📋 ${escapeHtml(summary || '')}${keyPoints ? '\n\n' + keyPoints : ''}
+
+🎯 ${action}${skipReason}</blockquote>`
+
+  const text = `📰 <b>RSS</b> | 📌 ${escapeHtml(sourceName)} | ${relevanceEmoji} ${score}/10 | ${categoryShort}
+🔗 <a href="${url}">${escapeHtml(title.substring(0, 100))}</a>
+
+💬 ${escapeHtml(shortSummary)}
+
+${expandable}
+
+newsId:${newsId}`
 
   try {
-    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/${method}`, {
+    const res = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        chat_id: TG_CHAT,
+        text,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+        reply_markup: buildKeyboard(newsId),
+      }),
     })
     const data = await res.json()
     const msgId = data.result?.message_id || null
-
-    // Update telegram_message_id in DB
     if (msgId && newsId) {
       await dbQuery(`UPDATE public.news SET telegram_message_id = ${msgId} WHERE id = ${sq(newsId)}`)
     }
@@ -326,7 +376,7 @@ async function main() {
           await autoSchedule(newsId, score)
 
           // Send to Telegram
-          const msgId = await sendToTelegram(newsId, article.title, source.name, score, analysis.summary, article.imageUrl)
+          const msgId = await sendToTelegram(newsId, article.title, source.name, score, analysis.summary, article.imageUrl, article.url, analysis)
           if (msgId) {
             console.log(`  📱 Sent to Telegram (msg: ${msgId})`)
           }
