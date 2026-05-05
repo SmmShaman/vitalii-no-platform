@@ -19,27 +19,30 @@ jobs:
   publish-en:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Run only on NY schedule (14:00/15:00 UTC) or manual with lang=en
     if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 15 * * *' || github.event.schedule == '0 14 * * *'
+
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Publish feature in EN
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
         run: |
           LANG="${{ inputs.lang || 'en' }}"
-          echo "📋 Publishing feature in ${LANG}..."
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
-            "${SUPABASE_URL}/functions/v1/publish-feature-social" \
-            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
-            -H "Content-Type: application/json" \
-            -X POST -d "{\"lang\": \"${LANG}\"}")
-
-          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
-          echo "Response ($HTTP_CODE): $BODY"
-          [ "$HTTP_CODE" -ge 400 ] && exit 1
-          echo "✅ Done"
+          echo "📋 Publishing feature in ${LANG} — $(date -u '+%H:%M UTC')"
+          node scripts/bypass/publish-feature-social.mjs --lang "${LANG}"
 
       - name: Notify Telegram on failure
         if: failure()
@@ -50,31 +53,34 @@ jobs:
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": \"❌ <b>Feature Social EN failed!</b>\n\n🔗 <a href=\\\"${RUN_URL}\\\">View logs</a>\", \"parse_mode\": \"HTML\", \"disable_web_page_preview\": true}"
+            -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": \"❌ Feature Social EN failed! Run: ${RUN_URL}\"}"
 
   publish-no:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    # Run only on Oslo schedule (08:00/09:00 UTC)
     if: github.event.schedule == '0 9 * * *' || github.event.schedule == '0 8 * * *'
+
     steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
       - name: Publish feature in NO
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
+          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
+          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
         run: |
-          echo "📋 Publishing feature in NO..."
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
-            "${SUPABASE_URL}/functions/v1/publish-feature-social" \
-            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
-            -H "Content-Type: application/json" \
-            -X POST -d '{"lang": "no"}')
-
-          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
-          echo "Response ($HTTP_CODE): $BODY"
-          [ "$HTTP_CODE" -ge 400 ] && exit 1
-          echo "✅ Done"
+          echo "📋 Publishing feature in NO — $(date -u '+%H:%M UTC')"
+          node scripts/bypass/publish-feature-social.mjs --lang no
 
       - name: Notify Telegram on failure
         if: failure()
@@ -85,4 +91,4 @@ jobs:
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
             -H "Content-Type: application/json" \
-            -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": \"❌ <b>Feature Social NO failed!</b>\n\n🔗 <a href=\\\"${RUN_URL}\\\">View logs</a>\", \"parse_mode\": \"HTML\", \"disable_web_page_preview\": true}"
+            -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": \"❌ Feature Social NO failed! Run: ${RUN_URL}\"}"
