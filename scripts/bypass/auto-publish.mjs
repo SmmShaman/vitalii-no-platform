@@ -277,6 +277,15 @@ export async function publishArticle(newsId) {
       slug: `news-${Date.now()}`,
       tags: [],
     }
+    // Save fallback so slug_en/title_en are not NULL (website needs them)
+    await dbQuery(`
+      UPDATE public.news SET
+        title_en = ${sq(rewritten.title)},
+        content_en = ${sq(rewritten.content)},
+        description_en = ${sq(rewritten.description)},
+        slug_en = ${sq(rewritten.slug)}
+      WHERE id = ${sq(newsId)}
+    `).catch(() => {})
   }
 
   // STEP 3: Social posting
@@ -330,11 +339,13 @@ export async function publishArticle(newsId) {
     }
   }
 
-  // STEP 4: Mark complete
+  // STEP 4: Mark complete + publish
   await dbQuery(`
     UPDATE public.news SET
       auto_publish_status = 'completed',
-      auto_publish_completed_at = NOW()
+      auto_publish_completed_at = NOW(),
+      is_published = true,
+      published_at = NOW()
     WHERE id = ${sq(newsId)}
   `)
 
