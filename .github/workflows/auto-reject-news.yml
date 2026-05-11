@@ -29,12 +29,17 @@ jobs:
 
           const cutoff48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()
 
-          // Reject pending articles older than 48h
+          // Reject pending articles older than 48h.
+          // Important: only reject articles that are NOT already published —
+          // otherwise we end up with the buggy state is_published=true +
+          // pre_moderation_status='rejected' which makes broken/empty rows
+          // appear at the top of the public feed.
           const pendingRejected = await dbQuery(`
             UPDATE public.news
             SET pre_moderation_status = 'rejected',
                 rejection_reason = 'Auto-rejected: pending for more than 48 hours'
             WHERE pre_moderation_status = 'pending'
+              AND (is_published = false OR is_published IS NULL)
               AND created_at < ${sq(cutoff48h)}
             RETURNING id
           `)
