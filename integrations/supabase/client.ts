@@ -158,6 +158,7 @@ export const getLatestNews = async (limit: number = 3) => {
       news_sources(name, category)
     `)
     .eq('is_published', true)
+    .not('published_at', 'is', null)
     .order('published_at', { ascending: false })
     .limit(limit);
 
@@ -214,6 +215,7 @@ export const getAllNews = async (filters: NewsFilters = {}) => {
     .from('news')
     .select('*', { count: 'exact' })
     .eq('is_published', true)
+    .not('published_at', 'is', null)
     .order('published_at', { ascending: false });
 
   // Filter by tags (PostgREST array overlap operator, case-insensitive via toLowerCase)
@@ -290,6 +292,7 @@ export const getNewsBySlug = async (slug: string, language: 'en' | 'no' | 'ua' =
     .select('*')
     .eq(slugColumn, slug)
     .eq('is_published', true)
+    .not('published_at', 'is', null)
     .single();
 
   // If not found, try other slug columns
@@ -302,6 +305,7 @@ export const getNewsBySlug = async (slug: string, language: 'en' | 'no' | 'ua' =
         .select('*')
         .eq(`slug_${lang}`, slug)
         .eq('is_published', true)
+        .not('published_at', 'is', null)
         .single();
 
       if (!foundError && foundData) {
@@ -383,6 +387,7 @@ export const getAllBlogPosts = async (filters: BlogFilters = {}) => {
     .from('blog_posts')
     .select('*', { count: 'exact' })
     .eq('is_published', true)
+    .not('published_at', 'is', null)
     .order('published_at', { ascending: false });
 
   // Filter by tags (PostgREST array overlap operator, case-insensitive via toLowerCase)

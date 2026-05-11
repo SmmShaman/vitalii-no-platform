@@ -193,11 +193,11 @@ async function postLinkedIn(text) {
 }
 
 // Track post in social_media_posts table
-async function trackPost(newsId, platform, language, postUrl, content, status = 'published') {
+async function trackPost(newsId, platform, language, postUrl, content, status = 'published', errorMessage = null) {
   try {
     await dbQuery(`
-      INSERT INTO public.social_media_posts (content_id, content_type, platform, language, status, post_content, platform_post_url, created_at)
-      VALUES (${sq(newsId)}, 'news', ${sq(platform)}, ${sq(language)}, ${sq(status)}, ${sq(content.substring(0, 500))}, ${sq(postUrl)}, NOW())
+      INSERT INTO public.social_media_posts (content_id, content_type, platform, language, status, post_content, platform_post_url, error_message, created_at)
+      VALUES (${sq(newsId)}, 'news', ${sq(platform)}, ${sq(language)}, ${sq(status)}, ${sq((content || '').substring(0, 500))}, ${sq(postUrl)}, ${sq(errorMessage)}, NOW())
       ON CONFLICT DO NOTHING
     `)
   } catch (e) {
@@ -335,7 +335,8 @@ export async function publishArticle(newsId) {
     } catch (e) {
       console.warn(`  ❌ ${platform} failed: ${e.message}`)
       socialResults.push({ platform, lang, success: false, error: e.message })
-      await trackPost(newsId, platform, lang, null, '', 'failed').catch(() => {})
+      // Persist actual Meta API error to error_message column (not just Telegram log)
+      await trackPost(newsId, platform, lang, null, '', 'failed', e.message || 'Unknown error').catch(() => {})
     }
   }
 
