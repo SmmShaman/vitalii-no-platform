@@ -33,6 +33,39 @@ const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')
 const TELEGRAM_CHAT_ID = Deno.env.get('TELEGRAM_CHAT_ID')
 const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')
 
+// Cloudflare R2 — primary storage for telegram-scraped images (replaces Supabase Storage)
+const CF_API_TOKEN = Deno.env.get('CF_API_TOKEN') ?? ''
+const CF_ACCOUNT_ID = Deno.env.get('CF_ACCOUNT_ID') ?? '1438e8d03009209c4a82ea4c28bdb358'
+const R2_BUCKET = 'news-images'
+const R2_PUBLIC_BASE = 'https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev'
+
+async function uploadToR2(key: string, data: Uint8Array, contentType: string): Promise<string | null> {
+  if (!CF_API_TOKEN) {
+    console.error('❌ CF_API_TOKEN not set — cannot upload to R2')
+    return null
+  }
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects/${key}`
+  try {
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${CF_API_TOKEN}`,
+        'Content-Type': contentType,
+      },
+      body: data,
+    })
+    if (!res.ok) {
+      const err = await res.text()
+      console.error(`❌ R2 upload failed for ${key}: ${res.status} ${err.substring(0, 200)}`)
+      return null
+    }
+    return `${R2_PUBLIC_BASE}/${key}`
+  } catch (e: any) {
+    console.error(`❌ R2 upload exception for ${key}: ${e?.message}`)
+    return null
+  }
+}
+
 // YouTube API credentials
 const YOUTUBE_CLIENT_ID = Deno.env.get('YOUTUBE_CLIENT_ID')
 const YOUTUBE_CLIENT_SECRET = Deno.env.get('YOUTUBE_CLIENT_SECRET')
@@ -552,26 +585,19 @@ serve(async (req) => {
                     console.error(`❌ Error generating image prompt for retry:`, promptError)
                   }
 
-                  // Download and upload photo for retry (if not already uploaded)
+                  // Download and upload photo to R2 for retry
                   let retryPhotoUrl = post.photoUrl
                   if (post.images && post.images.length > 0 && !existingPost.is_published) {
                     const imageUrl = post.images[0]
                     try {
                       const photoResponse = await fetch(imageUrl)
                       if (photoResponse.ok) {
-                        const photoBuffer = await photoResponse.arrayBuffer()
+                        const photoBuffer = new Uint8Array(await photoResponse.arrayBuffer())
                         const fileName = `telegram/${channelUsername}/${post.messageId}.jpg`
-                        const { data: uploadData, error: uploadError } = await supabase.storage
-                          .from('news-images')
-                          .upload(fileName, photoBuffer, {
-                            contentType: 'image/jpeg',
-                            upsert: true,
-                            cacheControl: '31536000'
-                          })
-                        if (!uploadError && uploadData) {
-                          const { data: urlData } = supabase.storage.from('news-images').getPublicUrl(fileName)
-                          retryPhotoUrl = urlData.publicUrl
-                          console.log(`📸 Photo re-uploaded for retry: ${retryPhotoUrl}`)
+                        const publicUrl = await uploadToR2(fileName, photoBuffer, 'image/jpeg')
+                        if (publicUrl) {
+                          retryPhotoUrl = publicUrl
+                          console.log(`📸 Photo re-uploaded to R2 for retry: ${retryPhotoUrl}`)
                         }
                       }
                     } catch (photoError) {
@@ -637,36 +663,23 @@ serve(async (req) => {
                 for (let i = 0; i < post.images.length; i++) {
                   const imageUrl = post.images[i]
                   try {
-                    // Download photo
                     const photoResponse = await fetch(imageUrl)
                     if (photoResponse.ok) {
-                      const photoBuffer = await photoResponse.arrayBuffer()
+                      const photoBuffer = new Uint8Array(await photoResponse.arrayBuffer())
 
-                      // Upload to Supabase Storage with index for multiple images
+                      // Upload to Cloudflare R2 (single image keeps original key, multi-image gets index suffix)
                       const fileName = post.images.length === 1
                         ? `telegram/${channelUsername}/${post.messageId}.jpg`
                         : `telegram/${channelUsername}/${post.messageId}_${i + 1}.jpg`
 
-                      const { data: uploadData, error: uploadError } = await supabase.storage
-                        .from('news-images')
-                        .upload(fileName, photoBuffer, {
-                          contentType: 'image/jpeg',
-                          upsert: true,
-                          cacheControl: '31536000'
-                        })
+                      const publicUrl = await uploadToR2(fileName, photoBuffer, 'image/jpeg')
 
-                      if (!uploadError && uploadData) {
-                        const { data: urlData } = supabase.storage
-                          .from('news-images')
-                          .getPublicUrl(fileName)
-                        const publicUrl = urlData.publicUrl
+                      if (publicUrl) {
                         uploadedImages.push(publicUrl)
-
-                        // Set first image as main photoUrl for backwards compatibility
                         if (i === 0) {
                           photoUrl = publicUrl
                         }
-                        console.log(`📸 Photo ${i + 1}/${post.images.length} uploaded: ${publicUrl}`)
+                        console.log(`📸 Photo ${i + 1}/${post.images.length} uploaded to R2: ${publicUrl}`)
                       }
                     }
                   } catch (photoError) {
