@@ -8,6 +8,39 @@ const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY') || ''
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')!
 const VERSION = '2026-03-26-v1-voice-blog'
 
+// Cloudflare R2 — primary storage (replaces Supabase Storage)
+const CF_API_TOKEN = Deno.env.get('CF_API_TOKEN') ?? ''
+const CF_ACCOUNT_ID = Deno.env.get('CF_ACCOUNT_ID') ?? '1438e8d03009209c4a82ea4c28bdb358'
+const R2_BUCKET = 'news-images'
+const R2_PUBLIC_BASE = 'https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev'
+
+async function uploadToR2(key: string, data: Uint8Array, contentType: string): Promise<string | null> {
+  if (!CF_API_TOKEN) {
+    console.error('❌ CF_API_TOKEN not set — cannot upload to R2')
+    return null
+  }
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects/${key}`
+  try {
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${CF_API_TOKEN}`,
+        'Content-Type': contentType,
+      },
+      body: data,
+    })
+    if (!res.ok) {
+      const err = await res.text()
+      console.error(`❌ R2 upload failed for ${key}: ${res.status} ${err.substring(0, 200)}`)
+      return null
+    }
+    return `${R2_PUBLIC_BASE}/${key}`
+  } catch (e: any) {
+    console.error(`❌ R2 upload exception for ${key}: ${e?.message}`)
+    return null
+  }
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -177,14 +210,12 @@ The text below is the author's OWN words transcribed from a voice message.
         const genData = await genRes.json()
         for (const part of genData?.candidates?.[0]?.content?.parts || []) {
           if (part.inlineData) {
-            // Upload to Supabase Storage
+            // Upload to Cloudflare R2
             const imgBytes = Uint8Array.from(atob(part.inlineData.data), c => c.charCodeAt(0))
             const path = `blog-covers/voice-blog-${Date.now()}.png`
-            const { error: uploadErr } = await supabase.storage.from('news-images').upload(path, imgBytes, {
-              contentType: 'image/png', upsert: true,
-            })
-            if (!uploadErr) {
-              imageUrl = `${SUPABASE_URL}/storage/v1/object/public/news-images/${path}`
+            const publicUrl = await uploadToR2(path, imgBytes, 'image/png')
+            if (publicUrl) {
+              imageUrl = publicUrl
             }
             break
           }
