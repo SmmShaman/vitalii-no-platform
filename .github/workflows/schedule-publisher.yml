@@ -12,27 +12,31 @@ jobs:
     timeout-minutes: 20
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Run schedule publisher
+      - name: Invoke schedule-publisher Edge Function (proper Edge pipeline)
         env:
           SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
-          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
-          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
-          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
-          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
         run: |
+          PROJECT_REF=uchmopqiylywnemvjttl
           echo "📅 Schedule Publisher — $(date -u '+%H:%M UTC')"
-          node scripts/bypass/schedule-publisher.mjs
+
+          # Fetch service_role key at runtime via Management API
+          SRV=$(curl -fsS --max-time 15 \
+            "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys" \
+            -H "Authorization: Bearer $SUPABASE_MGMT_PAT" \
+            | jq -r '.[] | select(.name=="service_role") | .api_key')
+
+          if [ -z "$SRV" ]; then
+            echo "::error::Failed to fetch service_role key"
+            exit 1
+          fi
+
+          # Invoke Edge Function — handles window check, in-flight count, picks next due article,
+          # fires auto-publish-news which does proper 3-language rewrite + image gen + social posting.
+          RESPONSE=$(curl -fsS --max-time 90 \
+            -X POST "https://$PROJECT_REF.supabase.co/functions/v1/schedule-publisher" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+
+          echo "Response: $RESPONSE"
+          echo "$RESPONSE" | jq -e '.success == true' >/dev/null || { echo "::error::Edge Function reported failure"; exit 1; }
