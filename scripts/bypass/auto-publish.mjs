@@ -107,6 +107,36 @@ Return ONLY valid JSON (no markdown, no backticks):
   return extractJSON(text)
 }
 
+async function rewriteToNorwegian(title, content, sourceUrl) {
+  const text = await callGemini(
+    `Du er en erfaren norsk teknologi-journalist. Skriv om artikkelen på naturlig norsk (bokmål), behold alle fakta intakt.
+Returner KUN gyldig JSON (ingen markdown, ingen backticks):
+{
+  "title": "engasjerende norsk tittel (under 100 tegn)",
+  "description": "2-3 setninger sammendrag på vanlig tekst",
+  "content": "3-5 avsnitt på flytende norsk bokmål, ingen markdown, ingen fet skrift, ingen punktlister",
+  "slug": "url-slug-fra-tittelen-ascii-only"
+}`,
+    `Title: ${title}\nSource: ${sourceUrl || ''}\nContent:\n${content.substring(0, 3000)}`
+  )
+  return extractJSON(text)
+}
+
+async function rewriteToUkrainian(title, content, sourceUrl) {
+  const text = await callGemini(
+    `Ти досвідчений український журналіст, який пише про технології. Перепиши статтю українською мовою, зберігши всі факти.
+Поверни ЛИШЕ валідний JSON (без markdown, без backticks):
+{
+  "title": "захопливий український заголовок (до 100 символів)",
+  "description": "2-3 речення резюме звичайним текстом",
+  "content": "3-5 абзаців природною українською, без markdown, без жирного, без буллетів",
+  "slug": "url-slug-from-title-ascii-only"
+}`,
+    `Title: ${title}\nSource: ${sourceUrl || ''}\nContent:\n${content.substring(0, 3000)}`
+  )
+  return extractJSON(text)
+}
+
 // ── Teaser generation ────────────────────────────────────────────────────
 
 const TEASER_PROMPTS = {
@@ -267,7 +297,42 @@ export async function publishArticle(newsId) {
         tags = ${sq(JSON.stringify(rewritten.tags || []))}::jsonb
       WHERE id = ${sq(newsId)}
     `)
-    console.log(`  ✅ Rewritten: "${rewritten.title}"`)
+    console.log(`  ✅ Rewritten EN: "${rewritten.title}"`)
+
+    // Norwegian + Ukrainian rewrites (non-fatal: if one fails the article still publishes)
+    const noEnContent = rewritten.content || news.original_content || ''
+    const noEnTitle = rewritten.title || news.original_title || ''
+    try {
+      const no = await rewriteToNorwegian(noEnTitle, noEnContent, news.original_url || '')
+      const noSlug = no.slug || slugify(no.title)
+      await dbQuery(`
+        UPDATE public.news SET
+          title_no = ${sq(no.title)},
+          content_no = ${sq(no.content)},
+          description_no = ${sq(no.description)},
+          slug_no = ${sq(noSlug)}
+        WHERE id = ${sq(newsId)}
+      `)
+      console.log(`  ✅ Rewritten NO: "${no.title}"`)
+    } catch (e) {
+      console.warn(`  ⚠️  Norwegian rewrite failed: ${e.message}`)
+    }
+    try {
+      const ua = await rewriteToUkrainian(noEnTitle, noEnContent, news.original_url || '')
+      const uaSlug = ua.slug || slugify(ua.title)
+      await dbQuery(`
+        UPDATE public.news SET
+          title_ua = ${sq(ua.title)},
+          content_ua = ${sq(ua.content)},
+          description_ua = ${sq(ua.description)},
+          slug_ua = ${sq(uaSlug)},
+          is_rewritten = true
+        WHERE id = ${sq(newsId)}
+      `)
+      console.log(`  ✅ Rewritten UA: "${ua.title}"`)
+    } catch (e) {
+      console.warn(`  ⚠️  Ukrainian rewrite failed: ${e.message}`)
+    }
   } catch (e) {
     console.warn(`  ⚠️  Content rewrite failed: ${e.message}`)
     rewritten = {
