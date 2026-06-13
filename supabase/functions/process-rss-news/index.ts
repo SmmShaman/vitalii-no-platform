@@ -1,10 +1,9 @@
-import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
-import { HUMANIZER_ARTICLE, VOICE_JOURNALISM } from '../_shared/humanizer-prompt.ts'
-const VERSION_STAMP = '2026-03-29-force-redeploy'
+const VERSION_STAMP = '2026-06-13-split-per-language'
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { generateLocalizedSlug } from '../_shared/slug-helpers.ts'
 import { getRandomOpeningStyle } from '../_shared/opening-styles.ts'
+import { rewriteThreeLanguages } from '../_shared/rewrite-per-language.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -119,102 +118,20 @@ async function processWithPrompt(
   images: string[],
   imagesWithMeta: ImageWithMeta[]
 ) {
-  // Build prompt with placeholders
   const openingStyle = getRandomOpeningStyle('news')
-  const systemPrompt = prompt.prompt_text
-    .replace('{title}', title)
-    .replace('{content}', content.substring(0, 6000)) // Limit content
-    .replace('{url}', sourceUrl)
-    + `\n\nOPENING STYLE DIRECTIVE (ОБОВ'ЯЗКОВО ДОТРИМУЙСЯ): ${openingStyle}`
-
-  console.log('📝 Rewriting with AI (summary style)...')
+  console.log('📝 Rewriting with AI (per-language parallel)...')
   console.log(`🎲 Opening style: ${openingStyle}`)
 
-  // Call Azure OpenAI
-  const response = await azureFetch('gemini', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      messages: [
-        {
-          role: 'system',
-          content: `You are a professional trilingual news editor. You write in English, Norwegian (Bokmål), and Ukrainian. Return ONLY valid JSON:
-{
-  "en": { "title": "...", "content": "...", "description": "..." },
-  "no": { "title": "...", "content": "...", "description": "..." },
-  "ua": { "title": "...", "content": "...", "description": "..." },
-  "tags": ["tag1", "tag2", "tag3"]
-}
-CRITICAL RULES:
-- ALL three languages (en, no, ua) are MANDATORY
-- Norwegian must be real Bokmål. Ukrainian must be real Ukrainian with Cyrillic
-- Each must have title, content, description
-- NEVER use markdown formatting: no **, no *, no #, no [], no ()
-- Write PLAIN TEXT only — no bold, no italic, no links, no special symbols
-- Separate paragraphs with double newline only
-- Do NOT add source links — they are added automatically
+  // Run 3 parallel LLM calls — one per language. Each gets a full token budget
+  // so nothing gets truncated mid-sentence when output is long (especially
+  // Cyrillic Ukrainian which uses more tokens per character).
+  // The legacy DB-stored news_rewrite prompt is no longer needed here —
+  // the per-language helper builds focused prompts inline. We keep the
+  // prompt fetch above for parity, but its text is unused now.
+  void prompt
 
-${HUMANIZER_ARTICLE}
-
-${VOICE_JOURNALISM}`
-        },
-        {
-          role: 'user',
-          content: systemPrompt
-        }
-      ],
-      temperature: 0.5,
-      max_tokens: 12000
-    })
-  })
-
-  if (!response.ok) {
-    const errorText = await response.text()
-    console.error('LLM rewrite error:', errorText)
-    throw new Error(`AI rewrite failed: ${response.status}`)
-  }
-
-  const data = await response.json()
-  const aiContent = data.choices[0]?.message?.content?.trim()
-
-  console.log('AI response received, parsing JSON...')
-
-  // Parse JSON response
-  const jsonMatch = aiContent.match(/\{[\s\S]*\}/)
-  if (!jsonMatch) {
-    console.error('Failed to parse AI response:', aiContent.substring(0, 500))
-    throw new Error('Failed to parse AI response')
-  }
-
-  let rewrittenContent
-  try {
-    rewrittenContent = JSON.parse(jsonMatch[0])
-    console.log('Parsed JSON keys:', Object.keys(rewrittenContent))
-  } catch (parseError: any) {
-    console.error('JSON parse error:', parseError.message)
-    throw new Error(`Failed to parse JSON: ${parseError.message}`)
-  }
-
-  // Validate structure
-  if (!rewrittenContent.en || !rewrittenContent.no || !rewrittenContent.ua) {
-    console.error('Missing language fields. Got keys:', Object.keys(rewrittenContent))
-    throw new Error(`AI response missing required language fields`)
-  }
-
-  // Validate titles
-  const missingTitles: string[] = []
-  if (!rewrittenContent.en?.title) missingTitles.push('en')
-  if (!rewrittenContent.no?.title) missingTitles.push('no')
-  if (!rewrittenContent.ua?.title) missingTitles.push('ua')
-
-  if (missingTitles.length > 0) {
-    throw new Error(`AI response missing titles for: ${missingTitles.join(', ')}`)
-  }
-
-  // Extract tags
-  const tags = rewrittenContent.tags || rewrittenContent.en?.tags || []
+  const rewrittenContent = await rewriteThreeLanguages(title, content, sourceUrl, openingStyle)
+  const tags = rewrittenContent.tags
   console.log(`✅ Content rewritten for all languages, tags: ${tags.length > 0 ? tags.join(', ') : 'none'}`)
 
   // Append source link to content (RSS-specific feature)
