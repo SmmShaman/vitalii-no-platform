@@ -409,6 +409,32 @@ serve(async (req) => {
     // ═══════════════════════════════════════════════════
     await updateStatus(supabase, newsId, 'social_posting')
 
+    // TOP-3 daily limit: cap total social posts per day at MAX_SOCIAL_POSTS_PER_DAY (default 3).
+    // Once today's count hits the cap, articles still publish to the website but skip all
+    // social platforms. send-top-social.yml picks "best of yesterday" every morning so the
+    // 3 daily slots tend to go to high-LinkedIn-score articles.
+    const { data: maxSetting } = await supabase
+      .from('api_settings')
+      .select('key_value')
+      .eq('key_name', 'MAX_SOCIAL_POSTS_PER_DAY')
+      .maybeSingle()
+    const MAX_SOCIAL_PER_DAY = parseInt(maxSetting?.key_value || '3', 10)
+
+    const todayStart = new Date()
+    todayStart.setHours(0, 0, 0, 0)
+    const { count: todaySocialCount } = await supabase
+      .from('social_media_posts')
+      .select('news_id', { count: 'exact', head: true })
+      .in('status', ['posted', 'pending'])
+      .gte('created_at', todayStart.toISOString())
+    const distinctTodayCount = todaySocialCount || 0
+
+    let dailyCapHit = false
+    if (distinctTodayCount >= MAX_SOCIAL_PER_DAY && !preset?.skipQueue) {
+      dailyCapHit = true
+      console.log(`🛑 Daily social cap reached (${distinctTodayCount}/${MAX_SOCIAL_PER_DAY}) — skipping social, website-only`)
+    }
+
     // LinkedIn Smart Filtering: skip LinkedIn if linkedin_score < 7 or daily limit reached
     const linkedinScore = (news.rss_analysis as any)?.linkedin_score || 0
     const LINKEDIN_MIN_SCORE = 7
@@ -436,9 +462,10 @@ serve(async (req) => {
     }
 
     // Build filtered platform list
-    const filteredPlatforms = linkedinSkipped
-      ? platforms.filter(p => p !== 'linkedin')
-      : platforms
+    // dailyCapHit takes precedence over per-platform filters: drops all social posting.
+    const filteredPlatforms = dailyCapHit
+      ? []
+      : (linkedinSkipped ? platforms.filter(p => p !== 'linkedin') : platforms)
 
     // Build all social post tasks, then execute in parallel
     // Timeout: 90s (teasers pre-cached, but image upload + API calls still need time)
