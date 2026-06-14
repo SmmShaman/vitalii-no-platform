@@ -14,7 +14,7 @@ const CF_API_TOKEN = Deno.env.get('CF_API_TOKEN') ?? ''
 const CF_ACCOUNT_ID = Deno.env.get('CF_ACCOUNT_ID') ?? '1438e8d03009209c4a82ea4c28bdb358'
 const R2_BUCKET = 'news-images'
 const R2_PUBLIC_BASE = `https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev`
-const VERSION = '2026-03-31-v13-pro-primary'
+const VERSION = '2026-06-14-v14-flux-primary'
 
 // Image generation models in priority order (all use generateContent API)
 const IMAGE_GENERATION_MODELS = [
@@ -204,6 +204,29 @@ async function generateImageCascading(
   aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
   articleContext?: { title: string; description?: string; content?: string }
 ): Promise<{ base64: string; provider: string; model: string } | null> {
+  // PRIORITY 0: Cloudflare Workers AI FLUX.1-schnell — free, fast (~2s), ~200/day cap.
+  // If CF_AI_TOKEN is set, try this first and skip Gemini if it succeeds.
+  if (Deno.env.get('CF_AI_TOKEN')) {
+    console.log('🔄 Cascading: trying Cloudflare FLUX (free, primary)...')
+    const fluxUrl = await generateImageViaCloudflareFlux(prompt, aspectRatio)
+    if (fluxUrl) {
+      try {
+        const resp = await fetch(fluxUrl)
+        if (resp.ok) {
+          const ab = await resp.arrayBuffer()
+          const base64 = btoa(new Uint8Array(ab).reduce((d, b) => d + String.fromCharCode(b), ''))
+          await trackProviderUsage(supabase, 'Cloudflare FLUX', '@cf/black-forest-labs/flux-1-schnell', true)
+          console.log('✅ Cloudflare FLUX succeeded')
+          return { base64, provider: 'Cloudflare FLUX', model: '@cf/black-forest-labs/flux-1-schnell' }
+        }
+      } catch (e: any) {
+        console.warn(`⚠️ Cloudflare FLUX URL fetch failed: ${e?.message || e}`)
+      }
+    }
+    await trackProviderUsage(supabase, 'Cloudflare FLUX', '@cf/black-forest-labs/flux-1-schnell', false)
+    console.log('⚠️ Cloudflare FLUX failed, falling back to Gemini...')
+  }
+
   for (const provider of CASCADING_PROVIDERS) {
     console.log(`🔄 Cascading: trying ${provider.name} (priority ${provider.priority})...`)
 
@@ -1370,6 +1393,73 @@ async function processImageWithAI(imageBase64: string, prompt: string, apiKey: s
 /**
  * Upload processed image to Supabase Storage
  */
+/**
+ * Generate image via Cloudflare Workers AI FLUX.1-schnell (free, ~200 images/day).
+ * Returns public R2 URL on success, null on any failure (caller falls through to next provider).
+ * FLUX cannot render text accurately, so we strip text-on-image instructions from the prompt.
+ */
+async function generateImageViaCloudflareFlux(
+  prompt: string,
+  aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
+): Promise<string | null> {
+  const aiToken = Deno.env.get('CF_AI_TOKEN')
+  if (!aiToken) {
+    console.log('ℹ️ CF_AI_TOKEN not set — skipping Cloudflare FLUX')
+    return null
+  }
+
+  // FLUX trained primarily on square; map aspect → approximate dimensions
+  // (CF FLUX accepts width/height but may ignore for now; we send for forward-compat)
+  const sizeMap: Record<string, { w: number; h: number }> = {
+    '1:1': { w: 1024, h: 1024 },
+    '16:9': { w: 1280, h: 720 },
+    '4:5': { w: 832, h: 1024 },
+  }
+  const { w, h } = sizeMap[aspectRatio] || sizeMap['1:1']
+
+  // FLUX is bad at rendering text/dates/watermarks; strip those instructions and
+  // append a "no text" guard so it focuses on the visual concept.
+  const cleanedPrompt = prompt
+    .replace(/⚠️[\s\S]*?(?=\n\n|$)/g, '') // remove CRITICAL TEXT LANGUAGE blocks
+    .replace(/BRANDING ELEMENTS[\s\S]*?(?=\n\n|$)/g, '') // remove watermark/date blocks
+    .replace(/\s+/g, ' ')
+    .trim()
+    .substring(0, 1500)
+
+  const finalPrompt = `${cleanedPrompt}\n\nStyle: professional editorial photography, no text in image, no watermarks, clean composition, photorealistic`
+
+  try {
+    const t0 = Date.now()
+    const res = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell`,
+      {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${aiToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: finalPrompt, steps: 4, width: w, height: h }),
+      },
+    )
+    const dt = Date.now() - t0
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '')
+      console.warn(`⚠️ Cloudflare FLUX HTTP ${res.status} (${dt}ms): ${body.substring(0, 200)}`)
+      return null
+    }
+
+    const data = await res.json()
+    if (!data?.success || !data?.result?.image) {
+      console.warn(`⚠️ Cloudflare FLUX success=false: ${JSON.stringify(data?.errors || data).substring(0, 200)}`)
+      return null
+    }
+
+    console.log(`✅ Cloudflare FLUX generated image in ${dt}ms, base64 len=${data.result.image.length}`)
+    return await uploadProcessedImage(data.result.image)
+  } catch (e: any) {
+    console.warn(`⚠️ Cloudflare FLUX exception: ${e?.message || String(e)}`)
+    return null
+  }
+}
+
 async function uploadProcessedImage(base64Image: string): Promise<string> {
   // Convert base64 to Uint8Array
   const binaryString = atob(base64Image)
