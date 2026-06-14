@@ -151,10 +151,11 @@ function formatDateNorwegian(dateStr: string): string {
 // ── LLM Helper ──
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
-  // NVIDIA Llama 3.1 405B — primary (best quality, OpenAI-compatible)
+  // NVIDIA Llama 4 Maverick — primary (Llama 3.1 405B was deprecated and returned 404)
   if (LLM_PROVIDER === "nvidia" && NVIDIA_API_KEY) {
+    const nvidiaModel = Deno.env.get("NVIDIA_MODEL") || "meta/llama-4-maverick-17b-128e-instruct";
     try {
-      console.log(`🤖 NVIDIA Llama 3.1 405B`);
+      console.log(`🤖 NVIDIA ${nvidiaModel}`);
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 90000); // 90s timeout
       let resp: Response;
@@ -167,7 +168,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
             "Authorization": `Bearer ${NVIDIA_API_KEY}`,
           },
           body: JSON.stringify({
-            model: "meta/llama-3.1-405b-instruct",
+            model: nvidiaModel,
             messages: [
               { role: "system", content: systemPrompt },
               { role: "user", content: userPrompt },
@@ -181,18 +182,15 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
         clearTimeout(timeout);
       }
       if (!resp.ok) {
+        // Fall back to Gemini on ANY non-2xx — not just 429/402 (404 = model gone, etc.)
         const errText = await resp.text().catch(() => "");
-        if (resp.status === 429 || resp.status === 402) {
-          console.warn(`⚠️ NVIDIA quota exhausted (${resp.status}), falling back to Gemini`);
-          LLM_PROVIDER = "gemini";
-          return callAI(systemPrompt, userPrompt, maxTokens);
-        }
-        throw new Error(`NVIDIA: ${resp.status} ${errText.substring(0, 200)}`);
+        console.warn(`⚠️ NVIDIA ${resp.status} (${errText.substring(0, 100)}), falling back to Gemini`);
+        LLM_PROVIDER = "gemini";
+        return callAI(systemPrompt, userPrompt, maxTokens);
       }
       const data = await resp.json();
       return data.choices?.[0]?.message?.content?.trim() || "";
     } catch (e: any) {
-      if (e.message?.includes("NVIDIA:")) throw e;
       const reason = e.name === "AbortError" ? "timeout (90s)" : e.message;
       console.warn(`⚠️ NVIDIA ${reason}, falling back to Gemini`);
       LLM_PROVIDER = "gemini";
