@@ -9,70 +9,76 @@ on:
 jobs:
   monitor:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      PROJECT_REF: uchmopqiylywnemvjttl
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+      - name: Fetch service_role key
+        id: keys
+        env:
+          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
+        run: |
+          SRV=$(curl -fsS --max-time 15 \
+            "https://api.supabase.com/v1/projects/${PROJECT_REF}/api-keys" \
+            -H "Authorization: Bearer $SUPABASE_MGMT_PAT" \
+            | jq -r '.[] | select(.name=="service_role") | .api_key')
+          if [ -z "$SRV" ]; then echo "::error::Failed to fetch service_role key"; exit 1; fi
+          echo "::add-mask::$SRV"
+          echo "srv=$SRV" >> $GITHUB_OUTPUT
 
       - name: Batch 0 (sources 0-7)
-        id: batch0
         env:
-          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SRV: ${{ steps.keys.outputs.srv }}
         run: |
-          echo "📰 RSS Monitor v2 — Batch 0 ($(date -u '+%H:%M UTC'))"
-          node scripts/bypass/monitor-rss.mjs --batch 0 --batch-size 8
-          echo "analyzed_0=done" >> $GITHUB_OUTPUT
+          echo "📰 RSS Monitor v2 (Edge Function) — Batch 0 ($(date -u '+%H:%M UTC'))"
+          RESPONSE=$(curl -fsS --max-time 600 \
+            -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/monitor-rss-sources" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -d '{"batchIndex":0,"batchSize":8}')
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
 
       - name: Batch 1 (sources 8-15)
-        id: batch1
         env:
-          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SRV: ${{ steps.keys.outputs.srv }}
         run: |
           echo "📰 RSS Monitor v2 — Batch 1"
-          node scripts/bypass/monitor-rss.mjs --batch 1 --batch-size 8
+          RESPONSE=$(curl -fsS --max-time 600 \
+            -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/monitor-rss-sources" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -d '{"batchIndex":1,"batchSize":8}')
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
 
       - name: Batch 2 (sources 16-23)
-        id: batch2
         env:
-          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SRV: ${{ steps.keys.outputs.srv }}
         run: |
           echo "📰 RSS Monitor v2 — Batch 2"
-          node scripts/bypass/monitor-rss.mjs --batch 2 --batch-size 8
+          RESPONSE=$(curl -fsS --max-time 600 \
+            -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/monitor-rss-sources" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -d '{"batchIndex":2,"batchSize":8}')
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
 
       - name: Batch 3 (sources 24-31)
-        id: batch3
         env:
-          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SRV: ${{ steps.keys.outputs.srv }}
         run: |
           echo "📰 RSS Monitor v2 — Batch 3"
-          node scripts/bypass/monitor-rss.mjs --batch 3 --batch-size 8
+          RESPONSE=$(curl -fsS --max-time 600 \
+            -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/monitor-rss-sources" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -d '{"batchIndex":3,"batchSize":8}')
+          echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
 
       - name: Summary
         if: always()
         run: |
-          echo "## RSS Monitor v2 Summary (Bypass Mode)" >> $GITHUB_STEP_SUMMARY
+          echo "## RSS Monitor v2 Summary (Edge Function)" >> $GITHUB_STEP_SUMMARY
           echo "- **Time:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
-          echo "- **Mode:** Direct Management API (Supabase 402 bypass)" >> $GITHUB_STEP_SUMMARY
+          echo "- **Mode:** Edge Function (analyze-rss-article does full URL fetch)" >> $GITHUB_STEP_SUMMARY
