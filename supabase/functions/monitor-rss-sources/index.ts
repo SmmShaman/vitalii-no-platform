@@ -120,8 +120,13 @@ serve(async (req) => {
     const errors: string[] = []
     const qualifiedNewsIds: string[] = []
 
-    // 3. Process selected sources
+    // 3. Process selected sources (stop after 120s to stay within Supabase 150s limit)
+    const BUDGET_MS = 120_000
     for (const src of selectedSources) {
+      if (Date.now() - startTime > BUDGET_MS) {
+        console.log(`⏱️ Time budget reached (${BUDGET_MS / 1000}s), stopping early`)
+        break
+      }
       try {
         console.log(`\n🔍 Processing source: ${src.name} (Tier ${src.tier})`)
 
@@ -136,7 +141,7 @@ serve(async (req) => {
             },
             body: JSON.stringify({
               rssUrl: src.rss_url,
-              limit: 5 // Get last 5 articles per source
+              limit: 3 // Get last 3 articles per source (was 5 — caused timeout with 8 sources)
             })
           }
         )
