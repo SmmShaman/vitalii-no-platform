@@ -166,6 +166,10 @@ serve(async (req) => {
 
         // 4. Analyze each article (with skipTelegram=true for batch mode)
         for (const article of articles) {
+          if (Date.now() - startTime > BUDGET_MS) {
+            console.log(`⏱️ Time budget reached inside article loop, stopping`)
+            break
+          }
           try {
             const analysisResponse = await fetch(
               `${SUPABASE_URL}/functions/v1/analyze-rss-article`,
