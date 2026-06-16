@@ -15,7 +15,9 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
-const MODELS = ['gemini-3-pro-image-preview', 'gemini-2.5-flash-image'];
+const CF_API_TOKEN = process.env.CF_API_TOKEN || '';
+const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID || '1438e8d03009209c4a82ea4c28bdb358';
+const MODELS = ['gemini-2.0-flash-exp-image-generation', 'gemini-2.5-flash-preview-05-20'];
 const TIMEOUT_MS = 60_000;
 
 // ── 4 Overlay Styles (applied on real article images) ──
@@ -212,14 +214,34 @@ TEXT LANGUAGE: Norwegian Bokmal ONLY. No emojis anywhere.
 OUTPUT: Image only, no text response.`;
 }
 
+// ── Cloudflare FLUX Fallback ──
+
+async function callCloudflareFlux(headline, articleCount, dateStr) {
+  if (!CF_API_TOKEN) return null;
+  const prompt = `Professional YouTube news thumbnail, dark navy background, bold white headline text "${headline}", orange badge with number ${articleCount}, photorealistic news studio aesthetic, 16:9 format, dramatic lighting, no watermarks`;
+  try {
+    const res = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell`,
+      {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${CF_API_TOKEN}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, steps: 4, width: 1280, height: 720 }),
+      }
+    );
+    if (!res.ok) { console.error(`❌ Cloudflare FLUX: ${res.status}`); return null; }
+    const data = await res.json();
+    if (!data?.success || !data?.result?.image) { console.error('❌ Cloudflare FLUX: no image in response'); return null; }
+    console.log('✅ Cloudflare FLUX thumbnail generated');
+    return Buffer.from(data.result.image, 'base64');
+  } catch (e) {
+    console.error(`❌ Cloudflare FLUX: ${e.message}`);
+    return null;
+  }
+}
+
 // ── Single Thumbnail (backward compat) ──
 
 export async function generateAIThumbnail(articles, clickbaitTitle, dateStr) {
-  if (!GOOGLE_API_KEY) {
-    console.log('⚠️ GOOGLE_API_KEY not set, skipping AI thumbnail');
-    return null;
-  }
-
   const displayDate = formatDateNorwegian(dateStr);
 
   // Try to use the first article's image
@@ -232,12 +254,23 @@ export async function generateAIThumbnail(articles, clickbaitTitle, dateStr) {
     }
   }
 
-  const prompt = buildThumbnailPrompt(clickbaitTitle, displayDate, articles.length, VISUAL_STYLES[0], !!imageBase64);
-  console.log(`🖼️ Generating thumbnail (${imageBase64 ? 'with article image' : 'text-only'})...`);
+  let buffer = null;
 
-  let buffer = await callGeminiImage(prompt, GOOGLE_API_KEY, imageBase64);
+  // Try Gemini first (if key available)
+  if (GOOGLE_API_KEY) {
+    const prompt = buildThumbnailPrompt(clickbaitTitle, displayDate, articles.length, VISUAL_STYLES[0], !!imageBase64);
+    console.log(`🖼️ Generating thumbnail via Gemini (${imageBase64 ? 'with article image' : 'text-only'})...`);
+    buffer = await callGeminiImage(prompt, GOOGLE_API_KEY, imageBase64);
+    if (!buffer) console.warn('⚠️ Gemini thumbnail failed, trying Cloudflare FLUX...');
+  }
+
+  // Fallback: Cloudflare FLUX
   if (!buffer) {
-    console.warn('⚠️ All Gemini models failed for thumbnail');
+    buffer = await callCloudflareFlux(clickbaitTitle, articles.length, dateStr);
+  }
+
+  if (!buffer) {
+    console.warn('⚠️ All thumbnail providers failed');
     return null;
   }
 

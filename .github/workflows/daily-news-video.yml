@@ -179,6 +179,10 @@ jobs:
           # Pexels (stock images + b-roll)
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
 
+          # Cloudflare (thumbnail fallback via FLUX)
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID || '1438e8d03009209c4a82ea4c28bdb358' }}
+
           # Google Custom Search (per-phrase contextual image search)
           GOOGLE_CSE_ID: ${{ secrets.GOOGLE_CSE_ID }}
 
