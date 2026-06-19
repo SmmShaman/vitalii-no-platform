@@ -130,21 +130,29 @@ serve(async (req) => {
       try {
         console.log(`\n🔍 Processing source: ${src.name} (Tier ${src.tier})`)
 
-        // Fetch RSS feed using fetch-rss-preview
-        const rssResponse = await fetch(
-          `${SUPABASE_URL}/functions/v1/fetch-rss-preview`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              rssUrl: src.rss_url,
-              limit: 3 // Get last 3 articles per source (was 5 — caused timeout with 8 sources)
-            })
-          }
-        )
+        // Fetch RSS feed using fetch-rss-preview (60s timeout)
+        const rssCtrl = new AbortController()
+        const rssTimer = setTimeout(() => rssCtrl.abort(), 60_000)
+        let rssResponse: Response
+        try {
+          rssResponse = await fetch(
+            `${SUPABASE_URL}/functions/v1/fetch-rss-preview`,
+            {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                rssUrl: src.rss_url,
+                limit: 3
+              }),
+              signal: rssCtrl.signal,
+            }
+          )
+        } finally {
+          clearTimeout(rssTimer)
+        }
 
         if (!rssResponse.ok) {
           const errorText = await rssResponse.text()
