@@ -29,6 +29,7 @@ jobs:
           echo "srv=$SRV" >> $GITHUB_OUTPUT
 
       - name: Batch 0 (sources 0-7)
+        continue-on-error: true
         env:
           SRV: ${{ steps.keys.outputs.srv }}
         run: |
@@ -41,6 +42,7 @@ jobs:
           echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
 
       - name: Batch 1 (sources 8-15)
+        continue-on-error: true
         env:
           SRV: ${{ steps.keys.outputs.srv }}
         run: |
@@ -53,6 +55,7 @@ jobs:
           echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
 
       - name: Batch 2 (sources 16-23)
+        continue-on-error: true
         env:
           SRV: ${{ steps.keys.outputs.srv }}
         run: |
@@ -65,6 +68,7 @@ jobs:
           echo "$RESPONSE" | jq '.' || echo "$RESPONSE"
 
       - name: Batch 3 (sources 24-31)
+        continue-on-error: true
         env:
           SRV: ${{ steps.keys.outputs.srv }}
         run: |
