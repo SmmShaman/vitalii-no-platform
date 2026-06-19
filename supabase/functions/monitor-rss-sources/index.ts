@@ -171,28 +171,36 @@ serve(async (req) => {
             break
           }
           try {
-            const analysisResponse = await fetch(
-              `${SUPABASE_URL}/functions/v1/analyze-rss-article`,
-              {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  url: article.url,
-                  title: article.title,
-                  content: article.description || '', // Pass description as content to avoid page fetch failures
-                  description: article.description,
-                  imageUrl: article.imageUrl,
-                  images: article.images || [],
-                  imagesWithMeta: article.imagesWithMeta || [],
-                  sourceId: src.id,
-                  sourceName: src.name,
-                  skipTelegram: true // Don't send immediately - we'll batch at the end
-                })
-              }
-            )
+            const analyzeCtrl = new AbortController()
+            const analyzeTimer = setTimeout(() => analyzeCtrl.abort(), 25_000)
+            let analysisResponse: Response
+            try {
+              analysisResponse = await fetch(
+                `${SUPABASE_URL}/functions/v1/analyze-rss-article`,
+                {
+                  method: 'POST',
+                  headers: {
+                    'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    url: article.url,
+                    title: article.title,
+                    content: article.description || '',
+                    description: article.description,
+                    imageUrl: article.imageUrl,
+                    images: article.images || [],
+                    imagesWithMeta: article.imagesWithMeta || [],
+                    sourceId: src.id,
+                    sourceName: src.name,
+                    skipTelegram: true
+                  }),
+                  signal: analyzeCtrl.signal,
+                }
+              )
+            } finally {
+              clearTimeout(analyzeTimer)
+            }
 
             const analysisResult: AnalysisResult = await analysisResponse.json()
             articlesAnalyzed++
