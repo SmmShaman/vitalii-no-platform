@@ -191,6 +191,7 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
     }),
   })
 
+  if (res.status === 401) return { error: 'LinkedIn токен прострочений ⚠️ <a href="https://www.linkedin.com/developers/tools/oauth/token-generator">Оновити токен</a>' }
   if (!res.ok) return { error: `LinkedIn ${res.status}: ${(await res.text()).slice(0, 200)}` }
   const postId = res.headers.get('x-restli-id') || ''
   return { id: postId, url: postId ? `https://www.linkedin.com/feed/update/${postId}` : undefined }
