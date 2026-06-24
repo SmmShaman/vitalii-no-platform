@@ -4,6 +4,8 @@ const LINKEDIN_ACCESS_TOKEN = Deno.env.get('LINKEDIN_ACCESS_TOKEN')
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')
 const TELEGRAM_ADMIN_CHAT_ID = Deno.env.get('TELEGRAM_ADMIN_CHAT_ID') || Deno.env.get('TELEGRAM_CHAT_ID')
 
+const LINKEDIN_TOKEN_URL = 'https://www.linkedin.com/developers/tools/oauth/token-generator'
+
 serve(async (_req) => {
   try {
     if (!LINKEDIN_ACCESS_TOKEN) {
@@ -17,7 +19,9 @@ serve(async (_req) => {
 
     if (resp.status === 401) {
       await sendTelegramAlert(
-        '🔴 LinkedIn токен ПРОСТРОЧЕНИЙ!\n\nОновити: https://www.linkedin.com/developers/tools/oauth/token-generator\nПотім оновити секрет LINKEDIN_ACCESS_TOKEN в Supabase.'
+        '🔴 <b>LinkedIn токен ПРОСТРОЧЕНИЙ!</b>\n\n' +
+        '👉 <a href="' + LINKEDIN_TOKEN_URL + '">Натисни тут — відкрити LinkedIn Token Generator</a>\n\n' +
+        'Після генерації нового токена оновити секрет <code>LINKEDIN_ACCESS_TOKEN</code> в Supabase.'
       )
       return new Response(JSON.stringify({ status: 'expired' }), { status: 200 })
     }
@@ -44,7 +48,12 @@ async function sendTelegramAlert(message: string): Promise<void> {
     await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: TELEGRAM_ADMIN_CHAT_ID, text: message }),
+      body: JSON.stringify({
+        chat_id: TELEGRAM_ADMIN_CHAT_ID,
+        text: message,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+      }),
     })
   } catch (err) {
     console.error('Failed to send Telegram alert:', err)
