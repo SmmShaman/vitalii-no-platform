@@ -4,6 +4,8 @@ import { useState, useEffect, memo, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calendar, Newspaper, ChevronLeft, Tag, ExternalLink, Video, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
 import { useTranslations } from '@/contexts/TranslationContext';
 import { getLatestNews, getNewsById, getAllNews } from '@/integrations/supabase/client';
 import type { LatestNews, NewsItem } from '@/integrations/supabase/types';
@@ -505,7 +507,31 @@ const NewsSectionComponent = ({
 
               {/* Content */}
               <div className="news-section-content prose prose-lg prose-invert max-w-none mb-6 text-content">
-                <p className="whitespace-pre-wrap">{content.content}</p>
+                <ReactMarkdown
+                  components={{
+                    a: ({ href, children }) => {
+                      const isInternal = href?.startsWith('/news/') || href?.startsWith('/blog/')
+                      if (isInternal && href) {
+                        return <Link href={href} className="text-news hover:text-news/80 underline">{children}</Link>
+                      }
+                      return (
+                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-news hover:text-news/80 underline">
+                          {children}
+                        </a>
+                      )
+                    },
+                    p: ({ children }) => <p className="leading-relaxed mb-4">{children}</p>,
+                    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                    ul: ({ children }) => <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>,
+                    ol: ({ children }) => <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>,
+                    li: ({ children }) => <li>{children}</li>,
+                    h1: ({ children }) => <h1 className="text-2xl font-bold mt-6 mb-4">{children}</h1>,
+                    h2: ({ children }) => <h2 className="text-xl font-bold mt-5 mb-3">{children}</h2>,
+                    h3: ({ children }) => <h3 className="text-lg font-semibold mt-4 mb-2">{children}</h3>,
+                  }}
+                >
+                  {content.content}
+                </ReactMarkdown>
               </div>
 
               {/* Links Section - prefer source_link over original_url */}
