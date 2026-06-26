@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-const VERSION_STAMP = '2026-03-29-force-redeploy'
+const VERSION_STAMP = '2026-06-26-force-redeploy'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
