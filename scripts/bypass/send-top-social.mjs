@@ -3,14 +3,14 @@
 // Replaces Supabase edge function send-top-social (blocked by 402)
 // Usage: node scripts/bypass/send-top-social.mjs
 
-import { dbQuery, sq } from './db.mjs'
+import { dbQuery, sq, loadSettings } from './db.mjs'
 import { callGemini } from './gemini.mjs'
 
 const FB_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN
 const FB_PAGE_ID = process.env.FACEBOOK_PAGE_ID
 const IG_ACCOUNT_ID = process.env.INSTAGRAM_ACCOUNT_ID
-const LI_TOKEN = process.env.LINKEDIN_ACCESS_TOKEN
-const LI_URN = process.env.LINKEDIN_PERSON_URN
+let LI_TOKEN = process.env.LINKEDIN_ACCESS_TOKEN
+let LI_URN = process.env.LINKEDIN_PERSON_URN
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const TG_CHAT = process.env.TELEGRAM_CHAT_ID
 const WEBSITE_BASE = 'https://vitalii.no'
@@ -75,6 +75,11 @@ async function postLinkedIn(text) {
 
 async function main() {
   console.log(`🔥 Send Top Social — ${new Date().toISOString()}`)
+
+  // Load LinkedIn credentials from api_settings (overrides stale GitHub Actions secrets)
+  const liSettings = await loadSettings(['LINKEDIN_ACCESS_TOKEN', 'LINKEDIN_PERSON_URN']).catch(() => ({}))
+  if (liSettings.LINKEDIN_ACCESS_TOKEN) LI_TOKEN = liSettings.LINKEDIN_ACCESS_TOKEN
+  if (liSettings.LINKEDIN_PERSON_URN) LI_URN = liSettings.LINKEDIN_PERSON_URN
 
   // Find top-viewed published article from last 7 days not already sent as top-social today
   const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
