@@ -89,7 +89,7 @@ async function main() {
       AND n.published_at >= ${sq(since7d)}
       AND NOT EXISTS (
         SELECT 1 FROM public.social_media_posts sp
-        WHERE sp.content_id = n.id::text
+        WHERE sp.content_id = n.id
           AND sp.content_type = 'top_social'
           AND sp.created_at >= ${sq(todayStart)}
       )
