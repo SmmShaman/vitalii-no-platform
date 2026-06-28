@@ -3,14 +3,14 @@
 // Replaces Supabase edge function publish-feature-social (blocked by 402)
 // Usage: node scripts/bypass/publish-feature-social.mjs [--lang en|no]
 
-import { dbQuery, sq } from './db.mjs'
+import { dbQuery, sq, loadSettings } from './db.mjs'
 import { callGemini } from './gemini.mjs'
 
 const FB_TOKEN = process.env.FACEBOOK_PAGE_ACCESS_TOKEN
 const FB_PAGE_ID = process.env.FACEBOOK_PAGE_ID
 const IG_ACCOUNT_ID = process.env.INSTAGRAM_ACCOUNT_ID
-const LI_TOKEN = process.env.LINKEDIN_ACCESS_TOKEN
-const LI_URN = process.env.LINKEDIN_PERSON_URN
+let LI_TOKEN = process.env.LINKEDIN_ACCESS_TOKEN
+let LI_URN = process.env.LINKEDIN_PERSON_URN
 const TG_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const TG_CHAT = process.env.TELEGRAM_CHAT_ID
 const WEBSITE_BASE = 'https://vitalii.no'
@@ -79,6 +79,12 @@ async function main() {
   const lang = langIdx >= 0 ? args[langIdx + 1] : 'en'
 
   console.log(`📋 Publish Feature Social — lang=${lang} — ${new Date().toISOString()}`)
+
+  // Load LinkedIn credentials from api_settings (overrides stale GitHub Actions secrets)
+  const settings = await loadSettings(['LINKEDIN_ACCESS_TOKEN', 'LINKEDIN_PERSON_URN']).catch(() => ({}))
+  if (settings.LINKEDIN_ACCESS_TOKEN) LI_TOKEN = settings.LINKEDIN_ACCESS_TOKEN
+  if (settings.LINKEDIN_PERSON_URN) LI_URN = settings.LINKEDIN_PERSON_URN
+  console.log(`  🔑 LinkedIn token: ${settings.LINKEDIN_ACCESS_TOKEN ? 'api_settings' : 'env var'}`)
 
   // Find a published feature not yet posted for this language today
   const todayStart = new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString()
