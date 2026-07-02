@@ -142,9 +142,9 @@ async function main() {
 
       await dbQuery(`
         INSERT INTO public.social_media_posts (content_id, content_type, platform, language, status, post_content, platform_post_url, created_at)
-        VALUES (${sq(article.id)}, 'top_social', ${sq(platform)}, 'en', 'published', ${sq(teaser.substring(0, 500))}, ${sq(postUrl)}, NOW())
+        VALUES (${sq(article.id)}, 'top_social', ${sq(platform)}, 'en', 'posted', ${sq(teaser.substring(0, 500))}, ${sq(postUrl)}, NOW())
         ON CONFLICT DO NOTHING
-      `).catch(() => {})
+      `).catch(err => console.warn(`  ⚠️ DB record failed: ${err.message}`))
 
       results.push({ platform, success: true, postUrl })
       console.log(`  ✅ ${platform}: ${postUrl}`)
