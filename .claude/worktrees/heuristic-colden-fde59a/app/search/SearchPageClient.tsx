@@ -1,0 +1,436 @@
+'use client'
+
+import { useState, useEffect, useCallback, useRef, Suspense } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
+import dynamic from 'next/dynamic'
+import { getAllNews, getAllBlogPosts, getTagFrequencies } from '@/integrations/supabase/client'
+import type { TagFrequency } from '@/integrations/supabase/client'
+import { useTranslations, type Language } from '@/contexts/TranslationContext'
+import { SearchResultCard } from '@/components/search/SearchResultCard'
+import { CategoryTabs, getActivePageBg } from '@/components/CategoryTabs'
+import { Loader2, SearchX, ArrowLeft, Search, X, Calendar, SlidersHorizontal } from 'lucide-react'
+import { AnimatePresence } from 'framer-motion'
+import type { SearchResult } from '@/components/search/SearchResultCard'
+
+const Footer = dynamic(
+  () => import('@/components/layout/Footer').then(mod => mod.Footer),
+  { ssr: false }
+)
+
+const ITEMS_PER_PAGE = 12
+
+function SearchPageInner() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const { t, currentLanguage, setCurrentLanguage } = useTranslations()
+  const languages: Language[] = ['NO', 'EN', 'UA']
+
+  // Override body background for this page
+  useEffect(() => {
+    document.body.style.backgroundColor = 'rgb(var(--surface-listing))'
+    return () => { document.body.style.backgroundColor = '' }
+  }, [])
+
+  // Read URL params
+  const tagParam = searchParams.get('tag') || ''
+  const queryParam = searchParams.get('q') || ''
+  const typeParam = (searchParams.get('type') || 'news') as 'news' | 'blog'
+  const dateFromParam = searchParams.get('dateFrom') || ''
+  const dateToParam = searchParams.get('dateTo') || ''
+
+  const [results, setResults] = useState<SearchResult[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [page, setPage] = useState(0)
+  const [categoryTags, setCategoryTags] = useState<TagFrequency[]>([])
+  const [hasMore, setHasMore] = useState(false)
+
+  // Inline filter state (moved from SearchFilters)
+  const [localQuery, setLocalQuery] = useState(queryParam)
+  const [showDateFilters, setShowDateFilters] = useState(!!dateFromParam || !!dateToParam)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => { setLocalQuery(queryParam) }, [queryParam])
+
+  const handleQueryChange = (value: string) => {
+    setLocalQuery(value)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => updateFilters({ q: value }), 300)
+  }
+
+  // Fetch tag frequencies based on current type filter
+  useEffect(() => {
+    const contentType = typeParam === 'blog' ? 'blog' : 'news'
+    getTagFrequencies(contentType).then(setCategoryTags)
+  }, [typeParam])
+
+  // Fetch results when filters change
+  const fetchResults = useCallback(async (pageNum: number = 0, append: boolean = false) => {
+    if (!append) setLoading(true)
+    else setLoadingMore(true)
+
+    const lang = currentLanguage.toLowerCase() as 'en' | 'no' | 'ua'
+    const offset = pageNum * ITEMS_PER_PAGE
+
+    // Handle __other__ — exclude top visible tags
+    const isOther = tagParam === '__other__'
+    const topTagNames = categoryTags.slice(0, 7).map(t => t.tag_name)
+    const tagsFilter = (tagParam && !isOther) ? [tagParam] : undefined
+    const excludeFilter = isOther ? topTagNames : undefined
+
+    try {
+      const promises: Promise<any>[] = []
+
+      if (typeParam === 'news') {
+        promises.push(getAllNews({
+          tags: tagsFilter,
+          excludeTags: excludeFilter,
+          search: queryParam || undefined,
+          dateFrom: dateFromParam || undefined,
+          dateTo: dateToParam || undefined,
+          limit: ITEMS_PER_PAGE,
+          offset,
+        }))
+        promises.push(Promise.resolve({ data: [], count: 0 }))
+      } else {
+        promises.push(Promise.resolve({ data: [], count: 0 }))
+        promises.push(getAllBlogPosts({
+          tags: tagsFilter,
+          excludeTags: excludeFilter,
+          search: queryParam || undefined,
+          dateFrom: dateFromParam || undefined,
+          dateTo: dateToParam || undefined,
+          limit: ITEMS_PER_PAGE,
+          offset,
+        }))
+      }
+
+      const [newsResult, blogResult] = await Promise.all(promises)
+
+      const newsItems: SearchResult[] = (newsResult.data || []).map((item: any) => ({
+        id: item.id,
+        type: 'news' as const,
+        title: item[`title_${lang}`] || item.title_en || item.original_title || '',
+        description: item[`description_${lang}`] || item.description_en || '',
+        slug: item[`slug_${lang}`] || item.slug_en || item.id,
+        image_url: item.image_url,
+        processed_image_url: item.processed_image_url,
+        tags: item.tags,
+        published_at: item.published_at,
+        views_count: item.views_count || 0,
+        video_url: item.video_url,
+        video_type: item.video_type,
+      }))
+
+      const blogItems: SearchResult[] = (blogResult.data || []).map((item: any) => ({
+        id: item.id,
+        type: 'blog' as const,
+        title: item[`title_${lang}`] || item.title_en || '',
+        description: item[`description_${lang}`] || item.description_en || '',
+        slug: item[`slug_${lang}`] || item.slug_en || item.id,
+        image_url: item.image_url,
+        processed_image_url: item.processed_image_url,
+        tags: item.tags,
+        published_at: item.published_at,
+        views_count: item.views_count || 0,
+        category: item.category,
+        reading_time: item.reading_time,
+      }))
+
+      const merged = [...newsItems, ...blogItems].sort((a, b) => {
+        const dateA = new Date(a.published_at || 0).getTime()
+        const dateB = new Date(b.published_at || 0).getTime()
+        return dateB - dateA
+      })
+
+      const total = (newsResult.count || 0) + (blogResult.count || 0)
+
+      if (append) {
+        setResults(prev => [...prev, ...merged])
+      } else {
+        setResults(merged)
+      }
+
+      setTotalCount(total)
+      setHasMore(offset + ITEMS_PER_PAGE < total)
+    } catch (error) {
+      console.error('Search error:', error)
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
+    }
+  }, [tagParam, queryParam, typeParam, dateFromParam, dateToParam, currentLanguage, categoryTags])
+
+  useEffect(() => {
+    setPage(0)
+    fetchResults(0, false)
+  }, [fetchResults])
+
+  const updateFilters = useCallback((updates: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams.toString())
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value)
+      } else {
+        params.delete(key)
+      }
+    })
+    const qs = params.toString()
+    router.replace(qs ? `/search?${qs}` : '/search', { scroll: false })
+  }, [searchParams, router])
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1
+    setPage(nextPage)
+    fetchResults(nextPage, true)
+  }
+
+  const tabs: Array<{ key: 'news' | 'blog'; label: string }> = [
+    { key: 'news', label: t('search_news') },
+    { key: 'blog', label: t('search_blog') },
+  ]
+
+  const pageBgTint = getActivePageBg(tagParam || null, categoryTags, 7)
+
+  return (
+    <div className="min-h-screen bg-[rgb(var(--surface-listing))] flex flex-col" style={{ backgroundImage: pageBgTint !== 'transparent' ? `linear-gradient(${pageBgTint}, ${pageBgTint})` : undefined }}>
+      {/* Compact Sticky Header — 2 rows */}
+      <header className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))]/95 backdrop-blur-sm border-b border-[#3C3C44]">
+        {/* Row 1: Brand + Search Input + Language */}
+        <div className="px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-[#B0B0B8] hover:text-content transition-colors group flex-shrink-0"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-bold text-amber-500 text-lg hidden sm:inline">Vitalii Berbeha</span>
+          </Link>
+
+          {/* Search input — flexible width */}
+          <div className="relative flex-1 max-w-2xl">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A8A94]" />
+            <input
+              type="text"
+              value={localQuery}
+              onChange={(e) => handleQueryChange(e.target.value)}
+              placeholder={t('search_articles_placeholder')}
+              className="w-full pl-9 pr-9 py-2 rounded-lg border border-[#3C3C44] bg-[#2E2E34] text-sm text-content placeholder-[#8A8A94] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-[#6366F1] transition-all"
+            />
+            {localQuery && (
+              <button
+                onClick={() => { setLocalQuery(''); updateFilters({ q: '' }) }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[#38383E] text-[#8A8A94] hover:text-[#B0B0B8] transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {/* Type tabs */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            {tabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => updateFilters({ type: tab.key, tag: '' })}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  typeParam === tab.key
+                    ? 'bg-brand text-white shadow-sm'
+                    : 'bg-[#38383E] text-[#B0B0B8] hover:bg-[#3C3C44]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Language buttons — pushed to far right */}
+          <div className="flex items-center gap-1 flex-shrink-0 ml-auto">
+            {languages.map((lang) => (
+              <button
+                key={lang}
+                onClick={() => setCurrentLanguage(lang)}
+                className={`px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                  currentLanguage === lang
+                    ? 'bg-brand text-white'
+                    : 'bg-[#2E2E34] text-[#B0B0B8] hover:bg-[#38383E]'
+                }`}
+                aria-label={`Switch to ${lang}`}
+              >
+                {lang}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2: Categories + Count */}
+        <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-2 border-t border-[#3C3C44]/50">
+          <div className="flex-1 min-w-0">
+            <CategoryTabs
+              tags={categoryTags}
+              activeTag={tagParam || null}
+              onTagChange={(tag) => updateFilters({ tag: tag || '' })}
+            />
+          </div>
+
+          {/* Date toggle — in category row */}
+          <button
+            onClick={() => setShowDateFilters(!showDateFilters)}
+            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs transition-all flex-shrink-0 ${
+              showDateFilters || dateFromParam || dateToParam
+                ? 'bg-[#38383E] text-brand-light'
+                : 'bg-[#38383E] text-[#B0B0B8] hover:bg-[#3C3C44]'
+            }`}
+          >
+            <Calendar className="w-3 h-3" />
+            <SlidersHorizontal className="w-3 h-3" />
+          </button>
+
+          {/* Result count */}
+          {totalCount > 0 && (
+            <span className="text-xs text-[#8A8A94] flex-shrink-0">
+              {totalCount} {t('search_results_count')}
+            </span>
+          )}
+        </div>
+
+        {/* Expandable date range (not a permanent row) */}
+        {showDateFilters && (
+          <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-3 flex-wrap border-t border-[#3C3C44]/30">
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#B0B0B8]">{t('search_date_from')}:</span>
+              <input
+                type="date"
+                value={dateFromParam}
+                onChange={(e) => updateFilters({ dateFrom: e.target.value })}
+                className="px-2.5 py-1 rounded-lg border border-[#3C3C44] bg-[#2E2E34] text-xs text-content-secondary focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-[#6366F1]"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-[#B0B0B8]">{t('search_date_to')}:</span>
+              <input
+                type="date"
+                value={dateToParam}
+                onChange={(e) => updateFilters({ dateTo: e.target.value })}
+                className="px-2.5 py-1 rounded-lg border border-[#3C3C44] bg-[#2E2E34] text-xs text-content-secondary focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-[#6366F1]"
+              />
+            </div>
+            {(dateFromParam || dateToParam) && (
+              <button
+                onClick={() => updateFilters({ dateFrom: '', dateTo: '' })}
+                className="text-xs text-brand-light hover:text-[#A5B4FC] underline"
+              >
+                {t('search_clear_filters')}
+              </button>
+            )}
+          </div>
+        )}
+      </header>
+
+      {/* Main Content — full width */}
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-4">
+        {/* Results */}
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-8 h-8 text-brand-light animate-spin" />
+          </div>
+        ) : results.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <SearchX className="w-12 h-12 text-[#8A8A94] mb-4" />
+            <p className="text-lg font-medium text-[#B0B0B8]">{t('search_no_results')}</p>
+            <p className="text-sm text-[#8A8A94] mt-1">{t('search_no_results_hint')}</p>
+            {(tagParam || queryParam || dateFromParam || dateToParam) && (
+              <button
+                onClick={() => router.replace('/search')}
+                className="mt-4 px-4 py-2 rounded-full text-sm font-medium bg-brand text-white hover:bg-brand-darker transition-colors"
+              >
+                {t('search_clear_filters')}
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* Masonry Layout — CSS columns for tight packing */}
+            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 mt-4">
+              <AnimatePresence mode="popLayout">
+                {results.map((result, index) => (
+                  <SearchResultCard
+                    key={`${result.type}-${result.id}`}
+                    result={result}
+                    index={index}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+
+            {/* Load More */}
+            {hasMore && (
+              <div className="flex justify-center mt-8">
+                <button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  className="px-6 py-2.5 rounded-full text-sm font-medium bg-[#2E2E34] text-content-secondary hover:bg-[#38383E] disabled:opacity-50 transition-all flex items-center gap-2"
+                >
+                  {loadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {t('search_load_more')}
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </main>
+
+      {/* Footer */}
+      <div className="mt-auto">
+        <Footer />
+      </div>
+    </div>
+  )
+}
+
+// Skeleton for Suspense fallback
+function SearchSkeleton() {
+  return (
+    <div className="min-h-screen bg-[rgb(var(--surface-listing))] flex flex-col">
+      <div className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))] border-b border-[#3C3C44]">
+        <div className="px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3">
+          <div className="h-6 w-36 bg-[#38383E] rounded animate-pulse" />
+          <div className="flex-1 max-w-2xl h-9 bg-[#38383E] rounded-lg animate-pulse" />
+          <div className="flex gap-1">
+            <div className="h-7 w-8 bg-[#38383E] rounded animate-pulse" />
+            <div className="h-7 w-8 bg-[#38383E] rounded animate-pulse" />
+            <div className="h-7 w-8 bg-[#38383E] rounded animate-pulse" />
+          </div>
+        </div>
+        <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-2">
+          <div className="h-6 w-14 bg-[#38383E] rounded-full animate-pulse" />
+          <div className="h-6 w-16 bg-[#38383E] rounded-full animate-pulse" />
+          <div className="h-6 w-14 bg-[#38383E] rounded-full animate-pulse" />
+        </div>
+      </div>
+      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="bg-[#2E2E34] rounded-xl overflow-hidden border border-[#3C3C44]">
+              <div className="w-full aspect-video bg-[#38383E] animate-pulse" />
+              <div className="p-4">
+                <div className="h-5 w-full bg-[#38383E] rounded mb-2 animate-pulse" />
+                <div className="h-5 w-3/4 bg-[#38383E] rounded mb-3 animate-pulse" />
+                <div className="h-3 w-24 bg-[#38383E] rounded animate-pulse" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  )
+}
+
+export function SearchPageClient() {
+  return (
+    <Suspense fallback={<SearchSkeleton />}>
+      <SearchPageInner />
+    </Suspense>
+  )
+}

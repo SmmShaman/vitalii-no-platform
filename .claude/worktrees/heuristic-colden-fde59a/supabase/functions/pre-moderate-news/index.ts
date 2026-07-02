@@ -1,0 +1,188 @@
+import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
+const VERSION_STAMP = '2026-03-29-force-redeploy'
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
+import { fetchRecentTitles } from '../_shared/duplicate-helpers.ts'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+
+interface PreModerationResult {
+  approved: boolean
+  reason: string
+  is_advertisement: boolean
+  is_duplicate: boolean
+  quality_score: number
+}
+
+/**
+ * Pre-moderate news post using AI before sending to Telegram bot
+ * This filters out spam, advertisements, duplicates, and low-quality content
+ */
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    const { title, content, url } = await req.json()
+
+    console.log('🤖 AI Pre-moderation started for:', title?.substring(0, 50))
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
+
+    // Get active pre-moderation prompt (most recently updated)
+    const { data: prompts, error: promptError } = await supabase
+      .from('ai_prompts')
+      .select('*')
+      .eq('is_active', true)
+      .eq('prompt_type', 'pre_moderation')
+      .order('updated_at', { ascending: false })
+      .limit(1)
+
+    if (promptError) {
+      console.error('Error fetching prompt:', promptError)
+      throw promptError
+    }
+
+    if (!prompts || prompts.length === 0) {
+      console.warn('⚠️ No active pre-moderation prompt found. Approving by default.')
+      return new Response(
+        JSON.stringify({
+          approved: true,
+          reason: 'No pre-moderation prompt configured',
+          is_advertisement: false,
+          is_duplicate: false,
+          quality_score: 5
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Fetch recent titles for duplicate context
+    const recentTitles = await fetchRecentTitles(supabase, 7, 20)
+    const recentTitlesContext = recentTitles.length > 0
+      ? `\n\nRECENT ARTICLES (last 7 days) for duplicate comparison:\n${recentTitles.map((a, i) => `${i + 1}. ${a.title}`).join('\n')}\n\nIf the article above covers the SAME event/story as any recent article, set is_duplicate to true.`
+      : ''
+
+    // Prepare AI prompt
+    const prompt = prompts[0].prompt_text
+      .replace('{title}', title || '')
+      .replace('{content}', content || '')
+      .replace('{url}', url || '')
+      + recentTitlesContext
+
+    console.log('Using pre-moderation prompt:', prompts[0].name, `(+${recentTitles.length} recent titles for dedup)`)
+
+    console.log('🤖 Calling AI for pre-moderation...')
+
+    const openaiResponse = await azureFetch('gemini', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a content moderator. Analyze posts and respond ONLY with valid JSON.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3, // Lower temperature for more consistent moderation
+        max_tokens: 300
+      })
+    })
+
+    if (!openaiResponse.ok) {
+      const errorText = await openaiResponse.text()
+      console.error('AI error:', errorText)
+      // If AI fails, approve by default (fail-open strategy)
+      return new Response(
+        JSON.stringify({
+          approved: true,
+          reason: 'AI error, approved by default',
+          is_advertisement: false,
+          is_duplicate: false,
+          quality_score: 5
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const aiResult = await openaiResponse.json()
+    const aiContent = aiResult.choices[0].message.content
+
+    console.log('AI response:', aiContent)
+
+    // Parse AI response
+    let moderationResult: PreModerationResult
+    try {
+      // Extract JSON from AI response (sometimes it adds markdown)
+      const jsonMatch = aiContent.match(/\{[\s\S]*\}/)
+      if (jsonMatch) {
+        moderationResult = JSON.parse(jsonMatch[0])
+      } else {
+        moderationResult = JSON.parse(aiContent)
+      }
+    } catch (parseError) {
+      console.error('Failed to parse AI response:', parseError)
+      // If parsing fails, approve by default
+      return new Response(
+        JSON.stringify({
+          approved: true,
+          reason: 'AI response parsing error, approved by default',
+          is_advertisement: false,
+          is_duplicate: false,
+          quality_score: 5
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Enforce: is_advertisement=true → always reject
+    if (moderationResult.is_advertisement && moderationResult.approved) {
+      console.log('⚠️ AI marked as advertisement but approved — overriding to REJECT')
+      moderationResult.approved = false
+      moderationResult.reason = `[Auto-rejected: advertisement] ${moderationResult.reason}`
+    }
+
+    console.log(moderationResult.approved ? '✅ Approved' : '❌ Rejected:', moderationResult.reason)
+
+    // Update AI prompt usage count
+    await supabase
+      .from('ai_prompts')
+      .update({ usage_count: prompts[0].usage_count + 1 })
+      .eq('id', prompts[0].id)
+
+    return new Response(
+      JSON.stringify(moderationResult),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    )
+
+  } catch (error: any) {
+    console.error('❌ Error in pre-moderation:', error)
+    // Fail-open: if there's an error, approve by default
+    return new Response(
+      JSON.stringify({
+        approved: true,
+        reason: `Error: ${error.message}, approved by default`,
+        is_advertisement: false,
+        is_duplicate: false,
+        quality_score: 5
+      }),
+      {
+        status: 200, // Return 200 even on error to not break the pipeline
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
+  }
+})

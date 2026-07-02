@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(git config:*)",
+      "Bash(npm ls:*)",
+      "Bash(npx supabase:*)",
+      "Bash(sudo npm:*)",
+      "Bash(ln -sf ~/.local/lib/node_modules/.bin/supabase ~/.local/bin/supabase)",
+      "Bash(echo $PATH)",
+      "Bash(~/.local/bin/supabase --version)"
+    ]
+  }
+}

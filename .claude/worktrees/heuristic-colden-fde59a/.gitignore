@@ -1,0 +1,66 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Supabase
+supabase/.temp/
+supabase/supabase/
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.next
+tsconfig.tsbuildinfo
+
+# Local Netlify folder
+.netlify
+
+# Local tools & temp files
+.brv/
+get_runs.js
+runs.json
+sync_log.txt
+scripts/test-gemini-api.js
+
+# Credentials (NEVER commit)
+ga4-credentials.json
+*-credentials.json
+
+# Auto-installed Claude Code skills
+.agent/
+.agents/
+.claude/skills/
+skills-lock.json
+
+# Deno lock (machine-generated)
+deno.lock
+
+# Lighthouse CI local artifacts
+.lighthouseci/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/

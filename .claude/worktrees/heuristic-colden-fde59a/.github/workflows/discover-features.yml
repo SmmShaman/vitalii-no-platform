@@ -1,0 +1,160 @@
+name: Discover Features
+
+on:
+  schedule:
+    - cron: '0 2 * * *'  # 03:00 Oslo (CET=UTC+1) / 04:00 (CEST=UTC+2)
+  workflow_dispatch:
+    inputs:
+      since:
+        description: 'Scan period (e.g. "1 day ago", "7 days ago")'
+        required: false
+        default: '1 day ago'
+
+jobs:
+  # Job 1: Discover all non-archived, non-fork repos dynamically
+  discover-repos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      repos: ${{ steps.list.outputs.repos }}
+    steps:
+      - name: List all repos and build matrix
+        id: list
+        env:
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          # Legacy mapping: repo name → project_id (preserve existing IDs)
+          declare -A LEGACY_MAP=(
+            ["vitalii_claude-code-in-browser"]="portfolio"
+            ["jobbot-norway"]="jobbot"
+            ["eyeplus-camera-cloud"]="eyeplus"
+            ["calendar-bot"]="calendar_bot"
+            ["lingva-ai"]="lingleverika"
+            ["Ghost-Interviewer-AI"]="ghost_interviewer"
+            ["youtube-channel-manager"]="youtube_manager"
+            ["elvarika"]="elvarika"
+          )
+
+          # Fetch all repos, filter archived and forks
+          REPOS_JSON=$(gh repo list SmmShaman --json name,isArchived,isFork --limit 100 2>/dev/null || echo "[]")
+
+          MATRIX="["
+          FIRST=true
+          while IFS= read -r REPO_NAME; do
+            [ -z "$REPO_NAME" ] && continue
+
+            # Derive project_id: use legacy map or auto-derive
+            if [ -n "${LEGACY_MAP[$REPO_NAME]}" ]; then
+              PROJECT_ID="${LEGACY_MAP[$REPO_NAME]}"
+            else
+              # Auto-derive: lowercase, replace hyphens with underscores
+              PROJECT_ID=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
+            fi
+
+            if [ "$FIRST" = true ]; then
+              FIRST=false
+            else
+              MATRIX+=","
+            fi
+            MATRIX+="{\"repo\":\"SmmShaman/$REPO_NAME\",\"project_id\":\"$PROJECT_ID\"}"
+
+          done < <(echo "$REPOS_JSON" | jq -r '.[] | select(.isArchived == false and .isFork == false) | .name')
+
+          MATRIX+="]"
+          echo "repos=$MATRIX" >> $GITHUB_OUTPUT
+
+          COUNT=$(echo "$MATRIX" | jq length)
+          echo "Found $COUNT active repos"
+
+  # Job 2: Analyze commits for each discovered repo
+  discover:
+    needs: discover-repos
+    if: needs.discover-repos.outputs.repos != '[]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include: ${{ fromJSON(needs.discover-repos.outputs.repos) }}
+    steps:
+      - name: Checkout ${{ matrix.repo }}
+        id: checkout
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: ${{ matrix.repo }}
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Collect commits with full context
+        id: commits
+        if: steps.checkout.outcome == 'success'
+        run: |
+          SINCE="${{ inputs.since || '1 day ago' }}"
+          echo "📦 Scanning ${{ matrix.repo }} since: $SINCE"
+
+          # Step 1: Find feat: commits
+          FEAT_HASHES=$(git log --since="$SINCE" --grep="^feat" --format="%h" 2>/dev/null || true)
+
+          if [ -z "$FEAT_HASHES" ]; then
+            echo "No feat: commits found"
+            echo "has_commits=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          COUNT=$(echo "$FEAT_HASHES" | wc -l)
+          echo "Found $COUNT feat: commits"
+          echo "has_commits=true" >> $GITHUB_OUTPUT
+
+          # Step 2: Write commits + diffs directly to file (avoids shell variable limits)
+          : > /tmp/commits.txt
+          while IFS= read -r HASH; do
+            [ -z "$HASH" ] && continue
+            echo "--- COMMIT ${HASH} ---" >> /tmp/commits.txt
+            git log -1 --format="%h %s%n%b" "$HASH" >> /tmp/commits.txt 2>/dev/null || true
+            echo "DIFF:" >> /tmp/commits.txt
+            git show "$HASH" --stat --unified=3 2>/dev/null | head -80 >> /tmp/commits.txt || true
+            echo "" >> /tmp/commits.txt
+          done <<< "$FEAT_HASHES"
+          echo "Commits file: $(wc -c < /tmp/commits.txt) bytes"
+
+          # Step 3: Read project context (CLAUDE.md, README)
+          : > /tmp/project_context.txt
+          if [ -f "CLAUDE.md" ]; then
+            head -c 2000 CLAUDE.md > /tmp/project_context.txt
+            echo "Found CLAUDE.md ($(wc -c < CLAUDE.md) bytes)"
+          elif [ -f "README.md" ]; then
+            head -c 2000 README.md > /tmp/project_context.txt
+            echo "Found README.md"
+          fi
+
+      - name: Call discover-features Edge Function
+        if: steps.commits.outputs.has_commits == 'true'
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          # Truncate to 100KB to stay within jq/curl arg limits
+          COMMITS=$(head -c 100000 /tmp/commits.txt)
+          PROJECT_CONTEXT=$(cat /tmp/project_context.txt)
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            "${SUPABASE_URL}/functions/v1/discover-features" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" \
+            -H "Content-Type: application/json" \
+            -X POST -d "$(jq -n \
+              --arg commits "$COMMITS" \
+              --arg project_id "${{ matrix.project_id }}" \
+              --arg repo_name "${{ matrix.repo }}" \
+              --arg project_context "$PROJECT_CONTEXT" \
+              '{commits: $commits, project_id: $project_id, repo_name: $repo_name, project_context: $project_context}')")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "Response ($HTTP_CODE): $BODY"
+
+          if [ "$HTTP_CODE" -ge 400 ]; then
+            echo "❌ Feature discovery failed for ${{ matrix.repo }}"
+            exit 1
+          fi
