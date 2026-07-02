@@ -1,0 +1,75 @@
+name: Reprocess Videos (Daily)
+
+on:
+  schedule:
+    # Run once per day at 08:00 UTC (YouTube quota: 10,000 units/day, upload=1,600 units = max ~6 videos)
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Number of videos to process'
+        required: false
+        default: '5'
+      dry_run:
+        description: 'Dry run (no changes)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  reprocess:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call Reprocess Videos Edge Function
+        env:
+          SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          echo "🔄 Calling reprocess-videos Edge Function..."
+
+          # Trim whitespace from secrets
+          CLEAN_URL=$(echo "$SUPABASE_URL" | tr -d '[:space:]')
+          CLEAN_KEY=$(echo "$SUPABASE_ANON_KEY" | tr -d '\n\r')
+
+          echo "URL length after trim: ${#CLEAN_URL}"
+          FULL_URL="${CLEAN_URL}/functions/v1/reprocess-videos"
+          echo "Full URL: $FULL_URL"
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X POST \
+            "$FULL_URL" \
+            -H "Authorization: Bearer ${CLEAN_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"autonomous": true, "limit": 5}')
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "HTTP Code: $HTTP_CODE"
+          echo "Response: $BODY"
+
+          # Parse response
+          SUCCESS=$(echo "$BODY" | jq -r '.success // false')
+          PROCESSED=$(echo "$BODY" | jq -r '.processed // 0')
+          REMAINING=$(echo "$BODY" | jq -r '.remaining // 0')
+          IS_COMPLETE=$(echo "$BODY" | jq -r '.state.is_complete // false')
+          MESSAGE=$(echo "$BODY" | jq -r '.message // "No message"')
+
+          echo ""
+          echo "📊 Results:"
+          echo "  - Success: $SUCCESS"
+          echo "  - Processed: $PROCESSED"
+          echo "  - Remaining: $REMAINING"
+          echo "  - Complete: $IS_COMPLETE"
+          echo "  - Message: $MESSAGE"
+
+          if [ "$IS_COMPLETE" = "true" ]; then
+            echo ""
+            echo "🎉 All videos have been reprocessed!"
+          fi
+
+      - name: Check for errors
+        if: failure()
+        run: |
+          echo "❌ Reprocess videos job failed. Check logs above."
+          exit 1

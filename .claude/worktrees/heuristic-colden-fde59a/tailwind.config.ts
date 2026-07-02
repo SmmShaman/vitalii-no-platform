@@ -1,0 +1,129 @@
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./contexts/**/*.{js,ts,jsx,tsx,mdx}",
+    "./data/**/*.{js,ts}",
+  ],
+  safelist: [
+    // Dynamic project badge colors (stored in DB, must survive purge)
+    'bg-emerald-500/20', 'text-emerald-400',
+    'bg-amber-500/20', 'text-amber-400',
+    'bg-blue-500/20', 'text-blue-400',
+    'bg-cyan-500/20', 'text-cyan-400',
+    'bg-purple-500/20', 'text-purple-400',
+    'bg-rose-500/20', 'text-rose-400',
+    'bg-red-500/20', 'text-red-400',
+    'bg-yellow-500/20', 'text-yellow-400',
+    'bg-indigo-500/20', 'text-indigo-400',
+    'bg-teal-500/20', 'text-teal-400',
+    'bg-gray-500/20', 'text-gray-400',
+  ],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Host Grotesk', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Open Sans', 'Helvetica Neue', 'sans-serif'],
+        comfortaa: ['var(--font-comfortaa)', 'Comfortaa', 'sans-serif'],
+      },
+      colors: {
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        // Design token colors — surfaces (RGB triplets for palette switching)
+        surface: {
+          DEFAULT: 'rgb(var(--surface-dark) / <alpha-value>)',
+          darker: 'rgb(var(--surface-darker) / <alpha-value>)',
+          deep: 'rgb(var(--surface-deep) / <alpha-value>)',
+          elevated: 'rgb(var(--surface-elevated) / <alpha-value>)',
+        },
+        'surface-border': {
+          DEFAULT: 'rgb(var(--surface-border) / <alpha-value>)',
+          hover: 'rgb(var(--surface-border-hover) / <alpha-value>)',
+        },
+        // Design token colors — text
+        content: {
+          DEFAULT: 'rgb(var(--text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+          muted: 'rgb(var(--text-muted) / <alpha-value>)',
+          faint: 'rgb(var(--text-faint) / <alpha-value>)',
+        },
+        // Design token colors — brand accent
+        brand: {
+          DEFAULT: 'rgb(var(--accent-brand) / <alpha-value>)',
+          light: 'rgb(var(--accent-brand-light) / <alpha-value>)',
+          lighter: 'rgb(var(--accent-brand-lighter) / <alpha-value>)',
+          dark: 'rgb(var(--accent-brand-dark) / <alpha-value>)',
+          darker: 'rgb(var(--accent-brand-darker) / <alpha-value>)',
+        },
+        // Section accent — news
+        news: {
+          DEFAULT: 'rgb(var(--accent-news) / <alpha-value>)',
+          light: 'rgb(var(--accent-news-light) / <alpha-value>)',
+          dark: 'rgb(var(--accent-news-dark) / <alpha-value>)',
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        fadeOut: {
+          from: {
+            opacity: "1",
+            transform: "scale(1) translateY(0)",
+          },
+          to: {
+            opacity: "0",
+            transform: "scale(0.95) translateY(10px)",
+          },
+        },
+        expandCard: {
+          "0%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
+          "100%": { transform: "scale(1)" },
+        },
+        "slide-right": {
+          from: {
+            opacity: "0",
+            transform: "translateX(-100%)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateX(0)",
+          },
+        },
+        float: {
+          "0%": { transform: "translateY(0) translateX(0)" },
+          "50%": { transform: "translateY(-100px) translateX(50px)" },
+          "100%": { transform: "translateY(0) translateX(0)" },
+        },
+        "cursor-blink": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
+        },
+      },
+      animation: {
+        fadeOut: "fadeOut 0.3s ease-out forwards",
+        expandCard: "expandCard 0.6s ease-in-out",
+        "slide-right": "slide-right 0.5s ease-out forwards",
+        float: "float 4s ease-in-out infinite",
+      },
+    },
+  },
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("tailwindcss-animate"),
+  ],
+}
+
+export default config
