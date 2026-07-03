@@ -209,9 +209,9 @@ export const projects: ProjectInfo[] = [
       ua: 'Boytasks',
     },
     description: {
-      en: 'Daily educational quest system for children with gamified YouTube access control',
-      no: 'Daglig pedagogisk questsystem for barn med gamifisert YouTube-tilgangskontroll',
-      ua: 'Щоденна освітня квест-система для дітей з ігровим контролем доступу до YouTube',
+      en: 'Daily educational quest system for children with gamified YouTube access control and AI face recognition presence detection',
+      no: 'Daglig pedagogisk questsystem for barn med gamifisert YouTube-tilgangskontroll og AI-ansiktsgjenkjenning',
+      ua: 'Щоденна освітня квест-система для дітей з ігровим контролем доступу до YouTube та AI-розпізнаванням обличь',
     },
     badge: 'B',
     color: { bg: 'bg-indigo-500/20', text: 'text-indigo-400' },
@@ -243,13 +243,15 @@ export function getCategoryCounts(features: Feature[]): Record<FeatureCategory, 
   return counts;
 }
 
-// Re-export all features (will be populated by portfolioFeatures + jobbotFeatures)
-// Import from portfolioFeatures.ts and jobbotFeatures.ts
+// Re-export all features (will be populated by portfolioFeatures + jobbotFeatures + boytasksFeatures)
+// Import from portfolioFeatures.ts, jobbotFeatures.ts, boytasksFeatures.ts
 export { portfolioFeatures } from './portfolioFeatures';
 export { jobbotFeatures } from './jobbotFeatures';
+export { boytasksFeatures } from './boytasksFeatures';
 
 // Combined features list
 import { portfolioFeatures } from './portfolioFeatures';
 import { jobbotFeatures } from './jobbotFeatures';
+import { boytasksFeatures } from './boytasksFeatures';
 
-export const allFeatures: Feature[] = [...portfolioFeatures, ...jobbotFeatures];
+export const allFeatures: Feature[] = [...portfolioFeatures, ...jobbotFeatures, ...boytasksFeatures];
