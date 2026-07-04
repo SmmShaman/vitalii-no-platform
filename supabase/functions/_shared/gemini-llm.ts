@@ -1,5 +1,5 @@
 /**
- * Shared LLM helper — Gemini primary, Claude fallback
+ * Shared LLM helper — Gemini primary, Groq fallback, Claude last resort
  * Usage: import { callLLM } from '../_shared/gemini-llm.ts'
  */
 
@@ -12,7 +12,7 @@ interface LLMOptions {
 }
 
 /**
- * Call LLM with system + user prompt. Gemini primary → Claude Sonnet fallback.
+ * Call LLM with system + user prompt. Gemini primary → Groq → Claude fallback.
  */
 export async function callLLM(
   systemPrompt: string,
@@ -20,6 +20,7 @@ export async function callLLM(
   options: LLMOptions = {},
 ): Promise<string> {
   const geminiKey = Deno.env.get('GOOGLE_API_KEY') || ''
+  const groqKey = Deno.env.get('GROQ_API_KEY') || ''
   const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY') || ''
 
   // Try Gemini first
@@ -27,16 +28,25 @@ export async function callLLM(
     try {
       return await callGemini(systemPrompt, userPrompt, options, geminiKey)
     } catch (e: any) {
-      console.warn(`⚠️ Gemini failed: ${e.message}, falling back to Claude`)
+      console.warn(`⚠️ Gemini failed: ${e.message}, trying Groq...`)
     }
   }
 
-  // Fallback to Claude
+  // Fallback to Groq (free, fast, reliable)
+  if (groqKey) {
+    try {
+      return await callGroq(systemPrompt, userPrompt, options, groqKey)
+    } catch (e: any) {
+      console.warn(`⚠️ Groq failed: ${e.message}, trying Claude...`)
+    }
+  }
+
+  // Last resort: Claude
   if (anthropicKey) {
     return await callClaude(systemPrompt, userPrompt, options, anthropicKey)
   }
 
-  throw new Error('No LLM configured (GOOGLE_API_KEY or ANTHROPIC_API_KEY required)')
+  throw new Error('No LLM configured (GOOGLE_API_KEY, GROQ_API_KEY, or ANTHROPIC_API_KEY required)')
 }
 
 async function callGemini(
@@ -68,6 +78,47 @@ async function callGemini(
   const data = await res.json()
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text || ''
   if (!text) throw new Error('Gemini returned empty response')
+  return text
+}
+
+async function callGroq(
+  systemPrompt: string,
+  userPrompt: string,
+  options: LLMOptions,
+  apiKey: string,
+): Promise<string> {
+  const temperature = options.temperature ?? 0.5
+  // Groq has lower token limits — cap at 8000 but use 32768 max
+  const maxTokens = Math.min(options.maxTokens ?? 8000, 8000)
+
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature,
+      max_tokens: maxTokens,
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    throw new Error(`Groq error ${res.status}: ${err.slice(0, 200)}`)
+  }
+
+  const data = await res.json()
+  const text = data?.choices?.[0]?.message?.content || ''
+  if (!text) throw new Error('Groq returned empty response')
+
+  const usage = data.usage
+  if (usage) console.log(`💰 Groq tokens: ${usage.prompt_tokens}+${usage.completion_tokens}`)
   return text
 }
 
