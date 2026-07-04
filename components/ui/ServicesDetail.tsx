@@ -101,7 +101,8 @@ export const ServicesDetail = ({ categories, isOpen, onClose }: ServicesDetailPr
   useEffect(() => {
     if (!isOpen) return;
 
-    requestAnimationFrame(() => {
+    let rafId: number;
+    rafId = requestAnimationFrame(() => {
       const activeService = activeServiceRef.current;
       const detailBox = detailBoxRef.current;
       const simpleBox = simpleBoxRef.current;
@@ -143,8 +144,6 @@ export const ServicesDetail = ({ categories, isOpen, onClose }: ServicesDetailPr
         Math.pow(line2_x2 - line2_x1, 2) + Math.pow(line2_y2 - line2_y1, 2)
       );
 
-      gsap.defaults({ duration: 0.55, ease: 'expo.out' });
-
       gsap.set(line1, { strokeDasharray: line1Length, strokeDashoffset: line1Length, opacity: 0 });
       gsap.to(line1, { strokeDashoffset: 0, opacity: 1, duration: 0.5, ease: 'power2.out' });
 
@@ -157,6 +156,11 @@ export const ServicesDetail = ({ categories, isOpen, onClose }: ServicesDetailPr
       gsap.set(simpleBox, { scale: 0.8, xPercent: -10, yPercent: 20, rotation: -8, opacity: 0 });
       gsap.to(simpleBox, { opacity: 1, scale: 1, xPercent: 0, yPercent: 0, rotation: 0, duration: 0.7, delay: 1.3, ease: 'expo.out' });
     });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      gsap.killTweensOf([detailBoxRef.current, simpleBoxRef.current, line1Ref.current, line2Ref.current]);
+    };
   }, [activeGlobalIndex, isOpen]);
 
   const handleClose = useCallback(() => {

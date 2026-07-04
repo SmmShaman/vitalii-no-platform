@@ -77,7 +77,8 @@ export const AboutAnimation = ({ text, isExploding, gridContainerRef, onClose }:
     debugLog('🎬 About: Starting chaotic cloud animation');
 
     // Wait for next frame to ensure DOM is ready
-    requestAnimationFrame(() => {
+    let rafId: number;
+    rafId = requestAnimationFrame(() => {
       if (!textRef.current) return;
 
       // Create SplitText
@@ -132,6 +133,7 @@ export const AboutAnimation = ({ text, isExploding, gridContainerRef, onClose }:
     });
 
     return () => {
+      cancelAnimationFrame(rafId);
       debugLog('🧹 About: Cleanup function called from animation useEffect');
       if (splitTextRef.current) {
         splitTextRef.current.revert();
