@@ -31,12 +31,40 @@ export const ServicesAnimation = ({ categories, currentLanguage = 'EN' }: Servic
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const currentIndexRef = useRef(0);
   const [hoverFontSize, setHoverFontSize] = useState('2rem');
   const timelineRef = useRef<gsap.core.Timeline | null>(null);
   const intervalRef = useRef<number | null>(null);
   const retryCountRef = useRef<number>(0);
   const maxRetries = 10;
   const splitTextsRef = useRef<SplitText[]>([]);
+
+  // Keep ref in sync so callbacks can read current index without stale closure
+  useEffect(() => { currentIndexRef.current = currentIndex; }, [currentIndex]);
+
+  // Shared: scatter chars in from random positions and animate to final place
+  const animateCharsIn = useCallback((chars: NodeListOf<Element> | Element[]): gsap.core.Timeline => {
+    gsap.set(chars, {
+      opacity: 0,
+      x: () => (Math.random() - 0.5) * 800,
+      y: () => (Math.random() - 0.5) * 800,
+      rotation: () => (Math.random() - 0.5) * 720,
+      scale: 0,
+    });
+    const tl = gsap.timeline();
+    tl.to(chars, {
+      duration: 2,
+      opacity: 1,
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: 1,
+      ease: 'power3.out',
+      stagger: { amount: 0.3, from: 'random' },
+    });
+    tl.to({}, { duration: 1 });
+    return tl;
+  }, []);
 
 
   // Calculate optimal font size for all categories to fit on hover
@@ -73,65 +101,33 @@ export const ServicesAnimation = ({ categories, currentLanguage = 'EN' }: Servic
     setHoverFontSize(`${fontSize}px`);
   }, [isHovered, categories, currentLanguage]);
 
-  // Function to start rotation animation
+  // Start rotation: animate current index and start auto-advance interval
   const startRotation = useCallback(() => {
     if (!containerRef.current) return;
 
     const container = containerRef.current;
     const serviceElements = container.querySelectorAll('.service-item');
+    if (!serviceElements || serviceElements.length === 0) return;
 
-    const animateService = (index: number) => {
-      if (!serviceElements || serviceElements.length === 0) return;
+    const index = currentIndexRef.current;
+    debugLog(`🎯 Starting animation for category ${index}`);
 
-      debugLog(`🎯 Starting animation for category ${index}`);
+    gsap.set(serviceElements, { autoAlpha: 0 });
+    const currentElement = serviceElements[index] as HTMLElement;
+    if (!currentElement) return;
 
-      gsap.set(serviceElements, { autoAlpha: 0 });
+    gsap.set(currentElement, { autoAlpha: 1 });
+    const chars = currentElement.querySelectorAll('.char');
+    if (!chars || chars.length === 0) return;
 
-      const currentElement = serviceElements[index] as HTMLElement;
-      if (!currentElement) return;
+    if (timelineRef.current) timelineRef.current.kill();
+    timelineRef.current = animateCharsIn(chars);
 
-      gsap.set(currentElement, { autoAlpha: 1 });
-
-      const chars = currentElement.querySelectorAll('.char');
-      if (!chars || chars.length === 0) return;
-
-      gsap.set(chars, {
-        opacity: 0,
-        x: () => (Math.random() - 0.5) * 800,
-        y: () => (Math.random() - 0.5) * 800,
-        rotation: () => (Math.random() - 0.5) * 720,
-        scale: 0,
-      });
-
-      const tl = gsap.timeline();
-
-      tl.to(chars, {
-        duration: 2,
-        opacity: 1,
-        x: 0,
-        y: 0,
-        rotation: 0,
-        scale: 1,
-        ease: 'power3.out',
-        stagger: {
-          amount: 0.3,
-          from: 'random',
-        },
-      });
-
-      tl.to({}, { duration: 1 });
-      timelineRef.current = tl;
-    };
-
-    animateService(currentIndex);
-
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
+    if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = window.setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % categories.length);
     }, 3000);
-  }, [currentIndex, categories.length]);
+  }, [animateCharsIn, categories.length]);
 
   // Main initialization effect
   useEffect(() => {
@@ -221,62 +217,30 @@ export const ServicesAnimation = ({ categories, currentLanguage = 'EN' }: Servic
 
   // Effect for currentIndex changes (rotation)
   useEffect(() => {
-    if (!isHovered && containerRef.current) {
-      const container = containerRef.current;
-      const serviceElements = container.querySelectorAll('.service-item');
+    if (isHovered || !containerRef.current) return;
 
-      if (!serviceElements || serviceElements.length === 0) return;
+    const container = containerRef.current;
+    const serviceElements = container.querySelectorAll('.service-item');
+    if (!serviceElements || serviceElements.length === 0) return;
 
-      debugLog('🔄 ANIMATION CYCLE - Starting transition to index:', currentIndex);
+    debugLog('🔄 ANIMATION CYCLE - Starting transition to index:', currentIndex);
 
-      gsap.set(serviceElements, { autoAlpha: 0 });
+    gsap.set(serviceElements, { autoAlpha: 0 });
+    const currentElement = serviceElements[currentIndex] as HTMLElement;
+    if (!currentElement) return;
 
-      const currentElement = serviceElements[currentIndex] as HTMLElement;
-      if (!currentElement) return;
+    gsap.set(currentElement, { autoAlpha: 1 });
+    const chars = currentElement.querySelectorAll('.char');
+    if (!chars || chars.length === 0) return;
 
-      gsap.set(currentElement, { autoAlpha: 1 });
+    debugLog(`✨ Animating category ${currentIndex} with ${chars.length} chars`);
 
-      const chars = currentElement.querySelectorAll('.char');
-      if (!chars || chars.length === 0) return;
-
-      debugLog(`✨ Animating category ${currentIndex} with ${chars.length} chars`);
-
-      gsap.set(chars, {
-        opacity: 0,
-        x: () => (Math.random() - 0.5) * 800,
-        y: () => (Math.random() - 0.5) * 800,
-        rotation: () => (Math.random() - 0.5) * 720,
-        scale: 0,
-      });
-
-      if (timelineRef.current) {
-        timelineRef.current.kill();
-      }
-
-      const tl = gsap.timeline({
-        onComplete: () => {
-          debugLog('✅ Animation complete for category', currentIndex);
-        }
-      });
-
-      tl.to(chars, {
-        duration: 2,
-        opacity: 1,
-        x: 0,
-        y: 0,
-        rotation: 0,
-        scale: 1,
-        ease: 'power3.out',
-        stagger: {
-          amount: 0.3,
-          from: 'random',
-        },
-      });
-
-      tl.to({}, { duration: 1 });
-      timelineRef.current = tl;
-    }
-  }, [currentIndex, isHovered, categories.length]);
+    if (timelineRef.current) timelineRef.current.kill();
+    timelineRef.current = animateCharsIn(chars);
+    timelineRef.current.eventCallback('onComplete', () => {
+      debugLog('✅ Animation complete for category', currentIndex);
+    });
+  }, [currentIndex, isHovered, animateCharsIn]);
 
   // Effect for hover state changes
   useEffect(() => {
@@ -342,14 +306,11 @@ export const ServicesAnimation = ({ categories, currentLanguage = 'EN' }: Servic
           scale: 0,
           duration: 0.4,
           ease: 'power2.in',
-          stagger: {
-            amount: 0.1,
-            from: 'random',
-          },
+          stagger: { amount: 0.1, from: 'random' },
           onComplete: () => {
             debugLog('✅ Scatter complete - starting rotation');
             startRotation();
-          }
+          },
         });
       } else {
         startRotation();

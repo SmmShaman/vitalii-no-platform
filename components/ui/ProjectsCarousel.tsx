@@ -160,7 +160,6 @@ export const ProjectsCarousel = ({ projects, onCardClick, backgroundText, onInde
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    console.log('Card clicked, currentIndex:', currentIndex);
     onCardClick(currentIndex);
   };
 
