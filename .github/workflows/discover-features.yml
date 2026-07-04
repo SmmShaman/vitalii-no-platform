@@ -1,8 +1,9 @@
 name: Discover Features
 
 on:
-  schedule:
-    - cron: '0 2 * * *'  # 03:00 Oslo (CET=UTC+1) / 04:00 (CEST=UTC+2)
+  # Cron disabled 2026-07-04: daily analysis now runs through the Nano agent
+  # (Claude subscription), which posts precomputed features to the discover-features
+  # Edge Function. This workflow remains available for manual fallback runs.
   workflow_dispatch:
     inputs:
       since:
