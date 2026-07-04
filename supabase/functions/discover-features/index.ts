@@ -121,11 +121,15 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}))
-    const { commits, project_id = 'portfolio', repo_name = 'unknown', project_context = '' } = body as {
+    const { commits, project_id = 'portfolio', repo_name = 'unknown', project_context = '', precomputed_features, skip_validation = false } = body as {
       commits?: string; project_id?: string; repo_name?: string; project_context?: string
+      precomputed_features?: Array<{ reasoning: string; feature: Record<string, unknown> }>
+      skip_validation?: boolean
     }
 
-    if (!commits || commits.trim().length < 10) {
+    const hasPrecomputed = Array.isArray(precomputed_features) && precomputed_features.length > 0
+
+    if (!hasPrecomputed && (!commits || commits.trim().length < 10)) {
       return json({ ok: false, error: 'Missing or empty commits data' }, 400)
     }
 
@@ -174,7 +178,7 @@ serve(async (req) => {
     }
 
     // Extract commit hashes from the text (lines starting with hash)
-    const commitHashes = commits.match(/^[a-f0-9]{7,40}/gm) || []
+    const commitHashes = (commits || '').match(/^[a-f0-9]{7,40}/gm) || []
 
     // Load existing features with full context for deduplication
     const { data: existing } = await supabase
@@ -197,23 +201,27 @@ EXISTING FEATURES ACROSS ALL PROJECTS (do NOT duplicate these):
 ${existingContext || '(none)'}
 
 RECENT COMMITS TO ANALYZE (includes commit messages + code diffs):
-${commits.slice(0, 6000)}
+${(commits || '').slice(0, 6000)}
 
 Identify significant new features from these commits. Use the project documentation and actual code diffs to write SPECIFIC, TECHNICAL descriptions with real function names, file paths, and architecture details. Remember: only genuinely new capabilities, max 3.`
 
     console.log(`Analyzing commits for ${project_id}, ${(existing || []).length} total features, ${projectFeatures.length} for this project, context: ${project_context ? project_context.length + ' chars' : 'none'}`)
 
     // === STEP 1: Discovery ===
-    const aiResponse = await callAI(SYSTEM_PROMPT, userPrompt, 8000)
-    console.log('Discovery response length:', aiResponse.length)
-
     let parsed: { features: Array<{ reasoning: string; feature: Record<string, unknown> }>; skipped_reason?: string }
-    try {
-      const cleaned = extractJSON(aiResponse)
-      parsed = JSON.parse(cleaned)
-    } catch {
-      console.error('Failed to parse discovery response:', aiResponse.slice(0, 500))
-      return json({ ok: false, error: 'AI returned invalid JSON', raw: aiResponse.slice(0, 500) })
+    if (hasPrecomputed) {
+      console.log(`Precomputed mode: ${precomputed_features!.length} features supplied, skipping discovery LLM`)
+      parsed = { features: precomputed_features! }
+    } else {
+      const aiResponse = await callAI(SYSTEM_PROMPT, userPrompt, 8000)
+      console.log('Discovery response length:', aiResponse.length)
+      try {
+        const cleaned = extractJSON(aiResponse)
+        parsed = JSON.parse(cleaned)
+      } catch {
+        console.error('Failed to parse discovery response:', aiResponse.slice(0, 500))
+        return json({ ok: false, error: 'AI returned invalid JSON', raw: aiResponse.slice(0, 500) })
+      }
     }
 
     if (!parsed.features?.length) {
@@ -279,16 +287,21 @@ For each candidate, return a verdict. Return ONLY valid JSON (no markdown fences
 }`
 
     let verdicts: Array<{ index: number; decision: string; reason: string }> = []
-    try {
-      const validationResponse = await callAI('You are a strict quality reviewer. Return only valid JSON.', validationPrompt, 2000)
-      console.log('Validation response length:', validationResponse.length)
-      const cleanedValidation = extractJSON(validationResponse)
-      const parsedValidation = JSON.parse(cleanedValidation)
-      verdicts = parsedValidation.verdicts || []
-    } catch (e) {
-      // If validation fails, fall back to pending status (safe default)
-      console.error('Validation LLM failed, falling back to pending:', e)
-      verdicts = parsed.features.map((_, i) => ({ index: i, decision: 'pending', reason: 'Validation LLM failed' }))
+    if (skip_validation && hasPrecomputed) {
+      console.log('Precomputed mode: validation skipped, auto-publishing all supplied features')
+      verdicts = parsed.features.map((_, i) => ({ index: i, decision: 'publish', reason: 'Precomputed & validated by Claude (subscription)' }))
+    } else {
+      try {
+        const validationResponse = await callAI('You are a strict quality reviewer. Return only valid JSON.', validationPrompt, 2000)
+        console.log('Validation response length:', validationResponse.length)
+        const cleanedValidation = extractJSON(validationResponse)
+        const parsedValidation = JSON.parse(cleanedValidation)
+        verdicts = parsedValidation.verdicts || []
+      } catch (e) {
+        // If validation fails, fall back to pending status (safe default)
+        console.error('Validation LLM failed, falling back to pending:', e)
+        verdicts = parsed.features.map((_, i) => ({ index: i, decision: 'pending', reason: 'Validation LLM failed' }))
+      }
     }
 
     // Build verdict map

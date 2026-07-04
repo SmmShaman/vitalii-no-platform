@@ -88,8 +88,12 @@ async function callGroq(
   apiKey: string,
 ): Promise<string> {
   const temperature = options.temperature ?? 0.5
-  // Groq has lower token limits — cap at 8000 but use 32768 max
-  const maxTokens = Math.min(options.maxTokens ?? 8000, 8000)
+  // Groq free tier counts prompt + max_tokens against a 12000 TPM limit — a large
+  // max_tokens gets the whole request rejected with 413 before generation starts.
+  // Estimate prompt tokens (~4 chars/token) and cap max_tokens to stay under the limit.
+  const promptTokens = Math.ceil((systemPrompt.length + userPrompt.length) / 4)
+  const budget = Math.max(11500 - promptTokens, 1000)
+  const maxTokens = Math.min(options.maxTokens ?? 8000, budget)
 
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
