@@ -1,13 +1,15 @@
 name: Publish Feature Social
 
 on:
-  schedule:
-    # EN post — 10:00 New York
-    - cron: '0 15 * * *'  # 10:00 EST (winter UTC-5)
-    - cron: '0 14 * * *'  # 10:00 EDT (summer UTC-4)
-    # NO post — 10:00 Oslo
-    - cron: '0 9 * * *'   # 10:00 CET (winter UTC+1)
-    - cron: '0 8 * * *'   # 10:00 CEST (summer UTC+2)
+  # Disabled 2026-07-15: replaced by Nano-orchestrated pipeline (nano-social-publish Edge Function
+  # + Telegram-scheduled daily task). Old cron was failing daily on dead Gemini/Groq copy generation.
+  # schedule:
+  #   # EN post — 10:00 New York
+  #   - cron: '0 15 * * *'  # 10:00 EST (winter UTC-5)
+  #   - cron: '0 14 * * *'  # 10:00 EDT (summer UTC-4)
+  #   # NO post — 10:00 Oslo
+  #   - cron: '0 9 * * *'   # 10:00 CET (winter UTC+1)
+  #   - cron: '0 8 * * *'   # 10:00 CEST (summer UTC+2)
   workflow_dispatch:
     inputs:
       lang:
