@@ -113,6 +113,48 @@ export function generateNewsArticleSchema(news: NewsItem, language: 'en' | 'no' 
 }
 
 /**
+ * Generate CreativeWork JSON-LD schema for a feature/case-study page
+ */
+export function generateFeatureSchema(feature: {
+  title_en: string; title_no: string; title_ua: string
+  short_description_en: string; short_description_no: string; short_description_ua: string
+  slug_en?: string | null; slug_no?: string | null; slug_ua?: string | null
+  feature_id: string
+  tech_stack?: string[] | null
+  discovered_at?: string | null
+  published_at?: string | null
+}, language: 'en' | 'no' | 'ua' = 'en') {
+  const slug = language === 'en' ? feature.slug_en : language === 'no' ? feature.slug_no : feature.slug_ua
+  const title = language === 'en' ? feature.title_en : language === 'no' ? feature.title_no : feature.title_ua
+  const description = language === 'en' ? feature.short_description_en : language === 'no' ? feature.short_description_no : feature.short_description_ua
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    headline: title || feature.title_en,
+    description: description || feature.short_description_en,
+    datePublished: feature.published_at || feature.discovered_at,
+    dateModified: feature.published_at || feature.discovered_at,
+    author: {
+      '@type': 'Person',
+      name: AUTHOR.name,
+      url: AUTHOR.url,
+    },
+    creator: {
+      '@type': 'Person',
+      name: AUTHOR.name,
+      url: AUTHOR.url,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${BASE_URL}/features/${slug || feature.feature_id}`,
+    },
+    keywords: feature.tech_stack?.join(', ') || '',
+    inLanguage: language === 'ua' ? 'uk' : language,
+  }
+}
+
+/**
  * Generate BreadcrumbList JSON-LD schema
  */
 export function generateBreadcrumbSchema(
@@ -194,11 +236,11 @@ export function detectSlugLanguage(
  * Generate alternates for multilingual content
  */
 export function generateAlternates(
-  type: 'blog' | 'news',
+  type: 'blog' | 'news' | 'features',
   slugs: { en?: string | null; no?: string | null; ua?: string | null },
   currentSlug: string
 ) {
-  const basePath = type === 'blog' ? 'blog' : 'news'
+  const basePath = type === 'blog' ? 'blog' : type === 'features' ? 'features' : 'news'
 
   const languages: Record<string, string> = {
     'x-default': slugs.en ? `${BASE_URL}/${basePath}/${slugs.en}` : `${BASE_URL}/${basePath}/${currentSlug}`,

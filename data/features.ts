@@ -14,6 +14,7 @@ export interface Feature {
   id: string;
   projectId: ProjectId;
   category: FeatureCategory;
+  slug?: { en: string | null; no: string | null; ua: string | null };
   title: { en: string; no: string; ua: string };
   shortDescription: { en: string; no: string; ua: string };
   problem: { en: string; no: string; ua: string };

@@ -73,10 +73,10 @@ export const trackFormSubmit = (
 }
 
 /**
- * Track article view (news or blog)
+ * Track article view (news, blog, or feature)
  */
 export const trackArticleView = (
-  contentType: 'news' | 'blog',
+  contentType: 'news' | 'blog' | 'feature',
   contentId: string,
   contentTitle: string,
   language?: string,

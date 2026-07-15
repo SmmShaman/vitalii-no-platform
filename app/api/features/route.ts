@@ -27,6 +27,7 @@ export async function GET() {
       id: f.feature_id,
       projectId: f.project_id,
       category: f.category,
+      slug: { en: f.slug_en, no: f.slug_no, ua: f.slug_ua },
       title: { en: f.title_en, no: f.title_no, ua: f.title_ua },
       shortDescription: { en: f.short_description_en, no: f.short_description_no, ua: f.short_description_ua },
       problem: { en: f.problem_en, no: f.problem_no, ua: f.problem_ua },

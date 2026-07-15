@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useMemo } from 'react';
+import Link from 'next/link';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, ChevronLeft, ChevronRight, Brain, Video, Bot, Palette, Server, Layers, ExternalLink } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -151,6 +152,7 @@ export const FeatureModal = ({
       back: 'Back to list',
       project: 'Project',
       featureOf: 'of',
+      viewPage: 'View full page',
     },
     no: {
       title: 'Funksjoner',
@@ -163,6 +165,7 @@ export const FeatureModal = ({
       back: 'Tilbake til listen',
       project: 'Prosjekt',
       featureOf: 'av',
+      viewPage: 'Se hele siden',
     },
     ua: {
       title: 'Функції',
@@ -175,6 +178,7 @@ export const FeatureModal = ({
       back: 'Назад до списку',
       project: 'Проект',
       featureOf: 'з',
+      viewPage: 'Переглянути повну сторінку',
     },
   };
 
@@ -435,6 +439,19 @@ export const FeatureModal = ({
 
                     {/* Commit info + Project Link */}
                     <FeatureMeta feature={selectedFeature} projectUrl={project.url} />
+
+                    {/* View full page link */}
+                    {selectedFeature.slug?.[lang] && (
+                      <div className="mt-4">
+                        <Link
+                          href={`/features/${selectedFeature.slug[lang]}`}
+                          className="inline-flex items-center gap-1.5 text-sm text-brand-light hover:text-brand transition-colors"
+                        >
+                          {t.viewPage}
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    )}
 
                     {/* Navigation */}
                     <div className="flex items-center justify-between mt-8 pt-4 border-t border-surface-border">
