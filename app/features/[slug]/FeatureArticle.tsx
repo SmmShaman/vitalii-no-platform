@@ -119,7 +119,9 @@ export function FeatureArticle({ slug, initialLanguage, initialData }: FeatureAr
             </li>
             <ChevronRight className="w-4 h-4 text-content-faint" />
             <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem" className="flex items-center">
-              <span itemProp="name" className="text-brand-light">{t.features}</span>
+              <a href="/" itemProp="item" className="text-brand-light hover:text-brand-light/80 transition-colors">
+                <span itemProp="name">{t.features}</span>
+              </a>
               <meta itemProp="position" content="2" />
             </li>
             <ChevronRight className="w-4 h-4 text-content-faint" />
