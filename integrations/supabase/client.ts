@@ -333,6 +333,68 @@ export const getNewsBySlug = async (slug: string, language: 'en' | 'no' | 'ua' =
   return data;
 };
 
+export const getFeatureBySlug = async (slug: string, language: 'en' | 'no' | 'ua' = 'en') => {
+  if (!isSupabaseConfigured()) return null;
+
+  // First try the specified language slug
+  const slugColumn = `slug_${language}`;
+  let { data, error } = await supabase
+    .from('features')
+    .select('*')
+    .eq(slugColumn, slug)
+    .eq('status', 'published')
+    .single();
+
+  // If not found, try other slug columns
+  if (error || !data) {
+    const otherLanguages = ['en', 'no', 'ua'].filter(l => l !== language);
+
+    for (const lang of otherLanguages) {
+      const { data: foundData, error: foundError } = await supabase
+        .from('features')
+        .select('*')
+        .eq(`slug_${lang}`, slug)
+        .eq('status', 'published')
+        .single();
+
+      if (!foundError && foundData) {
+        data = foundData;
+        error = null;
+        console.log(`Feature found with slug_${lang}:`, slug);
+        break;
+      }
+    }
+  }
+
+  if (error || !data) {
+    console.error('Error fetching feature by slug:', slug, error);
+    return null;
+  }
+
+  return data;
+};
+
+/**
+ * Get all published features (for sitemap generation)
+ */
+export const getPublishedFeatures = async (limit: number = 1000) => {
+  if (!isSupabaseConfigured()) return [];
+
+  const { data, error } = await supabase
+    .from('features')
+    .select('id, feature_id, slug_en, slug_no, slug_ua, published_at, discovered_at, updated_at')
+    .eq('status', 'published')
+    .order('discovered_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching published features:', error);
+    return [];
+  }
+
+  return data || [];
+};
+
 // ============================================
 // BLOG API
 // ============================================

@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next'
-import { getLatestNews, getLatestBlogPosts } from '@/integrations/supabase/client'
+import { getLatestNews, getLatestBlogPosts, getPublishedFeatures } from '@/integrations/supabase/client'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://vitalii-berbeha.netlify.app'
@@ -172,5 +172,71 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error fetching blog posts for sitemap:', error)
   }
 
-  return [...staticPages, ...newsPages, ...blogPages]
+  // Feature pages with multilingual support
+  let featurePages: MetadataRoute.Sitemap = []
+  try {
+    const features = await getPublishedFeatures(1000)
+    featurePages = features.flatMap((item: any) => {
+      const pages: MetadataRoute.Sitemap = []
+      const lastModified = new Date(item.updated_at || item.published_at || item.discovered_at)
+
+      // Build shared alternates for this feature
+      const featureAlternates: Record<string, string> = {}
+      if (item.slug_en) {
+        featureAlternates['x-default'] = `${baseUrl}/features/${item.slug_en}`
+        featureAlternates.en = `${baseUrl}/features/${item.slug_en}`
+      }
+      if (item.slug_no) featureAlternates.no = `${baseUrl}/features/${item.slug_no}`
+      if (item.slug_ua) featureAlternates.uk = `${baseUrl}/features/${item.slug_ua}`
+
+      // English version (primary)
+      if (item.slug_en) {
+        pages.push({
+          url: `${baseUrl}/features/${item.slug_en}`,
+          lastModified,
+          changeFrequency: 'monthly' as const,
+          priority: 0.7,
+          alternates: { languages: featureAlternates },
+        })
+      }
+
+      // Norwegian version
+      if (item.slug_no && item.slug_no !== item.slug_en) {
+        pages.push({
+          url: `${baseUrl}/features/${item.slug_no}`,
+          lastModified,
+          changeFrequency: 'monthly' as const,
+          priority: 0.6,
+          alternates: { languages: featureAlternates },
+        })
+      }
+
+      // Ukrainian version
+      if (item.slug_ua && item.slug_ua !== item.slug_en && item.slug_ua !== item.slug_no) {
+        pages.push({
+          url: `${baseUrl}/features/${item.slug_ua}`,
+          lastModified,
+          changeFrequency: 'monthly' as const,
+          priority: 0.6,
+          alternates: { languages: featureAlternates },
+        })
+      }
+
+      // Fallback to feature_id if no slugs
+      if (!item.slug_en && !item.slug_no && !item.slug_ua) {
+        pages.push({
+          url: `${baseUrl}/features/${item.feature_id}`,
+          lastModified,
+          changeFrequency: 'monthly' as const,
+          priority: 0.5,
+        })
+      }
+
+      return pages
+    })
+  } catch (error) {
+    console.error('Error fetching features for sitemap:', error)
+  }
+
+  return [...staticPages, ...newsPages, ...blogPages, ...featurePages]
 }

@@ -28,9 +28,9 @@ import {
 interface TrackingContextType {
   /** Track a form submission */
   trackFormSubmit: (formName: string, formData?: Record<string, unknown>) => void
-  /** Track article view (news or blog) */
+  /** Track article view (news, blog, or feature) */
   trackArticleView: (
-    contentType: 'news' | 'blog',
+    contentType: 'news' | 'blog' | 'feature',
     contentId: string,
     contentTitle: string,
     language?: string
@@ -91,7 +91,7 @@ export function TrackingProvider({ children }: { children: ReactNode }) {
 
   const trackArticleView = useCallback(
     (
-      contentType: 'news' | 'blog',
+      contentType: 'news' | 'blog' | 'feature',
       contentId: string,
       contentTitle: string,
       language?: string

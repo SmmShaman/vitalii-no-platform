@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { callLLM, extractJSON } from '../_shared/gemini-llm.ts'
 import { HUMANIZER_PORTFOLIO } from '../_shared/humanizer-prompt.ts'
+import { generateLocalizedSlug } from '../_shared/slug-helpers.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -334,6 +335,9 @@ For each candidate, return a verdict. Return ONLY valid JSON (no markdown fences
         title_en: feature.title_en,
         title_no: feature.title_no,
         title_ua: feature.title_ua,
+        slug_en: generateLocalizedSlug(feature.title_en, 'en', featureId),
+        slug_no: generateLocalizedSlug(feature.title_no, 'no', featureId),
+        slug_ua: generateLocalizedSlug(feature.title_ua, 'ua', featureId),
         short_description_en: feature.short_description_en,
         short_description_no: feature.short_description_no,
         short_description_ua: feature.short_description_ua,
