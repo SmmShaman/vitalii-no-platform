@@ -1,9 +1,11 @@
 name: Send Top Social
 
 on:
-  schedule:
-    - cron: '0 6 * * *'  # 08:00 Oslo (winter CET=UTC+1)
-    - cron: '0 7 * * *'  # 08:00 Oslo (summer CEST=UTC+2)
+  # Disabled 2026-07-15: replaced by Nano-orchestrated pipeline (nano-social-publish Edge Function
+  # + Telegram-scheduled daily task). Old cron was failing daily on dead Gemini/Groq copy generation.
+  # schedule:
+  #   - cron: '0 6 * * *'  # 08:00 Oslo (winter CET=UTC+1)
+  #   - cron: '0 7 * * *'  # 08:00 Oslo (summer CEST=UTC+2)
   workflow_dispatch:
 
 jobs:
