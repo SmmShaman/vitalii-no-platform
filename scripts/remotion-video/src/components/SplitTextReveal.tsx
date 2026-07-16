@@ -13,7 +13,7 @@ import {
 } from "remotion";
 import { colors, typography, clampBoth } from "../design-system";
 
-export type SplitEffect = "fadeUp" | "scaleIn" | "fadeIn";
+export type SplitEffect = "fadeUp" | "scaleIn" | "fadeIn" | "slideIn";
 
 export interface SplitTextRevealProps {
   text: string;
@@ -67,6 +67,11 @@ export const SplitTextReveal: React.FC<SplitTextRevealProps> = ({
           const s = spring({ frame: Math.max(0, elapsed), fps, config: { damping: 12, stiffness: 150, mass: 0.5 } });
           transform = `scale(${s})`;
           unitOpacity = s;
+        } else if (effect === "slideIn") {
+          const fromLeft = i % 2 === 0;
+          const x = interpolate(elapsed, [0, 12], [fromLeft ? -50 : 50, 0], clampBoth);
+          const rot = interpolate(elapsed, [0, 12], [fromLeft ? -6 : 6, 0], clampBoth);
+          transform = `translateX(${x}px) rotate(${rot}deg)`;
         }
 
         return (

@@ -170,6 +170,23 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
       }
       case "colorShift":
         return `scale(${1 + progress * 0.1})`;
+      case "pushIn": {
+        // Steady continuous dolly-in, no pulse — deliberate camera push for gravity/tension
+        const s = interpolate(progress, [0, 1], [1, 1.18], clampBoth);
+        return `scale(${s})`;
+      }
+      case "parallaxDrift": {
+        // Diagonal ease-in-out drift, distinct curve from kenBurns' linear pan
+        const t = interpolate(progress, [0, 0.5, 1], [0, 1, 0], clampBoth);
+        const px = dir.px * t * 3;
+        const py = dir.py * t * 2;
+        return `scale(1.08) translate(${px}%, ${py}%)`;
+      }
+      case "pulseGlow": {
+        // Near-static frame with a very subtle breathing scale — lets filter pulse read clearly
+        const phase = Math.sin(progress * Math.PI * 2);
+        return `scale(${1.03 + phase * 0.015})`;
+      }
       case "kenBurns":
       default: {
         const scaleEnd = moodCfg?.kenBurnsScale ?? kenBurns.scaleRange.end;
@@ -185,6 +202,11 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     if (effect === "colorShift") {
       const hue = interpolate(progress, [0, 1], [0, 30], clampBoth);
       return `hue-rotate(${hue}deg) saturate(1.2)`;
+    }
+    if (effect === "pulseGlow") {
+      const phase = Math.sin(progress * Math.PI * 2);
+      const brightness = 1 + phase * 0.12;
+      return `brightness(${brightness}) saturate(1.1)`;
     }
     return undefined;
   };
@@ -698,6 +720,55 @@ const PhraseText: React.FC<{
           />
         </div>
       );
+    case "wordFade":
+      return (
+        <div style={container}>
+          <SplitTextReveal
+            text={text}
+            fontSize={fontSize}
+            effect="fadeIn"
+            staggerFrames={2}
+          />
+        </div>
+      );
+    case "slideIn":
+      return (
+        <div style={container}>
+          <SplitTextReveal
+            text={text}
+            fontSize={fontSize}
+            effect="slideIn"
+            staggerFrames={4}
+          />
+        </div>
+      );
+    case "glitchIn": {
+      const settle = interpolate(frame, [0, 10], [1, 0], clampBoth);
+      const jitterX = settle * (Math.sin(frame * 3.1) * 6);
+      const skew = settle * (Math.sin(frame * 2.3) * 4);
+      const op = interpolate(frame, [0, 6], [0, 1], clampBoth);
+      return (
+        <div style={container}>
+          <div
+            style={{
+              opacity: op,
+              transform: `translateX(${jitterX}px) skewX(${skew}deg)`,
+              fontSize,
+              fontWeight: 700,
+              color: colors.text,
+              fontFamily: typography.fontFamily.primary,
+              textAlign: "center",
+              lineHeight: 1.3,
+              textShadow: settle > 0.3
+                ? `${jitterX > 0 ? 2 : -2}px 0 rgba(255,0,80,0.6), ${jitterX > 0 ? -2 : 2}px 0 rgba(0,200,255,0.6)`
+                : "0 2px 12px rgba(0,0,0,0.8)",
+            }}
+          >
+            {text}
+          </div>
+        </div>
+      );
+    }
     default:
       return null;
   }
