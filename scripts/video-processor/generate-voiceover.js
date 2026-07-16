@@ -1,11 +1,13 @@
 /**
  * TTS Voiceover Generator
  *
- * Uses Zvukogram neural TTS API to generate voiceover audio
- * with word-level timestamps for Remotion subtitle animation.
+ * Uses Zvukogram neural TTS API to generate voiceover audio.
+ * Zvukogram's /subs endpoint (real word-level timestamps) is unavailable
+ * on this account, so word timestamps for Remotion's animated subtitles
+ * are instead derived from real silence gaps detected in the generated
+ * audio via ffmpeg — see buildSubtitleTimestamps().
  *
  * API docs: https://zvukogram.com/node/api/
- * Endpoint /subs returns audio + timecoded subtitle fragments.
  *
  * This runs inside the GitHub Actions video-processor pipeline.
  */
@@ -88,23 +90,23 @@ export async function generateVoiceover(scriptText, language = 'en', options = {
   const BASE = 'https://zvukogram.com/index.php?r=api';
   console.log(`🔊 Using voice: ${voice}`);
 
-  // ── Step 1: Try /subs for real timestamps, fall back to /text ──
-  let result = await trySubsEndpoint(BASE, ZVUKOGRAM_TOKEN, ZVUKOGRAM_EMAIL, voice, scriptText);
-
-  if (!result) {
-    if (scriptText.length > 1500) {
-      console.log(`📝 Using /longtext endpoint (${scriptText.length} chars > 1500)`);
+  // ── Step 1: Generate audio. (Zvukogram's /subs endpoint, which would give
+  // real word timestamps, is confirmed unavailable on this account for any
+  // voice/params — skip straight to plain TTS and align captions to the
+  // audio ourselves in step 4.) ──
+  let result;
+  if (scriptText.length > 1500) {
+    console.log(`📝 Using /longtext endpoint (${scriptText.length} chars > 1500)`);
+    result = await longTextEndpoint(BASE, ZVUKOGRAM_TOKEN, ZVUKOGRAM_EMAIL, voice, scriptText);
+  } else {
+    console.log(`📝 Using /text endpoint (instant mode)`);
+    try {
+      result = await textEndpoint(BASE, ZVUKOGRAM_TOKEN, ZVUKOGRAM_EMAIL, voice, scriptText);
+    } catch (textErr) {
+      // Retry with /longtext if /text fails (partial voice failures, etc.)
+      console.log(`⚠️ /text failed: ${textErr.message}`);
+      console.log(`🔄 Retrying with /longtext...`);
       result = await longTextEndpoint(BASE, ZVUKOGRAM_TOKEN, ZVUKOGRAM_EMAIL, voice, scriptText);
-    } else {
-      console.log(`📝 Using /text endpoint (instant mode)`);
-      try {
-        result = await textEndpoint(BASE, ZVUKOGRAM_TOKEN, ZVUKOGRAM_EMAIL, voice, scriptText);
-      } catch (textErr) {
-        // Retry with /longtext if /text fails (partial voice failures, etc.)
-        console.log(`⚠️ /text failed: ${textErr.message}`);
-        console.log(`🔄 Retrying with /longtext...`);
-        result = await longTextEndpoint(BASE, ZVUKOGRAM_TOKEN, ZVUKOGRAM_EMAIL, voice, scriptText);
-      }
     }
   }
 
@@ -129,8 +131,8 @@ export async function generateVoiceover(scriptText, language = 'en', options = {
   console.log(`✅ Audio: ${fileSizeMB} MB, ${durationSeconds}s → ${audioPath}`);
   console.log(`💰 Cost: ${result.cost || '?'} tokens, balance: ${result.balans || '?'}`);
 
-  // ── Step 4: Parse subtitle timestamps from cuts ──
-  const subtitles = await parseZvukogramCuts(result.cuts, scriptText, durationSeconds, audioPath);
+  // ── Step 4: Build subtitle timestamps (audio-aligned, see buildSubtitleTimestamps) ──
+  const subtitles = await buildSubtitleTimestamps(scriptText, durationSeconds, audioPath);
   console.log(`📝 Generated ${subtitles.length} subtitle entries`);
 
   return {
@@ -138,53 +140,6 @@ export async function generateVoiceover(scriptText, language = 'en', options = {
     subtitles,
     durationSeconds,
   };
-}
-
-/**
- * Try /subs endpoint for real timestamps. Returns null if unsupported.
- */
-async function trySubsEndpoint(BASE, token, email, voice, text) {
-  try {
-    // Use a non-HD voice for subs (HD voices may not support it)
-    const subsVoice = 'Matthew plus';
-    console.log(`🎙️ Trying /subs with voice: ${subsVoice}`);
-
-    const resp = await fetch(`${BASE}/subs`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ token, email, voice: subsVoice, text, format: 'mp3', speed: '0.9' }).toString(),
-    });
-
-    const data = await resp.json();
-    if (data.status === -1) {
-      console.log(`⚠️ /subs not available: ${data.error || 'unknown error'}`);
-      return null;
-    }
-
-    // Poll if processing
-    let result = data;
-    if (result.status === 0) {
-      console.log(`⏳ Processing subs...`);
-      for (let i = 0; i < 120; i++) {
-        await new Promise(r => setTimeout(r, 2000));
-        const poll = await fetch(`${BASE}/result`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({ token, email, id: String(data.id) }).toString(),
-        });
-        result = await poll.json();
-        if (result.status === 1) break;
-        if (result.status === -1) { console.log(`⚠️ /subs failed: ${result.error}`); return null; }
-      }
-      if (result.status !== 1) return null;
-    }
-
-    console.log(`✅ /subs succeeded with real timestamps`);
-    return result;
-  } catch (e) {
-    console.log(`⚠️ /subs error: ${e.message}`);
-    return null;
-  }
 }
 
 /**
@@ -265,66 +220,25 @@ async function longTextEndpoint(BASE, token, email, voice, text) {
 }
 
 /**
- * Parse Zvukogram /subs `cuts` array into SubtitleEntry format.
- * Each cut has: { file, duration, text, start, end }
+ * Build subtitle timestamps for a script: align sentence groups to real
+ * silence gaps detected in the generated audio, so on-screen caption
+ * groups move in sync with actual pauses in speech. Falls back to a
+ * plain word-count estimate if silence detection can't find enough gaps.
  *
- * If cuts are not available, fall back to sentence-level timestamps
- * derived from real silence gaps in the generated audio (or, if that
- * also fails, a plain word-count estimate).
- *
- * @param {Array|undefined} cuts - Zvukogram cuts array
  * @param {string} scriptText - Original script text
  * @param {number} totalDuration - Total audio duration
- * @param {string} [audioPath] - Path to the generated audio file, used for silence detection
+ * @param {string} audioPath - Path to the generated audio file
  * @returns {Promise<SubtitleEntry[]>}
  */
-async function parseZvukogramCuts(cuts, scriptText, totalDuration, audioPath) {
-  if (cuts && Array.isArray(cuts) && cuts.length > 0) {
-    const subtitles = [];
-    let timeOffset = 0;
-
-    for (const cut of cuts) {
-      const cutStart = timeOffset;
-      const cutEnd = timeOffset + (cut.duration || 0);
-      const cutText = cut.text || '';
-
-      // Split cut text into words and distribute time evenly within the cut
-      const words = cutText.split(/\s+/).filter(w => w.length > 0);
-      if (words.length === 0) {
-        timeOffset = cutEnd;
-        continue;
-      }
-
-      const wordDuration = (cut.duration || 1) / words.length;
-      for (let i = 0; i < words.length; i++) {
-        subtitles.push({
-          text: words[i].replace(/[.,!?;:"""''()—–\-]/g, ''),
-          startTime: Math.round((cutStart + i * wordDuration) * 100) / 100,
-          endTime: Math.round((cutStart + (i + 1) * wordDuration) * 100) / 100,
-        });
-      }
-
-      timeOffset = cutEnd;
-    }
-
-    return subtitles;
+async function buildSubtitleTimestamps(scriptText, totalDuration, audioPath) {
+  const aligned = await generateAudioAlignedTimestamps(audioPath, scriptText, totalDuration).catch(e => {
+    console.log(`⚠️ Silence detection failed: ${e.message}`);
+    return null;
+  });
+  if (aligned && aligned.length > 0) {
+    return aligned;
   }
 
-  // Fallback 1: align sentence groups to real silence gaps in the audio,
-  // so on-screen caption groups move in sync with actual pauses in speech
-  // instead of a pure word-count guess.
-  console.log('⚠️ No cuts data, trying audio-aligned (silence detection) timestamps');
-  if (audioPath) {
-    const aligned = await generateAudioAlignedTimestamps(audioPath, scriptText, totalDuration).catch(e => {
-      console.log(`⚠️ Silence detection failed: ${e.message}`);
-      return null;
-    });
-    if (aligned && aligned.length > 0) {
-      return aligned;
-    }
-  }
-
-  // Fallback 2: estimate timestamps from word count only.
   console.log('⚠️ Falling back to plain word-count estimate');
   const words = scriptText.split(/\s+/).filter(w => w.length > 0);
   return generateEstimatedTimestamps(words, totalDuration);
