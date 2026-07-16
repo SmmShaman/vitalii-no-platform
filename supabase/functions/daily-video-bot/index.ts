@@ -200,7 +200,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
 
   if (LLM_PROVIDER === "gemini" && GEMINI_API_KEY) {
     const MAX_RETRIES = 3;
-    let quotaExhausted = false;
+    let geminiFailed = false;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
         console.log(`🤖 Gemini 2.5 Flash Lite (attempt ${attempt + 1}/${MAX_RETRIES + 1})`);
@@ -229,13 +229,10 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
             await new Promise(r => setTimeout(r, delay));
             continue;
           }
-          if (status === 429) {
-            // Daily quota exhausted — fall back to Groq
-            console.warn(`⚠️ Gemini quota exhausted after ${attempt + 1} attempts, falling back to Groq`);
-            quotaExhausted = true;
-            break;
-          }
-          throw new Error(`Gemini: ${status} ${errText.substring(0, 200)}`);
+          // Any non-retryable failure (auth error, quota exhausted, etc.) — fall back to Groq
+          console.warn(`⚠️ Gemini ${status} (${errText.substring(0, 100)}), falling back to Groq`);
+          geminiFailed = true;
+          break;
         }
         const data = await resp.json();
         const parts = data.candidates?.[0]?.content?.parts || [];
@@ -263,7 +260,7 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
         throw e;
       }
     }
-    if (!quotaExhausted) throw new Error("Gemini: all retries exhausted");
+    if (!geminiFailed) throw new Error("Gemini: all retries exhausted");
     // fall through to Groq fallback
   }
 
