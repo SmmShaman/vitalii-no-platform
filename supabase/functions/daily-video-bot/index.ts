@@ -715,12 +715,24 @@ ${HUMANIZER_VIDEO}
 
 ${VOICE_SPOKEN}
 
+CRITICAL: "scriptNo" and "scriptEn" below are FORMAT DESCRIPTIONS, not real values — never copy them verbatim. Replace each with actual generated text about the segment above.
+
 Return JSON:
 {
-  "scriptNo": "Norwegian script (3-5 sentences, ~${wordsPerArticle * 2} words)",
-  "scriptEn": "English translation",
+  "scriptNo": "<write the actual Norwegian script here: 3-5 sentences, ~${wordsPerArticle * 2} words, based on the article content above>",
+  "scriptEn": "<write the actual English translation of scriptNo here>",
   "entities": {"people": [], "companies": [], "products": [], "locations": [], "imageQueries": ["news photo query 1", "query 2", "query 3"]}
 }`;
+
+  // Reject LLM output that echoes the prompt's placeholder text instead of real content.
+  const isPlaceholderScript = (text: string): boolean => {
+    if (!text) return true;
+    const wordCount = text.trim().split(/\s+/).length;
+    if (wordCount < 15) return true; // too short to be a real 3-5 sentence script
+    if (/^(norwegian|write the actual)\b/i.test(text.trim())) return true;
+    if (/\(\s*\d[\d\-–]*\s*sentences?,?\s*~?\d+\s*words?\s*\)/i.test(text)) return true;
+    return false;
+  };
 
   const plan: any = {
     selectedArticleIds: selectedValid,
@@ -757,17 +769,30 @@ Return JSON: {"introScript": "Velkommen til dagens nyhetsdigest fra Vitalii Berb
   // Generate script for each segment individually
   for (let si = 0; si < groups.length; si++) {
     const segData = selectedArticleData.split("\n\n---\n\n")[si] || "";
-    try {
-      const segResponse = await callAI(perSegPrompt, `Write script for this segment:\n\n${segData}`, 1500);
-      const parsed = JSON.parse(segResponse.match(/\{[\s\S]*\}/)?.[0] || segResponse);
+    let parsed: any = null;
+    for (let attempt = 0; attempt < 2 && !parsed; attempt++) {
+      try {
+        const segResponse = await callAI(perSegPrompt, `Write script for this segment:\n\n${segData}`, 1500);
+        const candidate = JSON.parse(segResponse.match(/\{[\s\S]*\}/)?.[0] || segResponse);
+        if (isPlaceholderScript(candidate.scriptNo)) {
+          console.log(`  ⚠️ Segment ${si + 1} attempt ${attempt + 1}: LLM echoed placeholder text, ${attempt === 0 ? "retrying" : "giving up"}`);
+          continue;
+        }
+        parsed = candidate;
+      } catch (e: any) {
+        console.log(`  ⚠️ Segment ${si + 1} attempt ${attempt + 1} failed: ${e.message}`);
+      }
+    }
+    if (parsed) {
       plan.segmentScripts.push(parsed.scriptNo || "");
       plan.segmentTranslationsEn.push(parsed.scriptEn || "");
       plan.articleEntities.push(parsed.entities || null);
       console.log(`  ✅ Segment ${si + 1}/${groups.length}: ${(parsed.scriptNo || "").substring(0, 50)}...`);
-    } catch (e: any) {
-      console.log(`  ❌ Segment ${si + 1} failed: ${e.message}`);
+    } else {
+      console.log(`  ❌ Segment ${si + 1} failed, using article content as fallback`);
       const a = articleMap.get(selectedValid[si]);
-      plan.segmentScripts.push(a ? `${a.title_no || a.title_en || ""}. ${(a.description_no || a.description_en || "").substring(0, 200)}` : "");
+      const fallbackText = a ? `${a.title_no || a.title_en || ""}. ${(a.content_no || a.content_en || a.description_no || a.description_en || "").substring(0, 300)}` : "";
+      plan.segmentScripts.push(fallbackText);
       plan.segmentTranslationsEn.push(a?.title_en || "");
       plan.articleEntities.push(null);
     }
