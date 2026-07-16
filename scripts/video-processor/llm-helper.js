@@ -8,6 +8,9 @@
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const LLM_TIMEOUT_MS = 60_000;
+// mistralai/mistral-small-24b-instruct-2501 was deprecated by NVIDIA (returns 404) —
+// same model family used elsewhere in this repo after the daily-video-bot NVIDIA fix.
+const NVIDIA_MODEL = process.env.NVIDIA_MODEL || 'meta/llama-4-maverick-17b-128e-instruct';
 
 /** Fetch with AbortController timeout */
 async function fetchWithTimeout(url, options, timeoutMs = LLM_TIMEOUT_MS) {
@@ -86,7 +89,7 @@ async function callNvidia(systemPrompt, userPrompt, { maxTokens, temperature, js
       'Authorization': `Bearer ${NVIDIA_API_KEY}`,
     },
     body: JSON.stringify({
-      model: 'mistralai/mistral-small-24b-instruct-2501',
+      model: NVIDIA_MODEL,
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
@@ -98,9 +101,10 @@ async function callNvidia(systemPrompt, userPrompt, { maxTokens, temperature, js
   });
 
   if (!response.ok) {
-    let err;
-    try { err = JSON.stringify(await response.json()); } catch { err = await response.text(); }
-    throw new Error(`NVIDIA NIM ${response.status}: ${err}`);
+    // Read the body once — calling response.json()/.text() twice throws
+    // "Body is unusable: Body has already been read" and masks the real error.
+    const bodyText = await response.text().catch(() => '');
+    throw new Error(`NVIDIA NIM ${response.status}: ${bodyText.substring(0, 300)}`);
   }
 
   const data = await response.json();

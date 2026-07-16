@@ -1058,8 +1058,9 @@ async function main() {
 
   // Calculate total duration from actual segment durations
   // Dynamic intro/outro duration based on TTS (minimum 4s)
-  // Cap intro at 6s — no long black screen with just text
-  const introDuration = introVoiceover ? Math.min(Math.max(Number(introVoiceover.durationSeconds), 4), 6) : 5;
+  // No upper cap — the intro Sequence/Audio duration must never be shorter than
+  // the actual voiceover, or Remotion hard-truncates the audio mid-word.
+  const introDuration = introVoiceover ? Math.max(Number(introVoiceover.durationSeconds), 4) : 5;
   const roundupDuration = roundupVoiceover ? Math.max(Number(roundupVoiceover.durationSeconds), 5) : 0;
   const outroDuration = outroVoiceover ? Math.max(Number(outroVoiceover.durationSeconds), 4) : 4;
   const overflowDuration = overflowVoiceover ? Math.max(Number(overflowVoiceover.durationSeconds), 4) : 0;
