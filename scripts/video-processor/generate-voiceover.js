@@ -12,6 +12,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 /**
  * @typedef {Object} SubtitleEntry
@@ -126,7 +130,7 @@ export async function generateVoiceover(scriptText, language = 'en', options = {
   console.log(`💰 Cost: ${result.cost || '?'} tokens, balance: ${result.balans || '?'}`);
 
   // ── Step 4: Parse subtitle timestamps from cuts ──
-  const subtitles = parseZvukogramCuts(result.cuts, scriptText, durationSeconds);
+  const subtitles = await parseZvukogramCuts(result.cuts, scriptText, durationSeconds, audioPath);
   console.log(`📝 Generated ${subtitles.length} subtitle entries`);
 
   return {
@@ -264,14 +268,17 @@ async function longTextEndpoint(BASE, token, email, voice, text) {
  * Parse Zvukogram /subs `cuts` array into SubtitleEntry format.
  * Each cut has: { file, duration, text, start, end }
  *
- * If cuts are not available, fall back to estimated timestamps.
+ * If cuts are not available, fall back to sentence-level timestamps
+ * derived from real silence gaps in the generated audio (or, if that
+ * also fails, a plain word-count estimate).
  *
  * @param {Array|undefined} cuts - Zvukogram cuts array
  * @param {string} scriptText - Original script text
  * @param {number} totalDuration - Total audio duration
- * @returns {SubtitleEntry[]}
+ * @param {string} [audioPath] - Path to the generated audio file, used for silence detection
+ * @returns {Promise<SubtitleEntry[]>}
  */
-function parseZvukogramCuts(cuts, scriptText, totalDuration) {
+async function parseZvukogramCuts(cuts, scriptText, totalDuration, audioPath) {
   if (cuts && Array.isArray(cuts) && cuts.length > 0) {
     const subtitles = [];
     let timeOffset = 0;
@@ -303,10 +310,100 @@ function parseZvukogramCuts(cuts, scriptText, totalDuration) {
     return subtitles;
   }
 
-  // Fallback: estimate timestamps from word count
-  console.log('⚠️ No cuts data, using estimated timestamps');
+  // Fallback 1: align sentence groups to real silence gaps in the audio,
+  // so on-screen caption groups move in sync with actual pauses in speech
+  // instead of a pure word-count guess.
+  console.log('⚠️ No cuts data, trying audio-aligned (silence detection) timestamps');
+  if (audioPath) {
+    const aligned = await generateAudioAlignedTimestamps(audioPath, scriptText, totalDuration).catch(e => {
+      console.log(`⚠️ Silence detection failed: ${e.message}`);
+      return null;
+    });
+    if (aligned && aligned.length > 0) {
+      return aligned;
+    }
+  }
+
+  // Fallback 2: estimate timestamps from word count only.
+  console.log('⚠️ Falling back to plain word-count estimate');
   const words = scriptText.split(/\s+/).filter(w => w.length > 0);
   return generateEstimatedTimestamps(words, totalDuration);
+}
+
+/**
+ * Split a script into sentences, keeping trailing punctuation.
+ */
+function splitIntoSentences(text) {
+  const matches = text.match(/[^.!?]+[.!?]+(\s+|$)/g);
+  if (!matches || matches.length === 0) return [text.trim()].filter(s => s.length > 0);
+  return matches.map(s => s.trim()).filter(s => s.length > 0);
+}
+
+/**
+ * Run ffmpeg silencedetect on the generated audio to find real pause
+ * boundaries (sentence breaks), so captions can be grouped by actual
+ * speech gaps instead of guessed word timing.
+ *
+ * @returns {Promise<number[]>} silence_start timestamps, in order
+ */
+async function detectSilenceGaps(audioPath, noiseDb = -30, minSilenceDur = 0.15) {
+  const { stderr } = await execAsync(
+    `ffmpeg -i "${audioPath}" -af silencedetect=noise=${noiseDb}dB:d=${minSilenceDur} -f null -`,
+    { maxBuffer: 10 * 1024 * 1024 }
+  );
+  const output = stderr || '';
+  return [...output.matchAll(/silence_start:\s*([\d.]+)/g)].map(m => parseFloat(m[1]));
+}
+
+/**
+ * Distribute a sentence's words evenly (with a small long-word weight bump)
+ * across a known real time window.
+ */
+function distributeWordsInWindow(words, windowStart, windowDuration) {
+  const weights = words.map(word => (word.length > 8 ? 1.3 : 1.0));
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0) || 1;
+
+  const subtitles = [];
+  let t = windowStart;
+  for (let i = 0; i < words.length; i++) {
+    const wordDuration = (weights[i] / totalWeight) * windowDuration;
+    subtitles.push({
+      text: words[i].replace(/[.,!?;:"""''()—–\-]/g, ''),
+      startTime: Math.round(t * 100) / 100,
+      endTime: Math.round((t + wordDuration) * 100) / 100,
+    });
+    t += wordDuration;
+  }
+  return subtitles;
+}
+
+/**
+ * Split the script into sentences, detect real silence gaps in the audio,
+ * and match them 1:1 to get real per-sentence time windows. Returns null
+ * (caller should fall back) if there aren't enough detected gaps to match
+ * the sentence count.
+ */
+async function generateAudioAlignedTimestamps(audioPath, scriptText, totalDuration) {
+  const sentences = splitIntoSentences(scriptText);
+  if (sentences.length < 2) return null;
+
+  const gaps = await detectSilenceGaps(audioPath);
+  if (gaps.length < sentences.length - 1) {
+    console.log(`⚠️ Silence detection found ${gaps.length} gap(s), need ${sentences.length - 1} for ${sentences.length} sentences`);
+    return null;
+  }
+
+  const boundaries = [0, ...gaps.slice(0, sentences.length - 1), totalDuration];
+  const subtitles = [];
+  for (let i = 0; i < sentences.length; i++) {
+    const words = sentences[i].split(/\s+/).filter(w => w.length > 0);
+    if (words.length === 0) continue;
+    const windowStart = boundaries[i];
+    const windowDuration = Math.max(boundaries[i + 1] - boundaries[i], 0.1);
+    subtitles.push(...distributeWordsInWindow(words, windowStart, windowDuration));
+  }
+  console.log(`✅ Audio-aligned timestamps: matched ${sentences.length} sentences to real silence gaps`);
+  return subtitles;
 }
 
 /**
