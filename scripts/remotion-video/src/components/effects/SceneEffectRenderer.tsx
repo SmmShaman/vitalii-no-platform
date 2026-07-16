@@ -22,6 +22,8 @@ import { PhotoCollage } from "./PhotoCollage";
 import { PhotoCompareSlider } from "./PhotoCompareSlider";
 import { PhotoVerticalScroll } from "./PhotoVerticalScroll";
 import { PhotoFilterTransition } from "./PhotoFilterTransition";
+import { MatrixRainScene } from "./MatrixRainScene";
+import { PhotoScrollColumns } from "./PhotoScrollColumns";
 
 interface SceneEffectRendererProps {
   type: SceneEffectType;
@@ -131,6 +133,12 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
       const values = extractValues(data);
       return <DataDashboard accentColor={accentColor} values={values} />;
     }
+
+    case "matrixRain":
+      return <MatrixRainScene accentColor={accentColor} />;
+
+    case "photoScrollColumns":
+      return images.length >= 3 ? <PhotoScrollColumns images={images} /> : null;
 
     // ── Photo-native effects ──
 

@@ -401,7 +401,7 @@ CRITICAL RULE — CONTEXT OVER DECORATION:
 
 EFFECT MUST MATCH PHRASE MEANING — ask yourself: "If I remove the voiceover, can the viewer understand what this scene is about just from the visuals?" If NO — the effect is too generic.
 
-VARIETY RULE: You have 17 effects. Use AT LEAST 3 DIFFERENT effects across your 4-6 phrases. NEVER use the same effect twice in a row.
+VARIETY RULE: You have 19 effects. Use AT LEAST 3 DIFFERENT effects across your 4-6 phrases. NEVER use the same effect twice in a row.
 
 AVAILABLE EFFECTS (use exact keywords in sceneDescription):
 
@@ -412,6 +412,7 @@ AVAILABLE EFFECTS (use exact keywords in sceneDescription):
 - "vertical scroll" for long/detailed images
 - "grayscale to color" or "blur to sharp" for dramatic reveals
 - "before after slider" for comparisons
+- "scrolling photos" / "photo stream" for parallax-drifting columns — needs 3+ article photos, don't force it if fewer are available
 
 📊 DATA (only when article has REAL numbers):
 - "counter ticks from 0 to [NUMBER]" + meaningful label
@@ -426,14 +427,15 @@ AVAILABLE EFFECTS (use exact keywords in sceneDescription):
 🌊 ATMOSPHERE (use sparingly, max 1 per segment):
 - "wave flow" for organic/fluid topics
 - "circuit board traces" ONLY for actual tech/AI articles
+- "matrix" / "digital rain" ONLY for actual cybersecurity/hacking/AI-code articles — not generic "tech"
 - "alert pulse" ONLY for genuine breaking/urgent news
 - "dissolves pixel-by-pixel" for transformation stories
 
 PHRASE FIELDS:
 - "text": exact phrase
 - "sceneDescription": WHAT the viewer sees, tied to article content (2-3 sentences). Write like a film director's storyboard. This is flavor text for imageSearchQuery/renderHint context — it is NOT how sceneEffect gets picked (see below).
-- "sceneEffect": pick EXPLICITLY from the 17 values below, or "none" if this phrase should just show the background photo + key-phrase callout with no overlay graphic. Do NOT rely on sceneDescription keywords to trigger an effect — say what you want directly:
-  counterMosaic | splitScreen | mosaicGrid | iconStagger | pixelDissolve | circuitBoard | progressTimeline | alertPulse | globe3D | noiseWave | dataDashboard | photoSplitScreen | photoZoomReveal | photoCollage | photoCompareSlider | photoVerticalScroll | photoFilterTransition | none
+- "sceneEffect": pick EXPLICITLY from the 19 values below, or "none" if this phrase should just show the background photo + key-phrase callout with no overlay graphic. Do NOT rely on sceneDescription keywords to trigger an effect — say what you want directly:
+  counterMosaic | splitScreen | mosaicGrid | iconStagger | pixelDissolve | circuitBoard | progressTimeline | alertPulse | globe3D | noiseWave | dataDashboard | matrixRain | photoScrollColumns | photoSplitScreen | photoZoomReveal | photoCollage | photoCompareSlider | photoVerticalScroll | photoFilterTransition | none
 - "imageSearchQuery": Google Images search query to find the PERFECT background photo for THIS phrase. Be SPECIFIC to the content:
   ❌ BAD: "technology" (too generic)
   ✅ GOOD: "NTNU Trondheim university campus aerial view"
