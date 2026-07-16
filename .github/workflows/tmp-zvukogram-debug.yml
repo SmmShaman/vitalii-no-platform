@@ -1,0 +1,44 @@
+name: TMP Zvukogram Debug
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check voices list
+        env:
+          ZVUKOGRAM_TOKEN: ${{ secrets.ZVUKOGRAM_TOKEN }}
+          ZVUKOGRAM_EMAIL: ${{ secrets.ZVUKOGRAM_EMAIL }}
+        run: |
+          echo "=== /voices ==="
+          curl -s "https://zvukogram.com/index.php?r=api/voices" \
+            -d "token=${ZVUKOGRAM_TOKEN}" -d "email=${ZVUKOGRAM_EMAIL}" | node -e '
+            let d="";process.stdin.on("data",c=>d+=c);process.stdin.on("end",()=>{
+              try {
+                const j = JSON.parse(d);
+                if (Array.isArray(j)) {
+                  console.log("Total voices:", j.length);
+                  const matches = j.filter(v => JSON.stringify(v).toLowerCase().includes("финн") || JSON.stringify(v).toLowerCase().includes("matthew") || JSON.stringify(v).toLowerCase().includes("пернил"));
+                  console.log(JSON.stringify(matches, null, 2));
+                } else {
+                  console.log(JSON.stringify(j, null, 2).substring(0, 3000));
+                }
+              } catch(e) { console.log("RAW:", d.substring(0,2000)); }
+            })'
+
+          echo ""
+          echo "=== /subs with Matthew plus (current hardcoded, EN text) ==="
+          curl -s "https://zvukogram.com/index.php?r=api/subs" \
+            -d "token=${ZVUKOGRAM_TOKEN}" -d "email=${ZVUKOGRAM_EMAIL}" \
+            -d "voice=Matthew plus" -d "format=mp3" -d "speed=0.9" \
+            --data-urlencode "text=This is a short test sentence for subtitles." | head -c 1000
+          echo ""
+          echo ""
+          echo "=== /subs with Финн (actual NO voice used for real audio) ==="
+          curl -s "https://zvukogram.com/index.php?r=api/subs" \
+            -d "token=${ZVUKOGRAM_TOKEN}" -d "email=${ZVUKOGRAM_EMAIL}" \
+            -d "voice=Финн" -d "format=mp3" -d "speed=0.9" \
+            --data-urlencode "text=Dette er en kort testsetning for undertekster." | head -c 1000
+          echo ""
