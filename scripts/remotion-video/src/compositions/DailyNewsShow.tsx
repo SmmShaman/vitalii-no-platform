@@ -104,6 +104,9 @@ export interface VisualBlock {
   renderHint?: string;
   /** Classified visual metaphor for this phrase */
   visualMetaphor: string;
+  /** Explicit scene-effect choice (one of SceneEffectType, or 'none'/omitted).
+   *  Takes priority over keyword-guessing sceneDescription against resolveSceneEffect's regexes. */
+  sceneEffect?: string;
   /** Text animation effect for this block */
   textEffect: string;
   /** Infographic type to overlay ('none' = no graphic) */

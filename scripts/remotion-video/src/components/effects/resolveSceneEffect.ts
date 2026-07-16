@@ -48,7 +48,21 @@ const PATTERNS: [RegExp, SceneEffectType][] = [
   [/pulse|alert|breaking|flash|urgent.*visual|shake|red.*glow/i, "alertPulse"],
 ];
 
+const VALID_TYPES = new Set<SceneEffectType>([
+  "counterMosaic", "splitScreen", "mosaicGrid", "iconStagger", "pixelDissolve",
+  "circuitBoard", "progressTimeline", "alertPulse", "globe3D", "noiseWave",
+  "dataDashboard", "photoSplitScreen", "photoZoomReveal", "photoCollage",
+  "photoCompareSlider", "photoVerticalScroll", "photoFilterTransition",
+]);
+
 export function resolveSceneEffect(block: VisualBlock): SceneEffectType {
+  // Explicit choice (Visual Director picks the type directly) takes priority
+  // over keyword guessing — reliable intent instead of incidental phrase matches.
+  const explicit = (block as { sceneEffect?: string }).sceneEffect;
+  if (explicit && VALID_TYPES.has(explicit as SceneEffectType)) {
+    return explicit as SceneEffectType;
+  }
+
   const combined = `${block.sceneDescription || ""} ${block.renderHint || ""}`;
   if (!combined.trim()) return null;
 

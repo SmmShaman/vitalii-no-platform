@@ -355,12 +355,24 @@ import { callLLMJson } from './llm-helper.js';
  * Per-segment AI Visual Director call.
  * Each segment gets its own prompt with FULL article context + creative hints.
  */
-async function aiDirectSingleSegment(script, article, segmentMeta, segIndex, totalSegs) {
+async function aiDirectSingleSegment(script, article, segmentMeta, segIndex, totalSegs, usedSoFar = null) {
   if (!process.env.NVIDIA_API_KEY && !process.env.ANTHROPIC_API_KEY) return null;
 
   const title = article?.title_en || article?.title_no || segmentMeta?.headline || '';
   const content = (article?.content_en || article?.content_no || article?.original_content || '').substring(0, 1500);
   const category = segmentMeta?.category || 'news';
+
+  // Cross-segment variety: this video's segments are directed one at a time, but nothing
+  // stops segment 3 and segment 7 from picking the same transition/textEffect/backgroundEffect.
+  // Feed back what's already been used so far so the director actively spreads choices out
+  // across the WHOLE video, not just within this one segment's phrases.
+  const used = usedSoFar || { transitions: [], textEffects: [], backgroundEffects: [] };
+  const crossSegmentNote = segIndex === 0 ? '' : `
+CROSS-SEGMENT VARIETY (this video already used these in earlier segments — prefer options NOT in these lists, only repeat if you've genuinely exhausted the alternatives):
+- transitions used so far: ${used.transitions.join(', ') || '(none yet)'}
+- textEffects used so far: ${[...new Set(used.textEffects)].join(', ') || '(none yet)'}
+- backgroundEffects used so far: ${[...new Set(used.backgroundEffects)].join(', ') || '(none yet)'}
+`;
 
   const systemPrompt = `You are a Visual Director for segment ${segIndex + 1}/${totalSegs} of a news video.
 
@@ -371,7 +383,7 @@ Content: ${content}
 
 VOICEOVER:
 ${script}
-
+${crossSegmentNote}
 TASK: Split voiceover into phrases (3-5 sec each). For EACH phrase, choose ONE effect that is CONTEXTUALLY MEANINGFUL to what the phrase says. An effect must ILLUSTRATE the specific content — never be generic decoration.
 
 CRITICAL RULE — CONTEXT OVER DECORATION:
@@ -419,7 +431,9 @@ AVAILABLE EFFECTS (use exact keywords in sceneDescription):
 
 PHRASE FIELDS:
 - "text": exact phrase
-- "sceneDescription": WHAT the viewer sees, tied to article content (2-3 sentences). Write like a film director's storyboard.
+- "sceneDescription": WHAT the viewer sees, tied to article content (2-3 sentences). Write like a film director's storyboard. This is flavor text for imageSearchQuery/renderHint context — it is NOT how sceneEffect gets picked (see below).
+- "sceneEffect": pick EXPLICITLY from the 17 values below, or "none" if this phrase should just show the background photo + key-phrase callout with no overlay graphic. Do NOT rely on sceneDescription keywords to trigger an effect — say what you want directly:
+  counterMosaic | splitScreen | mosaicGrid | iconStagger | pixelDissolve | circuitBoard | progressTimeline | alertPulse | globe3D | noiseWave | dataDashboard | photoSplitScreen | photoZoomReveal | photoCollage | photoCompareSlider | photoVerticalScroll | photoFilterTransition | none
 - "imageSearchQuery": Google Images search query to find the PERFECT background photo for THIS phrase. Be SPECIFIC to the content:
   ❌ BAD: "technology" (too generic)
   ✅ GOOD: "NTNU Trondheim university campus aerial view"
@@ -430,17 +444,19 @@ PHRASE FIELDS:
   Write the query as if YOU are searching Google Images to find a photo that PERFECTLY illustrates this specific sentence.
 - "renderHint": Remotion implementation details
 - "metaphor": visual category
-- "textEffect": typewriter | fadeUp | blurReveal | springPop | splitScale (vary between phrases!)
+- "textEffect": typewriter | fadeUp | blurReveal | springPop | splitScale | wordFade | slideIn | glitchIn (vary between phrases! glitchIn only for urgent/breaking moods)
 - "graphicType": counter | keyFigure | comparison | barChart | bulletList | none
 - "graphicData": ONLY real numbers from article with meaningful labels
-- "backgroundEffect": kenBurns | zoomPulse | slowPan | colorShift (vary!)
+- "backgroundEffect": kenBurns | zoomPulse | slowPan | colorShift | pushIn | parallaxDrift | pulseGlow (vary!)
 - "triggerImageChange": true every other phrase
 
 RULES:
 - NO effect without specific context — every effect must illustrate the phrase's MEANING
+- sceneEffect is an explicit choice, not a guess — pick "none" rather than force-fitting one of the 17 types to a phrase it doesn't truly match
 - Adjacent phrases: different textEffect AND different backgroundEffect
 - graphicData labels must be DESCRIPTIVE (not empty "", but "Daglige ChatGPT-søk" or "Markedsandel")
 - Use 3+ DIFFERENT effect types per segment — don't repeat the same pattern
+- CROSS-SEGMENT: for "transition" (see list below) and for textEffect/backgroundEffect choices in this segment, actively avoid repeating what's listed in CROSS-SEGMENT VARIETY above unless every other option has already been used somewhere in the video — spread the full palette across all ${totalSegs} segments, don't let the same 2-3 favorites dominate
 
 Return JSON:
 {
@@ -452,6 +468,7 @@ Return JSON:
     {
       "text": "exact phrase",
       "sceneDescription": "detailed cinematic description...",
+      "sceneEffect": "counterMosaic",
       "imageSearchQuery": "NTNU Trondheim campus aerial winter",
       "renderHint": "Remotion: interpolate(), spring()...",
       "metaphor": "data",
@@ -487,13 +504,25 @@ async function aiDirectVisuals(segmentScripts, segments, articles) {
   const totalSegs = segmentScripts.length;
   const results = [];
 
+  // Accumulates transition/textEffect/backgroundEffect choices across segments so each
+  // subsequent call's CROSS-SEGMENT VARIETY note reflects what's actually been used so far.
+  const tracker = { transitions: [], textEffects: [], backgroundEffects: [] };
+
   for (let i = 0; i < totalSegs; i++) {
     console.log(`  🎬 Directing segment ${i + 1}/${totalSegs}...`);
     const article = articles?.[i] || {};
     const result = await aiDirectSingleSegment(
-      segmentScripts[i], article, segments[i], i, totalSegs,
+      segmentScripts[i], article, segments[i], i, totalSegs, tracker,
     );
     results.push(result);
+
+    if (result) {
+      if (result.transition) tracker.transitions.push(result.transition);
+      for (const phrase of result.phrases || []) {
+        if (phrase.textEffect) tracker.textEffects.push(phrase.textEffect);
+        if (phrase.backgroundEffect) tracker.backgroundEffects.push(phrase.backgroundEffect);
+      }
+    }
   }
 
   // Check if we got enough valid results (need at least 50%)
