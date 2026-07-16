@@ -783,13 +783,23 @@ function buildOverlaysFromBlocks(visualBlocks, segDuration) {
  * @param {object[]}  segments           Segment metadata from AI director
  * @param {object[]}  segmentVoiceovers  TTS output per segment
  * @param {object[]}  articles           Full article objects (for per-segment AI context)
+ * @param {object[]|null} precomputedDirectives  Pre-merge, per-segment directives (mood/transition/
+ *   textReveal/statsVisualType/phrases[], no timestamps) generated ahead of render time by the Nano
+ *   agent via its own Claude subscription. When present, skips aiDirectVisuals() (NVIDIA/Claude API)
+ *   entirely but still runs through the same timestamp-merge/fallback/variety pipeline below.
  * @returns {Promise<object[]>}          Visual directives per segment
  */
-export async function directVisuals(segmentScripts, segments, segmentVoiceovers, articles = []) {
+export async function directVisuals(segmentScripts, segments, segmentVoiceovers, articles = [], precomputedDirectives = null) {
   console.log(`\n🎨 Visual Director: planning ${segmentScripts.length} segments...`);
 
-  // Try AI path first — per-segment calls with full article context
-  let directives = await aiDirectVisuals(segmentScripts, segments, articles);
+  // Prefer Nano-generated directives (own Claude subscription) over the live AI API chain
+  let directives;
+  if (precomputedDirectives && precomputedDirectives.length > 0) {
+    console.log(`  🧠 Using ${precomputedDirectives.length} Nano-generated segment directives`);
+    directives = precomputedDirectives;
+  } else {
+    directives = await aiDirectVisuals(segmentScripts, segments, articles);
+  }
 
   if (directives && directives.length > 0) {
     // Merge per-segment AI results with subtitle timestamps
