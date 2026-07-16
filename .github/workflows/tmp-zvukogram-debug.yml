@@ -12,33 +12,39 @@ jobs:
           ZVUKOGRAM_TOKEN: ${{ secrets.ZVUKOGRAM_TOKEN }}
           ZVUKOGRAM_EMAIL: ${{ secrets.ZVUKOGRAM_EMAIL }}
         run: |
-          echo "=== /voices ==="
+          echo "=== /voices (search for Финн / Matthew / Пернилла, any nesting) ==="
           curl -s "https://zvukogram.com/index.php?r=api/voices" \
             -d "token=${ZVUKOGRAM_TOKEN}" -d "email=${ZVUKOGRAM_EMAIL}" | node -e '
             let d="";process.stdin.on("data",c=>d+=c);process.stdin.on("end",()=>{
               try {
                 const j = JSON.parse(d);
-                if (Array.isArray(j)) {
-                  console.log("Total voices:", j.length);
-                  const matches = j.filter(v => JSON.stringify(v).toLowerCase().includes("финн") || JSON.stringify(v).toLowerCase().includes("matthew") || JSON.stringify(v).toLowerCase().includes("пернил"));
-                  console.log(JSON.stringify(matches, null, 2));
-                } else {
-                  console.log(JSON.stringify(j, null, 2).substring(0, 3000));
-                }
-              } catch(e) { console.log("RAW:", d.substring(0,2000)); }
+                const all = [];
+                if (Array.isArray(j)) all.push(...j);
+                else for (const k of Object.keys(j)) if (Array.isArray(j[k])) all.push(...j[k].map(v => ({...v, _lang:k})));
+                console.log("Total voices found:", all.length);
+                const matches = all.filter(v => JSON.stringify(v).toLowerCase().includes("финн") || JSON.stringify(v).toLowerCase().includes("matthew") || JSON.stringify(v).toLowerCase().includes("пернил"));
+                console.log(JSON.stringify(matches, null, 2));
+              } catch(e) { console.log("PARSE ERROR:", e.message, "RAW:", d.substring(0,500)); }
             })'
 
           echo ""
-          echo "=== /subs with Matthew plus (current hardcoded, EN text) ==="
-          curl -s "https://zvukogram.com/index.php?r=api/subs" \
+          echo "=== /longtext baseline with Matthew plus (control - does base TTS work?) ==="
+          curl -s "https://zvukogram.com/index.php?r=api/longtext" \
             -d "token=${ZVUKOGRAM_TOKEN}" -d "email=${ZVUKOGRAM_EMAIL}" \
             -d "voice=Matthew plus" -d "format=mp3" -d "speed=0.9" \
+            --data-urlencode "text=This is a short test sentence for subtitles." | head -c 500
+          echo ""
+          echo ""
+          echo "=== /subs with Matthew plus + speed_type=1 ==="
+          curl -s "https://zvukogram.com/index.php?r=api/subs" \
+            -d "token=${ZVUKOGRAM_TOKEN}" -d "email=${ZVUKOGRAM_EMAIL}" \
+            -d "voice=Matthew plus" -d "format=mp3" -d "speed=0.9" -d "speed_type=1" \
             --data-urlencode "text=This is a short test sentence for subtitles." | head -c 1000
           echo ""
           echo ""
-          echo "=== /subs with Финн (actual NO voice used for real audio) ==="
+          echo "=== /subs with Matthew plus, minimal params (no speed) ==="
           curl -s "https://zvukogram.com/index.php?r=api/subs" \
             -d "token=${ZVUKOGRAM_TOKEN}" -d "email=${ZVUKOGRAM_EMAIL}" \
-            -d "voice=Финн" -d "format=mp3" -d "speed=0.9" \
-            --data-urlencode "text=Dette er en kort testsetning for undertekster." | head -c 1000
+            -d "voice=Matthew plus" -d "format=mp3" \
+            --data-urlencode "text=This is a short test sentence for subtitles." | head -c 1000
           echo ""
