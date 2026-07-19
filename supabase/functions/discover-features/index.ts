@@ -355,6 +355,7 @@ For each candidate, return a verdict. Return ONLY valid JSON (no markdown fences
         status,
         source_commits: commitHashes.slice(0, 10),
         discovered_at: new Date().toISOString(),
+        published_at: status === 'published' ? new Date().toISOString() : null,
       })
 
       if (insertErr) {
