@@ -19,34 +19,16 @@ export async function callLLM(
   userPrompt: string,
   options: LLMOptions = {},
 ): Promise<string> {
-  const geminiKey = Deno.env.get('GOOGLE_API_KEY') || ''
   const groqKey = Deno.env.get('GROQ_API_KEY') || ''
-  const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY') || ''
 
-  // Try Gemini first
-  if (geminiKey) {
-    try {
-      return await callGemini(systemPrompt, userPrompt, options, geminiKey)
-    } catch (e: any) {
-      console.warn(`⚠️ Gemini failed: ${e.message}, trying Groq...`)
-    }
+  // Rewrite/translation runs on Groq ONLY (owner decision, 2026-07-23).
+  // Gemini is deliberately NOT used here; GOOGLE_API_KEY stays set because other
+  // functions (image validation, transcription, comment replies) call Gemini directly.
+  if (!groqKey) {
+    throw new Error('GROQ_API_KEY is required for rewrite/translation (Groq-only mode)')
   }
 
-  // Fallback to Groq (free, fast, reliable)
-  if (groqKey) {
-    try {
-      return await callGroq(systemPrompt, userPrompt, options, groqKey)
-    } catch (e: any) {
-      console.warn(`⚠️ Groq failed: ${e.message}, trying Claude...`)
-    }
-  }
-
-  // Last resort: Claude
-  if (anthropicKey) {
-    return await callClaude(systemPrompt, userPrompt, options, anthropicKey)
-  }
-
-  throw new Error('No LLM configured (GOOGLE_API_KEY, GROQ_API_KEY, or ANTHROPIC_API_KEY required)')
+  return await callGroq(systemPrompt, userPrompt, options, groqKey)
 }
 
 async function callGemini(
