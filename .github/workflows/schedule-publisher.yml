@@ -14,26 +14,22 @@ jobs:
     steps:
       - name: Invoke schedule-publisher Edge Function (proper Edge pipeline)
         env:
-          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SRV: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
-          PROJECT_REF=uchmopqiylywnemvjttl
           echo "📅 Schedule Publisher — $(date -u '+%H:%M UTC')"
 
-          # Fetch service_role key at runtime via Management API
-          SRV=$(curl -fsS --max-time 15 \
-            "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys" \
-            -H "Authorization: Bearer $SUPABASE_MGMT_PAT" \
-            | jq -r '.[] | select(.name=="service_role") | .api_key')
-
-          if [ -z "$SRV" ]; then
-            echo "::error::Failed to fetch service_role key"
+          # Self-hosted Supabase: service_role key comes from repo secrets
+          # (no Management API on a self-hosted stack).
+          if [ -z "$SRV" ] || [ -z "$SUPABASE_URL" ]; then
+            echo "::error::SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set"
             exit 1
           fi
 
           # Invoke Edge Function — handles window check, in-flight count, picks next due article,
           # fires auto-publish-news which does proper 3-language rewrite + image gen + social posting.
           RESPONSE=$(curl -fsS --max-time 90 \
-            -X POST "https://$PROJECT_REF.supabase.co/functions/v1/schedule-publisher" \
+            -X POST "$SUPABASE_URL/functions/v1/schedule-publisher" \
             -H "Authorization: Bearer $SRV" \
             -H "Content-Type: application/json" \
             -d '{}')
