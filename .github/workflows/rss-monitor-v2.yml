@@ -11,31 +11,26 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    # Self-hosted Supabase: base URL + service_role key come from repo secrets
+    # (no Management API on a self-hosted stack).
     env:
-      PROJECT_REF: uchmopqiylywnemvjttl
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SRV: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
-      - name: Fetch service_role key
-        id: keys
-        env:
-          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
+      - name: Check credentials
         run: |
-          SRV=$(curl -fsS --max-time 15 \
-            "https://api.supabase.com/v1/projects/${PROJECT_REF}/api-keys" \
-            -H "Authorization: Bearer $SUPABASE_MGMT_PAT" \
-            | jq -r '.[] | select(.name=="service_role") | .api_key')
-          if [ -z "$SRV" ]; then echo "::error::Failed to fetch service_role key"; exit 1; fi
-          echo "::add-mask::$SRV"
-          echo "srv=$SRV" >> $GITHUB_OUTPUT
+          if [ -z "$SRV" ] || [ -z "$SUPABASE_URL" ]; then
+            echo "::error::SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set"
+            exit 1
+          fi
 
       - name: Batch 0 (sources 0-7)
         continue-on-error: true
-        env:
-          SRV: ${{ steps.keys.outputs.srv }}
         run: |
           echo "📰 RSS Monitor v2 (Edge Function) — Batch 0 ($(date -u '+%H:%M UTC'))"
           RESPONSE=$(curl -fsS --max-time 600 \
-            -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/monitor-rss-sources" \
+            -X POST "$SUPABASE_URL/functions/v1/monitor-rss-sources" \
             -H "Authorization: Bearer $SRV" \
             -H "Content-Type: application/json" \
             -d '{"batchIndex":0,"batchSize":8}')
@@ -43,12 +38,10 @@ jobs:
 
       - name: Batch 1 (sources 8-15)
         continue-on-error: true
-        env:
-          SRV: ${{ steps.keys.outputs.srv }}
         run: |
           echo "📰 RSS Monitor v2 — Batch 1"
           RESPONSE=$(curl -fsS --max-time 600 \
-            -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/monitor-rss-sources" \
+            -X POST "$SUPABASE_URL/functions/v1/monitor-rss-sources" \
             -H "Authorization: Bearer $SRV" \
             -H "Content-Type: application/json" \
             -d '{"batchIndex":1,"batchSize":8}')
@@ -56,12 +49,10 @@ jobs:
 
       - name: Batch 2 (sources 16-23)
         continue-on-error: true
-        env:
-          SRV: ${{ steps.keys.outputs.srv }}
         run: |
           echo "📰 RSS Monitor v2 — Batch 2"
           RESPONSE=$(curl -fsS --max-time 600 \
-            -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/monitor-rss-sources" \
+            -X POST "$SUPABASE_URL/functions/v1/monitor-rss-sources" \
             -H "Authorization: Bearer $SRV" \
             -H "Content-Type: application/json" \
             -d '{"batchIndex":2,"batchSize":8}')
@@ -69,12 +60,10 @@ jobs:
 
       - name: Batch 3 (sources 24-31)
         continue-on-error: true
-        env:
-          SRV: ${{ steps.keys.outputs.srv }}
         run: |
           echo "📰 RSS Monitor v2 — Batch 3"
           RESPONSE=$(curl -fsS --max-time 600 \
-            -X POST "https://${PROJECT_REF}.supabase.co/functions/v1/monitor-rss-sources" \
+            -X POST "$SUPABASE_URL/functions/v1/monitor-rss-sources" \
             -H "Authorization: Bearer $SRV" \
             -H "Content-Type: application/json" \
             -d '{"batchIndex":3,"batchSize":8}')
