@@ -93,7 +93,8 @@ async function tryGroq(call: LlmCall, model: string): Promise<Response | null> {
         const groqData = await groqRes.json()
         const text = stripFence(groqData?.choices?.[0]?.message?.content?.trim() || '')
         if (text) {
-          console.log(`🟢 Groq (${model}) — ${text.length} chars`)
+          const u = groqData.usage || {}
+          console.log(`🟢 Groq (${model}) — ${text.length} chars | tokens: ${u.prompt_tokens || 0}+${u.completion_tokens || 0}`)
           return okResponse(text, groqData.usage)
         }
       }
@@ -175,8 +176,9 @@ async function tryGemini(call: LlmCall): Promise<Response | null> {
       const geminiData = await geminiRes.json()
       const text = stripFence(geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || '')
       if (text) {
-        console.log(`🟡 Gemini (${GEMINI_MODEL}) — ${text.length} chars`)
-        return okResponse(text, { total_tokens: 0 })
+        const um = geminiData.usageMetadata || {}
+        console.log(`🟡 Gemini (${GEMINI_MODEL}) — ${text.length} chars | tokens: ${um.promptTokenCount || 0}+${(um.candidatesTokenCount || 0) + (um.thoughtsTokenCount || 0)}`)
+        return okResponse(text, { total_tokens: um.totalTokenCount || 0 })
       }
       const blockReason = geminiData?.candidates?.[0]?.finishReason || geminiData?.promptFeedback?.blockReason || 'unknown'
       console.warn(`⚠️ Gemini returned empty text. Reason: ${blockReason}`)
