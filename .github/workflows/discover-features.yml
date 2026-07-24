@@ -1,9 +1,11 @@
 name: Discover Features
 
 on:
-  # Cron disabled 2026-07-04: daily analysis now runs through the Nano agent
-  # (Claude subscription), which posts precomputed features to the discover-features
-  # Edge Function. This workflow remains available for manual fallback runs.
+  # Cron re-enabled 2026-07-24: the Nano-agent replacement never got its scheduled
+  # task, and the Edge Function now runs on Groq (callLLM) instead of the dead
+  # Anthropic key, so the daily GH scan works again.
+  schedule:
+    - cron: '30 5 * * *'  # 07:30 Oslo (summer)
   workflow_dispatch:
     inputs:
       since:
