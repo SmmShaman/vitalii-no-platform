@@ -1,9 +1,10 @@
 name: Schedule Publisher
 
 on:
-  schedule:
-    # Run every 5 minutes during active hours
-    - cron: '*/5 * * * *'
+  # 2026-07-24: trigger moved to pg_cron on the VPS (job 'schedule-publisher-job',
+  # every 2 min, no GitHub cron throttling). Keep workflow_dispatch as manual backup.
+  # schedule:
+  #   - cron: '*/5 * * * *'
   workflow_dispatch:
 
 jobs:
