@@ -158,6 +158,10 @@ async function tryGemini(call: LlmCall): Promise<Response | null> {
   const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GOOGLE_API_KEY}`
 
   const generationConfig: Record<string, unknown> = { temperature: call.temperature, maxOutputTokens: call.maxTokens }
+  // Gemini 2.5 thinking tokens count against maxOutputTokens AND are billed as
+  // output — small-budget calls were coming back truncated mid-sentence after
+  // ~750 thought tokens. Disable thinking by default (0); override via env.
+  generationConfig.thinkingConfig = { thinkingBudget: parseInt(Deno.env.get('GEMINI_THINKING_BUDGET') || '0', 10) }
   if (call.expectsJson) {
     generationConfig.responseMimeType = 'application/json'
   }
