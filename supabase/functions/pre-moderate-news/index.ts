@@ -98,7 +98,8 @@ serve(async (req) => {
           }
         ],
         temperature: 0.3, // Lower temperature for more consistent moderation
-        max_tokens: 300
+        max_tokens: 300,
+        llm_route: 'bulk' // High-volume internal scoring — 8b-instant pool
       })
     })
 

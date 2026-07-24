@@ -149,7 +149,8 @@ Rules:
           { role: 'user', content: prompt }
         ],
         temperature: 0.1,
-        max_tokens: 200
+        max_tokens: 200,
+        llm_route: 'bulk' // High-volume internal check — 8b-instant pool
       })
     });
 
