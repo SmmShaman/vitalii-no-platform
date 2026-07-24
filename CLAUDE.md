@@ -40,7 +40,7 @@ npm run lint            # ESLint
 | **Storage (primary)** | Cloudflare R2 (`news-images`, `daily-videos`) | - |
 | **Storage (legacy)** | Supabase Storage (kept as fallback) | - |
 | **Edge Functions** | Deno | - |
-| **AI (text)** | Google Gemini 2.5 Flash → Claude → Groq → NVIDIA NIM (cascade) | - |
+| **AI (text)** | Per-task routing in `azure-to-gemini-shim.ts` (`llm_route`): **quality** (article rewrites EN/NO/UA) = Gemini 2.5 Flash → Groq 70b; **bulk** (pre-moderation, dup checks) = Groq llama-3.1-8b-instant; **default** (teasers, image prompts, enrichment) = Groq llama-3.3-70b-versatile → Gemini; NVIDIA NIM last resort everywhere. `callLLM` in `gemini-llm.ts` = Groq 70b only | - |
 | **AI (images)** | Google Gemini 3 Pro Image Preview ("Nano Banana Pro") | paid model |
 | **Deployment** | Netlify | - |
 | **CI/CD** | GitHub Actions | - |
