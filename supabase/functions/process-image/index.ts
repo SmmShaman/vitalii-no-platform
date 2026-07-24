@@ -204,6 +204,22 @@ async function generateImageCascading(
   aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
   articleContext?: { title: string; description?: string; content?: string }
 ): Promise<{ base64: string; provider: string; model: string } | null> {
+  // PRIORITY -1: OpenRouter (prepaid balance, gemini-2.5-flash-image ≈ $0.04/img).
+  // Owner decision 2026-07-24: spend the OpenRouter balance first for better quality;
+  // when credits run out (402) fall through to free Cloudflare FLUX.
+  if (Deno.env.get('OPENROUTER_API_KEY')) {
+    console.log('🔄 Cascading: trying OpenRouter (prepaid, primary)...')
+    const orModel = Deno.env.get('OPENROUTER_IMAGE_MODEL') || 'google/gemini-2.5-flash-image'
+    const orBase64 = await generateImageViaOpenRouter(prompt, aspectRatio)
+    if (orBase64) {
+      await trackProviderUsage(supabase, 'OpenRouter', orModel, true)
+      console.log('✅ OpenRouter succeeded')
+      return { base64: orBase64, provider: 'OpenRouter', model: orModel }
+    }
+    await trackProviderUsage(supabase, 'OpenRouter', orModel, false)
+    console.log('⚠️ OpenRouter failed/out of credits, falling back to Cloudflare FLUX...')
+  }
+
   // PRIORITY 0: Cloudflare Workers AI FLUX.1-schnell — free, fast (~2s), ~200/day cap.
   // If CF_AI_TOKEN is set, try this first and skip Gemini if it succeeds.
   if (Deno.env.get('CF_AI_TOKEN')) {
@@ -1398,6 +1414,58 @@ async function processImageWithAI(imageBase64: string, prompt: string, apiKey: s
  * Returns public R2 URL on success, null on any failure (caller falls through to next provider).
  * FLUX cannot render text accurately, so we strip text-on-image instructions from the prompt.
  */
+/**
+ * Generate an image via OpenRouter (chat completions with image modality).
+ * Returns raw base64 (no data: prefix) or null on any failure — including 402
+ * when the prepaid balance is exhausted, which triggers the FLUX fallback.
+ */
+async function generateImageViaOpenRouter(
+  prompt: string,
+  aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
+): Promise<string | null> {
+  const apiKey = Deno.env.get('OPENROUTER_API_KEY')
+  if (!apiKey) return null
+  const model = Deno.env.get('OPENROUTER_IMAGE_MODEL') || 'google/gemini-2.5-flash-image'
+
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        messages: [{
+          role: 'user',
+          content: `Generate an image: ${prompt}\n\nComposition: strict ${aspectRatio} aspect ratio.`,
+        }],
+        modalities: ['image', 'text'],
+      }),
+      signal: AbortSignal.timeout(90_000),
+    })
+
+    if (!res.ok) {
+      const err = await res.text().catch(() => '')
+      console.warn(`⚠️ OpenRouter image failed (${res.status}): ${err.substring(0, 200)}`)
+      return null
+    }
+
+    const data = await res.json()
+    const dataUrl = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url || ''
+    const b64Idx = dataUrl.indexOf('base64,')
+    if (b64Idx < 0) {
+      console.warn('⚠️ OpenRouter response contains no image data')
+      return null
+    }
+    console.log(`✅ OpenRouter (${model}) generated image, base64 len=${dataUrl.length - b64Idx - 7}`)
+    return dataUrl.substring(b64Idx + 7)
+  } catch (e: any) {
+    console.warn(`⚠️ OpenRouter image error: ${e?.message || e}`)
+    return null
+  }
+}
+
 async function generateImageViaCloudflareFlux(
   prompt: string,
   aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
