@@ -12,6 +12,10 @@
 
 const NVIDIA_API_KEY = Deno.env.get('NVIDIA_API_KEY') || ''
 const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY') || ''
+// Hard daily budget for Gemini text calls: the shared Google project has billing
+// enabled (paid image model), so over-limit text usage would cost real money.
+// Once the counter exceeds this, Gemini is skipped and the chain falls to Groq/NVIDIA.
+const GEMINI_DAILY_LIMIT = parseInt(Deno.env.get('GEMINI_DAILY_LIMIT') || '150', 10)
 const NVIDIA_MODEL = Deno.env.get('NVIDIA_MODEL') || 'meta/llama-3.1-70b-instruct'
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash'
 const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'llama-3.3-70b-versatile'
@@ -116,8 +120,39 @@ async function tryGroq(call: LlmCall, model: string): Promise<Response | null> {
   return null
 }
 
+/**
+ * Increment today's Gemini call counter and check the budget.
+ * Fail-open: if the counter itself errors, allow the call (Groq still backs it up).
+ */
+async function geminiBudgetOk(): Promise<boolean> {
+  const supabaseUrl = Deno.env.get('SUPABASE_URL')
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  if (!supabaseUrl || !serviceKey) return true
+  try {
+    const res = await fetchWithTimeout(`${supabaseUrl}/rest/v1/rpc/bump_llm_usage`, {
+      method: 'POST',
+      headers: {
+        'apikey': serviceKey,
+        'Authorization': `Bearer ${serviceKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ p_provider: 'gemini' }),
+    }, 5_000)
+    if (!res.ok) return true
+    const count = await res.json()
+    if (typeof count === 'number' && count > GEMINI_DAILY_LIMIT) {
+      console.warn(`🛑 Gemini daily budget exhausted (${count}/${GEMINI_DAILY_LIMIT}) — skipping Gemini`)
+      return false
+    }
+    return true
+  } catch {
+    return true
+  }
+}
+
 async function tryGemini(call: LlmCall): Promise<Response | null> {
   if (!GOOGLE_API_KEY) return null
+  if (!(await geminiBudgetOk())) return null
   const parts = call.messages.map(m => m.content).join('\n\n')
   const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GOOGLE_API_KEY}`
 
