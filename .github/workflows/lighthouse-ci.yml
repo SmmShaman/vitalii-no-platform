@@ -85,12 +85,14 @@ jobs:
 
     steps:
       - name: Download Mobile Results
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: lighthouse-mobile-results
           path: mobile-results/
 
       - name: Download Desktop Results
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: lighthouse-desktop-results

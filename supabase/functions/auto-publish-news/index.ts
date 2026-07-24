@@ -342,7 +342,8 @@ serve(async (req) => {
       rewriteBody.imagesWithMeta = news.images_with_meta || null
     }
 
-    const rewriteResponse = await callFunction(processingEndpoint, rewriteBody)
+    // 240s: Gemini-first rewrite (3 languages) + link enrichment can exceed the 50s default
+    const rewriteResponse = await callFunction(processingEndpoint, rewriteBody, 240000)
 
     if (!rewriteResponse.ok) {
       const errorText = await rewriteResponse.text()
