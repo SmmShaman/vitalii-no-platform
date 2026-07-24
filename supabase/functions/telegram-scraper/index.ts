@@ -21,6 +21,7 @@ import {
 } from '../_shared/youtube-helpers.ts'
 import { escapeHtml } from '../_shared/social-media-helpers.ts'
 import { formatCompactVariants, buildPresetKeyboard } from '../_shared/telegram-format-helpers.ts'
+import { loadScheduleConfig, computeScheduledTime, classifyContentWeight, formatScheduledTime } from '../_shared/schedule-helpers.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -785,26 +786,30 @@ serve(async (req) => {
                 approvedCount++
                 totalApproved++
 
-                // 🤖 Auto-publish: only for RSS sources, Telegram channels go to manual moderation
-                if (false) { // DISABLED for telegram-scraper: Telegram news must go through manual bot moderation
-                  console.log(`🤖 Auto-publish enabled — firing auto-publish pipeline for post ${post.messageId}`)
+                // 🤖 Auto-publish: schedule into the publish queue (no manual confirmation).
+                // Slots are spaced by PUBLISH_SCHEDULE_SLOT_MINUTES and drained one-at-a-time
+                // by schedule-publisher, so bursts of approved posts never publish simultaneously.
+                if (isAutoPublishEnabled) {
                   try {
-                    // Fire-and-forget: don't await the response
-                    fetch(`${SUPABASE_URL}/functions/v1/auto-publish-news`, {
-                      method: 'POST',
-                      headers: {
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                        'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify({
-                        newsId: newsEntry.id,
-                        source: 'telegram'
-                      })
-                    }).catch(e => console.warn('⚠️ Auto-publish fire-and-forget error:', e))
+                    const schedConfig = await loadScheduleConfig(supabase)
+                    const weight = classifyContentWeight(newsEntry)
+                    const { scheduledAt, window: winId, windowLabel } = await computeScheduledTime(weight, schedConfig, supabase)
 
-                    // Send lightweight info to Telegram and save message_id to prevent duplicate sends
+                    await supabase
+                      .from('news')
+                      .update({
+                        auto_publish_status: 'scheduled',
+                        scheduled_publish_at: scheduledAt.toISOString(),
+                        content_weight: weight,
+                        schedule_window: winId,
+                      })
+                      .eq('id', newsEntry.id)
+
+                    console.log(`📅 Auto-publish: post ${post.messageId} scheduled for ${formatScheduledTime(scheduledAt)} (${windowLabel})`)
+
+                    // Lightweight info to Telegram (no approval buttons) + save message_id
                     if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
-                      const infoText = `🤖 <b>Auto-publishing in progress...</b>\n\n📰 ${escapeHtml(post.text.substring(0, 150))}\n\n⏳ <i>AI обирає зображення та публікує автоматично</i>`
+                      const infoText = `📅 <b>Заплановано автопублікацію</b> — ${formatScheduledTime(scheduledAt)} (${windowLabel})\n\n📰 ${escapeHtml(post.text.substring(0, 150))}`
                       const tgResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -825,7 +830,6 @@ serve(async (req) => {
                               telegram_message_id: tgResult.result.message_id,
                             })
                             .eq('id', newsEntry.id)
-                          console.log(`📝 Auto-publish: saved telegram_message_id=${tgResult.result.message_id} for ${newsEntry.id}`)
                         }
                       } catch (e) {
                         console.warn('⚠️ Failed to save auto-publish telegram_message_id:', e)
@@ -834,9 +838,9 @@ serve(async (req) => {
 
                     sentToBotCount++
                     totalSentToBot++
-                    continue // Skip the normal Telegram bot flow
+                    continue // Skip the manual moderation card
                   } catch (autoPublishError) {
-                    console.error('❌ Auto-publish trigger failed, falling back to manual:', autoPublishError)
+                    console.error('❌ Auto-schedule failed, falling back to manual moderation:', autoPublishError)
                     // Fall through to normal Telegram bot flow
                   }
                 }

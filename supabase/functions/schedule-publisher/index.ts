@@ -57,6 +57,21 @@ serve(async (req) => {
       )
     }
 
+    // 3b. Daily safety cap (PUBLISH_SCHEDULE_MAX_PER_DAY): count pipeline starts today
+    const dayStart = new Date()
+    dayStart.setUTCHours(0, 0, 0, 0)
+    const { count: startedToday } = await supabase
+      .from('news')
+      .select('id', { count: 'exact', head: true })
+      .gte('auto_publish_started_at', dayStart.toISOString())
+    if ((startedToday || 0) >= config.maxPerDay) {
+      console.log(`🛑 Daily cap reached (${startedToday}/${config.maxPerDay}), skipping until tomorrow`)
+      return new Response(
+        JSON.stringify({ success: true, action: 'daily_cap', count: startedToday, max: config.maxPerDay }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // 4. Pick next due scheduled article
     // scheduled_publish_at is stored in Oslo-as-UTC format (from computeScheduledTime),
     // so compare with Oslo time, not real UTC

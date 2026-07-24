@@ -436,29 +436,33 @@ serve(async (req) => {
       console.log(`🛑 Daily social cap reached (${distinctTodayCount}/${MAX_SOCIAL_PER_DAY}) — skipping social, website-only`)
     }
 
-    // LinkedIn Smart Filtering: skip LinkedIn if linkedin_score < 7 or daily limit reached
+    // LinkedIn filtering: hard daily cap (default 1 — only the top article posts there),
+    // enforced for EVERYONE including presets, so top-social's #1 takes the slot and the
+    // rest of the day stays quiet. Score filter applies only to non-preset articles.
     const linkedinScore = (news.rss_analysis as any)?.linkedin_score || 0
-    const LINKEDIN_MIN_SCORE = 7
-    const LINKEDIN_DAILY_LIMIT = 2
+    const { data: liLimitSetting } = await supabase
+      .from('api_settings')
+      .select('key_value')
+      .eq('key_name', 'LINKEDIN_DAILY_LIMIT')
+      .maybeSingle()
+    const LINKEDIN_DAILY_LIMIT = parseInt(liLimitSetting?.key_value || '1', 10)
     let linkedinSkipped = false
     let linkedinSkipReason = ''
 
-    if (platforms.includes('linkedin') && !preset?.socialPlatforms) {
-      // Only auto-filter if platforms not explicitly set via preset
-      if (linkedinScore < LINKEDIN_MIN_SCORE) {
+    if (platforms.includes('linkedin')) {
+      const todayCount = await getTodayLinkedInCount(supabase)
+      if (todayCount >= LINKEDIN_DAILY_LIMIT) {
         linkedinSkipped = true
-        linkedinSkipReason = `score ${linkedinScore}/10 < ${LINKEDIN_MIN_SCORE}`
+        linkedinSkipReason = `daily limit reached (${todayCount}/${LINKEDIN_DAILY_LIMIT})`
+        console.log(`🔗 LinkedIn SKIPPED: ${linkedinSkipReason}`)
+      } else if (!preset?.socialPlatforms) {
+        // LinkedIn is reserved for the daily top pick (send-top-social preset) and
+        // deliberate manual publishes — regular flow-through articles never post there.
+        linkedinSkipped = true
+        linkedinSkipReason = `reserved for daily top pick (score was ${linkedinScore}/10)`
         console.log(`🔗 LinkedIn SKIPPED: ${linkedinSkipReason}`)
       } else {
-        // Check daily limit
-        const todayCount = await getTodayLinkedInCount(supabase)
-        if (todayCount >= LINKEDIN_DAILY_LIMIT) {
-          linkedinSkipped = true
-          linkedinSkipReason = `daily limit reached (${todayCount}/${LINKEDIN_DAILY_LIMIT})`
-          console.log(`🔗 LinkedIn SKIPPED: ${linkedinSkipReason}`)
-        } else {
-          console.log(`🔗 LinkedIn OK: score ${linkedinScore}/10, today ${todayCount}/${LINKEDIN_DAILY_LIMIT}`)
-        }
+        console.log(`🔗 LinkedIn OK: score ${linkedinScore}/10, today ${todayCount}/${LINKEDIN_DAILY_LIMIT}`)
       }
     }
 

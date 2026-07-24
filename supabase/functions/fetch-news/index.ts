@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-const VERSION_STAMP = '2026-03-29-force-redeploy'
+const VERSION_STAMP = '2026-07-24-schedule-queue'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
+import { loadScheduleConfig, computeScheduledTime, classifyContentWeight, formatScheduledTime } from '../_shared/schedule-helpers.ts'
 import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts"
 import {
   checkDuplicateByTitle,
@@ -300,21 +301,25 @@ serve(async (req) => {
               approvedCount++
               totalApproved++
 
-              // 🤖 Auto-publish: fire-and-forget if enabled
+              // 🤖 Auto-publish: schedule into the publish queue (spread across slots,
+              // drained one-at-a-time by schedule-publisher — no simultaneous LLM bursts)
               if (isAutoPublishEnabled) {
-                console.log(`🤖 Auto-publish enabled — firing auto-publish pipeline for article`)
                 try {
-                  fetch(`${SUPABASE_URL}/functions/v1/auto-publish-news`, {
-                    method: 'POST',
-                    headers: {
-                      'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                      newsId: newsEntry.id,
-                      source: 'rss'
+                  const schedConfig = await loadScheduleConfig(supabase)
+                  const weight = classifyContentWeight(newsEntry)
+                  const { scheduledAt, window: winId, windowLabel } = await computeScheduledTime(weight, schedConfig, supabase)
+
+                  await supabase
+                    .from('news')
+                    .update({
+                      auto_publish_status: 'scheduled',
+                      scheduled_publish_at: scheduledAt.toISOString(),
+                      content_weight: weight,
+                      schedule_window: winId,
                     })
-                  }).catch(e => console.warn('⚠️ Auto-publish fire-and-forget error:', e))
+                    .eq('id', newsEntry.id)
+
+                  console.log(`📅 Auto-publish: RSS article scheduled for ${formatScheduledTime(scheduledAt)} (${windowLabel})`)
 
                   if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
                     const tgResponse = await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -322,7 +327,7 @@ serve(async (req) => {
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
                         chat_id: TELEGRAM_CHAT_ID,
-                        text: `🤖 <b>Auto-publishing RSS article...</b>\n\n📰 ${article.title?.substring(0, 150) || 'Untitled'}\n\n⏳ <i>AI обирає зображення та публікує автоматично</i>`,
+                        text: `📅 <b>Заплановано автопублікацію</b> — ${formatScheduledTime(scheduledAt)} (${windowLabel})\n\n📰 ${article.title?.substring(0, 150) || 'Untitled'}`,
                         parse_mode: 'HTML'
                       })
                     })
@@ -340,7 +345,7 @@ serve(async (req) => {
                   totalProcessed++
                   continue // Skip normal Telegram bot flow
                 } catch (autoPublishError) {
-                  console.error('❌ Auto-publish trigger failed, falling back to manual:', autoPublishError)
+                  console.error('❌ Auto-schedule failed, falling back to manual moderation:', autoPublishError)
                 }
               }
 
