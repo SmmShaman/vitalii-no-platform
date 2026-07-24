@@ -424,7 +424,7 @@ serve(async (req) => {
     todayStart.setHours(0, 0, 0, 0)
     const { count: todaySocialCount } = await supabase
       .from('social_media_posts')
-      .select('news_id', { count: 'exact', head: true })
+      .select('content_id', { count: 'exact', head: true })
       .in('status', ['posted', 'pending'])
       .gte('created_at', todayStart.toISOString())
     const distinctTodayCount = todaySocialCount || 0
