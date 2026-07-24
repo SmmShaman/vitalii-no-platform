@@ -34,6 +34,8 @@ function sanitizeText(text: string, maxLength: number = 1000): string {
   if (!text) return ''
 
   return text
+    // Strip markdown links (cross-links leak in from enriched content): [text](url) → text
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
     // Remove HTML tags
     .replace(/<[^>]*>/g, '')
     // Decode HTML entities
@@ -392,13 +394,19 @@ async function fetchNewsContent(
   // Get source link (external source URL extracted from Telegram post)
   const sourceLink = news.source_link || null
 
+  // 3-4 hashtags from article tags for the post footer
+  const hashtags = Array.isArray(news.tags) && news.tags.length > 0
+    ? news.tags.slice(0, 4).map((t: string) => `#${String(t).replace(/[^a-zA-Z0-9]/g, '')}`).filter((t: string) => t.length > 1).join(' ')
+    : ''
+
   return {
     title,
     description,
     fullContent,
     url,
     imageUrl,
-    sourceLink
+    sourceLink,
+    hashtags
   }
 }
 
@@ -543,6 +551,12 @@ const SOURCE_LABEL: Record<string, string> = {
   ua: 'Джерело'
 }
 
+const READ_LABEL: Record<string, string> = {
+  en: 'Read the full article',
+  no: 'Les hele artikkelen',
+  ua: 'Читати повністю'
+}
+
 /**
  * Extract domain from a URL (e.g., "https://www.tu.no/article/123" → "tu.no")
  */
@@ -568,30 +582,35 @@ async function postToLinkedIn(content: {
   imageUrl?: string
   sourceLink?: string
   teaser?: string  // AI-generated teaser (priority)
+  hashtags?: string
   language: 'en' | 'no' | 'ua'  // For localized CTA
 }): Promise<{ success: boolean; postId?: string; error?: string }> {
   try {
-    // Build the share commentary (LinkedIn limit is 3000 chars)
-    // Use teaser if available, otherwise fall back to title + description
+    // Build the share commentary (LinkedIn limit is 3000 chars).
+    // Everything — teaser included — goes through sanitizeText so raw JSON,
+    // markdown links and HTML can never reach the published post.
     let commentary: string
 
     if (content.teaser) {
-      // Use AI-generated teaser - already includes emojis
-      commentary = content.teaser
+      commentary = sanitizeText(content.teaser, 2500)
       console.log('📝 Using AI-generated teaser for LinkedIn post')
     } else {
-      // Fallback: title + description
       commentary = `${content.title}\n\n${content.description}`
       console.log('📝 Using title+description fallback for LinkedIn post')
     }
 
-    // Append source attribution + article link
+    // Footer: one clear CTA link, source as plain domain (no second raw URL), hashtags last
+    const readLabel = READ_LABEL[content.language] || READ_LABEL.en
     const sourceLabel = SOURCE_LABEL[content.language] || SOURCE_LABEL.en
     const sourceDomain = extractDomain(content.sourceLink)
+
+    commentary += `\n\n📖 ${readLabel}: ${content.url}`
     if (sourceDomain) {
-      commentary += `\n\n${sourceLabel}: ${content.sourceLink}`
+      commentary += `\n${sourceLabel}: ${sourceDomain}`
     }
-    commentary += `\n🔗 ${content.url}`
+    if (content.hashtags) {
+      commentary += `\n\n${content.hashtags}`
+    }
 
     const safeCommentary = commentary.substring(0, 2900)
 

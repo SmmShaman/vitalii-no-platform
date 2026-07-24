@@ -244,10 +244,31 @@ ${VOICE_SOCIAL}`
   }
 
   const data = await response.json()
-  const teaser = data.choices[0]?.message?.content?.trim()
+  let teaser = data.choices[0]?.message?.content?.trim()
 
   if (!teaser) {
     throw new Error('Empty response from AI')
+  }
+
+  // Defensive unwrap: if the model returned a JSON object anyway, extract the text value
+  if (teaser.startsWith('{')) {
+    try {
+      const parsed = JSON.parse(teaser)
+      const inner = parsed.text || parsed.teaser || Object.values(parsed).find(v => typeof v === 'string' && v.length > 40)
+      if (typeof inner === 'string') teaser = inner.trim()
+    } catch (_e) {
+      // Try to salvage the "text" value from truncated/invalid JSON
+      const m = teaser.match(/"(?:text|teaser)"\s*:\s*"([\s\S]+?)(?:"\s*[},]|$)/)
+      if (m?.[1]) teaser = m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').trim()
+    }
+  }
+
+  // Strip markdown links (site cross-links leak in from enriched content): [text](url) → text
+  teaser = teaser.replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+
+  // Never cache junk: a real teaser is at least a sentence
+  if (teaser.length < 40) {
+    throw new Error(`Teaser too short (${teaser.length} chars) — refusing to cache junk`)
   }
 
   return teaser

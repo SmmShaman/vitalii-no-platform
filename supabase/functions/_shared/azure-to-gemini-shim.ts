@@ -256,7 +256,12 @@ export async function azureFetch(
     messages: body.messages || [],
     temperature: body.temperature ?? 0.5,
     maxTokens: body.max_tokens ?? 8000,
-    expectsJson: /json/i.test(body.messages?.find((m: { role: string }) => m.role === 'system')?.content || ''),
+    // Force-JSON only when the system prompt POSITIVELY asks for JSON — "No JSON,
+    // no metadata" style prohibitions must not trigger json_object mode.
+    expectsJson: (() => {
+      const sys = body.messages?.find((m: { role: string }) => m.role === 'system')?.content || ''
+      return /json/i.test(sys) && !/no json|not json|без json/i.test(sys)
+    })(),
   }
 
   let providers: Array<() => Promise<Response | null>>
