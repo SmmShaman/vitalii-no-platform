@@ -272,7 +272,11 @@ serve(async (req) => {
     if (aiPosts) {
       console.log('AI generated posts successfully')
     } else {
-      console.log('AI failed, using fallback templates')
+      // Quality guard: never publish the bare fallback template to socials.
+      // Skip today; the daily cron retries tomorrow with fresh LLM quotas.
+      console.log('AI failed — skipping feature post (no fallback to socials)')
+      await sendTelegram(`📋 <b>Feature Social</b>\n\n⚠️ AI-копірайт недоступний (ліміти LLM?) — пост фічі ${featureNum}/${featureOrder.length} (${lang.toUpperCase()}) пропущено, спробую завтра.`)
+      return json({ ok: false, skipped: true, reason: 'ai_unavailable' })
     }
 
     const results: Record<string, { ok: boolean; url?: string; error?: string }> = {}

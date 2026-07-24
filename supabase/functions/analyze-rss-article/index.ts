@@ -447,7 +447,8 @@ serve(async (req) => {
           }
         ],
         temperature: 0.3,
-        max_tokens: 1000
+        max_tokens: 1000,
+        llm_route: 'bulk' // High-volume scoring (~40 articles/day) — keep it off the 70b TPD pool
       })
     })
 
