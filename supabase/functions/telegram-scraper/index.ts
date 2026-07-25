@@ -757,7 +757,9 @@ serve(async (req) => {
                 reason: 'Pre-moderation disabled',
                 is_advertisement: false,
                 is_duplicate: false,
-                quality_score: 5
+                // No verdict was asked for, so there is no score. Writing a 5 here
+                // made bypassed posts look like they had been judged 5/10.
+                quality_score: null as unknown as number
               }
 
               if (isPreModerationEnabled && !source.skip_pre_moderation) {
