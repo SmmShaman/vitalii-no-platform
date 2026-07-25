@@ -3,9 +3,13 @@
  * Drop-in replacement for Azure OpenAI calls.
  *
  * Routes (callers pass `llm_route` in the request body, default 'default'):
- *   quality — Gemini 2.5 Flash → gpt-oss-120b → Groq 70b → NVIDIA  (user-facing NO/UA text: article rewrites)
- *   bulk    — Groq 8b-instant → gpt-oss-20b → Gemini → NVIDIA      (high-volume internal scoring)
- *   default — gpt-oss-120b → Groq 70b → Gemini → NVIDIA            (creative EN: teasers, image prompts, enrichment)
+ *   quality — Gemini → gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA  (user-facing NO/UA text)
+ *   bulk    — Groq 8b-instant → gpt-oss-20b → Gemini → NVIDIA          (high-volume internal scoring)
+ *   default — gpt-oss-120b → gpt-oss-20b → Groq 70b → Gemini → NVIDIA  (creative EN: teasers, prompts)
+ *
+ * Each gpt-oss model carries only 8k TPM, and one article-sized call is ~4k, so
+ * the two of them are chained to double the per-minute headroom before the
+ * scarce 70b pool or paid Gemini are touched.
  *
  * Groq rate limits are per-model, so every model in the chain draws from its own
  * pool. The 70b pool (100k TPD) is the scarcest and is shared with the jobbot
@@ -283,6 +287,7 @@ export async function azureFetch(
     providers = [
       () => tryGemini(call),
       () => tryGroq(call, GROQ_MODEL_REASON),
+      () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryGroq(call, GROQ_MODEL),
       () => tryNvidia(call),
     ]
@@ -296,6 +301,7 @@ export async function azureFetch(
   } else {
     providers = [
       () => tryGroq(call, GROQ_MODEL_REASON),
+      () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryGroq(call, GROQ_MODEL),
       () => tryGemini(call),
       () => tryNvidia(call),
