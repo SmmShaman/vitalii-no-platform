@@ -17,6 +17,7 @@ import {
   formatDate,
   calculateReadingTime,
 } from '@/utils/seo'
+import { visibleResourceLinks } from '@/lib/source-policy'
 
 // Helper function to extract YouTube video ID
 function extractYouTubeId(url: string): string {
@@ -89,6 +90,8 @@ export function BlogArticle({ slug, initialLanguage, initialData }: BlogArticleP
   const heroImage = heroImgFailed ? null : heroImagePrimary
   const originalImage = post?.image_url || post?.cover_image_url // Original source image for attribution
   const sourceName = post?.source_news_id ? '' : '' // Blog posts usually don't need source attribution
+  // Telegram-sourced posts must not link back to the channel (see @/lib/source-policy).
+  const resourceLinks = visibleResourceLinks(post)
 
   // Collect all images for lightbox (hero + images from content) - MUST be before conditional returns
   const allImages = useMemo(() => {
@@ -507,8 +510,8 @@ export function BlogArticle({ slug, initialLanguage, initialData }: BlogArticleP
             )
           })()}
 
-          {/* Source Links - Display all external links */}
-          {(post.source_links?.length > 0 || post.original_url) && (
+          {/* Resource links - filtered by @/lib/source-policy (Telegram sources are not credited) */}
+          {resourceLinks.length > 0 && (
             <ScrollReveal delay={0.5}>
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-content mb-3 flex items-center gap-2">
@@ -516,38 +519,24 @@ export function BlogArticle({ slug, initialLanguage, initialData }: BlogArticleP
                   Resources
                 </h2>
                 <div className="flex flex-wrap gap-3">
-                  {/* If we have multiple source_links, display all */}
-                  {post.source_links?.length > 0 ? (
-                    post.source_links.map((link: string, index: number) => {
-                      let hostname = 'Source'
-                      try {
-                        hostname = new URL(link).hostname.replace('www.', '')
-                      } catch {}
-                      return (
-                        <a
-                          key={index}
-                          href={link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-surface-elevated hover:bg-brand/15 text-content-secondary hover:text-brand-light rounded-lg transition-colors text-sm font-medium"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                          {hostname}
-                        </a>
-                      )
-                    })
-                  ) : (
-                    /* Fallback to original_url */
-                    <a
-                      href={post.original_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-brand hover:bg-brand-darker text-white rounded-lg transition-colors font-medium"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Read Original Article
-                    </a>
-                  )}
+                  {resourceLinks.map((link: string, index: number) => {
+                    let hostname = 'Source'
+                    try {
+                      hostname = new URL(link).hostname.replace('www.', '')
+                    } catch {}
+                    return (
+                      <a
+                        key={index}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-surface-elevated hover:bg-brand/15 text-content-secondary hover:text-brand-light rounded-lg transition-colors text-sm font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        {hostname}
+                      </a>
+                    )
+                  })}
                 </div>
               </div>
             </ScrollReveal>
