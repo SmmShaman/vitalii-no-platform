@@ -1,9 +1,10 @@
-// Regenerate translations using alternative LLM providers (Gemini, Claude, etc.)
+// Regenerate translations through the shared LLM router (Gemini-free quality route).
 const VERSION_STAMP = '2026-03-29-force-redeploy'
 // Regenerate translations using alternative LLM providers
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
-import { callLLM, extractJSON } from '../_shared/gemini-llm.ts'
+import { extractJSON } from '../_shared/gemini-llm.ts'
+import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
 import { HUMANIZER_ARTICLE } from '../_shared/humanizer-prompt.ts'
 
 const corsHeaders = {
@@ -15,29 +16,30 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 // Provider configs
+// RULE (owner, 2026-07-25): translations never run on paid Gemini. This tool goes
+// through the shared LLM router on the 'quality' route, which is Gemini-free.
 const PROVIDERS: Record<string, { call: (system: string, user: string) => Promise<string> }> = {
-  gemini: {
+  router: {
     call: async (system: string, user: string) => {
-      const apiKey = Deno.env.get('GOOGLE_API_KEY')
-      if (!apiKey) throw new Error('GOOGLE_API_KEY not set')
-      const resp = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            systemInstruction: { parts: [{ text: system }] },
-            contents: [{ role: 'user', parts: [{ text: user }] }],
-            generationConfig: { temperature: 0.5, maxOutputTokens: 4000 },
-          }),
-        }
-      )
+      const resp = await azureFetch('router', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          llm_route: 'quality',
+          temperature: 0.5,
+          max_tokens: 8000,
+          messages: [
+            { role: 'system', content: system },
+            { role: 'user', content: user },
+          ],
+        }),
+      })
       if (!resp.ok) {
         const err = await resp.text()
-        throw new Error(`Gemini error ${resp.status}: ${err.substring(0, 300)}`)
+        throw new Error(`LLM router error ${resp.status}: ${err.substring(0, 300)}`)
       }
       const data = await resp.json()
-      return data.candidates?.[0]?.content?.parts?.[0]?.text || ''
+      return data?.choices?.[0]?.message?.content || ''
     },
   },
 }
@@ -50,7 +52,7 @@ serve(async (req) => {
     const url = new URL(req.url)
     const targetDate = url.searchParams.get('target_date') || ''
     const lang = url.searchParams.get('lang') || 'ua'  // ua, en, no, all
-    const provider = url.searchParams.get('provider') || 'gemini'
+    const provider = url.searchParams.get('provider') || 'router'
     const dryRun = url.searchParams.get('dry_run') === 'true'
     const limitN = parseInt(url.searchParams.get('limit') || '100')
     const offsetN = parseInt(url.searchParams.get('offset') || '0')

@@ -118,6 +118,8 @@ serve(async (req) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
+        // RSS rewrite runs on the quality route, which is deliberately Gemini-free.
+        llm_route: 'quality',
         messages: [
           {
             role: 'system',

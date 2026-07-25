@@ -137,7 +137,7 @@ async function rewriteOneLanguage(
       ],
       temperature: 0.5,
       max_tokens: 8000, // Per-provider max output. Plenty for ~500 words even in Cyrillic.
-      llm_route: 'quality', // Gemini first — noticeably better Norwegian/Ukrainian than llama
+      llm_route: 'quality', // Gemini-free chain: gpt-oss-120b leads on NO/UA quality
     }),
   })
 

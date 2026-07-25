@@ -3,7 +3,7 @@
  * Drop-in replacement for Azure OpenAI calls.
  *
  * Routes (callers pass `llm_route` in the request body, default 'default'):
- *   quality — Gemini → gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA  (user-facing NO/UA text)
+ *   quality — gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA          (rewrites + translations)
  *   bulk    — Groq 8b-instant → gpt-oss-20b → Gemini → NVIDIA          (high-volume internal scoring)
  *   default — gpt-oss-120b → gpt-oss-20b → Groq 70b → Gemini → NVIDIA  (creative EN: teasers, prompts)
  *
@@ -284,8 +284,10 @@ export async function azureFetch(
 
   let providers: Array<() => Promise<Response | null>>
   if (route === 'quality') {
+    // RULE: rewrites and translations never touch Gemini - it is a paid model on
+    // this project (billing is enabled) and rewrite is the highest-volume task we
+    // have. Owner decision 2026-07-25. Do not add tryGemini to this chain.
     providers = [
-      () => tryGemini(call),
       () => tryGroq(call, GROQ_MODEL_REASON),
       () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryGroq(call, GROQ_MODEL),
