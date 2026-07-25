@@ -16,6 +16,7 @@ import {
   generateNewsArticleSchema,
   formatDate,
 } from '@/utils/seo'
+import { showsSourceCredit, visibleResourceLinks } from '@/lib/source-policy'
 
 // Helper function to extract YouTube video ID
 function extractYouTubeId(url: string): string {
@@ -87,7 +88,10 @@ export function NewsArticle({ slug, initialLanguage, initialData }: NewsArticleP
   const [heroImgFailed, setHeroImgFailed] = useState(false)
   const heroImage = heroImgFailed ? null : heroImagePrimary
   const originalImage = news?.image_url // Original source image for attribution
-  const sourceName = news?.original_url ? (() => { try { return new URL(news.original_url).hostname.replace('www.', '') } catch { return '' } })() : (news?.rss_source_url ? (() => { try { return new URL(news.rss_source_url).hostname.replace('www.', '') } catch { return '' } })() : '')
+  // Telegram-sourced articles show no credit: we are the author of the rewrite
+  // and we do not point readers at the source channels (see @/lib/source-policy).
+  const sourceName = !showsSourceCredit(news) ? '' : (news?.original_url ? (() => { try { return new URL(news.original_url).hostname.replace('www.', '') } catch { return '' } })() : (news?.rss_source_url ? (() => { try { return new URL(news.rss_source_url).hostname.replace('www.', '') } catch { return '' } })() : ''))
+  const resourceLinks = visibleResourceLinks(news)
 
   // Collect all images for lightbox (hero + images from content) - MUST be before conditional returns
   const allImages = useMemo(() => {
@@ -498,8 +502,8 @@ export function NewsArticle({ slug, initialLanguage, initialData }: NewsArticleP
             )
           })()}
 
-          {/* Source Links - Display all external links */}
-          {(news.source_links?.length > 0 || news.source_link || news.original_url) && (
+          {/* Resource links - filtered by @/lib/source-policy (Telegram sources are not credited) */}
+          {resourceLinks.length > 0 && (
             <ScrollReveal delay={0.5}>
               <div className="mb-8">
                 <h2 className="text-lg font-semibold text-content mb-3 flex items-center gap-2">
@@ -507,9 +511,7 @@ export function NewsArticle({ slug, initialLanguage, initialData }: NewsArticleP
                   Resources
                 </h2>
                 <div className="flex flex-wrap gap-3">
-                  {/* If we have multiple source_links, display all */}
-                  {news.source_links?.length > 0 ? (
-                    news.source_links.map((link: string, index: number) => {
+                  {resourceLinks.map((link: string, index: number) => {
                       let hostname = 'Source'
                       try {
                         hostname = new URL(link).hostname.replace('www.', '')
@@ -526,19 +528,7 @@ export function NewsArticle({ slug, initialLanguage, initialData }: NewsArticleP
                           {hostname}
                         </a>
                       )
-                    })
-                  ) : (
-                    /* Fallback to single source_link or original_url */
-                    <a
-                      href={news.source_link || news.original_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-news hover:bg-news-dark text-white rounded-lg transition-colors font-medium"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Read Original Article
-                    </a>
-                  )}
+                  })}
                 </div>
               </div>
             </ScrollReveal>
