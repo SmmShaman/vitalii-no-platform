@@ -117,7 +117,28 @@ function buildUserPrompt(title: string, content: string, sourceUrl: string): str
   return `Original Title: ${title}\n\nOriginal Content:\n${content.substring(0, 6000)}\n\nSource URL: ${sourceUrl}`
 }
 
+/**
+ * One language, with one retry. Reasoning models occasionally return a JSON body
+ * that is cut off mid-string while still reporting finish_reason=stop, which makes
+ * the whole 3-language rewrite fail and drops the article to status='failed'.
+ * A single retry re-rolls both the sampling and (via the router) the provider.
+ */
 async function rewriteOneLanguage(
+  langCode: 'en' | 'no' | 'ua',
+  title: string,
+  content: string,
+  sourceUrl: string,
+  openingStyle: string,
+): Promise<LanguageRewrite> {
+  try {
+    return await rewriteOneLanguageOnce(langCode, title, content, sourceUrl, openingStyle)
+  } catch (e: any) {
+    console.warn(`  [${langCode}] rewrite attempt 1 failed: ${String(e?.message).substring(0, 160)} — retrying once`)
+    return await rewriteOneLanguageOnce(langCode, title, content, sourceUrl, openingStyle)
+  }
+}
+
+async function rewriteOneLanguageOnce(
   langCode: 'en' | 'no' | 'ua',
   title: string,
   content: string,
