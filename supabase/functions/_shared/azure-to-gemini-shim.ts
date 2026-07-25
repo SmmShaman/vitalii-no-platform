@@ -3,11 +3,13 @@
  * Drop-in replacement for Azure OpenAI calls.
  *
  * Routes (callers pass `llm_route` in the request body, default 'default'):
- *   quality — Gemini 2.5 Flash → Groq 70b → NVIDIA   (user-facing NO/UA text: article rewrites)
- *   bulk    — Groq 8b-instant → Gemini → NVIDIA      (high-volume internal scoring: pre-moderation, dup checks)
- *   default — Groq 70b → Gemini → NVIDIA             (creative EN: teasers, image prompts, enrichment)
+ *   quality — Gemini 2.5 Flash → gpt-oss-120b → Groq 70b → NVIDIA  (user-facing NO/UA text: article rewrites)
+ *   bulk    — Groq 8b-instant → gpt-oss-20b → Gemini → NVIDIA      (high-volume internal scoring)
+ *   default — gpt-oss-120b → Groq 70b → Gemini → NVIDIA            (creative EN: teasers, image prompts, enrichment)
  *
- * Groq rate limits are per-model, so bulk (8b) and default (70b) draw from separate pools.
+ * Groq rate limits are per-model, so every model in the chain draws from its own
+ * pool. The 70b pool (100k TPD) is the scarcest and is shared with the jobbot
+ * project, so it is no longer the first choice on any route.
  */
 
 const NVIDIA_API_KEY = Deno.env.get('NVIDIA_API_KEY') || ''
@@ -20,6 +22,10 @@ const NVIDIA_MODEL = Deno.env.get('NVIDIA_MODEL') || 'meta/llama-3.1-70b-instruc
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash'
 const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'llama-3.3-70b-versatile'
 const GROQ_MODEL_BULK = Deno.env.get('GROQ_MODEL_BULK') || 'llama-3.1-8b-instant'
+// gpt-oss models sit on their own Groq pools and reason before answering.
+const GROQ_MODEL_REASON = Deno.env.get('GROQ_MODEL_REASON') || 'openai/gpt-oss-120b'
+const GROQ_MODEL_REASON_SMALL = Deno.env.get('GROQ_MODEL_REASON_SMALL') || 'openai/gpt-oss-20b'
+const GROQ_REASONING_EFFORT = Deno.env.get('GROQ_REASONING_EFFORT') || 'low'
 const FETCH_TIMEOUT_MS = 50_000
 
 export type LlmRoute = 'quality' | 'bulk' | 'default'
@@ -72,12 +78,20 @@ async function tryGroq(call: LlmCall, model: string): Promise<Response | null> {
   if (GROQ_KEYS.length === 0) return null
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
+      const isReasoning = model.startsWith('openai/gpt-oss')
+      // Reasoning tokens are charged against max_tokens, so a tight budget comes
+      // back as an empty completion. Give reasoning models headroom on top of
+      // whatever the caller asked for.
+      const tokenBudget = isReasoning
+        ? Math.min(Math.max(call.maxTokens + 1500, 2000), 8192)
+        : Math.min(call.maxTokens, 8192)
       const groqBody: Record<string, unknown> = {
         model,
         messages: call.messages,
         temperature: call.temperature,
-        max_tokens: Math.min(call.maxTokens, 8192),
+        max_tokens: tokenBudget,
       }
+      if (isReasoning) groqBody.reasoning_effort = GROQ_REASONING_EFFORT
       if (call.expectsJson) groqBody.response_format = { type: 'json_object' }
 
       const groqRes = await fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
@@ -266,11 +280,26 @@ export async function azureFetch(
 
   let providers: Array<() => Promise<Response | null>>
   if (route === 'quality') {
-    providers = [() => tryGemini(call), () => tryGroq(call, GROQ_MODEL), () => tryNvidia(call)]
+    providers = [
+      () => tryGemini(call),
+      () => tryGroq(call, GROQ_MODEL_REASON),
+      () => tryGroq(call, GROQ_MODEL),
+      () => tryNvidia(call),
+    ]
   } else if (route === 'bulk') {
-    providers = [() => tryGroq(call, GROQ_MODEL_BULK), () => tryGemini(call), () => tryNvidia(call)]
+    providers = [
+      () => tryGroq(call, GROQ_MODEL_BULK),
+      () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
+      () => tryGemini(call),
+      () => tryNvidia(call),
+    ]
   } else {
-    providers = [() => tryGroq(call, GROQ_MODEL), () => tryGemini(call), () => tryNvidia(call)]
+    providers = [
+      () => tryGroq(call, GROQ_MODEL_REASON),
+      () => tryGroq(call, GROQ_MODEL),
+      () => tryGemini(call),
+      () => tryNvidia(call),
+    ]
   }
 
   for (const provider of providers) {
