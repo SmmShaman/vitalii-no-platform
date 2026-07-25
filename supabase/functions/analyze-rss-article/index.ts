@@ -504,7 +504,13 @@ serve(async (req) => {
         ],
         temperature: 0.3,
         max_tokens: 1000,
-        llm_route: 'bulk' // High-volume scoring (~40 articles/day) — keep it off the 70b TPD pool
+        // Same judge as pre-moderation since 2026-07-25. A/B over 30 recent RSS
+        // articles: mean relevance is IDENTICAL (Groq 6.63 vs Lite 6.60), so this is
+        // not a stricter gate — but Lite correctly skips off-topic items Groq wanted
+        // to publish (a celebrity finance piece, mycology, forest fires, all scored 5-6
+        // by Groq and 3 by Lite) and separates the strong ones better at the top end
+        // (>=8: 30% vs 16%). It also moves ~40 calls/day off Groq entirely.
+        llm_route: 'moderation'
       })
     })
 
