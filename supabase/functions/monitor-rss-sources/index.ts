@@ -40,6 +40,8 @@ interface RSSArticle {
 }
 
 interface AnalysisResult {
+  qualityPassed?: boolean
+  qualityScore?: number | null
   success: boolean
   newsId?: string
   analysis?: {
@@ -119,6 +121,9 @@ serve(async (req) => {
     let sentToTelegram = 0
     const errors: string[] = []
     const qualifiedNewsIds: string[] = []
+    const { data: relevanceSetting } = await supabase
+      .from('api_settings').select('key_value').eq('key_name', 'RSS_MIN_RELEVANCE_SCORE').maybeSingle()
+    const minRelevance = parseInt(relevanceSetting?.key_value ?? '', 10) || 5
 
     // 3. Process selected sources (stop after 120s to stay within Supabase 150s limit)
     const BUDGET_MS = 120_000
@@ -214,9 +219,11 @@ serve(async (req) => {
             articlesAnalyzed++
 
             if (analysisResult.success && analysisResult.newsId) {
-              // Check if article is qualified (score >= 5)
+              // Qualified = on-topic AND has substance. analyze-rss-article runs the
+              // quality moderator and reports qualityPassed; false means the article
+              // was judged thin, or could not be judged at all.
               const score = analysisResult.analysis?.relevance_score || 0
-              if (score >= 5) {
+              if (score >= minRelevance && analysisResult.qualityPassed !== false) {
                 qualifiedNewsIds.push(analysisResult.newsId)
                 qualifiedArticles++
                 console.log(`✅ Qualified: "${article.title.substring(0, 50)}..." (score: ${score})`)

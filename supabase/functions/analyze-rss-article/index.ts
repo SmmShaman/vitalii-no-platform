@@ -248,11 +248,67 @@ async function getTodayLinkedInCount(supabase: any): Promise<number> {
   }
 }
 
+const DEFAULT_MIN_QUALITY = 6
+const DEFAULT_MIN_RELEVANCE = 5
+
+/** Read an integer api_setting, falling back to a default. */
+async function readIntSetting(supabase: any, key: string, fallback: number): Promise<number> {
+  const { data } = await supabase
+    .from('api_settings').select('key_value').eq('key_name', key).maybeSingle()
+  return parseInt(data?.key_value ?? '', 10) || fallback
+}
+
+/**
+ * Run the shared quality moderator over an RSS article.
+ *
+ * Until 2026-07-25 the RSS stream never went through pre-moderation at all - only
+ * telegram-scraper and fetch-news did - so the only filter was relevance_score,
+ * which measures whether the TOPIC fits, not whether the text has any substance.
+ * A backtest over 198 already-published RSS articles found 19% scoring 3/10 or
+ * lower: headlines with a link, funding round-up teasers, hiring notices.
+ *
+ * Returns null when the moderator gave no verdict. Owner rule 2026-07-25: an item
+ * we could not judge is skipped, never published on a guess.
+ */
+async function moderateQuality(
+  title: string,
+  content: string,
+  url: string,
+): Promise<{ approved: boolean; quality_score: number; reason: string } | null> {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/pre-moderate-news`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title, content: content.substring(0, 1800), url }),
+    })
+    if (!res.ok) {
+      console.warn(`No quality verdict (HTTP ${res.status})`)
+      return null
+    }
+    const r = await res.json()
+    if (r?.moderated === false) {
+      console.warn(`Not moderated: ${r?.reason}`)
+      return null
+    }
+    return {
+      approved: !!r?.approved,
+      quality_score: Number(r?.quality_score) || 0,
+      reason: r?.reason || '',
+    }
+  } catch (e) {
+    console.warn(`Quality moderation error: ${(e as Error).message}`)
+    return null
+  }
+}
+
 /**
  * Analyze RSS article using AI and send to Telegram Bot for moderation
  */
 serve(async (req) => {
-  // Version: 2026-01-29-01 - Filter by relevance_score >= 5
+  // Version: 2026-07-25 - relevance AND quality gates, both configurable
   console.log('🔍 Analyze RSS Article v2026-01-28-03 started')
 
   if (req.method === 'OPTIONS') {
@@ -531,6 +587,25 @@ serve(async (req) => {
     if (isNorwayRelated) {
       console.log('🇳🇴 AI detected Norway-related article')
     }
+    // Quality gate - the second axis next to relevance. Relevance asks "is this our
+    // topic?", quality asks "is there anything in the text?". Both are needed.
+    const minQuality = await readIntSetting(supabase, 'MIN_QUALITY_SCORE', DEFAULT_MIN_QUALITY)
+    const quality = await moderateQuality(title, articleContent.text, requestData.url || '')
+    const qualityPassed = quality !== null && quality.approved && quality.quality_score >= minQuality
+    if (quality === null) {
+      console.log('No quality verdict - article will not be published')
+    } else if (!qualityPassed) {
+      console.log(`Quality ${quality.quality_score}/10 below ${minQuality}: ${quality.reason}`)
+    } else {
+      console.log(`Quality ${quality.quality_score}/10 - passed`)
+    }
+
+    const moderationStatus = analysis.recommended_action === 'skip'
+      ? 'rejected'
+      : quality === null
+        ? 'skipped'
+        : qualityPassed ? 'pending' : 'rejected'
+
     const { data: newsRecord, error: insertError } = await supabase
       .from('news')
       .insert({
@@ -544,7 +619,9 @@ serve(async (req) => {
         image_url: requestData.imageUrl || articleContent.imageUrl,
         images: requestData.images || null,
         images_with_meta: requestData.imagesWithMeta || null,
-        pre_moderation_status: analysis.recommended_action === 'skip' ? 'rejected' : 'pending',
+        pre_moderation_status: moderationStatus,
+        pre_moderation_score: quality?.quality_score ?? null,
+        rejection_reason: qualityPassed ? null : (quality?.reason || 'Not moderated'),
         is_published: false,
         is_rewritten: false,
         ...(topDuplicate?.existingNewsId && {
@@ -600,10 +677,11 @@ serve(async (req) => {
       console.warn('⚠️ Image variants generation error:', promptError)
     }
 
-    // 🤖 Auto-publish: fire-and-forget if enabled (score >= 5)
-    // Skip in streams mode — website-publish handles publication via send-rss-to-telegram
+    // Auto-publish: fire-and-forget if enabled.
+    // Skip in streams mode - website-publish handles publication via send-rss-to-telegram
+    const minRelevance = await readIntSetting(supabase, 'RSS_MIN_RELEVANCE_SCORE', DEFAULT_MIN_RELEVANCE)
     let autoPublishTriggered = false
-    if (analysis.relevance_score >= 5 && !requestData.skipTelegram) {
+    if (analysis.relevance_score >= minRelevance && qualityPassed && !requestData.skipTelegram) {
       const { data: autoPublishSetting } = await supabase
         .from('api_settings')
         .select('key_value')
@@ -645,7 +723,7 @@ serve(async (req) => {
 
     // Send to Telegram Bot for moderation (score >= 5, unless skipTelegram is set)
     // ALWAYS send buttons — even when auto-publish is triggered, so moderator can manage
-    if (analysis.relevance_score >= 5 && !requestData.skipTelegram && TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
+    if (analysis.relevance_score >= minRelevance && qualityPassed && !requestData.skipTelegram && TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
       const telegramMessageId = await sendTelegramNotification(
         newsRecord.id,
         title,
@@ -667,8 +745,9 @@ serve(async (req) => {
         console.log(`💾 Saved telegram_message_id: ${telegramMessageId}`)
       }
     } else {
-      // Skip articles with score < 5
-      const skipReason = `Low relevance (score ${analysis.relevance_score}/10 < 5) - not sent to bot`
+      const skipReason = qualityPassed
+        ? `Low relevance (${analysis.relevance_score}/10 < ${minRelevance}) - not sent to bot`
+        : `Failed quality gate (${quality ? quality.quality_score + '/10 < ' + minQuality : 'no verdict'}) - not sent to bot`
       console.log(`⏭️ Auto-skipped article: ${skipReason}`)
     }
 
@@ -677,6 +756,8 @@ serve(async (req) => {
         success: true,
         newsId: newsRecord.id,
         analysis: analysis,
+        qualityPassed,
+        qualityScore: quality?.quality_score ?? null,
         autoPublish: autoPublishTriggered
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
