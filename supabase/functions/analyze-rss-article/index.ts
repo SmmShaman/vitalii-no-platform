@@ -480,62 +480,114 @@ serve(async (req) => {
 Приклад: ["OpenAI GPT-5", "artificial intelligence", "tech layoffs"]
 Використовуй конкретні назви продуктів, компаній, технологій та загальну тему.`
 
-    const systemPrompt = (analysisPrompt.prompt_text + linkedinScoreAddendum)
-      .replace('{title}', title)
-      .replace('{content}', articleContent.text.substring(0, 4000)) // Limit content
-      .replace('{url}', requestData.url)
+    const runAnalysis = async (text: string): Promise<AIAnalysisResult> => {
+      const systemPrompt = (analysisPrompt.prompt_text + linkedinScoreAddendum)
+        .replace('{title}', title)
+        .replace('{content}', text.substring(0, 4000)) // Limit content
+        .replace('{url}', requestData.url)
+
+      const aiResponse = await azureFetch('gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a news analyst. Analyze articles and respond ONLY with valid JSON.'
+            },
+            {
+              role: 'user',
+              content: systemPrompt
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 1000,
+          // Same judge as pre-moderation since 2026-07-25. A/B over 30 recent RSS
+          // articles: mean relevance is IDENTICAL (Groq 6.63 vs Lite 6.60), so this is
+          // not a stricter gate — but Lite correctly skips off-topic items Groq wanted
+          // to publish (a celebrity finance piece, mycology, forest fires, all scored 5-6
+          // by Groq and 3 by Lite) and separates the strong ones better at the top end
+          // (>=8: 30% vs 16%). It also moves ~40 calls/day off Groq entirely.
+          llm_route: 'moderation'
+        })
+      })
+
+      if (!aiResponse.ok) {
+        const errorText = await aiResponse.text()
+        console.error('Azure OpenAI error:', errorText)
+        throw new Error(`AI analysis failed: ${aiResponse.status}`)
+      }
+
+      const aiResult = await aiResponse.json()
+      const aiContent = aiResult.choices[0]?.message?.content?.trim()
+      console.log('AI response received, content length:', aiContent?.length || 0, 'first 300 chars:', aiContent?.substring(0, 300))
+
+      const jsonMatch = aiContent?.match(/\{[\s\S]*\}/)
+      if (!jsonMatch) {
+        console.error('Failed to parse AI response:', aiContent?.substring(0, 500))
+        throw new Error('No JSON found in response')
+      }
+      return JSON.parse(jsonMatch[0])
+    }
 
     // Call Gemini via Azure-compatible shim
     console.log('🤖 Calling Gemini for analysis...')
+    let analysis: AIAnalysisResult = await runAnalysis(articleContent.text)
 
-    const aiResponse = await azureFetch('gemini', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a news analyst. Analyze articles and respond ONLY with valid JSON.'
-          },
-          {
-            role: 'user',
-            content: systemPrompt
+    // ── Teaser upgrade ────────────────────────────────────────────────────────────
+    // RSS monitors hand us the feed's blurb as `content`, which short-circuits the
+    // page fetch above: 165 of 218 'manual' rows in the last 14 days are under 400
+    // chars, median 151 — i.e. a headline. Rewriting from that is what produced the
+    // Kalshi article, 270 words of invented specifics (a letter to Netflix's legal
+    // department, "backed by Andreessen Horowitz") from a 119-char source.
+    //
+    // Measured 2026-07-25 on 10 such articles, each scored twice: a teaser is enough
+    // to DECIDE (no verdict flipped; ranking held) but never enough to REWRITE. Full
+    // text also adds a systematic +1 to relevance, which is why the fetch gate sits
+    // BELOW the publish gate — otherwise we would drop articles that only look weak
+    // until you read them.
+    const minRewriteChars = await readIntSetting(supabase, 'MIN_REWRITE_CHARS', 400)
+    const fetchMinRelevance = await readIntSetting(supabase, 'FETCH_MIN_RELEVANCE', 5)
+    let contentUpgraded = false
+    let upgradeFailed = false
+
+    if (articleContent.text.length < minRewriteChars && requestData.url) {
+      if (analysis.relevance_score >= fetchMinRelevance) {
+        console.log(`📥 Teaser is ${articleContent.text.length} chars and relevance ${analysis.relevance_score} — fetching full article`)
+        try {
+          const full = await fetchArticleContent(requestData.url)
+          if (full.text && full.text.length >= minRewriteChars) {
+            articleContent = {
+              text: full.text,
+              title: articleContent.title,
+              imageUrl: articleContent.imageUrl || full.imageUrl,
+            }
+            contentUpgraded = true
+            console.log(`✅ Upgraded to ${full.text.length} chars — re-scoring on the real text`)
+            analysis = await runAnalysis(articleContent.text)
+          } else {
+            upgradeFailed = true
+            console.warn(`⚠️ Fetch returned only ${full.text?.length || 0} chars`)
           }
-        ],
-        temperature: 0.3,
-        max_tokens: 1000,
-        // Same judge as pre-moderation since 2026-07-25. A/B over 30 recent RSS
-        // articles: mean relevance is IDENTICAL (Groq 6.63 vs Lite 6.60), so this is
-        // not a stricter gate — but Lite correctly skips off-topic items Groq wanted
-        // to publish (a celebrity finance piece, mycology, forest fires, all scored 5-6
-        // by Groq and 3 by Lite) and separates the strong ones better at the top end
-        // (>=8: 30% vs 16%). It also moves ~40 calls/day off Groq entirely.
-        llm_route: 'moderation'
-      })
-    })
-
-    if (!aiResponse.ok) {
-      const errorText = await aiResponse.text()
-      console.error('Azure OpenAI error:', errorText)
-      throw new Error(`AI analysis failed: ${aiResponse.status}`)
+        } catch (e) {
+          upgradeFailed = true
+          console.warn(`⚠️ Full-article fetch failed: ${(e as Error).message}`)
+        }
+      } else {
+        console.log(`⏭️ Teaser too short but relevance ${analysis.relevance_score} < ${fetchMinRelevance} — not worth fetching`)
+      }
     }
 
-    const aiResult = await aiResponse.json()
-    const aiContent = aiResult.choices[0]?.message?.content?.trim()
-
-    console.log('AI response received, content length:', aiContent?.length || 0, 'first 300 chars:', aiContent?.substring(0, 300))
-
-    // Parse AI response
-    let analysis: AIAnalysisResult
-    try {
-      const jsonMatch = aiContent.match(/\{[\s\S]*\}/)
-      if (!jsonMatch) {
-        throw new Error('No JSON found in response')
-      }
-      analysis = JSON.parse(jsonMatch[0])
-    } catch (parseError: any) {
-      console.error('Failed to parse AI response:', aiContent?.substring(0, 500))
-      throw new Error(`Failed to parse AI response: ${parseError.message}`)
+    // Never rewrite from a teaser. If we could not get the real text (paywall, JS-only
+    // page — 1 of the 10 measured), skip the article rather than let the model invent
+    // one. Silence is cheap; fabricated claims about a named company are not.
+    if (articleContent.text.length < minRewriteChars && requestData.url) {
+      const why = upgradeFailed
+        ? `full text could not be fetched (${articleContent.text.length} chars available)`
+        : `only ${articleContent.text.length} chars of source text`
+      console.log(`🚫 Not enough source material to rewrite — ${why}`)
+      analysis.recommended_action = 'skip'
+      analysis.skip_reason = `Insufficient source material: ${why}`
     }
 
     // Ensure linkedin_score exists (fallback if AI didn't return it)
@@ -579,7 +631,7 @@ serve(async (req) => {
     // Get today's LinkedIn post count
     const todayLinkedInCount = await getTodayLinkedInCount(supabase)
 
-    console.log(`✅ Analysis complete: relevance=${analysis.relevance_score}, linkedin=${analysis.linkedin_score} (bonus +${totalBonus}), action=${analysis.recommended_action}, HN=${hnResult.hnPosts}, GT=${gtResult.matchedTrends.length} matches, LinkedIn today=${todayLinkedInCount}`)
+    console.log(`✅ Analysis complete: relevance=${analysis.relevance_score}${contentUpgraded ? ' (on full text)' : ''}, source=${articleContent.text.length} chars, linkedin=${analysis.linkedin_score} (bonus +${totalBonus}), action=${analysis.recommended_action}, HN=${hnResult.hnPosts}, GT=${gtResult.matchedTrends.length} matches, LinkedIn today=${todayLinkedInCount}`)
 
     // Update AI prompt usage count
     await supabase
