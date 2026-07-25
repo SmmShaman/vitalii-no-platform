@@ -18,6 +18,30 @@ interface PreModerationResult {
   is_advertisement: boolean
   is_duplicate: boolean
   quality_score: number
+  /**
+   * False means we never got a verdict (no prompt, LLM down, unparseable answer).
+   * Owner rule 2026-07-25: a post we could not judge is SKIPPED, not published and
+   * not held - callers move on to the next item. Never fail open to approved=true.
+   */
+  moderated: boolean
+}
+
+const DEFAULT_MIN_QUALITY = 6
+
+/** Technical failure - the caller skips this item and carries on. */
+function unmoderated(reason: string): Response {
+  console.warn(`⏭️ Not moderated (${reason}) — post will be skipped`)
+  return new Response(
+    JSON.stringify({
+      approved: false,
+      moderated: false,
+      reason: `Not moderated: ${reason}`,
+      is_advertisement: false,
+      is_duplicate: false,
+      quality_score: 0,
+    }),
+    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  )
 }
 
 /**
@@ -51,18 +75,16 @@ serve(async (req) => {
     }
 
     if (!prompts || prompts.length === 0) {
-      console.warn('⚠️ No active pre-moderation prompt found. Approving by default.')
-      return new Response(
-        JSON.stringify({
-          approved: true,
-          reason: 'No pre-moderation prompt configured',
-          is_advertisement: false,
-          is_duplicate: false,
-          quality_score: 5
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return unmoderated('no active pre_moderation prompt configured')
     }
+
+    // Minimum quality the AI must give a post for it to reach the site.
+    const { data: minSetting } = await supabase
+      .from('api_settings')
+      .select('key_value')
+      .eq('key_name', 'MIN_QUALITY_SCORE')
+      .maybeSingle()
+    const minQuality = parseInt(minSetting?.key_value ?? '', 10) || DEFAULT_MIN_QUALITY
 
     // Fetch recent titles for duplicate context
     const recentTitles = await fetchRecentTitles(supabase, 7, 20)
@@ -106,17 +128,7 @@ serve(async (req) => {
     if (!openaiResponse.ok) {
       const errorText = await openaiResponse.text()
       console.error('AI error:', errorText)
-      // If AI fails, approve by default (fail-open strategy)
-      return new Response(
-        JSON.stringify({
-          approved: true,
-          reason: 'AI error, approved by default',
-          is_advertisement: false,
-          is_duplicate: false,
-          quality_score: 5
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return unmoderated(`LLM error ${openaiResponse.status}`)
     }
 
     const aiResult = await openaiResponse.json()
@@ -136,24 +148,25 @@ serve(async (req) => {
       }
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError)
-      // If parsing fails, approve by default
-      return new Response(
-        JSON.stringify({
-          approved: true,
-          reason: 'AI response parsing error, approved by default',
-          is_advertisement: false,
-          is_duplicate: false,
-          quality_score: 5
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
+      return unmoderated('LLM answer was not valid JSON')
     }
+
+    moderationResult.moderated = true
+    moderationResult.quality_score = Number(moderationResult.quality_score) || 0
 
     // Enforce: is_advertisement=true → always reject
     if (moderationResult.is_advertisement && moderationResult.approved) {
       console.log('⚠️ AI marked as advertisement but approved — overriding to REJECT')
       moderationResult.approved = false
       moderationResult.reason = `[Auto-rejected: advertisement] ${moderationResult.reason}`
+    }
+
+    // Enforce the quality floor. The AI has always returned quality_score; until
+    // 2026-07-25 nobody looked at it, so a 2/10 link dump published like anything else.
+    if (moderationResult.approved && moderationResult.quality_score < minQuality) {
+      console.log(`⚠️ Quality ${moderationResult.quality_score}/10 below floor ${minQuality} — overriding to REJECT`)
+      moderationResult.approved = false
+      moderationResult.reason = `[Auto-rejected: quality ${moderationResult.quality_score}/10 < ${minQuality}] ${moderationResult.reason}`
     }
 
     console.log(moderationResult.approved ? '✅ Approved' : '❌ Rejected:', moderationResult.reason)
@@ -171,19 +184,6 @@ serve(async (req) => {
 
   } catch (error: any) {
     console.error('❌ Error in pre-moderation:', error)
-    // Fail-open: if there's an error, approve by default
-    return new Response(
-      JSON.stringify({
-        approved: true,
-        reason: `Error: ${error.message}, approved by default`,
-        is_advertisement: false,
-        is_duplicate: false,
-        quality_score: 5
-      }),
-      {
-        status: 200, // Return 200 even on error to not break the pipeline
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
+    return unmoderated(error?.message || 'unexpected error')
   }
 })

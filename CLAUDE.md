@@ -41,6 +41,7 @@ npm run lint            # ESLint
 | **Storage (legacy)** | Supabase Storage (kept as fallback) | - |
 | **Edge Functions** | Deno | - |
 | **AI (text)** | Per-task routing in `azure-to-gemini-shim.ts` (`llm_route`). **RULE (owner, 2026-07-25): rewrites and translations NEVER use Gemini — it is billed on this project.** **quality** (article rewrites EN/NO/UA, RSS rewrite in `website-publish`, `backfill-translations`, `regenerate-translations`) = gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA, **no Gemini in the chain**; **bulk** (pre-moderation, dup checks, RSS scoring) = llama-3.1-8b-instant → gpt-oss-20b → Gemini → NVIDIA; **default** (teasers, image prompts, enrichment) = gpt-oss-120b → gpt-oss-20b → Groq 70b → Gemini → NVIDIA. Each Groq model has its own pool; 70b is 100k TPD and gpt-oss are 8k TPM each. `callLLM` in `gemini-llm.ts` = Groq 70b only | - |
+| **Pre-moderation** | Never fails open: a post that cannot be judged is `pre_moderation_status='skipped'` and passed over (owner rule 2026-07-25). `quality_score` is stored in `news.pre_moderation_score` and enforced against `api_settings.MIN_QUALITY_SCORE` (default 6). The prompt defaults to REJECT and explicitly kills link dumps, digests and award roundups | - |
 | **AI (images)** | Google Gemini 3 Pro Image Preview ("Nano Banana Pro") | paid model |
 | **Deployment** | Netlify | - |
 | **CI/CD** | GitHub Actions | - |

@@ -268,6 +268,7 @@ serve(async (req) => {
             // 🤖 AI PRE-MODERATION (check global toggle)
             let moderationResult = {
               approved: true,
+              moderated: true,
               reason: 'Pre-moderation disabled',
               is_advertisement: false,
               is_duplicate: false,
@@ -290,7 +291,11 @@ serve(async (req) => {
             await supabase
               .from('news')
               .update({
-                pre_moderation_status: moderationResult.approved ? 'approved' : 'rejected',
+                // 'skipped' = we never got a verdict; it is not a rejection on the merits.
+                pre_moderation_status: moderationResult.moderated === false
+                  ? 'skipped'
+                  : (moderationResult.approved ? 'approved' : 'rejected'),
+                pre_moderation_score: moderationResult.quality_score ?? null,
                 rejection_reason: moderationResult.approved ? null : moderationResult.reason,
                 moderation_checked_at: new Date().toISOString()
               })
@@ -691,7 +696,7 @@ async function preModerate(
   title: string,
   content: string,
   url: string
-): Promise<{ approved: boolean; reason: string; is_advertisement: boolean; is_duplicate: boolean; quality_score: number }> {
+): Promise<{ approved: boolean; reason: string; is_advertisement: boolean; is_duplicate: boolean; quality_score: number; moderated: boolean }> {
   try {
     const response = await fetch(
       `${SUPABASE_URL}/functions/v1/pre-moderate-news`,
@@ -706,13 +711,15 @@ async function preModerate(
     )
 
     if (!response.ok) {
-      console.warn('⚠️ Pre-moderation failed, approving by default')
+      // Owner rule 2026-07-25: never publish something we could not judge - skip it.
+      console.warn('⏭️ Pre-moderation service unavailable — skipping this item')
       return {
-        approved: true,
-        reason: 'Pre-moderation service unavailable',
+        approved: false,
+        moderated: false,
+        reason: 'Not moderated: pre-moderation service unavailable',
         is_advertisement: false,
         is_duplicate: false,
-        quality_score: 5
+        quality_score: 0
       }
     }
 
@@ -720,13 +727,14 @@ async function preModerate(
     return result
   } catch (error) {
     console.error('Error in preModerate:', error)
-    // Fail-open: if error, approve by default
+    // Fail-skip: an item we could not judge is passed over, not published.
     return {
-      approved: true,
-      reason: 'Pre-moderation error',
+      approved: false,
+      moderated: false,
+      reason: 'Not moderated: pre-moderation error',
       is_advertisement: false,
       is_duplicate: false,
-      quality_score: 5
+      quality_score: 0
     }
   }
 }
