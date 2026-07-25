@@ -3,9 +3,10 @@
  * Drop-in replacement for Azure OpenAI calls.
  *
  * Routes (callers pass `llm_route` in the request body, default 'default'):
- *   quality — gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA          (rewrites + translations)
- *   bulk    — Groq 8b-instant → gpt-oss-20b → Gemini → NVIDIA          (high-volume internal scoring)
- *   default — gpt-oss-120b → gpt-oss-20b → Groq 70b → Gemini → NVIDIA  (creative EN: teasers, prompts)
+ *   quality    — gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA → free-Gemini  (rewrites + translations)
+ *   moderation — free-Gemini Lite → Groq 8b-instant → gpt-oss-20b → NVIDIA     (pre-moderation scoring)
+ *   bulk       — Groq 8b-instant → gpt-oss-20b → Gemini → NVIDIA               (high-volume internal scoring)
+ *   default    — gpt-oss-120b → gpt-oss-20b → Groq 70b → Gemini → NVIDIA       (creative EN: teasers, prompts)
  *
  * Each gpt-oss model carries only 8k TPM, and one article-sized call is ~4k, so
  * the two of them are chained to double the per-minute headroom before the
@@ -32,7 +33,19 @@ const GROQ_MODEL_REASON_SMALL = Deno.env.get('GROQ_MODEL_REASON_SMALL') || 'open
 const GROQ_REASONING_EFFORT = Deno.env.get('GROQ_REASONING_EFFORT') || 'low'
 const FETCH_TIMEOUT_MS = 50_000
 
-export type LlmRoute = 'quality' | 'bulk' | 'default'
+// ── Second Gemini key, from a Google project with NO billing account ────────────
+// Verified 2026-07-25: quota metric is `generate_content_free_tier_requests`, so
+// this key CANNOT be charged — over quota it returns 429, never an invoice. That
+// is why it is allowed on `quality`, which the paid GOOGLE_API_KEY must never touch.
+// Quotas are per-model and small: full Flash = 20 req/day, the Lite models = 500/day.
+const GEMINI_FREE_API_KEY = Deno.env.get('GEMINI_FREE_API_KEY') || ''
+// Lite: 500 req/day, does not "think" at all (0 thought tokens) — the workhorse.
+const GEMINI_FREE_MODEL_LITE = Deno.env.get('GEMINI_FREE_MODEL_LITE') || 'gemini-3.1-flash-lite'
+// Full Flash: best bokmål of anything we have, but only 20 req/day → last resort.
+// Pinned deliberately: `gemini-flash-latest` is an alias that moves under us.
+const GEMINI_FREE_MODEL_FULL = Deno.env.get('GEMINI_FREE_MODEL_FULL') || 'gemini-3.6-flash'
+
+export type LlmRoute = 'quality' | 'moderation' | 'bulk' | 'default'
 
 // Collect all configured Groq keys (GROQ_API_KEY, GROQ_API_KEY_2, GROQ_API_KEY_3)
 const GROQ_KEYS: string[] = [
@@ -214,6 +227,62 @@ async function tryGemini(call: LlmCall): Promise<Response | null> {
   return null
 }
 
+/**
+ * Gemini on the FREE (unbilled) project. Deliberately NOT wired to
+ * `geminiBudgetOk()` — that gate exists to stop the paid key running up a bill,
+ * and this key cannot bill. Google enforces its own daily cap with a 429, which
+ * we treat as "provider unavailable" and fall through to the next link.
+ *
+ * Two behaviours differ from the paid path and both were measured 2026-07-25:
+ *  - `thinkingConfig.thinkingBudget: 0` is REJECTED by the full 3.x Flash models
+ *    ("invalid argument") and there is no `thinkingLevel` in this API version, so
+ *    thinking can only be switched off on the Lite models. Send it only there.
+ *  - Consequently the full models always think, and thoughts are charged against
+ *    maxOutputTokens — the same trap that truncated image prompts (bbdc42c). Give
+ *    them generous headroom or the answer comes back empty.
+ */
+async function tryGeminiFree(call: LlmCall, model: string): Promise<Response | null> {
+  if (!GEMINI_FREE_API_KEY) return null
+  const isLite = model.includes('lite')
+  const parts = call.messages.map(m => m.content).join('\n\n')
+
+  const generationConfig: Record<string, unknown> = {
+    temperature: call.temperature,
+    maxOutputTokens: isLite ? call.maxTokens : Math.min(call.maxTokens * 3 + 2000, 65536),
+  }
+  if (isLite) generationConfig.thinkingConfig = { thinkingBudget: 0 }
+  if (call.expectsJson) generationConfig.responseMimeType = 'application/json'
+
+  try {
+    const res = await fetchWithTimeout(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': GEMINI_FREE_API_KEY },
+        body: JSON.stringify({ contents: [{ parts: [{ text: parts }] }], generationConfig }),
+      },
+    )
+
+    if (res.ok) {
+      const data = await res.json()
+      const text = stripFence(data?.candidates?.[0]?.content?.parts?.[0]?.text || '')
+      if (text) {
+        const um = data.usageMetadata || {}
+        console.log(`🆓 Gemini-free (${model}) — ${text.length} chars | tokens: ${um.promptTokenCount || 0}+${(um.candidatesTokenCount || 0) + (um.thoughtsTokenCount || 0)}`)
+        return okResponse(text, { total_tokens: um.totalTokenCount || 0 })
+      }
+      const reason = data?.candidates?.[0]?.finishReason || data?.promptFeedback?.blockReason || 'unknown'
+      console.warn(`⚠️ Gemini-free ${model} returned empty text. Reason: ${reason}`)
+    } else {
+      const err = await res.text().catch(() => '')
+      console.warn(`⚠️ Gemini-free ${model} failed (${res.status}): ${err.substring(0, 200)}`)
+    }
+  } catch (e) {
+    console.warn(`⚠️ Gemini-free ${model} error: ${(e as Error).message}`)
+  }
+  return null
+}
+
 async function tryNvidia(call: LlmCall): Promise<Response | null> {
   if (!NVIDIA_API_KEY) return null
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -268,7 +337,9 @@ export async function azureFetch(
   options: RequestInit,
 ): Promise<Response> {
   const body = JSON.parse(options.body as string)
-  const route: LlmRoute = body.llm_route === 'quality' || body.llm_route === 'bulk' ? body.llm_route : 'default'
+  const route: LlmRoute = ['quality', 'moderation', 'bulk'].includes(body.llm_route)
+    ? body.llm_route
+    : 'default'
 
   const call: LlmCall = {
     messages: body.messages || [],
@@ -291,6 +362,24 @@ export async function azureFetch(
       () => tryGroq(call, GROQ_MODEL_REASON),
       () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryGroq(call, GROQ_MODEL),
+      () => tryNvidia(call),
+      // Last resort only. On 2026-07-25 all three Groq pools hit their daily caps
+      // at once and 10 articles died at rewrite because the chain ended at NVIDIA
+      // ("upstream server is timing out"). This is the free key, so it does not
+      // violate the no-paid-Gemini-for-rewrites rule — but it is worth only ~20
+      // calls a day, which is why it sits behind everything else.
+      () => tryGeminiFree(call, GEMINI_FREE_MODEL_FULL),
+    ]
+  } else if (route === 'moderation') {
+    // Pre-moderation scoring. Measured A/B over the 29 already-scored articles
+    // (2026-07-25): Groq mean 5.45 / 15 approved vs Lite mean 2.97 / 2 approved.
+    // Lite enforces the prompt's own rules — link dumps, off-topic and channel
+    // promos — which Groq was scoring 7-9. Owner asked for a harder filter, so
+    // Lite leads here. Free quota (500/day) also keeps moderation off Groq's TPD.
+    providers = [
+      () => tryGeminiFree(call, GEMINI_FREE_MODEL_LITE),
+      () => tryGroq(call, GROQ_MODEL_BULK),
+      () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryNvidia(call),
     ]
   } else if (route === 'bulk') {

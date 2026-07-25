@@ -121,7 +121,11 @@ serve(async (req) => {
         ],
         temperature: 0.3, // Lower temperature for more consistent moderation
         max_tokens: 300,
-        llm_route: 'bulk' // High-volume internal scoring — 8b-instant pool
+        // Own route since 2026-07-25: free-Gemini Lite judges first. It applies this
+        // prompt far more strictly than Groq did (mean 2.97 vs 5.45 over the same 29
+        // articles) and runs on a separate free quota, so moderation no longer spends
+        // Groq's daily token budget that the evening rewrites need.
+        llm_route: 'moderation'
       })
     })
 
