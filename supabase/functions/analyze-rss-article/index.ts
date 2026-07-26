@@ -671,7 +671,13 @@ serve(async (req) => {
         original_content: articleContent.text.substring(0, 10000),
         original_url: requestData.url || null,
         rss_source_url: requestData.url || null,
-        source_type: requestData.content ? 'manual' : 'rss',
+        // Provenance, not transport. `content` only says "the caller already had the
+        // text" — and monitor-rss-sources always hands us the feed blurb as `content`,
+        // so since 2026-07-24 every cron RSS article has been filed as 'manual'. The
+        // last row labelled 'rss' is 2026-07-24 11:32; the admin news queue renders
+        // them with the wrong badge and any "how is RSS doing" query reads empty.
+        // sourceId is the honest signal: only monitor-rss-sources sends one.
+        source_type: requestData.sourceId ? 'rss' : (requestData.content ? 'manual' : 'rss'),
         rss_analysis: analysis,
         is_norway_related: isNorwayRelated,
         image_url: requestData.imageUrl || articleContent.imageUrl,
