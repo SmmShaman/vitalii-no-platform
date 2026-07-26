@@ -134,16 +134,24 @@ serve(async (req) => {
         `${i + 1}. "${l.title}" → ${l.route}/${l.slug}`
       ).join('\n')
 
-      const response = await azureFetch('gemini', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: 'system',
-              content: `You are a Wikipedia-style editor. Your task is to find phrases in the article text that semantically relate to the given list of existing articles, and convert those phrases into markdown hyperlinks.
+      let response: Response
+      try {
+        response = await azureFetch('gemini', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            // Enrichment costs one article-sized call PER LANGUAGE and always runs
+            // after the rewrite, so on the `default` route it was the first thing to
+            // starve once the rewrites had drained the gpt-oss pools (measured
+            // 2026-07-25: only ~40% of published articles got any inline link).
+            // `bulk` leads with 8b-instant, which sits on its own Groq pool.
+            llm_route: 'bulk',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a Wikipedia-style editor. Your task is to find phrases in the article text that semantically relate to the given list of existing articles, and convert those phrases into markdown hyperlinks.
 
 Rules:
 - Insert 2-5 inline links maximum (don't overlink)
@@ -155,22 +163,30 @@ Rules:
 - Do NOT add any "Related articles" section at the bottom
 - Keep all existing formatting, paragraphs, and structure exactly the same
 - Return ONLY the modified article text, nothing else — no explanations, no preamble`
-            },
-            {
-              role: 'user',
-              content: `ARTICLE TEXT:
+              },
+              {
+                role: 'user',
+                content: `ARTICLE TEXT:
 ${content}
 
 AVAILABLE ARTICLES TO LINK TO:
 ${articlesListForAI}
 
 Return the article text with inline hyperlinks inserted where relevant phrases match the available articles.`
-            }
-          ],
-          temperature: 0.2,
-          max_tokens: 4000
+              }
+            ],
+            temperature: 0.2,
+            max_tokens: 4000
+          })
         })
-      })
+      } catch (e) {
+        // azureFetch THROWS when every provider in the chain is rate-limited. It
+        // used to escape the loop and abort the whole function, throwing away the
+        // languages that had already been enriched. One dead language must not
+        // cost the article the other two.
+        console.warn(`⚠️ ${key}: LLM unavailable — ${(e as Error).message}`)
+        continue
+      }
 
       if (!response.ok) {
         console.error(`AI error for ${key}:`, await response.text())
@@ -182,6 +198,14 @@ Return the article text with inline hyperlinks inserted where relevant phrases m
 
       if (!enrichedContent) {
         console.error(`Empty AI response for ${key}`)
+        continue
+      }
+
+      // The model must echo the article back with links added, so the result can
+      // only grow. Anything materially shorter is a truncated or summarised
+      // answer — saving it would silently destroy the article body.
+      if (enrichedContent.length < content.length * 0.9) {
+        console.warn(`⚠️ ${key}: rejected — result shrank ${content.length} → ${enrichedContent.length} chars`)
         continue
       }
 
