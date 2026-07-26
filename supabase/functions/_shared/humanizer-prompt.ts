@@ -145,6 +145,44 @@ VOICE GUIDELINES:
 - Each paragraph should contain one main idea.
 - Avoid editorializing unless it is an opinion piece.`
 
+/**
+ * News-rewrite discipline: the rules that stop a news rewrite from reading like
+ * an LLM wrote it. Diagnosed on real published output (2026-07-26) — the tells
+ * cluster in the LAST sentence, where the model "lands the plane" by inventing
+ * an assessment, an outlook, or a class of sources the article never had
+ * ("Legal experts anticipate…" when the source said "Deadline noted…").
+ *
+ * Kept separate from HUMANIZER_ARTICLE because it is news-specific: it assumes
+ * there IS a source text to be faithful to. Do not add it to blog/voice paths.
+ */
+export const NEWS_SOURCE_DISCIPLINE = `
+HOW THE ARTICLE MUST END — MOST IMPORTANT RULE:
+- End on the last concrete fact taken from the source. Then stop.
+- FORBIDDEN as a final sentence: any assessment, outlook, significance, "what this means", a restatement of the opening, or any sentence that carries no new fact from the source. Never write things like "the company remains a high-profile player", "the case could reshape the industry", "the deal has not closed, but...".
+- If the source ends abruptly, the article ends abruptly. An abrupt ending is correct. A tidy landing is a failure.
+- Before you output, delete your last sentence and check whether a fact was lost. If nothing was lost, leave it deleted.
+
+ATTRIBUTION:
+- Attribute every claim exactly as the source attributes it, naming the same party. If the source does not name who said it, do not invent a who.
+- NEVER write "experts", "analysts", "observers", "critics", "industry watchers", "legal experts", "many believe", "it is expected", "is seen as", "is likely to" — or the same move rephrased in Norwegian or Ukrainian.
+- Check every name, number and pronoun against the source before using it. Never move a fact from one company or person to another.
+
+SOURCE FIDELITY — THIS OVERRIDES EVERY OTHER INSTRUCTION:
+- Write ONLY what the source text supports. NEVER add a fact, number, date, name, quote, funding round, investor, company history, regulatory detail or official reaction that is not in the source. Inventing a plausible-sounding detail about a real company is the worst failure possible — worse than a short article.
+- If the source does not say why something matters, do not invent a reason. Leave it out.
+- Ignore navigation text, newsletter pitches, ads, "Related" and "Latest in" blocks that arrived with the source — they are not part of the story.
+- BANNED filler — never write these or their equivalents in any language: "this could revolutionise", "it remains to be seen", "in the coming years", "experts believe", "this has significant implications", "as the project progresses", "we can expect to see", "the potential to transform", "a key player".
+
+HOW IT MUST SOUND:
+- Vary sentence length. Mix short blunt sentences with longer ones. Never let three sentences in a row share the same shape or length.
+- Vary paragraph length too — some two sentences, some five. Uniform paragraphs read as machine output.
+- Direct verbs, not nominalisations: "Warner Bros. sued Amazon", not "initiated legal action against".
+- Use contractions in English where they read naturally. In Norwegian and Ukrainian use ordinary journalistic word order, not bureaucratic register.
+- State definite facts definitely. No "could", "may", "appears to", "seemingly" unless the source itself hedges.
+- No connector openers: Meanwhile, Moreover, Furthermore, Additionally, Notably, Overall (NO: Videre, Dessuten, Samtidig, I tillegg; UA: Крім того, Водночас, Загалом, Варто зазначити).
+- Do not explain the obvious. The reader knows what a lawsuit, an IPO or a funding round is.
+- At most one em dash per paragraph. Never force ideas into groups of three.`
+
 export const VOICE_SPOKEN = `
 VOICE GUIDELINES:
 - Write for the ear, not the eye. Short, clear sentences.

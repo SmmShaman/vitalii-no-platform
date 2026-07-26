@@ -5,7 +5,7 @@
 // Used by process-news and process-rss-news.
 
 import { azureFetch } from './azure-to-gemini-shim.ts'
-import { HUMANIZER_ARTICLE, VOICE_JOURNALISM } from './humanizer-prompt.ts'
+import { HUMANIZER_ARTICLE, NEWS_SOURCE_DISCIPLINE, VOICE_JOURNALISM } from './humanizer-prompt.ts'
 
 export interface LanguageRewrite {
   title: string
@@ -96,15 +96,18 @@ Return ONLY valid JSON (no markdown fence, no backticks). Use \\n\\n inside the 
 {
   "title": "engaging ${langName} title (5-12 words)",
   "description": "2-3 sentence summary in ${langName}",
-  "content": "Full article, 400-500 words, 4-5 paragraphs separated by \\n\\n"${tagsInstruction}
+  "content": "Full article, length follows the source, paragraphs separated by \\n\\n"${tagsInstruction}
 }
 
-DEPTH REQUIREMENTS:
-- 400-500 words — a substantive article, NOT a summary
-- Preserve key technical details, numbers, product names
-- Include WHAT happened, WHY it matters, brief CONTEXT
+LENGTH — FOLLOWS THE SOURCE, NEVER A TARGET:
+- A detailed source supports a long article; a 400-character Telegram post supports roughly 120-200 words, not 400. Padding to reach a length is a failure, not a success.
+- Every paragraph must carry at least one concrete fact from the source. If the next paragraph would repeat or speculate, the article is finished.
+- Preserve every technical detail, number, product name, specification and list item that IS in the source. If the source lists features, include every item.
+- Report WHAT happened. Add why it matters or background context ONLY where the source itself states it.
 - Plain text only — NO **bold**, NO *italic*, NO #headers, NO [links](url), NO bullet points
 - IMPORTANT JSON SAFETY: Use \\n\\n (escaped) for paragraph breaks, never raw newlines inside string values
+
+${NEWS_SOURCE_DISCIPLINE}
 
 ${HUMANIZER_ARTICLE}
 
