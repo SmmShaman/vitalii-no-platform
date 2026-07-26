@@ -3,6 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { triggerVideoProcessing, isGitHubActionsEnabled } from '../_shared/github-actions.ts'
 import { escapeHtml } from '../_shared/social-media-helpers.ts'
 import { callLLM } from '../_shared/gemini-llm.ts'
+import { fetchArticleContent, isFetchableSourceUrl } from '../_shared/article-fetch.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -320,10 +321,81 @@ serve(async (req) => {
       ? 'process-blog-post'
       : (source === 'rss' ? 'process-rss-news' : 'process-news')
 
+    // ── Fetch the real article before rewriting (telegram) ──────────────────
+    // Same rule the RSS path has run since bca7387: the post itself is only good
+    // enough to DECIDE whether an item deserves our attention — pre-moderation has
+    // already made that call by the time we get here. It is never good enough to
+    // REWRITE from. A telegram post is typically 200-800 chars of announcement with
+    // the real material sitting behind a link (GitHub README, vendor blog, paper).
+    // Rewriting the announcement is what produced padded articles before 58564e2 and
+    // invented ones before that.
+    //
+    // RSS does this inside analyze-rss-article, at scoring time. Telegram cannot: the
+    // links are only known after telegram-scraper has extracted them, and there is no
+    // single canonical URL — a post can carry several. So we do it here, at publish
+    // time, walking the links until one yields a real article.
+    let rewriteContent = news.original_content || ''
+    let contentUpgraded = false
+
+    if (source === 'telegram' && processingEndpoint !== 'process-blog-post') {
+      const minRewriteChars = await readIntSetting(supabase, 'MIN_REWRITE_CHARS', 400)
+
+      if (rewriteContent.length < minRewriteChars) {
+        const candidateLinks: string[] = [
+          ...(Array.isArray(news.source_links) ? news.source_links : []),
+          ...(news.source_link ? [news.source_link] : []),
+        ].filter(isFetchableSourceUrl)
+
+        const seen = new Set<string>()
+        const links = candidateLinks.filter(u => !seen.has(u) && seen.add(u))
+
+        console.log(`📥 Telegram post is ${rewriteContent.length} chars (< ${minRewriteChars}) — ${links.length} link(s) to try`)
+
+        for (const link of links) {
+          try {
+            const full = await fetchArticleContent(link)
+            if (full.text && full.text.length >= minRewriteChars) {
+              rewriteContent = full.text.substring(0, 10000)
+              contentUpgraded = true
+              console.log(`✅ Upgraded to ${full.text.length} chars from ${new URL(link).hostname}`)
+              break
+            }
+            console.warn(`⚠️ ${new URL(link).hostname} returned only ${full.text?.length || 0} chars`)
+          } catch (e) {
+            console.warn(`⚠️ Fetch failed for ${link}: ${(e as Error).message}`)
+          }
+        }
+
+        // Never rewrite from an announcement. If no link gave us a real article — or
+        // the post carried no link at all — skip it. Silence is cheap; a fabricated
+        // claim about a named company is not. This is a deliberate no-op, not a
+        // failure: nothing broke, we simply had nothing honest to write from.
+        if (!contentUpgraded) {
+          const why = links.length === 0
+            ? `no external source link in the post (${rewriteContent.length} chars available)`
+            : `none of the ${links.length} link(s) yielded a full article (${rewriteContent.length} chars available)`
+          console.log(`🚫 Not enough source material to rewrite — ${why}`)
+
+          await supabase
+            .from('news')
+            .update({
+              auto_publish_status: 'skipped',
+              auto_publish_error: `Insufficient source material: ${why}`,
+            })
+            .eq('id', newsId)
+
+          return new Response(
+            JSON.stringify({ success: true, skipped: true, reason: why, newsId }),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          )
+        }
+      }
+    }
+
     const rewriteBody: Record<string, any> = {
       newsId,
       title: news.original_title || '',
-      content: news.original_content || '',
+      content: rewriteContent,
       url: news.original_url || '',
       imageUrl: latestImageUrl,
       videoUrl: news.video_url || null,
@@ -666,6 +738,17 @@ async function updateStatus(supabase: any, newsId: string, status: string) {
   }
   await supabase.from('news').update(update).eq('id', newsId)
   console.log(`📊 Status: ${status}`)
+}
+
+async function readIntSetting(supabase: any, key: string, fallback: number): Promise<number> {
+  const { data } = await supabase
+    .from('api_settings')
+    .select('key_value')
+    .eq('key_name', key)
+    .maybeSingle()
+
+  const parsed = parseInt(data?.key_value ?? '', 10)
+  return Number.isFinite(parsed) ? parsed : fallback
 }
 
 async function loadAutoPublishSettings(supabase: any) {
