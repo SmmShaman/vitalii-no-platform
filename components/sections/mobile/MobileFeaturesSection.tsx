@@ -51,7 +51,7 @@ export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: Mobile
                   className="flex items-center gap-2 p-1.5 rounded-md mb-1 bg-white/5 active:bg-white/10"
                 >
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-white/90 truncate">
+                    <p className="text-xs font-medium text-white/90 line-clamp-2">
                       {feature.title[langKey as 'en' | 'no' | 'ua']}
                     </p>
                   </div>
@@ -65,8 +65,8 @@ export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: Mobile
             })}
           </div>
 
-          {/* Category folders grid */}
-          <div className="grid grid-cols-3 gap-1.5">
+          {/* Category folders */}
+          <div className="flex gap-1.5 overflow-x-auto scrollbar-hide -mr-4 pr-4">
             {categories.map((cat) => {
               const count = allFeatures.filter((f) => f.category === cat.id).length
               return (
@@ -77,9 +77,9 @@ export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: Mobile
                     setSelectedFeatureCategory(cat.id)
                     setIsFeaturesModalOpen(true)
                   }}
-                  className={`flex flex-col items-center p-1.5 rounded-lg ${cat.color.bg} border border-white/5`}
+                  className={`flex flex-col items-center flex-shrink-0 p-1.5 rounded-lg ${cat.color.bg} border border-white/5`}
                 >
-                  <span className={`text-[10px] font-medium ${cat.color.text} text-center leading-tight`}>
+                  <span className={`text-[10px] font-medium ${cat.color.text} text-center leading-tight whitespace-nowrap`}>
                     {cat.label[langKey as 'en' | 'no' | 'ua']}
                   </span>
                   <span className="text-[10px] text-white/30">{count}</span>

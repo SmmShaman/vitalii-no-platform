@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { generateLocalizedSlug } from '../_shared/slug-helpers.ts'
 import { getRandomOpeningStyle } from '../_shared/opening-styles.ts'
 import { rewriteThreeLanguages } from '../_shared/rewrite-per-language.ts'
+import { cleanTagsArray } from '../_shared/text-sanitize.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -123,7 +124,8 @@ async function processWithPrompt(
   console.log(`📊 Word counts — EN: ${wcEn}, NO: ${wcNo}, UA: ${wcUa}`)
 
   // Extract tags from AI response (if available)
-  const tags = rewrittenContent.tags || rewrittenContent.en?.tags || []
+  // Gemini occasionally wraps values in stray literal quotes (e.g. "'ai'") — strip those before storing
+  const tags = cleanTagsArray(rewrittenContent.tags || rewrittenContent.en?.tags || [])
   console.log(`✅ Content rewritten for all languages, tags: ${tags.length > 0 ? tags.join(', ') : 'none'}`)
 
   // Append source links to content if available (for each language)

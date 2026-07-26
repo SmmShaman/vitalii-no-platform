@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import gsap from 'gsap';
 import { SplitText } from 'gsap/SplitText';
 import { debugLog, debugWarn, debugError } from '@/utils/debug';
+import { stripMarkdown } from '@/utils/markdown';
 
 // Register GSAP plugins
 gsap.registerPlugin(SplitText);
@@ -155,8 +156,8 @@ export const AboutAnimation = ({ text, isExploding, gridContainerRef, onClose }:
 
   debugLog('✅ AboutAnimation: Rendering portal');
 
-  // Process text: remove ** markdown and split into paragraphs
-  const cleanText = currentText.replace(/\*\*/g, '');
+  // Process text: strip leaking markdown syntax and split into paragraphs
+  const cleanText = stripMarkdown(currentText);
   const paragraphs = cleanText.split('\n\n').filter(p => p.trim());
   debugLog('📝 AboutAnimation: Paragraphs count:', paragraphs.length);
 

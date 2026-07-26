@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { sectionColors } from './types'
 import { VerticalLabel } from './VerticalLabel'
 import type { TranslateFn } from './types'
+import { stripMarkdown } from '@/utils/markdown'
 
 // About Explosion Overlay - Fast word-by-word animation
 const AboutExplosionOverlay = ({
@@ -18,7 +19,7 @@ const AboutExplosionOverlay = ({
   color: string
 }) => {
   // Clean text and split into paragraphs
-  const cleanText = text.replace(/\*\*/g, '')
+  const cleanText = stripMarkdown(text)
   const paragraphs = cleanText.split('\n\n').filter((p) => p.trim())
 
   // Flatten all words for stagger animation
@@ -105,7 +106,7 @@ export const MobileAboutSection = ({ t, currentLanguage, sectionRef, isMounted }
 
   // Typewriter effect - shows full content
   useEffect(() => {
-    const aboutText = t('about_content') as string
+    const aboutText = stripMarkdown(t('about_content') as string)
     if (!isTyping) return
 
     if (typedText.length < aboutText.length) {

@@ -156,7 +156,7 @@ export function BlogArticle({ slug, initialLanguage, initialData }: BlogArticleP
           itemScope
           itemType="https://schema.org/BreadcrumbList"
         >
-          <ol className="flex items-center gap-2 text-sm text-content-muted">
+          <ol className="flex items-center gap-2 text-sm text-content-muted min-w-0">
             <li
               itemProp="itemListElement"
               itemScope
@@ -214,7 +214,7 @@ export function BlogArticle({ slug, initialLanguage, initialData }: BlogArticleP
               itemProp="itemListElement"
               itemScope
               itemType="https://schema.org/ListItem"
-              className="flex items-center"
+              className="flex items-center min-w-0"
             >
               <span
                 itemProp="name"

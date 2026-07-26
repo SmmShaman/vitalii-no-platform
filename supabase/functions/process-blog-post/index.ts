@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { generateLocalizedSlug } from '../_shared/slug-helpers.ts'
 import { getRandomOpeningStyle } from '../_shared/opening-styles.ts'
 import { HUMANIZER_ARTICLE, VOICE_JOURNALISM } from '../_shared/humanizer-prompt.ts'
+import { cleanTagText, cleanTagsArray } from '../_shared/text-sanitize.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -419,8 +420,9 @@ ${blogPromptText}`
     const readingTime = Math.ceil(wordCount / 200)
 
     // Extract tags from AI response or use defaults
-    const extractedTags = rewrittenContent.tags || rewrittenContent.en.tags || ['ai', 'technology']
-    const category = rewrittenContent.category || rewrittenContent.en.category || 'Tech'
+    // Gemini occasionally wraps values in stray literal quotes (e.g. "'Tech'") — strip those before storing
+    const extractedTags = cleanTagsArray(rewrittenContent.tags || rewrittenContent.en.tags || ['ai', 'technology'])
+    const category = cleanTagText(rewrittenContent.category || rewrittenContent.en.category || 'Tech')
 
     // Dedup check: prevent duplicate voice blog posts from webhook retries
     // Uses fuzzy match (first 100 chars) because Gemini transcription varies slightly each time
