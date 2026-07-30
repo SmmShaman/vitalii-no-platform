@@ -1,0 +1,11 @@
+[Unit]
+Description=Check git every 5 min for undeployed portfolio Edge Function changes
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=portfolio-functions-deploy.service
+
+[Install]
+WantedBy=timers.target

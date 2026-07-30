@@ -1,0 +1,12 @@
+[Unit]
+Description=Deploy portfolio Edge Functions from git to the self-hosted Supabase stack
+Documentation=file:///home/stuar/RUNBOOK.md
+After=docker.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=stuar
+Group=stuar
+SupplementaryGroups=docker
+ExecStart=/usr/bin/flock -n /tmp/portfolio-functions-deploy.lock /home/stuar/Projects/vitalii_claude-code-in-browser/scripts/vps/portfolio-functions-deploy.sh
