@@ -924,9 +924,6 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
                         style={{
                           height: getExpandedHeight(),
                           willChange: 'transform',
-                          boxShadow: hoveredSection === section.id
-                            ? `inset 0 0 0 2px ${neonColors[section.id]?.primary ?? 'transparent'}`
-                            : 'inset 0 0 0 2px transparent',
                           // ЯВНІ grid positions щоб вікна залишалися на місцях
                           // Row 1: About(1,1), Services(2,1), Projects(3,1)
                           // Row 2: Features(1,2), News(2,2), Blog(3,2)
@@ -1064,6 +1061,15 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
 
                         {/* Hover Effect Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-purple-500/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                        {/* Neon perimeter outline on hover - matches section title color, z-40 to stay above content (z-30) */}
+                        <div
+                          className="absolute inset-0 rounded-lg pointer-events-none transition-opacity duration-300 z-40"
+                          style={{
+                            boxShadow: `inset 0 0 0 2px ${neonColors[section.id]?.primary ?? 'transparent'}`,
+                            opacity: hoveredSection === section.id ? 1 : 0,
+                          }}
+                        />
                       </motion.div>
                     );
                   })}
