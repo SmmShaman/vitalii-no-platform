@@ -403,13 +403,47 @@ export function SkillsMarquee() {
   }, [])
 
   useEffect(() => {
-    const timer = setTimeout(() => { measure(); startAnimation() }, 500)
+    let ro: ResizeObserver | null = null
+    let rafId: number | null = null
+
+    // BentoGrid boxes resize/reposition constantly (hover-expand on News/Blog/
+    // Services/Projects) without ever firing a window `resize` event. Without
+    // tracking that directly, the ribbon keeps animating along a stale
+    // rectangle and visibly drifts off the real box borders.
+    const scheduleRemeasure = () => {
+      if (rafId !== null) return
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+        measure()
+      })
+    }
+
+    const setupObserver = () => {
+      const gridEl = document.querySelector('[data-bento-grid]') as HTMLElement | null
+      if (!gridEl) return
+      ro = new ResizeObserver(scheduleRemeasure)
+      ro.observe(gridEl)
+      for (const kid of Array.from(gridEl.children)) ro.observe(kid as Element)
+    }
+
+    const timer = setTimeout(() => {
+      measure()
+      startAnimation()
+      setupObserver()
+    }, 500)
+
+    // Only a true viewport resize needs a full restart (path count/columns
+    // can change); layout-driven shifts are handled by the observer above
+    // via measure() alone, which keeps tweens running so there's no snap.
     const onResize = () => { measure(); startAnimation() }
     window.addEventListener('resize', onResize)
+
     return () => {
       clearTimeout(timer)
+      if (rafId !== null) cancelAnimationFrame(rafId)
       for (const tw of tweensRef.current) tw.kill()
       window.removeEventListener('resize', onResize)
+      ro?.disconnect()
     }
   }, [measure, startAnimation])
 
