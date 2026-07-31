@@ -914,7 +914,7 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
                             debugLog(`❌ BLOG: Умова НЕ виконалась - таймер НЕ встановлено`);
                           }
                         }}
-                        className={`relative rounded-lg transition-all duration-300 hover:shadow-[0_0_45px_rgba(0,0,0,0.45)] active:shadow-[0_0_25px_rgba(0,0,0,0.35)] w-full ${(section.id === 'news' && selectedNewsId) || (section.id === 'blog' && selectedBlogId) ? 'cursor-default' : 'cursor-pointer'} ${(section.id === 'news' && !isNewsExpanded) || (section.id === 'blog' && !isBlogExpanded) ? 'hover:scale-105 active:scale-[0.98]' : 'active:scale-[0.99]'
+                        className={`relative rounded-lg transition-all duration-300 shadow-[0_4px_0_rgba(0,0,0,0.35)] hover:-translate-y-1 hover:shadow-[0_8px_0_rgba(0,0,0,0.4)] active:translate-y-0.5 active:shadow-[0_2px_0_rgba(0,0,0,0.3)] w-full ${(section.id === 'news' && selectedNewsId) || (section.id === 'blog' && selectedBlogId) ? 'cursor-default' : 'cursor-pointer'} ${(section.id === 'news' && !isNewsExpanded) || (section.id === 'blog' && !isBlogExpanded) ? 'hover:scale-105 active:scale-[0.98]' : 'active:scale-[0.99]'
                           } ${
                           // Allow scroll when news/blog item is selected, otherwise hide overflow
                           (section.id === 'news' && selectedNewsId) || (section.id === 'blog' && selectedBlogId)
