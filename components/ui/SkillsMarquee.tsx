@@ -254,7 +254,10 @@ export function SkillsMarquee() {
       const pos = posAtDist(dist, path.segments, path.length, path.loop)
       const rot = pos.rot !== undefined ? pos.rot : rotForAngle(pos.angle, path.loop, dist, path.length)
 
-      el.style.transform = `translate(${pos.x}px, ${pos.y}px) translate(-50%, -50%) rotate(${rot}deg)`
+      // Round to whole pixels — fractional translate values force the browser
+      // to resample/interpolate the glyph every frame, which reads as blur
+      // on 7-10px text. Whole-pixel snapping keeps edges crisp while moving.
+      el.style.transform = `translate(${Math.round(pos.x)}px, ${Math.round(pos.y)}px) translate(-50%, -50%) rotate(${rot}deg)`
     }
   }, [skillChars])
 
@@ -465,8 +468,11 @@ export function SkillsMarquee() {
             <span key={`ch-${i}`} ref={el => { charRefs.current[i] = el }}
               className="absolute top-0 left-0 pointer-events-auto cursor-pointer select-none"
               style={{ fontFamily: 'Comfortaa, sans-serif', fontSize: '9px', lineHeight: '12px',
-                color: c.color, fontWeight: 600, willChange: 'transform',
-                WebkitFontSmoothing: 'antialiased', textRendering: 'optimizeLegibility' }}
+                color: c.color, fontWeight: 700, willChange: 'transform',
+                WebkitFontSmoothing: 'antialiased', textRendering: 'optimizeLegibility',
+                // Thin strokes at this size lose definition to anti-aliasing;
+                // a same-color stroke reinforces glyph edges so colors read solid, not washed out.
+                WebkitTextStroke: `0.3px ${c.color}` }}
               onMouseEnter={onHoverIn} onMouseLeave={onHoverOut} onClick={handleCharClick}
             >{ch.char}</span>
           )
