@@ -284,7 +284,9 @@ export function SkillsMarquee() {
     const skillWidths: number[] = new Array(skills.length).fill(0)
     let currentSkill = -1
     let cumWidth = 0
-    const letterGap = fs * 0.08
+    // Wider than the old 0.08 — cramped kerning made adjacent letters visually
+    // merge into each other at this tiny font size, reading as a smeared blob.
+    const letterGap = fs * 0.35
 
     for (let ci = 0; ci < skillChars.length; ci++) {
       const si = skillChars[ci].skillIdx
@@ -463,7 +465,8 @@ export function SkillsMarquee() {
             <span key={`ch-${i}`} ref={el => { charRefs.current[i] = el }}
               className="absolute top-0 left-0 pointer-events-auto cursor-pointer select-none"
               style={{ fontFamily: 'Comfortaa, sans-serif', fontSize: '9px', lineHeight: '12px',
-                color: c.color, fontWeight: 600, willChange: 'transform' }}
+                color: c.color, fontWeight: 600, willChange: 'transform',
+                WebkitFontSmoothing: 'antialiased', textRendering: 'optimizeLegibility' }}
               onMouseEnter={onHoverIn} onMouseLeave={onHoverOut} onClick={handleCharClick}
             >{ch.char}</span>
           )
