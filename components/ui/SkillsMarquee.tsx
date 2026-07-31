@@ -181,6 +181,34 @@ function posAtDist(dist: number, segments: Segment[], length: number, loop: bool
   return { x: segments[0].x, y: segments[0].y, angle: segments[0].angle }
 }
 
+// Local reading-direction sign at a given distance along a path: +1 when the
+// path is traversing left→right/top→bottom at that point (normal char order),
+// -1 when it's traversing right→left/bottom→top (bottom & left contour edges,
+// or the return half of a yoyo street) — used to mirror character order so
+// words never spell backward regardless of which way the path is going.
+function charOrderSign(dist: number, segments: Segment[], length: number, loop: boolean): number {
+  let d: number
+  let phaseFlip = 1
+  if (loop) {
+    d = ((dist % length) + length) % length
+  } else {
+    const cycle = dist % (length * 2)
+    d = cycle <= length ? cycle : length * 2 - cycle
+    phaseFlip = cycle <= length ? 1 : -1
+  }
+  let lastStraightSign = 1
+  for (const seg of segments) {
+    if (!seg.arc) {
+      lastStraightSign = (seg.dx === -1 || seg.dy === -1) ? -1 : 1
+    }
+    if (d <= seg.len) {
+      return lastStraightSign * phaseFlip
+    }
+    d -= seg.len
+  }
+  return lastStraightSign * phaseFlip
+}
+
 // Determine rotation for readability
 function rotForAngle(angle: number, loop: boolean, dist: number, length: number): number {
   if (!loop) {
@@ -206,6 +234,8 @@ export function SkillsMarquee() {
   const offsetRef = useRef<number[]>([])
   // Per-char: cumulative offset within its skill
   const charOffsetsRef = useRef<number[]>([])
+  // Per-skill: total rendered width (needed to mirror char order when reversed)
+  const skillWidthsRef = useRef<number[]>([])
   const pausedRef = useRef(false)
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [skills] = useState(() => convertSkillsForAnimation(getStoredSkills()))
@@ -239,7 +269,14 @@ export function SkillsMarquee() {
     const assigns = assignRef.current
     const offsets = offsetRef.current
     const charOffsets = charOffsetsRef.current
+    const skillWidths = skillWidthsRef.current
     const progresses = progressRefs.current
+
+    // Direction sign is computed once per word (at its anchor point) and
+    // reused for every character in it, so a word never flips mid-way.
+    let lastSkill = -1
+    let cachedSign = 1
+    let cachedAnchor = 0
 
     for (let ci = 0; ci < chars.length; ci++) {
       const el = chars[ci]
@@ -250,7 +287,19 @@ export function SkillsMarquee() {
 
       const path = paths[pi]
       const progress = progresses[pi]?.value || 0
-      const dist = progress + (offsets[si] || 0) + (charOffsets[ci] || 0)
+      const anchorDist = progress + (offsets[si] || 0)
+
+      if (si !== lastSkill) {
+        lastSkill = si
+        cachedAnchor = anchorDist
+        cachedSign = charOrderSign(anchorDist, path.segments, path.length, path.loop)
+      }
+
+      const rawOffset = charOffsets[ci] || 0
+      // When the path is locally traversing backward, mirror the char order
+      // (last char first) so the word still reads left-to-right visually.
+      const effOffset = cachedSign >= 0 ? rawOffset : (skillWidths[si] || 0) - rawOffset
+      const dist = cachedAnchor + effOffset
       const pos = posAtDist(dist, path.segments, path.length, path.loop)
       const rot = pos.rot !== undefined ? pos.rot : rotForAngle(pos.angle, path.loop, dist, path.length)
 
@@ -304,6 +353,7 @@ export function SkillsMarquee() {
     }
     if (currentSkill >= 0) skillWidths[currentSkill] = cumWidth
     charOffsetsRef.current = charOffsets
+    skillWidthsRef.current = skillWidths
 
     // Distribute skills across paths proportionally
     const totalLen = layout.paths.reduce((a, p) => a + p.length, 0)
