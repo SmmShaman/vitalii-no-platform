@@ -98,7 +98,7 @@ export const NewsModal = ({ isOpen, onClose, selectedNewsId }: NewsModalProps) =
         limit: itemsPerPage,
       };
       const { data, count } = await getAllNews(filters);
-      setNews(data);
+      setNews(data as LatestNews[]);
       setTotalPages(Math.ceil(count / itemsPerPage));
     } catch (error) {
       console.error('Failed to load news:', error);

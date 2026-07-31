@@ -102,7 +102,7 @@ export const BlogModal = ({ isOpen, onClose, selectedPostId }: BlogModalProps) =
         limit: itemsPerPage,
       };
       const { data, count } = await getAllBlogPosts(filters);
-      setPosts(data);
+      setPosts(data as LatestBlogPost[]);
       setTotalPages(Math.ceil(count / itemsPerPage));
     } catch (error) {
       console.error('Failed to load blog posts:', error);

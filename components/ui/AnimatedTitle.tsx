@@ -42,7 +42,7 @@ export const AnimatedTitle = ({ text, className = '' }: AnimatedTitleProps) => {
       rotate: [-10, 0],
       easing: 'out(elastic, 1, 0.6)',
       duration: 1200,
-      delay: (_target: unknown, i: number) => 300 + i * 50, // 50ms between each letter, start after 300ms
+      delay: (_target: unknown, i: number = 0) => 300 + i * 50, // 50ms between each letter, start after 300ms
     });
 
     hasAnimated.current = true;
