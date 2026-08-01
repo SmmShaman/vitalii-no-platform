@@ -149,15 +149,15 @@ export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex
 
             {/* Project Details */}
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
-              {/* Cover Image */}
+              {/* Cover Image — fills the full width/height of the frame */}
               {selectedProject?.image && (
                 <div className="mb-6 overflow-hidden rounded-xl">
                   <Image
                     src={selectedProject.image}
                     alt={selectedProject.title}
                     width={900}
-                    height={200}
-                    className="w-full max-h-[200px] object-cover rounded-xl"
+                    height={400}
+                    className="w-full h-[280px] sm:h-[360px] object-cover rounded-xl"
                   />
                 </div>
               )}

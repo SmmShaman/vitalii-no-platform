@@ -143,21 +143,6 @@ export const projects: ProjectInfo[] = [
     color: { bg: 'bg-cyan-500/20', text: 'text-cyan-400' },
   },
   {
-    id: 'lingleverika',
-    name: {
-      en: 'Lingva AI',
-      no: 'Lingva AI',
-      ua: 'Lingva AI',
-    },
-    description: {
-      en: 'AI-powered video translation and understanding platform',
-      no: 'AI-drevet videooversettelse og forståelsesplattform',
-      ua: 'AI-платформа перекладу та розуміння відео',
-    },
-    badge: 'L',
-    color: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
-  },
-  {
     id: 'ghost_interviewer',
     name: {
       en: 'Ghost Interviewer AI',

@@ -337,10 +337,10 @@ export const ProjectsCarousel = ({ projects, onCardClick, backgroundText, onInde
                       border: `1px solid rgb(var(--accent-brand) / 0.25)`,
                     }}
                   >
-                    {/* Project Image Background */}
+                    {/* Project Image Background — full strength, fills the whole card */}
                     {project.image && (
                       <div
-                        className="absolute inset-0 opacity-30 group-hover:opacity-50 transition-opacity duration-300"
+                        className="absolute inset-0"
                         style={{
                           backgroundImage: `url(${project.image})`,
                           backgroundSize: 'cover',
@@ -349,11 +349,13 @@ export const ProjectsCarousel = ({ projects, onCardClick, backgroundText, onInde
                       />
                     )}
 
-                    {/* Gradient overlay */}
+                    {/* Gradient overlay — only at the bottom, just enough for title legibility */}
                     <div
                       className="absolute inset-0"
                       style={{
-                        background: `linear-gradient(to top, rgb(var(--accent-brand-dark) / 0.56) 0%, transparent 60%)`,
+                        background: project.image
+                          ? `linear-gradient(to top, rgb(var(--accent-brand-dark) / 0.75) 0%, transparent 40%)`
+                          : `linear-gradient(to top, rgb(var(--accent-brand-dark) / 0.56) 0%, transparent 60%)`,
                       }}
                     />
 
