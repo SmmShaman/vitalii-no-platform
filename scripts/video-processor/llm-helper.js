@@ -1,16 +1,18 @@
 /**
  * LLM Helper for Video Processor scripts (Node.js)
  *
- * Priority: NVIDIA NIM (free, 40 RPM) → Claude Sonnet 4.6 (fallback)
+ * Priority: NVIDIA NIM (free, 40 RPM) → Gemini (GOOGLE_API_KEY) → Claude Sonnet 4.6
  * Replaces all Azure OpenAI calls removed in March 2026.
  */
 
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 const LLM_TIMEOUT_MS = 60_000;
-// mistralai/mistral-small-24b-instruct-2501 was deprecated by NVIDIA (returns 404) —
-// same model family used elsewhere in this repo after the daily-video-bot NVIDIA fix.
-const NVIDIA_MODEL = process.env.NVIDIA_MODEL || 'meta/llama-4-maverick-17b-128e-instruct';
+// meta/llama-4-maverick-17b-128e-instruct hit NVIDIA EOL 2026-07-27 (410 Gone);
+// llama-3.3-70b-instruct verified live + JSON-mode capable on 2026-08-02.
+// NVIDIA NIM has its own per-key rate limits — this does NOT touch the Groq 70b pool.
+const NVIDIA_MODEL = process.env.NVIDIA_MODEL || 'meta/llama-3.3-70b-instruct';
 
 /** Fetch with AbortController timeout */
 async function fetchWithTimeout(url, options, timeoutMs = LLM_TIMEOUT_MS) {
@@ -41,6 +43,17 @@ export async function callLLM(systemPrompt, userPrompt, options = {}) {
     }
   }
 
+  // Gemini — same billed GOOGLE_API_KEY the daily-video-bot Edge Function already
+  // uses for digest scripts. Video pipeline only; never wired into article rewrites.
+  if (GOOGLE_API_KEY) {
+    try {
+      return await callGemini(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode });
+    } catch (err) {
+      errors.push(`Gemini: ${err.message}`);
+      console.warn(`⚠️ Gemini failed: ${err.message}, falling back to Claude`);
+    }
+  }
+
   // Fallback to Claude
   if (ANTHROPIC_API_KEY) {
     try {
@@ -53,7 +66,7 @@ export async function callLLM(systemPrompt, userPrompt, options = {}) {
   if (errors.length > 0) {
     throw new Error(`All LLM backends failed:\n  - ${errors.join('\n  - ')}`);
   }
-  throw new Error('No LLM credentials available (NVIDIA_API_KEY or ANTHROPIC_API_KEY required)');
+  throw new Error('No LLM credentials available (NVIDIA_API_KEY, GOOGLE_API_KEY or ANTHROPIC_API_KEY required)');
 }
 
 /**
@@ -114,6 +127,44 @@ async function callNvidia(systemPrompt, userPrompt, { maxTokens, temperature, js
   const usage = data.usage;
   if (usage) {
     console.log(`💰 NVIDIA tokens: ${usage.prompt_tokens}+${usage.completion_tokens}`);
+  }
+
+  return content;
+}
+
+// ── Gemini (Google AI, billed key — video pipeline only) ──
+
+async function callGemini(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode }) {
+  const response = await fetchWithTimeout(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GOOGLE_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          temperature,
+          maxOutputTokens: maxTokens,
+          ...(jsonMode ? { responseMimeType: 'application/json' } : {}),
+        },
+      }),
+    },
+  );
+
+  if (!response.ok) {
+    const bodyText = await response.text().catch(() => '');
+    throw new Error(`Gemini ${response.status}: ${bodyText.substring(0, 300)}`);
+  }
+
+  const data = await response.json();
+  const parts = data.candidates?.[0]?.content?.parts || [];
+  const content = parts.map(p => p.text || '').join('').trim();
+  if (!content) throw new Error('Empty Gemini response');
+
+  const usage = data.usageMetadata;
+  if (usage) {
+    console.log(`💰 Gemini tokens: ${usage.promptTokenCount}+${usage.candidatesTokenCount}`);
   }
 
   return content;

@@ -25,7 +25,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { triggerDailyVideoRender } from "../_shared/github-actions.ts";
 import { HUMANIZER_VIDEO, VOICE_SPOKEN } from "../_shared/humanizer-prompt.ts";
 
-const VERSION = "2026-04-21-v35-selection-retry";
+const VERSION = "2026-08-02-v36-group-cap-nvidia-model";
 const MAX_DETAILED = 10;
 
 const supabase = createClient(
@@ -155,9 +155,10 @@ function formatDateNorwegian(dateStr: string): string {
 // ── LLM Helper ──
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
-  // NVIDIA Llama 4 Maverick — primary (Llama 3.1 405B was deprecated and returned 404)
+  // NVIDIA primary — llama-4-maverick hit EOL 2026-07-27 (410 Gone);
+  // llama-3.3-70b-instruct verified live + JSON-mode capable on 2026-08-02.
   if (LLM_PROVIDER === "nvidia" && NVIDIA_API_KEY) {
-    const nvidiaModel = Deno.env.get("NVIDIA_MODEL") || "meta/llama-4-maverick-17b-128e-instruct";
+    const nvidiaModel = Deno.env.get("NVIDIA_MODEL") || "meta/llama-3.3-70b-instruct";
     try {
       console.log(`🤖 NVIDIA ${nvidiaModel}`);
       const controller = new AbortController();
@@ -625,6 +626,18 @@ Return JSON:
       for (const id of selection.selectedArticleIds) {
         const mapped = mapId(id);
         if (articleMap.has(mapped)) groups.push({ articleIds: [mapped], topic: "" });
+      }
+    }
+
+    // A runaway "mega-group" (LLM lumping most articles into one group) marks every
+    // id as used, so the score-based filler below finds nothing and the digest ships
+    // with a single segment (2026-08-02: selected=1 of total=16). Cap group size so
+    // the extras return to the selection pool.
+    const MAX_GROUP_SIZE = 4;
+    for (const g of groups) {
+      if (g.articleIds.length > MAX_GROUP_SIZE) {
+        console.warn(`⚠️ Group "${g.topic}" has ${g.articleIds.length} articles — capping at ${MAX_GROUP_SIZE}`);
+        g.articleIds = g.articleIds.slice(0, MAX_GROUP_SIZE);
       }
     }
 
