@@ -8,7 +8,9 @@
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
-const LLM_TIMEOUT_MS = 60_000;
+// 60s was too short: llama-3.3-70b needs >60s for 4k-token visual-direction
+// generations and aborted mid-answer on 2026-08-02.
+const LLM_TIMEOUT_MS = 120_000;
 // meta/llama-4-maverick-17b-128e-instruct hit NVIDIA EOL 2026-07-27 (410 Gone);
 // llama-3.3-70b-instruct verified live + JSON-mode capable on 2026-08-02.
 // NVIDIA NIM has its own per-key rate limits — this does NOT touch the Groq 70b pool.
@@ -33,13 +35,26 @@ export async function callLLM(systemPrompt, userPrompt, options = {}) {
   const { maxTokens = 4000, temperature = 0.7, jsonMode = false } = options;
   const errors = [];
 
-  // Try NVIDIA NIM first (free tier, OpenAI-compatible)
+  // Try NVIDIA NIM first (free tier, OpenAI-compatible). Back-to-back per-segment
+  // calls trip its burst limit ("Worker local total request limit reached", 503) —
+  // retry those with a pause instead of burning the whole fallback chain.
   if (NVIDIA_API_KEY) {
-    try {
-      return await callNvidia(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode });
-    } catch (err) {
-      errors.push(`NVIDIA: ${err.message}`);
-      console.warn(`⚠️ NVIDIA NIM failed: ${err.message}, falling back to Claude`);
+    const NVIDIA_ATTEMPTS = 3;
+    for (let attempt = 1; attempt <= NVIDIA_ATTEMPTS; attempt++) {
+      try {
+        return await callNvidia(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode });
+      } catch (err) {
+        const transient = /503|429|aborted/i.test(err.message);
+        if (transient && attempt < NVIDIA_ATTEMPTS) {
+          const delay = attempt * 15_000;
+          console.warn(`⚠️ NVIDIA NIM transient (${err.message.substring(0, 80)}), retry ${attempt}/${NVIDIA_ATTEMPTS - 1} in ${delay / 1000}s`);
+          await new Promise(r => setTimeout(r, delay));
+          continue;
+        }
+        errors.push(`NVIDIA: ${err.message}`);
+        console.warn(`⚠️ NVIDIA NIM failed: ${err.message}, falling back`);
+        break;
+      }
     }
   }
 
