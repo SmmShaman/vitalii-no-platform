@@ -118,7 +118,7 @@ serve(async (req) => {
       .single()
 
     const basePrompt = promptData?.prompt_text || `Convert raw text into a polished trilingual blog post. Return JSON with en/no/ua titles, content, descriptions, tags, category.`
-    const wordCount = rawText.split(/\s+/).length
+    const rawWordCount = rawText.split(/\s+/).length
     const voiceSafeguards = `
 VOICE DICTATION MODE — CRITICAL RULES:
 The text below is the author's OWN words transcribed from a voice message.
@@ -127,7 +127,7 @@ The text below is the author's OWN words transcribed from a voice message.
 3. Do NOT invent details, examples, backstory, or emotional context the author did not say.
 4. Do NOT generalize specific experiences into abstract motivation. If the author described a concrete problem with a specific tool, write about THAT tool and THAT problem.
 5. Do NOT add "I remember when...", "Back in those days..." or nostalgic filler.
-6. Keep roughly the same level of detail as the original (~${wordCount} words ±30% per language).
+6. Keep roughly the same level of detail as the original (~${rawWordCount} words ±30% per language).
 7. If unsure whether something was said — leave it out.
 8. The blog post should feel like the author's voice cleaned up, NOT a completely different text inspired by the topic.`
     const systemPrompt = `${basePrompt}\n\n${voiceSafeguards}\n\n${HUMANIZER_ARTICLE}\n\n${VOICE_JOURNALISM}`
