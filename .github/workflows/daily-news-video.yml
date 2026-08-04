@@ -101,6 +101,28 @@ jobs:
 
           echo "Response ($HTTP_CODE): $BODY"
 
+          # Gateway timeouts (Kong 504 / Cloudflare 524) cut the connection at
+          # ~60-100s while the Edge Function keeps working and dispatches the
+          # render itself. Poll the draft row before declaring failure.
+          if [ "$HTTP_CODE" = "504" ] || [ "$HTTP_CODE" = "524" ]; then
+            DATE="${TARGET_DATE:-$(date -u -d yesterday +%F)}"
+            echo "⏳ Gateway timeout — polling draft for ${DATE} to see if the function is still working..."
+            for i in 1 2 3 4; do
+              sleep 60
+              STATUS=$(curl -s "${SUPABASE_URL}/rest/v1/daily_video_drafts?target_date=eq.${DATE}&select=status" \
+                -H "apikey: ${SUPABASE_SERVICE_ROLE_KEY}" \
+                -H "Authorization: Bearer ${SUPABASE_SERVICE_ROLE_KEY}" | \
+                sed -n 's/.*"status":"\([^"]*\)".*/\1/p')
+              echo "   poll ${i}/4: draft status = ${STATUS:-none}"
+              if [ -n "$STATUS" ] && [ "$STATUS" != "pending_digest" ]; then
+                echo "✅ Auto digest is progressing in the background (status: ${STATUS})"
+                exit 0
+              fi
+            done
+            echo "❌ Auto digest timed out and the draft never advanced"
+            exit 1
+          fi
+
           if [ "$HTTP_CODE" -ge 400 ]; then
             echo "❌ Auto digest failed with HTTP $HTTP_CODE"
             exit 1
