@@ -12,7 +12,7 @@ serve(async (req) => {
     const code = url.searchParams.get('code')
 
     // External URL (Supabase edge functions have internal origin without /functions/v1/)
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://uchmopqiylywnemvjttl.supabase.co'
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || 'https://db-portfolio.vitalii.no'
     const EXTERNAL_REDIRECT_URI = `${SUPABASE_URL}/functions/v1/test-youtube-auth`
 
     // ── OAuth callback: exchange code for refresh token ──

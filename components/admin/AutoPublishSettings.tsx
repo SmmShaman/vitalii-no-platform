@@ -119,7 +119,7 @@ export const AutoPublishSettings = () => {
 
     try {
       const response = await fetch(
-        'https://uchmopqiylywnemvjttl.supabase.co/functions/v1/fetch-news',
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/fetch-news`,
         {
           method: 'POST',
           headers: {
@@ -157,7 +157,7 @@ export const AutoPublishSettings = () => {
 
     try {
       const response = await fetch(
-        'https://uchmopqiylywnemvjttl.supabase.co/functions/v1/telegram-scraper',
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/telegram-scraper`,
         {
           method: 'POST',
           headers: {
@@ -216,7 +216,7 @@ export const AutoPublishSettings = () => {
       }
 
       const response = await fetch(
-        'https://uchmopqiylywnemvjttl.supabase.co/functions/v1/telegram-scraper',
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/telegram-scraper`,
         {
           method: 'POST',
           headers: {

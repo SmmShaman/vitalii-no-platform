@@ -526,7 +526,7 @@ SELECT cron.schedule(
   $$
   SELECT
     net.http_post(
-      url:='https://uchmopqiylywnemvjttl.supabase.co/functions/v1/${jobName.replace('-job', '')}',
+      url:='${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/${jobName.replace('-job', '')}',
       headers:=jsonb_build_object(
         'Content-Type','application/json',
         'Authorization','Bearer ' || current_setting('app.settings.service_role_key')
@@ -540,7 +540,7 @@ SELECT cron.schedule(
 
       setSaveResult({
         success: true,
-        message: `SQL copied! Open SQL Editor and execute:\nhttps://app.supabase.com/project/uchmopqiylywnemvjttl/sql/new`,
+        message: `SQL copied! Execute it against the self-hosted database (SQL client / psql).`,
       })
 
       if (jobName === 'telegram-scraper-job') {
@@ -554,7 +554,7 @@ SELECT cron.unschedule('${jobName}');
 
 SELECT cron.schedule('${jobName}', '${newSchedule}', $$
   SELECT net.http_post(
-    url:='https://uchmopqiylywnemvjttl.supabase.co/functions/v1/${jobName.replace('-job', '')}',
+    url:='${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/${jobName.replace('-job', '')}',
     headers:=jsonb_build_object('Content-Type','application/json','Authorization','Bearer ' || current_setting('app.settings.service_role_key')),
     body:='{}'::jsonb
   );
