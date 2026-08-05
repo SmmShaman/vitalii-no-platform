@@ -10,56 +10,58 @@ jobs:
   auto-reject:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+    # Self-hosted Supabase: base URL + service_role key come from repo secrets
+    # (no Management API on a self-hosted stack — the old uchmopqiylywnemvjttl
+    # project this used to query via scripts/bypass/db.mjs has been dead/402
+    # since 2026-07-15).
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SRV: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+    steps:
+      - name: Check credentials
+        run: |
+          if [ -z "$SRV" ] || [ -z "$SUPABASE_URL" ]; then
+            echo "::error::SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set"
+            exit 1
+          fi
 
       - name: Auto-reject stale news
         id: reject
-        env:
-          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
         run: |
           echo "🤖 Auto-reject stale news — $(date -u '+%H:%M UTC')"
 
-          node --input-type=module << 'EOF'
-          import { dbQuery, sq } from './scripts/bypass/db.mjs'
+          CUTOFF=$(date -u -d '48 hours ago' '+%Y-%m-%dT%H:%M:%S.000Z')
 
-          const cutoff48h = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()
+          # Reject pending articles older than 48h.
+          # Important: only reject articles that are NOT already published —
+          # otherwise we end up with the buggy state is_published=true +
+          # pre_moderation_status='rejected' which makes broken/empty rows
+          # appear at the top of the public feed.
+          PENDING=$(curl -fsS \
+            -X PATCH "$SUPABASE_URL/rest/v1/news?pre_moderation_status=eq.pending&created_at=lt.$CUTOFF&or=(is_published.eq.false,is_published.is.null)" \
+            -H "apikey: $SRV" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=representation" \
+            -d '{"pre_moderation_status":"rejected","rejection_reason":"Auto-rejected: pending for more than 48 hours"}')
+          PENDING_COUNT=$(echo "$PENDING" | jq 'length')
+          echo "📊 Rejected $PENDING_COUNT pending-stale articles"
 
-          // Reject pending articles older than 48h.
-          // Important: only reject articles that are NOT already published —
-          // otherwise we end up with the buggy state is_published=true +
-          // pre_moderation_status='rejected' which makes broken/empty rows
-          // appear at the top of the public feed.
-          const pendingRejected = await dbQuery(`
-            UPDATE public.news
-            SET pre_moderation_status = 'rejected',
-                rejection_reason = 'Auto-rejected: pending for more than 48 hours'
-            WHERE pre_moderation_status = 'pending'
-              AND (is_published = false OR is_published IS NULL)
-              AND created_at < ${sq(cutoff48h)}
-            RETURNING id
-          `)
+          # Reject approved-but-unpublished articles older than 48h
+          APPROVED=$(curl -fsS \
+            -X PATCH "$SUPABASE_URL/rest/v1/news?pre_moderation_status=eq.approved&created_at=lt.$CUTOFF&published_at=is.null&or=(is_published.eq.false,is_published.is.null)" \
+            -H "apikey: $SRV" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=representation" \
+            -d '{"pre_moderation_status":"rejected","rejection_reason":"Auto-rejected: approved but not published within 48 hours"}')
+          APPROVED_COUNT=$(echo "$APPROVED" | jq 'length')
+          echo "📊 Rejected $APPROVED_COUNT approved-stale articles"
 
-          // Reject approved-but-unpublished articles older than 48h
-          const approvedRejected = await dbQuery(`
-            UPDATE public.news
-            SET pre_moderation_status = 'rejected',
-                rejection_reason = 'Auto-rejected: approved but not published within 48 hours'
-            WHERE pre_moderation_status = 'approved'
-              AND (is_published = false OR is_published IS NULL)
-              AND (published_at IS NULL)
-              AND created_at < ${sq(cutoff48h)}
-            RETURNING id
-          `)
-
-          const total = (pendingRejected?.length || 0) + (approvedRejected?.length || 0)
-          console.log(`📊 Rejected ${pendingRejected?.length || 0} pending + ${approvedRejected?.length || 0} approved-stale = ${total} total`)
-          console.log(`REJECTED_COUNT=${total}`)
-          EOF
+          TOTAL=$((PENDING_COUNT + APPROVED_COUNT))
+          echo "📊 Total rejected: $TOTAL"
+          echo "REJECTED_COUNT=$TOTAL" >> "$GITHUB_OUTPUT"
 
       - name: Summary
         if: always()
@@ -67,5 +69,6 @@ jobs:
           echo "## Auto-reject Stale News Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Time:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- **Rejected:** ${{ steps.reject.outputs.REJECTED_COUNT }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "News items pending or approved but not published within 48 hours are automatically rejected." >> $GITHUB_STEP_SUMMARY
