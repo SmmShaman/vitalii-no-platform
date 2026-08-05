@@ -15,14 +15,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check credentials
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SRV: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          if [ -z "$SRV" ] || [ -z "$SUPABASE_URL" ]; then
+            echo "::error::SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set"
+            exit 1
+          fi
+
       - name: Get active sources and pick one
         id: pick
         env:
-          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SRV: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
+          # Self-hosted Supabase (the old uchmopqiylywnemvjttl project this used to
+          # hit has been dead/402 since 2026-07-15).
           # Fetch sources
-          SOURCES=$(curl -s "https://uchmopqiylywnemvjttl.supabase.co/rest/v1/news_sources?select=id,name&is_active=eq.true&source_type=eq.telegram" \
-            -H "apikey: $SUPABASE_ANON_KEY")
+          SOURCES=$(curl -s "$SUPABASE_URL/rest/v1/news_sources?select=id,name&is_active=eq.true&source_type=eq.telegram" \
+            -H "apikey: $SRV" \
+            -H "Authorization: Bearer $SRV")
 
           echo "Raw response: $SOURCES"
 
@@ -56,14 +70,15 @@ jobs:
       - name: Scrape selected source
         if: steps.pick.outputs.source_id != ''
         env:
-          SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SRV: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           SOURCE_ID: ${{ steps.pick.outputs.source_id }}
           SOURCE_NAME: ${{ steps.pick.outputs.source_name }}
         run: |
           echo "🕷️ Scraping: $SOURCE_NAME"
 
-          RESULT=$(curl -s -X POST "https://uchmopqiylywnemvjttl.supabase.co/functions/v1/telegram-scraper" \
-            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+          RESULT=$(curl -s -X POST "$SUPABASE_URL/functions/v1/telegram-scraper" \
+            -H "Authorization: Bearer $SRV" \
             -H "Content-Type: application/json" \
             -d "{\"source_id\": \"$SOURCE_ID\"}" \
             --max-time 150)

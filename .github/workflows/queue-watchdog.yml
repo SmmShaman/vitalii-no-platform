@@ -10,56 +10,49 @@ jobs:
   watchdog:
     runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v4
+    # Self-hosted Supabase: base URL + service_role key come from repo secrets
+    # (no Management API on a self-hosted stack — this used to query the old
+    # uchmopqiylywnemvjttl project via scripts/bypass/db.mjs, which has been
+    # dead/402 since 2026-07-15).
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SRV: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+    steps:
+      - name: Check credentials
+        run: |
+          if [ -z "$SRV" ] || [ -z "$SUPABASE_URL" ]; then
+            echo "::error::SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set"
+            exit 1
+          fi
 
       - name: Zombie cleanup & schedule backup
-        env:
-          SUPABASE_MGMT_PAT: ${{ secrets.SUPABASE_MGMT_PAT }}
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          FACEBOOK_PAGE_ACCESS_TOKEN: ${{ secrets.FACEBOOK_PAGE_ACCESS_TOKEN }}
-          FACEBOOK_PAGE_ID: ${{ secrets.FACEBOOK_PAGE_ID }}
-          INSTAGRAM_ACCOUNT_ID: ${{ secrets.INSTAGRAM_ACCOUNT_ID }}
-          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
-          LINKEDIN_PERSON_URN: ${{ secrets.LINKEDIN_PERSON_URN }}
         run: |
           echo "🧟 Queue Watchdog — $(date -u '+%H:%M UTC')"
 
-          node --input-type=module << 'EOF'
-          import { dbQuery, sq } from './scripts/bypass/db.mjs'
+          CUTOFF=$(date -u -d '10 minutes ago' '+%Y-%m-%dT%H:%M:%S.000Z')
+          STALE_CUTOFF=$(date -u -d '24 hours ago' '+%Y-%m-%dT%H:%M:%S.000Z')
 
-          const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString()
-          const staleCutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+          # Clean zombies: stuck mid-pipeline for more than 10 minutes
+          ZOMBIES=$(curl -fsS \
+            -X PATCH "$SUPABASE_URL/rest/v1/news?auto_publish_status=in.(pending,variant_selection,image_generation,content_rewrite,social_posting)&auto_publish_started_at=lt.$CUTOFF" \
+            -H "apikey: $SRV" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=representation" \
+            -d '{"auto_publish_status":"failed","auto_publish_error":"Zombie: watchdog auto-cleaned after 10min timeout"}')
+          ZOMBIE_COUNT=$(echo "$ZOMBIES" | jq 'length')
+          echo "🧟 Cleaned $ZOMBIE_COUNT zombie(s)"
 
-          // Clean zombies
-          const zombies = await dbQuery(`
-            UPDATE public.news
-            SET auto_publish_status = 'failed',
-                auto_publish_error = 'Zombie: watchdog auto-cleaned after 10min timeout'
-            WHERE auto_publish_status IN ('pending','variant_selection','image_generation','content_rewrite','social_posting')
-              AND auto_publish_started_at < ${sq(cutoff)}
-            RETURNING id
-          `)
-          console.log(`🧟 Cleaned ${zombies?.length || 0} zombie(s)`)
+          # Clean stale scheduled (>24h, never picked up)
+          STALE=$(curl -fsS \
+            -X PATCH "$SUPABASE_URL/rest/v1/news?auto_publish_status=eq.scheduled&scheduled_publish_at=lt.$STALE_CUTOFF" \
+            -H "apikey: $SRV" \
+            -H "Authorization: Bearer $SRV" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=representation" \
+            -d '{"auto_publish_status":"failed","auto_publish_error":"Stale: scheduled >24h ago, never picked up"}')
+          STALE_COUNT=$(echo "$STALE" | jq 'length')
+          echo "📅 Cleaned $STALE_COUNT stale scheduled article(s)"
 
-          // Clean stale scheduled (>24h)
-          const stale = await dbQuery(`
-            UPDATE public.news
-            SET auto_publish_status = 'failed',
-                auto_publish_error = 'Stale: scheduled >24h ago, never picked up'
-            WHERE auto_publish_status = 'scheduled'
-              AND scheduled_publish_at < ${sq(staleCutoff)}
-            RETURNING id
-          `)
-          console.log(`📅 Cleaned ${stale?.length || 0} stale scheduled article(s)`)
-
-          console.log('✅ Watchdog complete')
-          EOF
+          echo "✅ Watchdog complete"
