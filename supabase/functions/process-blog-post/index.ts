@@ -5,6 +5,7 @@ import { generateLocalizedSlug } from '../_shared/slug-helpers.ts'
 import { getRandomOpeningStyle } from '../_shared/opening-styles.ts'
 import { HUMANIZER_ARTICLE, VOICE_JOURNALISM } from '../_shared/humanizer-prompt.ts'
 import { cleanTagText, cleanTagsArray } from '../_shared/text-sanitize.ts'
+import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -180,19 +181,22 @@ serve(async (req) => {
     const blogPrompt = prompts[0]
     console.log('Using blog rewrite prompt:', blogPrompt.name)
 
-    // ── Helper: call Gemini ──
+    // ── Helper: rewrite-class LLM call via shim `quality` route ──
+    // (gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA → free Gemini;
+    // paid Gemini removed per owner policy 2026-08-06)
     async function callGemini(prompt: string, maxTokens = 4000): Promise<string> {
-      const { data: gKey } = await supabase.from('api_settings').select('key_value').eq('key_name', 'GOOGLE_API_KEY').single()
-      const key = gKey?.key_value || Deno.env.get('GOOGLE_API_KEY') || ''
-      if (!key) throw new Error('Google API key not configured')
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
-        { method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.4, maxOutputTokens: maxTokens } }) }
-      )
-      if (!res.ok) throw new Error(`Gemini ${res.status}: ${(await res.text()).slice(0, 200)}`)
+      const res = await azureFetch('', {
+        method: 'POST',
+        body: JSON.stringify({
+          llm_route: 'quality',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.4,
+          max_tokens: maxTokens,
+        }),
+      })
+      if (!res.ok) throw new Error(`LLM ${res.status}: ${(await res.text()).slice(0, 200)}`)
       const d = await res.json()
-      return d?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+      return d?.choices?.[0]?.message?.content || ''
     }
 
     // ══════════════════════════════════════════════════════════════

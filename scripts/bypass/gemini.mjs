@@ -1,14 +1,16 @@
-// AI API helpers — cascade: Gemini → Groq → Nvidia NIM
-// Text generation: all three providers supported
-// Image generation: Gemini only
+// AI API helpers — cascade: free Gemini → Groq → Nvidia NIM
+// Owner policy 2026-08-06: paid GOOGLE_API_KEY removed everywhere. Text runs on
+// the no-billing GEMINI_FREE_API_KEY (429s over quota, never invoices); images
+// go OpenRouter (prepaid balance) → Cloudflare FLUX (free).
+// NOTE: gemini-2.5-flash 404s on the free project — lite is the workhorse.
 
-const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash'
+const DEFAULT_GEMINI_MODEL = process.env.GEMINI_FREE_MODEL_LITE || 'gemini-3.1-flash-lite'
 
-// ── Gemini ────────────────────────────────────────────────────────────────
+// ── Gemini (free key) ─────────────────────────────────────────────────────
 
 async function callGeminiDirect(systemPrompt, userPrompt, opts = {}) {
-  const key = process.env.GOOGLE_API_KEY
-  if (!key) throw new Error('GOOGLE_API_KEY not set')
+  const key = process.env.GEMINI_FREE_API_KEY
+  if (!key) throw new Error('GEMINI_FREE_API_KEY not set')
   const model = opts.model || DEFAULT_GEMINI_MODEL
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`
   const res = await fetch(url, {
@@ -144,31 +146,62 @@ export async function transcribeAudio(audioPath, mimeType = 'audio/ogg') {
   return res.text()
 }
 
-// ── Image generation (Gemini only) ────────────────────────────────────────
+// ── Image generation: OpenRouter (prepaid) → Cloudflare FLUX (free) ──────
+// Keeps the old export name so callers (auto-publish.mjs) don't change.
 
 export async function generateGeminiImage(prompt) {
-  const key = process.env.GOOGLE_API_KEY
-  if (!key) throw new Error('GOOGLE_API_KEY not set')
-  const model = 'gemini-3-pro-image-preview'
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { responseModalities: ['IMAGE', 'TEXT'] },
-    }),
-  })
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Gemini image ${res.status}: ${err.slice(0, 300)}`)
-  }
-  const data = await res.json()
-  const parts = data?.candidates?.[0]?.content?.parts || []
-  for (const part of parts) {
-    if (part.inlineData?.mimeType?.startsWith('image/')) {
-      return { base64: part.inlineData.data, mimeType: part.inlineData.mimeType }
+  const errors = []
+
+  if (process.env.OPENROUTER_API_KEY) {
+    try {
+      const model = process.env.OPENROUTER_IMAGE_MODEL || 'google/gemini-2.5-flash-image'
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: 'user', content: `Generate an image: ${prompt}` }],
+          modalities: ['image', 'text'],
+        }),
+        signal: AbortSignal.timeout(90_000),
+      })
+      if (!res.ok) throw new Error(`OpenRouter ${res.status}: ${(await res.text()).slice(0, 200)}`)
+      const data = await res.json()
+      const dataUrl = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url || ''
+      const b64Idx = dataUrl.indexOf('base64,')
+      if (b64Idx < 0) throw new Error('OpenRouter response contains no image data')
+      const mime = dataUrl.slice(5, dataUrl.indexOf(';')) || 'image/png'
+      return { base64: dataUrl.substring(b64Idx + 7), mimeType: mime }
+    } catch (e) {
+      console.warn(`  ⚠️  OpenRouter image failed: ${e.message.slice(0, 120)}`)
+      errors.push(`OpenRouter: ${e.message.slice(0, 120)}`)
     }
   }
-  throw new Error('No image data in Gemini response')
+
+  const cfToken = process.env.CF_AI_TOKEN
+  const cfAccount = process.env.CF_ACCOUNT_ID || '1438e8d03009209c4a82ea4c28bdb358'
+  if (cfToken) {
+    try {
+      const res = await fetch(
+        `https://api.cloudflare.com/client/v4/accounts/${cfAccount}/ai/run/@cf/black-forest-labs/flux-1-schnell`,
+        {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${cfToken}`, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: `${prompt}\n\nStyle: professional editorial photography, no text in image, no watermarks`.slice(0, 2000),
+            steps: 4, width: 1280, height: 720,
+          }),
+        },
+      )
+      if (!res.ok) throw new Error(`FLUX ${res.status}: ${(await res.text()).slice(0, 200)}`)
+      const data = await res.json()
+      if (!data?.success || !data?.result?.image) throw new Error(`FLUX success=false`)
+      return { base64: data.result.image, mimeType: 'image/jpeg' }
+    } catch (e) {
+      console.warn(`  ⚠️  Cloudflare FLUX failed: ${e.message.slice(0, 120)}`)
+      errors.push(`FLUX: ${e.message.slice(0, 120)}`)
+    }
+  }
+
+  throw new Error(`Free image cascade failed:\n${errors.join('\n') || 'no provider configured (OPENROUTER_API_KEY / CF_AI_TOKEN)'}`)
 }

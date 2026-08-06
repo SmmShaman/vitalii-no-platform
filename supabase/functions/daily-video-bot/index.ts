@@ -24,8 +24,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { triggerDailyVideoRender } from "../_shared/github-actions.ts";
 import { HUMANIZER_VIDEO, VOICE_SPOKEN } from "../_shared/humanizer-prompt.ts";
+import { generateImageFree } from "../_shared/free-image.ts";
 
-const VERSION = "2026-08-02-v36-group-cap-nvidia-model";
+const VERSION = "2026-08-06-v37-free-llm-only";
 const MAX_DETAILED = 10;
 
 const supabase = createClient(
@@ -69,7 +70,10 @@ async function uploadToR2(key: string, data: Uint8Array, contentType: string): P
 const TELEGRAM_BOT_TOKEN = Deno.env.get("TELEGRAM_BOT_TOKEN")!;
 const TELEGRAM_CHAT_ID = Deno.env.get("TELEGRAM_CHAT_ID")!;
 
-const GEMINI_API_KEY = Deno.env.get("GOOGLE_API_KEY") || "";
+// Free no-billing Gemini key ONLY (owner policy 2026-08-06: the paid GOOGLE_API_KEY
+// must never be a text/image fallback; free key 429s over quota, never invoices).
+const GEMINI_API_KEY = Deno.env.get("GEMINI_FREE_API_KEY") || "";
+const GEMINI_TEXT_MODEL = Deno.env.get("GEMINI_FREE_MODEL_LITE") || "gemini-3.1-flash-lite";
 const GROQ_API_KEY = Deno.env.get("GROQ_API_KEY") || "";
 const NVIDIA_API_KEY = Deno.env.get("NVIDIA_API_KEY") || "";
 const SERPER_API_KEY = Deno.env.get("SERPER_API_KEY") || "";
@@ -208,9 +212,9 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
     let geminiFailed = false;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
-        console.log(`🤖 Gemini 2.5 Flash Lite (attempt ${attempt + 1}/${MAX_RETRIES + 1})`);
+        console.log(`🤖 Gemini ${GEMINI_TEXT_MODEL} free (attempt ${attempt + 1}/${MAX_RETRIES + 1})`);
         const resp = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -2485,9 +2489,8 @@ async function triggerRender(targetDate: string, chatId?: number, messageId?: nu
 // THUMBNAIL GENERATION + SELECTION (4 variants via Gemini)
 // ══════════════════════════════════════════════════════════════
 
-const GOOGLE_API_KEY = Deno.env.get("GOOGLE_API_KEY") || "";
-const GEMINI_MODELS = ["gemini-3-pro-image-preview", "gemini-2.5-flash-image"];
-const GEMINI_TIMEOUT = 45_000;
+// Thumbnails go through the free-first cascade (OpenRouter prepaid → FLUX) —
+// the paid Google image models were removed per owner policy 2026-08-06.
 const TOTAL_THUMBNAIL_TIMEOUT = 120_000; // 2 min max for all variants combined
 
 // 4 overlay styles applied on top of real article images
@@ -2607,39 +2610,17 @@ async function convertToJpegViaGemini(pngBuffer: Uint8Array): Promise<Uint8Array
     for (let i = 0; i < pngBuffer.length; i++) binary += String.fromCharCode(pngBuffer[i]);
     const base64 = btoa(binary);
 
-    const requestBody = {
-      contents: [{
-        parts: [
-          { text: "Convert this image to JPEG format. Output the exact same image without any modifications — same content, same dimensions. Just change the format to JPEG." },
-          { inline_data: { mime_type: "image/png", data: base64 } },
-        ],
-      }],
-      generationConfig: {
-        responseModalities: ["IMAGE"],
-        imageConfig: { aspectRatio: "16:9", imageSize: "1K" },
-      },
-    };
-
-    for (const model of GEMINI_MODELS) {
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-      const resp = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": GOOGLE_API_KEY },
-        body: JSON.stringify(requestBody),
-        signal: AbortSignal.timeout(30_000),
-      });
-      if (!resp.ok) continue;
-      const result = await resp.json();
-      const part = result.candidates?.[0]?.content?.parts?.find(
-        (p: any) => (p.inline_data || p.inlineData)?.data,
-      );
-      const imgData = part?.inline_data || part?.inlineData;
-      if (imgData?.data) {
-        const bStr = atob(imgData.data);
-        const bytes = new Uint8Array(bStr.length);
-        for (let j = 0; j < bStr.length; j++) bytes[j] = bStr.charCodeAt(j);
-        return bytes;
-      }
+    // OpenRouter only (input image); callers keep the PNG when this returns null.
+    const res = await generateImageFree(
+      "Convert this image to JPEG format. Output the exact same image without any modifications — same content, same dimensions. Just change the format to JPEG.",
+      "16:9",
+      { data: base64, mimeType: "image/png" },
+    );
+    if (res?.base64) {
+      const bStr = atob(res.base64);
+      const bytes = new Uint8Array(bStr.length);
+      for (let j = 0; j < bStr.length; j++) bytes[j] = bStr.charCodeAt(j);
+      return bytes;
     }
   } catch (err: any) {
     console.error(`❌ JPEG conversion error: ${err.message}`);
@@ -2648,83 +2629,33 @@ async function convertToJpegViaGemini(pngBuffer: Uint8Array): Promise<Uint8Array
 }
 
 async function callGeminiImage(prompt: string, inputImageBase64?: string): Promise<Uint8Array | null> {
-  const parts: any[] = [{ text: prompt }];
-  if (inputImageBase64) {
-    parts.push({
-      inline_data: {
-        mime_type: "image/jpeg",
-        data: inputImageBase64,
-      },
-    });
-  }
+  try {
+    const res = await generateImageFree(
+      prompt,
+      "16:9",
+      inputImageBase64 ? { data: inputImageBase64, mimeType: "image/jpeg" } : undefined,
+    );
+    if (!res?.base64) return null;
 
-  const requestBody = {
-    contents: [{ parts }],
-    generationConfig: {
-      responseModalities: ["TEXT", "IMAGE"],
-      imageConfig: {
-        aspectRatio: "16:9",
-        imageSize: "1K",
-      },
-    },
-  };
+    const binaryStr = atob(res.base64);
+    const bytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
 
-  for (const model of GEMINI_MODELS) {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), GEMINI_TIMEOUT);
-
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "x-goog-api-key": GOOGLE_API_KEY },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
-
-      if (!response.ok) {
-        clearTimeout(timeout);
-        console.error(`❌ ${model}: ${response.status}`);
-        continue;
-      }
-
-      const result = await response.json();
-      const candidate = result.candidates?.[0];
-      if (candidate?.finishReason === "IMAGE_OTHER") {
-        clearTimeout(timeout);
-        continue;
-      }
-
-      if (candidate?.content?.parts) {
-        for (const part of candidate.content.parts) {
-          const imageData = part.inline_data || part.inlineData;
-          if (imageData?.data) {
-            clearTimeout(timeout);
-            const binaryStr = atob(imageData.data);
-            const bytes = new Uint8Array(binaryStr.length);
-            for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-
-            // Check dimensions (PNG or JPEG)
-            const isPng = bytes[0] === 137 && bytes[1] === 80;
-            const isJpg = bytes[0] === 0xFF && bytes[1] === 0xD8;
-            if (isPng) {
-              const dims = getPngDimensions(bytes);
-              if (dims) console.log(`📐 PNG output: ${dims.width}×${dims.height}`);
-            } else if (isJpg) {
-              console.log(`📐 JPEG output (${(bytes.length / 1024).toFixed(0)} KB)`);
-            }
-
-            return bytes;
-          }
-        }
-      }
-      clearTimeout(timeout);
-    } catch (err: any) {
-      clearTimeout(timeout);
-      console.error(`❌ ${model}: ${err.message}`);
+    // Check dimensions (PNG or JPEG)
+    const isPng = bytes[0] === 137 && bytes[1] === 80;
+    const isJpg = bytes[0] === 0xFF && bytes[1] === 0xD8;
+    if (isPng) {
+      const dims = getPngDimensions(bytes);
+      if (dims) console.log(`📐 PNG output (${res.provider}): ${dims.width}×${dims.height}`);
+    } else if (isJpg) {
+      console.log(`📐 JPEG output (${res.provider}, ${(bytes.length / 1024).toFixed(0)} KB)`);
     }
+
+    return bytes;
+  } catch (err: any) {
+    console.error(`❌ Free image cascade: ${err.message}`);
+    return null;
   }
-  return null;
 }
 
 // Generate a punchy 2-4 word headline for thumbnail overlay via AI
@@ -2739,7 +2670,7 @@ async function generateThumbnailHeadline(articles: any[]): Promise<string> {
 
   try {
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TEXT_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -2847,8 +2778,8 @@ OUTPUT: Image only, no text response.`;
 }
 
 async function generateThumbnails(targetDate: string, chatId?: number): Promise<Response> {
-  if (!GOOGLE_API_KEY) {
-    return json({ error: "GOOGLE_API_KEY not set" }, 500);
+  if (!Deno.env.get("OPENROUTER_API_KEY") && !Deno.env.get("CF_AI_TOKEN")) {
+    return json({ error: "No free image provider configured (OPENROUTER_API_KEY / CF_AI_TOKEN)" }, 500);
   }
 
   const theChatId = chatId || Number(TELEGRAM_CHAT_ID);
@@ -3223,8 +3154,8 @@ async function notifyComplete(targetDate: string, youtubeUrl: string): Promise<R
  * Saves tokens by generating only 1 variant instead of 4.
  */
 async function autoGenerateAndSetThumbnail(targetDate: string, youtubeVideoId: string, chatId: number | string): Promise<void> {
-  if (!GOOGLE_API_KEY) {
-    console.log("⏭️ No GOOGLE_API_KEY, skipping thumbnail");
+  if (!Deno.env.get("OPENROUTER_API_KEY") && !Deno.env.get("CF_AI_TOKEN")) {
+    console.log("⏭️ No free image provider configured, skipping thumbnail");
     return;
   }
 

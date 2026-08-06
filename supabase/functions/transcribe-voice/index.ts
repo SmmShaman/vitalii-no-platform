@@ -1,8 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-const VERSION_STAMP = '2026-03-29-force-redeploy'
+const VERSION_STAMP = '2026-08-06-free-transcription'
 
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')!
-const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY') || ''
+// Free-only transcription (owner policy 2026-08-06): Groq Whisper (free, per-model
+// pool) first, then the no-billing Gemini free key. Paid GOOGLE_API_KEY removed.
+const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || ''
+const GEMINI_FREE_API_KEY = Deno.env.get('GEMINI_FREE_API_KEY') || ''
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,15 +19,7 @@ serve(async (req) => {
     const { voiceFileId } = await req.json()
     if (!voiceFileId) throw new Error('voiceFileId required')
 
-    // Get Google API key from env or api_settings
-    let apiKey = GOOGLE_API_KEY
-    if (!apiKey) {
-      const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2.39.0')
-      const supabase = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!)
-      const { data } = await supabase.from('api_settings').select('key_value').eq('key_name', 'GOOGLE_API_KEY').single()
-      apiKey = data?.key_value || ''
-    }
-    if (!apiKey) throw new Error('Google API key not configured')
+    if (!GROQ_API_KEY && !GEMINI_FREE_API_KEY) throw new Error('No free transcription provider configured (GROQ_API_KEY / GEMINI_FREE_API_KEY)')
 
     // Step 1: Get file path from Telegram
     console.log(`📥 Getting file info for ${voiceFileId}...`)
@@ -50,19 +45,50 @@ serve(async (req) => {
     audioBase64 = btoa(audioBase64)
     console.log(`🎙️ Downloaded ${Math.round(audioBuffer.byteLength / 1024)}KB audio`)
 
-    // Step 3: Send to Gemini for transcription (with retry + model fallback)
+    // Step 3: Transcribe — Groq Whisper first (free, purpose-built for speech),
+    // then free-Gemini fallback. NOTE: gemini-2.5-flash 404s on the free project.
     const mimeType = filePath.endsWith('.oga') || filePath.endsWith('.ogg') ? 'audio/ogg' : 'audio/mpeg'
-    const models = ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash']
+    const models = [
+      Deno.env.get('GEMINI_FREE_MODEL_LITE') || 'gemini-3.1-flash-lite',
+      Deno.env.get('GEMINI_FREE_MODEL_FULL') || 'gemini-3.6-flash',
+    ]
 
     let text = ''
     let lastError = ''
 
+    if (GROQ_API_KEY) {
+      try {
+        console.log('🧠 Trying Groq Whisper (whisper-large-v3)...')
+        const form = new FormData()
+        form.append('file', new Blob([audioBuffer], { type: mimeType }), filePath.endsWith('.mp3') ? 'voice.mp3' : 'voice.ogg')
+        form.append('model', 'whisper-large-v3')
+        form.append('response_format', 'json')
+        const whisperRes = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${GROQ_API_KEY}` },
+          body: form,
+        })
+        if (whisperRes.ok) {
+          const whisperData = await whisperRes.json()
+          text = (whisperData?.text || '').trim()
+          if (text) console.log(`✅ Transcribed with Groq Whisper: ${text.slice(0, 100)}...`)
+        } else {
+          lastError = `Groq Whisper ${whisperRes.status}: ${(await whisperRes.text().catch(() => '')).slice(0, 100)}`
+          console.log(`  ❌ ${lastError}`)
+        }
+      } catch (e) {
+        lastError = `Groq Whisper: ${(e as Error).message}`
+        console.log(`  ❌ ${lastError}`)
+      }
+    }
+
     for (const model of models) {
+      if (text || !GEMINI_FREE_API_KEY) break
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
           console.log(`🧠 Trying ${model} (attempt ${attempt + 1})...`)
           const geminiRes = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_FREE_API_KEY}`,
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },

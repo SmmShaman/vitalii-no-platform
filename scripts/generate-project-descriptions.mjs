@@ -1,6 +1,9 @@
 import fs from 'fs';
 
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+// Free no-billing key only (owner policy 2026-08-06). NOTE: thinkingBudget:0 is
+// rejected by full 3.x models — lite ignores it safely.
+const GOOGLE_API_KEY = process.env.GEMINI_FREE_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_FREE_MODEL_LITE || 'gemini-3.1-flash-lite';
 
 const SYSTEM_PROMPT = `You are a creative copywriter for a tech portfolio. Generate structured project descriptions.
 
@@ -82,7 +85,7 @@ async function generateForProject(project) {
 
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GOOGLE_API_KEY, {
+      const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + GOOGLE_API_KEY, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

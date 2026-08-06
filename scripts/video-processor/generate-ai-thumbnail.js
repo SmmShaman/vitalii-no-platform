@@ -14,10 +14,10 @@ import { writeFile } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
+// Paid Gemini removed (owner policy 2026-08-06): thumbnails run OpenRouter → FLUX.
+const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY || '';
 const CF_API_TOKEN = process.env.CF_API_TOKEN || '';
 const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID || '1438e8d03009209c4a82ea4c28bdb358';
-const MODELS = ['gemini-2.0-flash-exp-image-generation', 'gemini-2.5-flash-preview-05-20'];
 const TIMEOUT_MS = 60_000;
 
 // ── 4 Overlay Styles (applied on real article images) ──
@@ -98,76 +98,54 @@ async function ensureSize(buffer) {
   return buffer;
 }
 
-// ── Core Gemini API call ──
+// ── Core image call — OpenRouter (prepaid balance), paid Gemini removed
+// per owner policy 2026-08-06. Keeps the old name so call sites don't change;
+// the `apiKey` argument is ignored. FLUX fallback lives in the callers.
 
-async function callGeminiImage(prompt, apiKey, inputImageBase64) {
-  const parts = [{ text: prompt }];
-  if (inputImageBase64) {
-    parts.push({
-      inline_data: {
-        mime_type: 'image/jpeg',
-        data: inputImageBase64,
-      },
+async function callGeminiImage(prompt, _apiKey, inputImageBase64) {
+  const orKey = process.env.OPENROUTER_API_KEY || '';
+  if (!orKey) {
+    console.warn('⚠️ OPENROUTER_API_KEY not set — skipping OpenRouter thumbnail');
+    return null;
+  }
+  const model = process.env.OPENROUTER_IMAGE_MODEL || 'google/gemini-2.5-flash-image';
+
+  const content = inputImageBase64
+    ? [
+        { type: 'text', text: `${prompt}\n\nComposition: strict 16:9 aspect ratio.` },
+        { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${inputImageBase64}` } },
+      ]
+    : `${prompt}\n\nComposition: strict 16:9 aspect ratio.`;
+
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${orKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content }],
+        modalities: ['image', 'text'],
+      }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-  }
 
-  const requestBody = {
-    contents: [{ parts }],
-    generationConfig: {
-      responseModalities: ['TEXT', 'IMAGE'],
-      imageConfig: {
-        aspectRatio: '16:9',
-        imageSize: '1K',
-      },
-    },
-  };
-
-  for (const model of MODELS) {
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
-
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
-
-      if (!response.ok) {
-        console.error(`❌ ${model}: ${response.status}`);
-        clearTimeout(timeout);
-        continue;
-      }
-
-      const result = await response.json();
-      const candidate = result.candidates?.[0];
-      if (candidate?.finishReason === 'IMAGE_OTHER') {
-        clearTimeout(timeout);
-        continue;
-      }
-
-      if (candidate?.content?.parts) {
-        for (const part of candidate.content.parts) {
-          const imageData = part.inline_data || part.inlineData;
-          if (imageData?.data) {
-            clearTimeout(timeout);
-            return Buffer.from(imageData.data, 'base64');
-          }
-        }
-      }
-      clearTimeout(timeout);
-    } catch (error) {
-      clearTimeout(timeout);
-      if (error.name === 'AbortError') {
-        console.error(`⏱️ ${model} timed out`);
-      } else {
-        console.error(`❌ ${model}: ${error.message}`);
-      }
+    if (!response.ok) {
+      console.error(`❌ OpenRouter ${response.status}: ${(await response.text().catch(() => '')).slice(0, 150)}`);
+      return null;
     }
+
+    const data = await response.json();
+    const dataUrl = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url || '';
+    const b64Idx = dataUrl.indexOf('base64,');
+    if (b64Idx < 0) {
+      console.error('❌ OpenRouter response contains no image data');
+      return null;
+    }
+    return Buffer.from(dataUrl.substring(b64Idx + 7), 'base64');
+  } catch (error) {
+    console.error(`❌ OpenRouter: ${error.name === 'AbortError' || error.name === 'TimeoutError' ? 'timed out' : error.message}`);
+    return null;
   }
-  return null;
 }
 
 // ── Prompt Builder ──
@@ -256,12 +234,12 @@ export async function generateAIThumbnail(articles, clickbaitTitle, dateStr) {
 
   let buffer = null;
 
-  // Try Gemini first (if key available)
-  if (GOOGLE_API_KEY) {
+  // Try OpenRouter first (prepaid balance)
+  if (OPENROUTER_API_KEY) {
     const prompt = buildThumbnailPrompt(clickbaitTitle, displayDate, articles.length, VISUAL_STYLES[0], !!imageBase64);
-    console.log(`🖼️ Generating thumbnail via Gemini (${imageBase64 ? 'with article image' : 'text-only'})...`);
-    buffer = await callGeminiImage(prompt, GOOGLE_API_KEY, imageBase64);
-    if (!buffer) console.warn('⚠️ Gemini thumbnail failed, trying Cloudflare FLUX...');
+    console.log(`🖼️ Generating thumbnail via OpenRouter (${imageBase64 ? 'with article image' : 'text-only'})...`);
+    buffer = await callGeminiImage(prompt, null, imageBase64);
+    if (!buffer) console.warn('⚠️ OpenRouter thumbnail failed, trying Cloudflare FLUX...');
   }
 
   // Fallback: Cloudflare FLUX
@@ -284,9 +262,8 @@ export async function generateAIThumbnail(articles, clickbaitTitle, dateStr) {
 // ── 4 Variant Generation ──
 
 export async function generateThumbnailVariants(articles, clickbaitTitle, dateStr, count = 4) {
-  const apiKey = GOOGLE_API_KEY;
-  if (!apiKey) {
-    console.log('⚠️ GOOGLE_API_KEY not set');
+  if (!OPENROUTER_API_KEY) {
+    console.log('⚠️ OPENROUTER_API_KEY not set');
     return [];
   }
 
@@ -318,7 +295,7 @@ export async function generateThumbnailVariants(articles, clickbaitTitle, dateSt
     console.log(`  🎨 ${i + 1}/${styles.length}: ${style.name} (${img ? 'with image' : 'text-only'})`);
 
     const prompt = buildThumbnailPrompt(clickbaitTitle, displayDate, articles.length, style, !!img);
-    let buffer = await callGeminiImage(prompt, apiKey, img);
+    let buffer = await callGeminiImage(prompt, null, img);
 
     if (buffer) {
       buffer = await ensureSize(buffer);

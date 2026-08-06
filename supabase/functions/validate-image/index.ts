@@ -250,8 +250,15 @@ async function validateImageWithAI(
     // Download image
     const imageBase64 = await downloadImageAsBase64(imageUrl)
 
-    // Use Gemini Pro Vision for analysis
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`
+    // Vision analysis on the FREE Gemini key only (owner policy 2026-08-06);
+    // the paid key passed as `apiKey` is deliberately ignored.
+    const freeKey = Deno.env.get('GEMINI_FREE_API_KEY') || ''
+    if (!freeKey) {
+      console.warn('⚠️ GEMINI_FREE_API_KEY not set — skipping image validation')
+      return getDefaultValidation(true)
+    }
+    const visionModel = Deno.env.get('GEMINI_FREE_MODEL_LITE') || 'gemini-3.1-flash-lite'
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${visionModel}:generateContent`
 
     const requestBody = {
       contents: [{
@@ -287,7 +294,7 @@ Analyze the image below and provide your evaluation as JSON only.`
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey
+        'x-goog-api-key': freeKey
       },
       body: JSON.stringify(requestBody)
     })

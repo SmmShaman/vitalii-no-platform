@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-const VERSION_STAMP = '2026-04-06-text-blog-social-fix'
+const VERSION_STAMP = '2026-08-06-free-llm-cascade'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { triggerVideoProcessing, isGitHubActionsEnabled, triggerLinkedInVideo, triggerFacebookVideo, triggerInstagramVideo } from '../_shared/github-actions.ts'
 import { escapeHtml } from '../_shared/social-media-helpers.ts'
@@ -7,6 +7,7 @@ import { formatCompactVariants, buildManualKeyboard } from '../_shared/telegram-
 import { classifyContentWeight, loadScheduleConfig, computeScheduledTime, formatScheduledTime, countInFlight } from '../_shared/schedule-helpers.ts'
 import { dispatchToWorker } from '../_shared/webhook-dispatch.ts'
 import { HUMANIZER_SOCIAL, VOICE_SOCIAL } from '../_shared/humanizer-prompt.ts'
+import { generateImageFree, callFreeGeminiText } from '../_shared/free-image.ts'
 
 /**
  * Extract external source links from text content
@@ -221,40 +222,22 @@ serve(async (req) => {
                 return r?.key_value || Deno.env.get(name) || ''
               }
 
-              // Image generation via Gemini
+              // Image generation — free cascade (OpenRouter → FLUX), paid key removed (owner policy 2026-08-06)
               const imagePromise = (async () => {
                 try {
-                  const gKey = await getKey('GOOGLE_API_KEY')
-                  if (!gKey) return null
-                  console.log('🖼️ Generating blog cover via Gemini (/blog direct)...')
-                  const imgRes = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${gKey}`,
-                    { method: 'POST', headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        contents: [{ parts: [{ text: `Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos. 16:9 landscape.` }] }],
-                        generationConfig: { responseModalities: ['image', 'text'] },
-                      }),
-                    },
-                  )
-                  if (!imgRes.ok) { console.error('Gemini image:', imgRes.status); return null }
-                  const imgData = await imgRes.json()
-                  for (const part of imgData?.candidates?.[0]?.content?.parts || []) {
-                    if (part.inlineData) {
-                      const b64 = part.inlineData.data as string
-                      const raw = atob(b64)
-                      const arr = new Uint8Array(raw.length)
-                      for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
-                      const path = `blog-covers/direct-${Date.now()}.png`
-                      const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
-                      if (!upErr) {
-                        const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
-                        await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
-                        console.log('🖼️ Image saved:', url)
-                        return url
-                      } else { console.error('Upload err:', upErr) }
-                    }
-                  }
-                  return null
+                  console.log('🖼️ Generating blog cover via free cascade (/blog direct)...')
+                  const freeImg = await generateImageFree(`Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos.`, '16:9')
+                  if (!freeImg) return null
+                  const raw = atob(freeImg.base64)
+                  const arr = new Uint8Array(raw.length)
+                  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
+                  const path = `blog-covers/direct-${Date.now()}.png`
+                  const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
+                  if (upErr) { console.error('Upload err:', upErr); return null }
+                  const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
+                  await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
+                  console.log(`🖼️ Image saved (${freeImg.provider}):`, url)
+                  return url
                 } catch (e) { console.error('Image failed:', e); return null }
               })()
 
@@ -268,24 +251,15 @@ serve(async (req) => {
                 let liText = blogTitle + '\n\n' + (post?.tags || []).map((t: string) => '#' + t.replace(/\s/g, '')).join(' ')
                 let fbText = blogTitle
                 try {
-                  const gk = await getKey('GOOGLE_API_KEY')
-                  if (gk) {
-                    const sp = 'Generate social media posts for this blog. Author is a full-stack developer.\n' +
-                      'TITLE: ' + blogTitle + '\nCONTENT: ' + postContent + '\nURL: ' + blogUrlSocial + '\n' +
-                      'TAGS: ' + (post?.tags || []).join(', ') + '\n\n' +
-                      'LINKEDIN (1200-1800 chars): Hook under 210 chars, storytelling, NO links in body, 3-5 hashtags, CTA question.\n' +
-                      'FACEBOOK (under 280 chars): Short hook, 1-2 hashtags, conversational.\n\n' +
-                      HUMANIZER_SOCIAL + '\n\n' + VOICE_SOCIAL + '\n\n' +
-                      'Return ONLY JSON: {"linkedin_post":"...","facebook_post":"..."}'
-                    const gr = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + gk, {
-                      method: 'POST', headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ contents: [{ parts: [{ text: sp }] }], generationConfig: { temperature: 0.6, maxOutputTokens: 4000 } }),
-                    })
-                    if (gr.ok) {
-                      const gt = ((await gr.json())?.candidates?.[0]?.content?.parts?.[0]?.text || '').replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-                      try { const p = JSON.parse(gt); if (p.linkedin_post) liText = p.linkedin_post; if (p.facebook_post) fbText = p.facebook_post } catch { /* keep defaults */ }
-                    }
-                  }
+                  const sp = 'Generate social media posts for this blog. Author is a full-stack developer.\n' +
+                    'TITLE: ' + blogTitle + '\nCONTENT: ' + postContent + '\nURL: ' + blogUrlSocial + '\n' +
+                    'TAGS: ' + (post?.tags || []).join(', ') + '\n\n' +
+                    'LINKEDIN (1200-1800 chars): Hook under 210 chars, storytelling, NO links in body, 3-5 hashtags, CTA question.\n' +
+                    'FACEBOOK (under 280 chars): Short hook, 1-2 hashtags, conversational.\n\n' +
+                    HUMANIZER_SOCIAL + '\n\n' + VOICE_SOCIAL + '\n\n' +
+                    'Return ONLY JSON: {"linkedin_post":"...","facebook_post":"..."}'
+                  const gt = ((await callFreeGeminiText(sp, { temperature: 0.6, maxOutputTokens: 4000 })) || '').replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+                  try { const p = JSON.parse(gt); if (p.linkedin_post) liText = p.linkedin_post; if (p.facebook_post) fbText = p.facebook_post } catch { /* keep defaults */ }
                 } catch { /* keep defaults */ }
 
                 // LinkedIn
@@ -470,17 +444,15 @@ serve(async (req) => {
               })
 
               // Stage 1: Extract real intent from messy voice transcription (same as blog pipeline)
-              const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY') || ''
+              // Free Gemini key only — paid GOOGLE_API_KEY removed (owner policy 2026-08-06)
               let cleanedPrompt = txData.text
-              if (GOOGLE_API_KEY) {
-                try {
-                  const intentRes = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GOOGLE_API_KEY}`,
-                    {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        systemInstruction: { parts: [{ text: `You are a voice transcription interpreter. The user dictated a video creation request via voice message.
+              try {
+                const extracted = ((await callFreeGeminiText(
+                  `Raw voice transcription:\n"${txData.text}"\n\nWhat does the user actually want? Extract the video creation request:`,
+                  {
+                    temperature: 0.1,
+                    maxOutputTokens: 500,
+                    systemPrompt: `You are a voice transcription interpreter. The user dictated a video creation request via voice message.
 The transcription may contain:
 - Filler words ("ну", "тобто", "як-то", "ага", "так")
 - Repetitions and self-corrections
@@ -491,23 +463,15 @@ Your task: Extract the REAL INTENT of what the user wants as a VIDEO topic.
 Return a clean, clear description of what video the user wants to create.
 Keep ALL specific details: names, URLs, project names, features mentioned.
 Write in the SAME language as the user spoke.
-Return ONLY the cleaned request, nothing else.` }] },
-                        contents: [{ role: 'user', parts: [{ text: `Raw voice transcription:\n"${txData.text}"\n\nWhat does the user actually want? Extract the video creation request:` }] }],
-                        generationConfig: { temperature: 0.1, maxOutputTokens: 500 },
-                      }),
-                    }
-                  )
-                  if (intentRes.ok) {
-                    const intentData = await intentRes.json()
-                    const extracted = (intentData.candidates?.[0]?.content?.parts || []).map((p: any) => p.text || '').join('').trim()
-                    if (extracted && extracted.length > 10) {
-                      console.log(`🎬 Cleaned intent: "${extracted.slice(0, 200)}"`)
-                      cleanedPrompt = extracted
-                    }
-                  }
-                } catch (e: any) {
-                  console.warn(`🎬 Intent extraction failed (using raw): ${e.message}`)
+Return ONLY the cleaned request, nothing else.`,
+                  },
+                )) || '').trim()
+                if (extracted && extracted.length > 10) {
+                  console.log(`🎬 Cleaned intent: "${extracted.slice(0, 200)}"`)
+                  cleanedPrompt = extracted
                 }
+              } catch (e: any) {
+                console.warn(`🎬 Intent extraction failed (using raw): ${e.message}`)
               }
 
               // Dispatch cleaned prompt to custom-video-bot
@@ -603,38 +567,19 @@ Return ONLY the cleaned request, nothing else.` }] },
 
           const imagePromise = (async () => {
             try {
-              const gKey = await getKey('GOOGLE_API_KEY')
-              if (!gKey) return null
-              console.log('🖼️ Generating blog cover via Gemini...')
-              const imgRes = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${gKey}`,
-                { method: 'POST', headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    contents: [{ parts: [{ text: `Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos. 16:9 landscape.` }] }],
-                    generationConfig: { responseModalities: ['image', 'text'] },
-                  }),
-                },
-              )
-              if (!imgRes.ok) { console.error('Gemini image:', imgRes.status); return null }
-              const imgData = await imgRes.json()
-              for (const part of imgData?.candidates?.[0]?.content?.parts || []) {
-                if (part.inlineData) {
-                  // Chunk base64 decode to avoid stack overflow
-                  const b64 = part.inlineData.data as string
-                  const raw = atob(b64)
-                  const arr = new Uint8Array(raw.length)
-                  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
-                  const path = `blog-covers/voice-${Date.now()}.png`
-                  const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
-                  if (!upErr) {
-                    const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
-                    await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
-                    console.log('🖼️ Image saved:', url)
-                    return url
-                  } else { console.error('Upload err:', upErr) }
-                }
-              }
-              return null
+              console.log('🖼️ Generating blog cover via free cascade (voice blog)...')
+              const freeImg = await generateImageFree(`Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos.`, '16:9')
+              if (!freeImg) return null
+              const raw = atob(freeImg.base64)
+              const arr = new Uint8Array(raw.length)
+              for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
+              const path = `blog-covers/voice-${Date.now()}.png`
+              const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
+              if (upErr) { console.error('Upload err:', upErr); return null }
+              const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
+              await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
+              console.log(`🖼️ Image saved (${freeImg.provider}):`, url)
+              return url
             } catch (e) { console.error('Image failed:', e); return null }
           })()
 
@@ -648,24 +593,15 @@ Return ONLY the cleaned request, nothing else.` }] },
             let liText = blogTitle + '\n\n' + (post?.tags || []).map((t: string) => '#' + t.replace(/\s/g, '')).join(' ')
             let fbText = blogTitle
             try {
-              const gk = await getKey('GOOGLE_API_KEY')
-              if (gk) {
-                const sp = 'Generate social media posts for this blog. Author is a full-stack developer.\n' +
-                  'TITLE: ' + blogTitle + '\nCONTENT: ' + postContent + '\nURL: ' + blogUrlSocial + '\n' +
-                  'TAGS: ' + (post?.tags || []).join(', ') + '\n\n' +
-                  'LINKEDIN (1200-1800 chars): Hook under 210 chars, storytelling, NO links in body, 3-5 hashtags, CTA question.\n' +
-                  'FACEBOOK (under 280 chars): Short hook, 1-2 hashtags, conversational.\n\n' +
-                  HUMANIZER_SOCIAL + '\n\n' + VOICE_SOCIAL + '\n\n' +
-                  'Return ONLY JSON: {"linkedin_post":"...","facebook_post":"..."}'
-                const gr = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + gk, {
-                  method: 'POST', headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ contents: [{ parts: [{ text: sp }] }], generationConfig: { temperature: 0.6, maxOutputTokens: 4000 } }),
-                })
-                if (gr.ok) {
-                  const gt = ((await gr.json())?.candidates?.[0]?.content?.parts?.[0]?.text || '').replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-                  try { const p = JSON.parse(gt); if (p.linkedin_post) liText = p.linkedin_post; if (p.facebook_post) fbText = p.facebook_post } catch { /* keep defaults */ }
-                }
-              }
+              const sp = 'Generate social media posts for this blog. Author is a full-stack developer.\n' +
+                'TITLE: ' + blogTitle + '\nCONTENT: ' + postContent + '\nURL: ' + blogUrlSocial + '\n' +
+                'TAGS: ' + (post?.tags || []).join(', ') + '\n\n' +
+                'LINKEDIN (1200-1800 chars): Hook under 210 chars, storytelling, NO links in body, 3-5 hashtags, CTA question.\n' +
+                'FACEBOOK (under 280 chars): Short hook, 1-2 hashtags, conversational.\n\n' +
+                HUMANIZER_SOCIAL + '\n\n' + VOICE_SOCIAL + '\n\n' +
+                'Return ONLY JSON: {"linkedin_post":"...","facebook_post":"..."}'
+              const gt = ((await callFreeGeminiText(sp, { temperature: 0.6, maxOutputTokens: 4000 })) || '').replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+              try { const p = JSON.parse(gt); if (p.linkedin_post) liText = p.linkedin_post; if (p.facebook_post) fbText = p.facebook_post } catch { /* keep defaults */ }
             } catch { /* keep defaults */ }
 
             // LinkedIn — with image if available
@@ -822,40 +758,22 @@ Return ONLY the cleaned request, nothing else.` }] },
                 return r?.key_value || Deno.env.get(name) || ''
               }
 
-              // Image generation via Gemini
+              // Image generation — free cascade (OpenRouter → FLUX), paid key removed (owner policy 2026-08-06)
               const imagePromise = (async () => {
                 try {
-                  const gKey = await getKey('GOOGLE_API_KEY')
-                  if (!gKey) return null
-                  console.log('🖼️ Generating blog cover via Gemini (text blog)...')
-                  const imgRes = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${gKey}`,
-                    { method: 'POST', headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        contents: [{ parts: [{ text: `Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos. 16:9 landscape.` }] }],
-                        generationConfig: { responseModalities: ['image', 'text'] },
-                      }),
-                    },
-                  )
-                  if (!imgRes.ok) { console.error('Gemini image:', imgRes.status); return null }
-                  const imgData = await imgRes.json()
-                  for (const part of imgData?.candidates?.[0]?.content?.parts || []) {
-                    if (part.inlineData) {
-                      const b64 = part.inlineData.data as string
-                      const raw = atob(b64)
-                      const arr = new Uint8Array(raw.length)
-                      for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
-                      const path = `blog-covers/text-${Date.now()}.png`
-                      const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
-                      if (!upErr) {
-                        const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
-                        await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
-                        console.log('🖼️ Image saved:', url)
-                        return url
-                      } else { console.error('Upload err:', upErr) }
-                    }
-                  }
-                  return null
+                  console.log('🖼️ Generating blog cover via free cascade (text blog)...')
+                  const freeImg = await generateImageFree(`Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos.`, '16:9')
+                  if (!freeImg) return null
+                  const raw = atob(freeImg.base64)
+                  const arr = new Uint8Array(raw.length)
+                  for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
+                  const path = `blog-covers/text-${Date.now()}.png`
+                  const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
+                  if (upErr) { console.error('Upload err:', upErr); return null }
+                  const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
+                  await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
+                  console.log(`🖼️ Image saved (${freeImg.provider}):`, url)
+                  return url
                 } catch (e) { console.error('Image failed:', e); return null }
               })()
 
@@ -869,24 +787,15 @@ Return ONLY the cleaned request, nothing else.` }] },
                 let liText = blogTitle + '\n\n' + (post?.tags || []).map((t: string) => '#' + t.replace(/\s/g, '')).join(' ')
                 let fbText = blogTitle
                 try {
-                  const gk = await getKey('GOOGLE_API_KEY')
-                  if (gk) {
-                    const sp = 'Generate social media posts for this blog. Author is a full-stack developer.\n' +
-                      'TITLE: ' + blogTitle + '\nCONTENT: ' + postContent + '\nURL: ' + blogUrlSocial + '\n' +
-                      'TAGS: ' + (post?.tags || []).join(', ') + '\n\n' +
-                      'LINKEDIN (1200-1800 chars): Hook under 210 chars, storytelling, NO links in body, 3-5 hashtags, CTA question.\n' +
-                      'FACEBOOK (under 280 chars): Short hook, 1-2 hashtags, conversational.\n\n' +
-                      HUMANIZER_SOCIAL + '\n\n' + VOICE_SOCIAL + '\n\n' +
-                      'Return ONLY JSON: {"linkedin_post":"...","facebook_post":"..."}'
-                    const gr = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + gk, {
-                      method: 'POST', headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ contents: [{ parts: [{ text: sp }] }], generationConfig: { temperature: 0.6, maxOutputTokens: 4000 } }),
-                    })
-                    if (gr.ok) {
-                      const gt = ((await gr.json())?.candidates?.[0]?.content?.parts?.[0]?.text || '').replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-                      try { const p = JSON.parse(gt); if (p.linkedin_post) liText = p.linkedin_post; if (p.facebook_post) fbText = p.facebook_post } catch { /* keep defaults */ }
-                    }
-                  }
+                  const sp = 'Generate social media posts for this blog. Author is a full-stack developer.\n' +
+                    'TITLE: ' + blogTitle + '\nCONTENT: ' + postContent + '\nURL: ' + blogUrlSocial + '\n' +
+                    'TAGS: ' + (post?.tags || []).join(', ') + '\n\n' +
+                    'LINKEDIN (1200-1800 chars): Hook under 210 chars, storytelling, NO links in body, 3-5 hashtags, CTA question.\n' +
+                    'FACEBOOK (under 280 chars): Short hook, 1-2 hashtags, conversational.\n\n' +
+                    HUMANIZER_SOCIAL + '\n\n' + VOICE_SOCIAL + '\n\n' +
+                    'Return ONLY JSON: {"linkedin_post":"...","facebook_post":"..."}'
+                  const gt = ((await callFreeGeminiText(sp, { temperature: 0.6, maxOutputTokens: 4000 })) || '').replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
+                  try { const p = JSON.parse(gt); if (p.linkedin_post) liText = p.linkedin_post; if (p.facebook_post) fbText = p.facebook_post } catch { /* keep defaults */ }
                 } catch { /* keep defaults */ }
 
                 // LinkedIn

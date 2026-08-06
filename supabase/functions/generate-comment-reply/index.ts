@@ -3,6 +3,7 @@ const VERSION_STAMP = '2026-03-29-force-redeploy'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { callLLM, extractJSON } from '../_shared/gemini-llm.ts'
 import { HUMANIZER_SOCIAL } from '../_shared/humanizer-prompt.ts'
+import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -147,24 +148,20 @@ Comment: "${commentText}"
 
 Return only valid JSON, no other text.`
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${Deno.env.get("GOOGLE_API_KEY")}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-gemini-migrated': 'true' // was Azure
-        },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: 'You are a sentiment analysis assistant. Return only valid JSON.' },
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 100,
-          temperature: 0.3
-        })
-      }
-    )
+    // Shim `bulk` route — the old direct call sent an OpenAI-shaped body to the
+    // Gemini endpoint and had been silently broken since the March migration.
+    const response = await azureFetch('', {
+      method: 'POST',
+      body: JSON.stringify({
+        llm_route: 'bulk',
+        messages: [
+          { role: 'system', content: 'You are a sentiment analysis assistant. Return only valid JSON.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 100,
+        temperature: 0.3
+      })
+    })
 
     if (!response.ok) {
       console.error('AI error:', await response.text())
@@ -290,31 +287,25 @@ Guidelines:
 Reply (just the text, no quotes):`;
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${Deno.env.get("GOOGLE_API_KEY")}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-gemini-migrated': 'true' // was Azure
-        },
-        body: JSON.stringify({
-          messages: [
-            {
-              role: 'system',
-              content: `You are a social media manager for Vitalii Berbeha, an e-commerce and marketing expert.
+    // Shim `default` route — same silent March-migration breakage as the sentiment call.
+    const response = await azureFetch('', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'system',
+            content: `You are a social media manager for Vitalii Berbeha, an e-commerce and marketing expert.
 Write replies that are professional, insightful, and engaging. Avoid generic responses.
 Match the tone and formality level of the platform (${platform}).
 
 ${HUMANIZER_SOCIAL}`
-            },
-            { role: 'user', content: prompt }
-          ],
-          max_tokens: 150,
-          temperature: 0.7
-        })
-      }
-    )
+          },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 150,
+        temperature: 0.7
+      })
+    })
 
     if (!response.ok) {
       console.error('AI error:', await response.text())

@@ -383,10 +383,12 @@ export async function azureFetch(
       () => tryNvidia(call),
     ]
   } else if (route === 'bulk') {
+    // Owner policy 2026-08-06: paid Gemini removed from every chain — the free
+    // Lite key (500 req/day, cannot be invoiced) takes its slot.
     providers = [
       () => tryGroq(call, GROQ_MODEL_BULK),
       () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
-      () => tryGemini(call),
+      () => tryGeminiFree(call, GEMINI_FREE_MODEL_LITE),
       () => tryNvidia(call),
     ]
   } else {
@@ -394,7 +396,7 @@ export async function azureFetch(
       () => tryGroq(call, GROQ_MODEL_REASON),
       () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryGroq(call, GROQ_MODEL),
-      () => tryGemini(call),
+      () => tryGeminiFree(call, GEMINI_FREE_MODEL_LITE),
       () => tryNvidia(call),
     ]
   }

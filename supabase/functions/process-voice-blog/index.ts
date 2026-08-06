@@ -1,12 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { HUMANIZER_ARTICLE, VOICE_JOURNALISM } from '../_shared/humanizer-prompt.ts'
+import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
+import { generateImageFree } from '../_shared/free-image.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY') || ''
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')!
-const VERSION = '2026-03-26-v1-voice-blog'
+const VERSION = '2026-08-06-v2-free-llm-only'
 
 // Cloudflare R2 — primary storage (replaces Supabase Storage)
 const CF_API_TOKEN = Deno.env.get('CF_API_TOKEN') ?? ''
@@ -132,33 +133,27 @@ The text below is the author's OWN words transcribed from a voice message.
 8. The blog post should feel like the author's voice cleaned up, NOT a completely different text inspired by the topic.`
     const systemPrompt = `${basePrompt}\n\n${voiceSafeguards}\n\n${HUMANIZER_ARTICLE}\n\n${VOICE_JOURNALISM}`
 
-    // Get Google API key
-    let apiKey = GOOGLE_API_KEY
-    if (!apiKey) {
-      const { data } = await supabase.from('api_settings').select('key_value').eq('key_name', 'GOOGLE_API_KEY').single()
-      apiKey = data?.key_value || ''
-    }
+    // Blog writing is a rewrite-class task → shim `quality` route
+    // (gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA → free Gemini).
+    // Paid Gemini removed per owner policy 2026-08-06.
+    console.log(`📝 Calling quality LLM route with ${rawText.length} chars...`)
+    const llmRes = await azureFetch('', {
+      method: 'POST',
+      body: JSON.stringify({
+        llm_route: 'quality',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `RAW TEXT FROM VOICE MESSAGE:\n${rawText.slice(0, 5000)}` },
+        ],
+        temperature: 0.3,
+        max_tokens: 16000,
+      }),
+    })
 
-    // Call Gemini to generate blog post
-    console.log(`📝 Calling Gemini with ${rawText.length} chars...`)
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [{ text: `${systemPrompt}\n\nRAW TEXT FROM VOICE MESSAGE:\n${rawText.slice(0, 5000)}` }],
-          }],
-          generationConfig: { temperature: 0.3, maxOutputTokens: 16000 },
-        }),
-      },
-    )
+    if (!llmRes.ok) throw new Error(`LLM ${llmRes.status}: ${(await llmRes.text()).slice(0, 200)}`)
 
-    if (!geminiRes.ok) throw new Error(`Gemini ${geminiRes.status}: ${(await geminiRes.text()).slice(0, 200)}`)
-
-    const geminiData = await geminiRes.json()
-    const aiText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    const llmData = await llmRes.json()
+    const aiText = llmData?.choices?.[0]?.message?.content || ''
     const cleaned = aiText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
 
     let blogData: {
@@ -195,29 +190,14 @@ The text below is the author's OWN words transcribed from a voice message.
       const imgPrompt = imgPromptData?.prompt
 
       if (imgPrompt) {
-        // Generate image with Gemini
-        const genRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: imgPrompt }] }],
-              generationConfig: { responseModalities: ['image', 'text'] },
-            }),
-          },
-        )
-        const genData = await genRes.json()
-        for (const part of genData?.candidates?.[0]?.content?.parts || []) {
-          if (part.inlineData) {
-            // Upload to Cloudflare R2
-            const imgBytes = Uint8Array.from(atob(part.inlineData.data), c => c.charCodeAt(0))
-            const path = `blog-covers/voice-blog-${Date.now()}.png`
-            const publicUrl = await uploadToR2(path, imgBytes, 'image/png')
-            if (publicUrl) {
-              imageUrl = publicUrl
-            }
-            break
+        // Free cascade (OpenRouter → FLUX) — paid Gemini removed (owner policy 2026-08-06)
+        const freeImg = await generateImageFree(imgPrompt, '16:9')
+        if (freeImg) {
+          const imgBytes = Uint8Array.from(atob(freeImg.base64), c => c.charCodeAt(0))
+          const path = `blog-covers/voice-blog-${Date.now()}.png`
+          const publicUrl = await uploadToR2(path, imgBytes, 'image/png')
+          if (publicUrl) {
+            imageUrl = publicUrl
           }
         }
       }

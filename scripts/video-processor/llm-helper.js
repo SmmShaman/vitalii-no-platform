@@ -6,7 +6,11 @@
  */
 
 const NVIDIA_API_KEY = process.env.NVIDIA_API_KEY || '';
-const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
+// Free no-billing Gemini key ONLY (owner policy 2026-08-06) — the paid
+// GOOGLE_API_KEY must never be a text fallback. Needs the GEMINI_FREE_API_KEY
+// secret in GitHub Actions; without it the chain is NVIDIA → Claude → heuristics.
+const GEMINI_FREE_API_KEY = process.env.GEMINI_FREE_API_KEY || '';
+const GEMINI_FREE_MODEL = process.env.GEMINI_FREE_MODEL_LITE || 'gemini-3.1-flash-lite';
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 // 60s was too short: llama-3.3-70b needs >60s for 4k-token visual-direction
 // generations and aborted mid-answer on 2026-08-02.
@@ -58,9 +62,8 @@ export async function callLLM(systemPrompt, userPrompt, options = {}) {
     }
   }
 
-  // Gemini — same billed GOOGLE_API_KEY the daily-video-bot Edge Function already
-  // uses for digest scripts. Video pipeline only; never wired into article rewrites.
-  if (GOOGLE_API_KEY) {
+  // Free Gemini key (429s over quota, never invoices).
+  if (GEMINI_FREE_API_KEY) {
     try {
       return await callGemini(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode });
     } catch (err) {
@@ -81,7 +84,7 @@ export async function callLLM(systemPrompt, userPrompt, options = {}) {
   if (errors.length > 0) {
     throw new Error(`All LLM backends failed:\n  - ${errors.join('\n  - ')}`);
   }
-  throw new Error('No LLM credentials available (NVIDIA_API_KEY, GOOGLE_API_KEY or ANTHROPIC_API_KEY required)');
+  throw new Error('No LLM credentials available (NVIDIA_API_KEY, GEMINI_FREE_API_KEY or ANTHROPIC_API_KEY required)');
 }
 
 /**
@@ -151,7 +154,7 @@ async function callNvidia(systemPrompt, userPrompt, { maxTokens, temperature, js
 
 async function callGemini(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode }) {
   const response = await fetchWithTimeout(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${GOOGLE_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_FREE_MODEL}:generateContent?key=${GEMINI_FREE_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

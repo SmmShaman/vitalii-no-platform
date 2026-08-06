@@ -814,8 +814,15 @@ async function validateGeneratedImage(
       new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
     )
 
-    // Use Gemini for validation
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`
+    // Critic runs on the FREE Gemini key (owner policy 2026-08-06) — vision works
+    // on lite; the paid `apiKey` argument is deliberately ignored below.
+    const criticKey = Deno.env.get('GEMINI_FREE_API_KEY') || ''
+    if (!criticKey) {
+      console.warn('⚠️ GEMINI_FREE_API_KEY not set — skipping critic validation')
+      return getDefaultValidation(true)
+    }
+    const criticModel = Deno.env.get('GEMINI_FREE_MODEL_LITE') || 'gemini-3.1-flash-lite'
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${criticModel}:generateContent`
 
     const criticPrompt = `You are an expert image quality critic for a professional news website.
 Analyze this generated image and evaluate it.
@@ -869,7 +876,7 @@ Respond with ONLY valid JSON:
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey
+        'x-goog-api-key': criticKey
       },
       body: JSON.stringify(requestBody)
     })
