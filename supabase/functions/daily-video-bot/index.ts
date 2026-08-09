@@ -24,7 +24,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.0";
 import { triggerDailyVideoRender } from "../_shared/github-actions.ts";
 import { HUMANIZER_VIDEO, VOICE_SPOKEN } from "../_shared/humanizer-prompt.ts";
-import { generateImageFree } from "../_shared/free-image.ts";
+import { generateImageFree, generateImageFluxFree } from "../_shared/free-image.ts";
 
 const VERSION = "2026-08-06-v37-free-llm-only";
 const MAX_DETAILED = 10;
@@ -1072,6 +1072,43 @@ Return JSON: {"introScript": "Velkommen til dagens nyhetsdigest fra Vitalii Berb
     return { images, sources: srcInfo.join(" ") };
   }
 
+  // ── Helper: AI b-roll fill (rights-clean) ──
+  // Serper/Google Images was never wired (no key) and downloading press photos
+  // into rendered videos is exactly the copyright exposure the NTB claim taught
+  // us to avoid. Instead, groups short of MIN_IMAGES get topical AI-generated
+  // b-roll: free FLUX only (never the prepaid OpenRouter balance), uploaded to
+  // R2 so the render workflow can download them like any other image URL.
+  const AI_BROLL_MAX_PER_RUN = 20;
+  let aiBrollUsed = 0;
+  async function generateAiBroll(topic: string, queries: string[], needed: number, dateKey: string, groupIdx: number): Promise<string[]> {
+    const urls: string[] = [];
+    const prompts = (queries.length > 0 ? queries : [topic]).slice(0, needed);
+    while (prompts.length < needed) prompts.push(topic);
+    for (let i = 0; i < needed; i++) {
+      if (aiBrollUsed >= AI_BROLL_MAX_PER_RUN) {
+        console.log(`  ⚠️ AI b-roll cap reached (${AI_BROLL_MAX_PER_RUN}/run)`);
+        break;
+      }
+      const prompt = `Photorealistic editorial b-roll photograph for a technology news broadcast, illustrating: ${prompts[i]}. Wide cinematic composition, realistic lighting, news documentary style.`;
+      const res = await generateImageFluxFree(prompt, "16:9");
+      aiBrollUsed++;
+      if (!res) continue;
+      try {
+        const bStr = atob(res.base64);
+        const bytes = new Uint8Array(bStr.length);
+        for (let bi = 0; bi < bStr.length; bi++) bytes[bi] = bStr.charCodeAt(bi);
+        const isJpeg = bytes[0] === 0xFF && bytes[1] === 0xD8;
+        const ext = isJpeg ? "jpg" : "png";
+        const key = `broll/${dateKey}/g${groupIdx}_${i}.${ext}`;
+        const url = await uploadToR2(key, bytes, isJpeg ? "image/jpeg" : "image/png");
+        if (url) urls.push(url);
+      } catch (e: any) {
+        console.log(`  ⚠️ AI b-roll upload failed: ${e.message}`);
+      }
+    }
+    return urls;
+  }
+
   // ── Run media check for all groups ──
   // For merged groups: collect images from ALL articles in the group
   type MediaResult = { id: string; imageCount: number; passed: boolean; title: string; images: string[]; sources: string };
@@ -1103,7 +1140,21 @@ Return JSON: {"introScript": "Velkommen til dagens nyhetsdigest fra Vitalii Berb
       const a = articleMap.get(id);
       return a && (a.video_url || a.original_video_url);
     });
-    const imageCount = hasVideo ? allGroupImages.length + 3 : allGroupImages.length;
+    let imageCount = hasVideo ? allGroupImages.length + 3 : allGroupImages.length;
+
+    // AI b-roll fill: top up short groups with rights-clean generated images
+    if (imageCount < MIN_IMAGES) {
+      const needed = Math.min(MIN_IMAGES - imageCount + 1, 4);
+      const queries = entityMap[primaryId]?.imageQueries || [];
+      console.log(`  🎨 "${title.substring(0, 40)}" short of images (${imageCount}/${MIN_IMAGES}) — generating ${needed} AI b-roll`);
+      const aiUrls = await generateAiBroll(title, queries, needed, date, gi);
+      for (const u of aiUrls) {
+        if (!allGroupImages.includes(u)) allGroupImages.push(u);
+      }
+      if (aiUrls.length > 0) allSources.push(`AI:${aiUrls.length}`);
+      imageCount = hasVideo ? allGroupImages.length + 3 : allGroupImages.length;
+    }
+
     const passed = imageCount >= MIN_IMAGES;
     const sourcesStr = allSources.join(" + ");
 

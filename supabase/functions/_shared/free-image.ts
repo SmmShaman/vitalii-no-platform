@@ -111,6 +111,23 @@ async function generateImageViaOpenRouter(
   }
 }
 
+/**
+ * FLUX-only entry for BULK image needs (video b-roll fill). Deliberately skips
+ * OpenRouter: b-roll can need dozens of images per digest and would drain the
+ * prepaid balance reserved for covers/thumbnails. Free tier only — returns
+ * null when FLUX is unavailable and the caller degrades gracefully.
+ */
+export async function generateImageFluxFree(
+  prompt: string,
+  aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
+): Promise<FreeImageResult | null> {
+  const fluxBase64 = await generateImageViaCloudflareFlux(prompt, aspectRatio)
+  if (fluxBase64) {
+    return { base64: fluxBase64, provider: 'Cloudflare FLUX', model: '@cf/black-forest-labs/flux-1-schnell' }
+  }
+  return null
+}
+
 /** Cloudflare Workers AI FLUX.1-schnell — free, ~200/day. Returns raw base64 or null. */
 async function generateImageViaCloudflareFlux(
   prompt: string,
