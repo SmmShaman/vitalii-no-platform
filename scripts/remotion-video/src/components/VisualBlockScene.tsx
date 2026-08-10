@@ -234,7 +234,20 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
   // ── Researched context timing ──
   // The strip needs reading time (~1.6s per line); the quote takes the middle
   // of the segment, where the narration is deep into the story.
-  const factLines = buildFactLines(factSheet);
+  // Figures this segment already shows on a data card — the strip must not
+  // repeat them.
+  const cardValues: string[] = [];
+  for (const b of visualBlocks) {
+    const d = b.graphicData as Record<string, any> | null | undefined;
+    if (!d) continue;
+    if (d.value != null) cardValues.push(String(d.value));
+    if (d.left?.value != null) cardValues.push(String(d.left.value));
+    if (d.right?.value != null) cardValues.push(String(d.right.value));
+    if (Array.isArray(d.items)) {
+      for (const it of d.items) if (it?.value != null) cardValues.push(String(it.value));
+    }
+  }
+  const factLines = buildFactLines(factSheet, cardValues);
   const factStripSeconds = Math.min(
     Math.max(4, factLines.length * 1.6 + 1.5),
     Math.max(4, segmentSeconds * 0.45),

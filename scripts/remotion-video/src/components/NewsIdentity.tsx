@@ -124,10 +124,26 @@ export const IdentityBar: React.FC<{
 
 // ── Fact strip ─────────────────────────────────────────────────────
 
-/** Turn a fact sheet into at most three short, readable lines. */
-export function buildFactLines(sheet: FactSheet | undefined): FactLine[] {
+/** Digits only, so "100" and "100 ganger" compare equal. */
+function numericKey(text: string): string {
+  const m = String(text).replace(/\s/g, "").match(/\d[\d.,]*/);
+  return m ? m[0].replace(/[.,]$/, "") : "";
+}
+
+/**
+ * Turn a fact sheet into at most three short, readable lines.
+ *
+ * `cardValues` are figures already shown on a data card in this segment. The
+ * 09.08 render printed "100 ganger høyere båndbredde" in the strip while a card
+ * beside it showed "100" — the same fact twice.
+ */
+export function buildFactLines(
+  sheet: FactSheet | undefined,
+  cardValues: string[] = [],
+): FactLine[] {
   if (!sheet) return [];
   const lines: FactLine[] = [];
+  const onCard = new Set(cardValues.map(numericKey).filter(Boolean));
 
   for (const person of (sheet.who || []).slice(0, 2)) {
     if (person.status === "conflicting") continue;
@@ -143,6 +159,7 @@ export function buildFactLines(sheet: FactSheet | undefined): FactLine[] {
 
   for (const n of (sheet.numbers || []).slice(0, 2)) {
     if (n.status === "conflicting") continue;
+    if (onCard.has(numericKey(n.value))) continue; // already on a card
     lines.push({
       text: `${n.value} ${n.label}`,
       status: n.status,

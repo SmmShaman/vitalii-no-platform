@@ -31,6 +31,7 @@ import { downloadPexelsMedia } from './pexels-media.js';
 import { scrapeAllArticleImages } from './scrape-article-images.js';
 import { directVisuals } from './visual-director.js';
 import { buildFactSheets } from './research-facts.js';
+import { buildKeywordSet, describesSameTopic } from './relevance.js';
 import { callLLMJson } from './llm-helper.js';
 
 // ── Config ──
@@ -809,9 +810,21 @@ async function main() {
   const totalQueries = visualDirectives.reduce((s, vd) => s + (vd?.visualBlocks || []).filter(b => b.imageSearchQuery).length, 0);
   console.log(`  📊 Total blocks: ${totalBlocks}, with imageSearchQuery: ${totalQueries}`);
 
+  // Topic vocabulary per story, so a search result is judged on what its own
+  // title says, not merely on having answered the query string.
+  const phraseKeywords = detailedArticlesForBot.map((a, idx) =>
+    buildKeywordSet(a.title_no || a.title_en || '', factSheets[idx]),
+  );
+  /** Pick the first candidate whose description matches the story; else the first. */
+  const pickOnTopic = (candidates, keywords) => {
+    const hit = candidates.find(c => c.url && describesSameTopic(c.description, keywords));
+    return (hit || candidates.find(c => c.url) || {}).url || null;
+  };
+
   if (hasImageSearch && totalQueries > 0) {
     for (let i = 0; i < visualDirectives.length; i++) {
       const blocks = visualDirectives[i]?.visualBlocks || [];
+      const keywords = phraseKeywords[i] || new Set();
       let phraseImagesFound = 0;
       for (let j = 0; j < blocks.length; j++) {
         const query = blocks[j].imageSearchQuery;
@@ -828,7 +841,10 @@ async function main() {
             });
             if (resp.ok) {
               const data = await resp.json();
-              imgUrl = data.images?.[0]?.imageUrl;
+              imgUrl = pickOnTopic(
+                (data.images || []).map(r => ({ url: r.imageUrl, description: `${r.title || ''} ${r.source || ''}` })),
+                keywords,
+              );
             }
           }
 
@@ -841,7 +857,13 @@ async function main() {
               const resp = await fetch(`https://www.googleapis.com/customsearch/v1?${params}`);
               if (resp.ok) {
                 const data = await resp.json();
-                imgUrl = data.items?.[0]?.link;
+                imgUrl = pickOnTopic(
+                  (data.items || []).map(r => ({
+                    url: r.link,
+                    description: `${r.title || ''} ${r.snippet || ''} ${r.image?.contextLink || ''}`,
+                  })),
+                  keywords,
+                );
               }
             } catch { /* skip */ }
           }
@@ -854,7 +876,11 @@ async function main() {
               });
               if (pxResp.ok) {
                 const pxData = await pxResp.json();
-                imgUrl = pxData.photos?.[0]?.src?.large2x || pxData.photos?.[0]?.src?.large;
+                // Stock is the weakest source: require it to be on topic, or skip
+                const onTopic = (pxData.photos || [])
+                  .map(p => ({ url: p.src?.large2x || p.src?.large, description: p.alt || '' }))
+                  .find(c => c.url && describesSameTopic(c.description, keywords));
+                imgUrl = onTopic ? onTopic.url : null;
               }
             } catch { /* skip */ }
           }
@@ -1019,6 +1045,12 @@ async function main() {
     });
   }
 
+  // What each story is about — headline + researched entities. Used to reject
+  // stock and web photos whose own description is about something else.
+  const segmentKeywords = segments.map((s) =>
+    buildKeywordSet(s.headline, s.factSheet, s.imageSearchQueries || []),
+  );
+
   // Step 3.5: Download web images found during media pre-check (from daily-video-bot)
   // IMPORTANT: Remotion <Img> in headless Chrome can't reliably load external HTTP URLs.
   // All images must be downloaded to publicDir as local files before render.
@@ -1173,7 +1205,10 @@ async function main() {
       category: s.category,
       imageSearchQueries: s.imageSearchQueries || [],
     }));
-    const pexelsMedia = await downloadPexelsMedia(pexelsInput, publicDir);
+    const pexelsMedia = await downloadPexelsMedia(pexelsInput, publicDir, {
+      isRelevant: (segIndex, description) =>
+        describesSameTopic(description, segmentKeywords[segIndex] || new Set()),
+    });
 
     for (let i = 0; i < segments.length; i++) {
       if (segments[i].videoSrc) continue; // segment already has the article's own video

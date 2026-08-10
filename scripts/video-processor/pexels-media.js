@@ -100,6 +100,9 @@ export async function searchPexelsImages(query, count = 3) {
     height: p.height,
     photographer: p.photographer,
     photographerUrl: p.photographer_url,
+    // Pexels' own description of the shot — the only clue we get about what is
+    // actually IN the photo, and the basis of the relevance gate.
+    description: p.alt || '',
   }));
 }
 
@@ -188,7 +191,9 @@ async function downloadFile(url, destPath) {
  * @param {string} publicDir - Absolute path to download directory
  * @returns {Promise<Record<number, {images:string[], videos:string[], attribution:string[]}>>}
  */
-export async function downloadPexelsMedia(segments, publicDir) {
+export async function downloadPexelsMedia(segments, publicDir, options = {}) {
+  // Optional per-segment topic gate: (segIndex, description) => boolean
+  const isRelevant = options.isRelevant || null;
   const result = {};
 
   // Initialise empty result for every segment so callers always get a value
@@ -234,6 +239,18 @@ export async function downloadPexelsMedia(segments, publicDir) {
             console.log(`[pexels]   +${newImages.length} from alt query "${allQueries[q].substring(0, 30)}"`);
           }
         } catch { /* skip failed alt query */ }
+      }
+
+      // Topic gate: drop stock photos whose own description is about something
+      // else (the graffiti wall that illustrated a satellite story on 09.08).
+      if (isRelevant) {
+        const before = images.length;
+        const onTopic = images.filter(img => isRelevant(segIndex, img.description));
+        // Keep at least two so a segment never falls back to a single image
+        images = onTopic.length >= 2 ? onTopic : images.slice(0, 2);
+        if (images.length < before) {
+          console.log(`[pexels] Segment ${segIndex}: ${before - images.length} off-topic photos dropped`);
+        }
       }
 
       console.log(`[pexels] Segment ${segIndex}: found ${images.length} images, ${videos.length} videos`);
