@@ -127,20 +127,43 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     b.phraseImageSrc ? resolve(b.phraseImageSrc) : null,
   );
 
-  // ── Image rotation on a clock, not on block boundaries ──
-  // Block-driven cycling advanced roughly once per segment, so a story that
-  // downloaded 8 photos showed two of them. A steady clock with a minimum
-  // dwell shows as many as genuinely fit, each long enough to be looked at.
+  // ── One background schedule, minimum three seconds per picture ──
+  //
+  // Two separate mechanisms used to fight over the background: a clock rotating
+  // `allImages`, and per-phrase photos swapped on every block. A block can be
+  // 1.5s long, so a phrase photo could flash and vanish — the half-second
+  // flicker the owner kept seeing. Both now feed ONE schedule whose entries are
+  // never shorter than MIN_DWELL_SECONDS.
   const MIN_DWELL_SECONDS = 3;
   const segmentSeconds = durationInFrames / fps;
-  const dwellSeconds = Math.max(
-    MIN_DWELL_SECONDS,
-    segmentSeconds / Math.max(1, allImages.length),
-  );
-  const imageIndexAt = (t: number) =>
-    allImages.length > 0
-      ? Math.min(allImages.length - 1, Math.floor(t / dwellSeconds))
-      : 0;
+
+  const backgroundSchedule: { start: number; src: string }[] = [];
+  if (allImages.length > 0 || phraseImages.some(Boolean)) {
+    let clock = 0;
+    const nextClockImage = () =>
+      allImages.length > 0 ? allImages[clock++ % allImages.length] : "";
+
+    for (let t = 0; t < segmentSeconds; t += MIN_DWELL_SECONDS) {
+      // Which phrase is speaking when this window opens?
+      let blockAt = 0;
+      for (let i = 0; i < visualBlocks.length; i++) {
+        if (t >= visualBlocks[i].startTime) blockAt = i;
+      }
+      const src = phraseImages[blockAt] || nextClockImage();
+      if (!src) continue;
+      const last = backgroundSchedule[backgroundSchedule.length - 1];
+      if (last && last.src === src) continue; // extend, don't re-cut
+      backgroundSchedule.push({ start: t, src });
+    }
+  }
+
+  const scheduleIndexAt = (t: number) => {
+    let idx = 0;
+    for (let i = 0; i < backgroundSchedule.length; i++) {
+      if (t >= backgroundSchedule[i].start) idx = i;
+    }
+    return idx;
+  };
 
   // Find active block for current frame
   const currentTime = frame / fps;
@@ -149,21 +172,21 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     if (currentTime >= visualBlocks[i].startTime) activeIdx = i;
   }
 
-  // Active image: per-phrase photo if available, else the clock's pick
-  const activePhraseImage = phraseImages[activeIdx];
-  const curImgIdx = imageIndexAt(currentTime);
+  // Active background comes from the schedule, never straight from the block
+  const schedIdx = scheduleIndexAt(currentTime);
+  const currentBg = backgroundSchedule[schedIdx]?.src || "";
+  const nextBg = backgroundSchedule[schedIdx + 1]?.src || currentBg;
 
   // When a scene effect is active, dim the background image so effects are visible
   const activeBlockHasEffect = resolveSceneEffect(visualBlocks[activeIdx] || {} as VisualBlock) !== null;
   const bgDimFactor = activeBlockHasEffect ? 0.3 : 1.0; // 30% opacity when effect active
 
-  // Crossfade into the next image as its dwell ends
+  // Crossfade into the next scheduled picture
   const XFADE = 12;
-  const nextImgIdx = Math.min(allImages.length - 1, curImgIdx + 1);
-  const dwellEnd = (curImgIdx + 1) * dwellSeconds;
+  const dwellEnd =
+    backgroundSchedule[schedIdx + 1]?.start ?? segmentSeconds + 999;
   const framesLeft = (dwellEnd - currentTime) * fps;
-  const isXfading =
-    framesLeft > 0 && framesLeft < XFADE && nextImgIdx !== curImgIdx;
+  const isXfading = framesLeft > 0 && framesLeft < XFADE && nextBg !== currentBg;
   // interpolate requires monotonically increasing inputRange: [0, XFADE]
   // framesElapsedInCrossfade goes from 0 (start) to XFADE (end)
   const framesElapsedInXfade = XFADE - framesLeft;
@@ -231,6 +254,20 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     return undefined;
   };
 
+  // ── Block windows, clamped so they never overlap ──
+  // TTS phrase timings can run past the next phrase's start. Two overlapping
+  // Sequences meant two narration lines drawn on top of each other — the
+  // doubled, unreadable text on the Lørenskog and Flamingo frames.
+  const blockWindow = (i: number) => {
+    const startF = Math.round(visualBlocks[i].startTime * fps);
+    const nextStartF =
+      i + 1 < visualBlocks.length
+        ? Math.round(visualBlocks[i + 1].startTime * fps)
+        : durationInFrames;
+    const natural = Math.round(visualBlocks[i].duration * fps);
+    return { startF, durF: Math.max(1, Math.min(natural, nextStartF - startF)) };
+  };
+
   // ── Researched context timing ──
   // The strip needs reading time (~1.6s per line); the quote takes the middle
   // of the segment, where the narration is deep into the story.
@@ -284,31 +321,31 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
           volume={0}
         />
-      ) : (activePhraseImage || hasImages) ? (
+      ) : currentBg ? (
         <>
           <Img
-            key={`vb-bg-${activePhraseImage || curImgIdx}`}
-            src={activePhraseImage || allImages[curImgIdx]}
+            key={`vb-bg-${currentBg}`}
+            src={currentBg}
             style={{
               position: "absolute",
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              transform: bgTransform(bgEffect, curImgIdx),
+              transform: bgTransform(bgEffect, schedIdx),
               filter: [bgFilter(bgEffect), activeBlockHasEffect ? `brightness(${bgDimFactor})` : ''].filter(Boolean).join(' ') || undefined,
               opacity: isXfading ? 1 - xfadeProgress : 1,
             }}
           />
           {isXfading && (
             <Img
-              key={`vb-bg-next-${nextImgIdx}`}
-              src={allImages[nextImgIdx]}
+              key={`vb-bg-next-${nextBg}`}
+              src={nextBg}
               style={{
                 position: "absolute",
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                transform: bgTransform(bgEffect, nextImgIdx),
+                transform: bgTransform(bgEffect, schedIdx + 1),
                 filter: bgFilter(bgEffect),
                 opacity: xfadeProgress,
               }}
@@ -329,8 +366,7 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
       {!hasVideo &&
         visualBlocks.map((block, bi) => {
           if (!block.bRollVideoSrc) return null;
-          const startF = Math.round(block.startTime * fps);
-          const durF = Math.max(1, Math.round(block.duration * fps));
+          const { startF, durF } = blockWindow(bi);
           return (
             <Sequence key={`broll-${bi}`} from={startF} durationInFrames={durF}>
               <BRollBackground src={resolve(block.bRollVideoSrc)} durationInFrames={durF} />
@@ -349,8 +385,7 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
 
       {/* ─── Layer 2: Per-block text + graphics + key phrase callouts ─── */}
       {visualBlocks.map((block, bi) => {
-        const startF = Math.round(block.startTime * fps);
-        const durF = Math.max(1, Math.round(block.duration * fps));
+        const { startF, durF } = blockWindow(bi);
         return (
           <Sequence key={bi} from={startF} durationInFrames={durF}>
             <BlockContent
@@ -361,6 +396,12 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
               images={allImages}
               blockIndex={bi}
               allBlocks={visualBlocks}
+              // The quote card owns the centre of the screen while it is up
+              muteText={
+                quoteFrames > 0 &&
+                startF < quoteStartFrame + quoteFrames &&
+                startF + durF > quoteStartFrame
+              }
             />
           </Sequence>
         );
@@ -677,7 +718,9 @@ const BlockContent: React.FC<{
   images?: string[];
   blockIndex: number;
   allBlocks: VisualBlock[];
-}> = ({ block, accentColor, isVertical, moodTempo = 1.0, images = [], blockIndex, allBlocks }) => {
+  /** True while the quote card occupies the middle of the frame */
+  muteText?: boolean;
+}> = ({ block, accentColor, isVertical, moodTempo = 1.0, images = [], blockIndex, allBlocks, muteText = false }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
@@ -717,7 +760,7 @@ const BlockContent: React.FC<{
   const phraseWordCount = (block.phraseText || "").trim().split(/\s+/).filter(Boolean).length;
   const phraseIsSubstantial = phraseWordCount >= 4;
   const showText =
-    !hasGraphic && !hasSceneEffect && callout === null && phraseIsSubstantial;
+    !hasGraphic && !hasSceneEffect && callout === null && phraseIsSubstantial && !muteText;
 
   return (
     <AbsoluteFill style={{ opacity, zIndex: 5 }}>
@@ -932,6 +975,11 @@ const GraphicCard: React.FC<{
   const data = block.graphicData as Record<string, unknown> | null;
   if (!data) return null;
 
+  // Render the panel only if something actually goes inside it. An empty card
+  // is a dark rectangle sitting on the photo for no reason — the "empty spaces"
+  // the owner reported.
+  if (!dataGraphicHasContent(block.graphicType, data)) return null;
+
   const panelStyle: React.CSSProperties = {
     position: "relative",
     background: "rgba(0, 0, 0, 0.75)",
@@ -961,6 +1009,25 @@ const GraphicCard: React.FC<{
     </div>
   );
 };
+
+/** Is there a real value behind this card, or would it draw an empty box? */
+function dataGraphicHasContent(
+  type: string,
+  data: Record<string, unknown>,
+): boolean {
+  const hasDigits = (v: unknown) => /\d/.test(String(v ?? ""));
+
+  if (type === "comparison") {
+    const l = data.left as { value?: unknown } | undefined;
+    const r = data.right as { value?: unknown } | undefined;
+    return hasDigits(l?.value) && hasDigits(r?.value);
+  }
+  if (type === "barChart") {
+    const items = Array.isArray(data.items) ? data.items : [];
+    return items.filter((it: any) => hasDigits(it?.value)).length >= 2;
+  }
+  return hasDigits(data.value);
+}
 
 // ── DataGraphic — routes graphicData to a real chart form ──
 

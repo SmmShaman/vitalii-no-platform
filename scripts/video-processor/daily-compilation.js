@@ -724,10 +724,20 @@ async function main() {
   }
 
   // Generate TTS for intro script (male voice — main host)
+  //
+  // The host introduces himself by name. The LLM-written opening was neither
+  // reliable nor always intelligible, and the show never said whose it was.
+  const HOST_NAME = 'Vitalii Berbeha';
+  const introGreeting = LANGUAGE === 'no'
+    ? `Hei, jeg heter ${HOST_NAME}, og dette er dagens nyhetsoppdatering for ${displayDate}.`
+    : `Hi, my name is ${HOST_NAME}, and this is your news update for ${displayDate}.`;
+  const introScript = `${introGreeting} ${plan.introScript || ''}`.trim();
+
   let introVoiceover = null;
-  if (plan.introScript) {
+  if (introScript) {
     console.log('\n  🎙️ Intro voiceover (male)...');
-    introVoiceover = await generateVoiceover(plan.introScript, LANGUAGE, { gender: 'male' });
+    console.log(`     "${introScript.slice(0, 120)}"`);
+    introVoiceover = await generateVoiceover(introScript, LANGUAGE, { gender: 'male' });
   }
 
   // Generate TTS for roundup script (female voice — co-host)
