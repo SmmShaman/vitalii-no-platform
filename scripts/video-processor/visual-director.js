@@ -301,7 +301,39 @@ function extractDataPoints(text) {
     pts.push({ type: 'count', value: m[0].trim(), raw: m[0] });
   }
 
+  // Directional change: "økte med 40 prosent", "falt 12%", "grew by 30 percent"
+  const dirRe = /(økte|steg|vokste|opp|økning|grew|rose|increased|up|falt|sank|ned|nedgang|fell|dropped|decreased|down)\D{0,20}?(\d+[\.,]?\d*)\s*(%|prosent|percent)/gi;
+  while ((m = dirRe.exec(text)) !== null) {
+    const down = /falt|sank|ned|nedgang|fell|dropped|decreased|down/i.test(m[1]);
+    const magnitude = parseFloat(m[2].replace(',', '.'));
+    pts.push({
+      type: 'delta',
+      value: m[2].replace(',', '.') + '%',
+      changePct: down ? -magnitude : magnitude,
+      raw: m[0],
+    });
+  }
+
   return pts;
+}
+
+/**
+ * Build a bar-chart series when a phrase enumerates several comparable numbers,
+ * e.g. "Norge 40 prosent, Sverige 25 prosent, Danmark 18 prosent".
+ * Returns null unless at least two label+value pairs share a unit.
+ */
+function extractSeries(text) {
+  const re = /([A-ZÆØÅА-ЯІЇЄҐ][\wæøåÆØÅ\-]{2,}(?:\s+[A-ZÆØÅ][\wæøå\-]+)?)\s*[:–-]?\s*(\d+[\.,]?\d*)\s*(%|prosent|percent|millioner?|milliarder?)/g;
+  const items = [];
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const unit = /%|prosent|percent/i.test(m[3]) ? '%' : ` ${m[3]}`;
+    items.push({ label: m[1].trim(), value: m[2].replace(',', '.') + unit });
+  }
+  if (items.length < 2) return null;
+  const units = new Set(items.map(it => it.value.replace(/[\d.,]/g, '')));
+  if (units.size > 1) return null;
+  return items.slice(0, 4);
 }
 
 /**
@@ -608,18 +640,49 @@ function fallbackDirectVisuals(segmentScripts, segments, segmentVoiceovers) {
       let graphicType = cls.graphicType;
       let graphicData = null;
 
-      if (graphicType !== 'none' && dataPoints.length > 0) {
-        const dp = dataPoints[0];
-        if (dp.type === 'percentage') {
-          graphicType = 'counter';
-          graphicData = { value: dp.value + '%', label: '' };
-        } else if (dp.type === 'comparison') {
+      // Series (several comparable numbers) outranks a single figure — it's a real chart
+      const series = extractSeries(phrase.text);
+
+      // A phrase carrying real data deserves a chart even when the keyword
+      // classifier saw no data cue — the numbers ARE the cue. (Before this,
+      // graphics only appeared when both the keyword and the number matched,
+      // which is why whole digests rendered without a single chart.)
+      const hasStrongData =
+        series ||
+        dataPoints.some(p =>
+          p.type === 'comparison' || p.type === 'delta' || p.type === 'percentage',
+        );
+      if (graphicType === 'none' && hasStrongData) {
+        graphicType = 'keyFigure';
+      }
+
+      if (graphicType !== 'none' && series) {
+        graphicType = 'barChart';
+        graphicData = { items: series, label: '' };
+      } else if (graphicType !== 'none' && dataPoints.length > 0) {
+        // Prefer the richest form available in this phrase
+        const dp =
+          dataPoints.find(p => p.type === 'comparison') ||
+          dataPoints.find(p => p.type === 'delta') ||
+          dataPoints[0];
+
+        if (dp.type === 'comparison') {
           graphicType = 'comparison';
           const u = (dp.unit === '%' || dp.unit === 'prosent') ? '%' : '';
           graphicData = {
             left:  { label: 'Før', value: dp.from + u },
             right: { label: 'Nå',  value: dp.to + u },
           };
+        } else if (dp.type === 'delta') {
+          graphicType = 'keyFigure';
+          graphicData = {
+            value: dp.value,
+            label: dp.changePct >= 0 ? 'Økning' : 'Nedgang',
+            changePct: dp.changePct,
+          };
+        } else if (dp.type === 'percentage') {
+          graphicType = 'counter';
+          graphicData = { value: dp.value + '%', label: '' };
         } else if (dp.type === 'money' || dp.type === 'count') {
           graphicType = 'keyFigure';
           graphicData = { value: dp.value, label: '' };
@@ -642,6 +705,32 @@ function fallbackDirectVisuals(segmentScripts, segments, segmentVoiceovers) {
         triggerImageChange: j > 0 && j % 2 === 0,
       };
     });
+
+    // 2b. Cap graphics per segment so charts stay an accent, not wallpaper.
+    // Keep the richest forms and never two in a row.
+    const GRAPHIC_RANK = { barChart: 4, comparison: 3, keyFigure: 2, counter: 1 };
+    const MAX_GRAPHICS_PER_SEGMENT = 3;
+    const graphicIdx = visualBlocks
+      .map((b, j) => ({ j, rank: GRAPHIC_RANK[b.graphicType] || 0 }))
+      .filter(x => x.rank > 0)
+      .sort((a, b) => b.rank - a.rank || a.j - b.j);
+
+    const keep = new Set();
+    for (const cand of graphicIdx) {
+      if (keep.size >= MAX_GRAPHICS_PER_SEGMENT) break;
+      if (keep.has(cand.j - 1) || keep.has(cand.j + 1)) continue;
+      keep.add(cand.j);
+    }
+    for (let j = 0; j < visualBlocks.length; j++) {
+      if (visualBlocks[j].graphicType !== 'none' && !keep.has(j)) {
+        visualBlocks[j].graphicType = 'none';
+        visualBlocks[j].graphicData = null;
+      }
+    }
+    const graphicCount = keep.size;
+    if (graphicCount > 0) {
+      console.log(`    📊 Seg ${i + 1}: ${graphicCount} data graphics (${[...keep].map(j => visualBlocks[j].graphicType).join(', ')})`);
+    }
 
     // 3. Segment-level directives (variety across segments)
     const cat = seg.category || 'news';
@@ -755,6 +844,76 @@ function ensureVariety(directives) {
 // ═══════════════════════════════════════════════════════════════════
 
 /**
+ * Derive a data graphic straight from a phrase's own numbers.
+ * Used as the floor for BOTH paths: the LLM almost never fills graphicData,
+ * so without this the digest renders with no charts at all.
+ * Returns null when the phrase carries no chartable data.
+ */
+function deriveGraphicFromText(text) {
+  const series = extractSeries(text);
+  if (series) return { graphicType: 'barChart', graphicData: { items: series, label: '' } };
+
+  const dps = extractDataPoints(text);
+  const dp =
+    dps.find(p => p.type === 'comparison') ||
+    dps.find(p => p.type === 'delta') ||
+    dps.find(p => p.type === 'percentage') ||
+    dps.find(p => p.type === 'money' || p.type === 'count');
+  if (!dp) return null;
+
+  if (dp.type === 'comparison') {
+    const u = (dp.unit === '%' || dp.unit === 'prosent') ? '%' : '';
+    return {
+      graphicType: 'comparison',
+      graphicData: {
+        left:  { label: 'Før', value: dp.from + u },
+        right: { label: 'Nå',  value: dp.to + u },
+      },
+    };
+  }
+  if (dp.type === 'delta') {
+    return {
+      graphicType: 'keyFigure',
+      graphicData: {
+        value: dp.value,
+        label: dp.changePct >= 0 ? 'Økning' : 'Nedgang',
+        changePct: dp.changePct,
+      },
+    };
+  }
+  if (dp.type === 'percentage') {
+    return { graphicType: 'counter', graphicData: { value: dp.value + '%', label: '' } };
+  }
+  return { graphicType: 'keyFigure', graphicData: { value: dp.value, label: '' } };
+}
+
+/**
+ * Keep at most MAX graphics per segment, richest first, never two adjacent.
+ * Charts should punctuate the segment, not wallpaper it.
+ */
+function capGraphics(visualBlocks, max = 3) {
+  const RANK = { barChart: 4, comparison: 3, keyFigure: 2, counter: 1 };
+  const ranked = visualBlocks
+    .map((b, j) => ({ j, rank: RANK[b.graphicType] || 0 }))
+    .filter(x => x.rank > 0 && visualBlocks[x.j].graphicData)
+    .sort((a, b) => b.rank - a.rank || a.j - b.j);
+
+  const keep = new Set();
+  for (const cand of ranked) {
+    if (keep.size >= max) break;
+    if (keep.has(cand.j - 1) || keep.has(cand.j + 1)) continue;
+    keep.add(cand.j);
+  }
+  for (let j = 0; j < visualBlocks.length; j++) {
+    if (visualBlocks[j].graphicType !== 'none' && !keep.has(j)) {
+      visualBlocks[j].graphicType = 'none';
+      visualBlocks[j].graphicData = null;
+    }
+  }
+  return [...keep].map(j => visualBlocks[j].graphicType);
+}
+
+/**
  * AI returns phrases without precise timestamps.
  * We align them with subtitle-based phrase boundaries.
  */
@@ -765,6 +924,21 @@ function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
   const visualBlocks = timedPhrases.map((tp, j) => {
     // Pick the closest AI phrase (by index, since order should match)
     const ap = aiPhrases[j] || aiPhrases[aiPhrases.length - 1] || {};
+
+    // The LLM rarely fills graphicData — fall back to the phrase's own numbers
+    let graphicType = ap.graphicType || 'none';
+    let graphicData = ap.graphicData || null;
+    if (graphicType === 'none' || !graphicData) {
+      const derived = deriveGraphicFromText(tp.text);
+      if (derived) {
+        graphicType = derived.graphicType;
+        graphicData = derived.graphicData;
+      } else {
+        graphicType = 'none';
+        graphicData = null;
+      }
+    }
+
     return {
       phraseText: tp.text,
       startTime: tp.startTime,
@@ -775,12 +949,20 @@ function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
       renderHint: ap.renderHint || '',
       visualMetaphor: ap.metaphor || 'narrative',
       textEffect: ap.textEffect || 'fadeUp',
-      graphicType: ap.graphicType || 'none',
-      graphicData: ap.graphicData || null,
+      // NOTE: ap.sceneEffect is deliberately NOT merged yet — wiring the LLM's
+      // explicit effect choice changes effect density AND suppresses b-roll
+      // (b-roll skips scene-effect blocks). Ship it as its own iteration.
+      graphicType,
+      graphicData,
       backgroundEffect: ap.backgroundEffect || 'kenBurns',
       triggerImageChange: ap.triggerImageChange ?? (j > 0 && j % 2 === 0),
     };
   });
+
+  const kept = capGraphics(visualBlocks);
+  if (kept.length > 0) {
+    console.log(`    📊 ${kept.length} data graphics: ${kept.join(', ')}`);
+  }
 
   return visualBlocks;
 }

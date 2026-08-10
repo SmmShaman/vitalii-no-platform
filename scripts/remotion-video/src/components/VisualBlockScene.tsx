@@ -43,6 +43,12 @@ import { getMoodConfig } from "../design-system/moods";
 import { Particles, Spawner, Behavior } from "remotion-bits";
 import type { VisualBlock } from "../compositions/DailyNewsShow";
 import { resolveSceneEffect, SceneEffectRenderer } from "./effects";
+import {
+  BeforeAfterChart,
+  DeltaFigure,
+  SeriesBarChart,
+  ShareDonut,
+} from "./DataViz";
 
 // ── Props ──
 
@@ -656,9 +662,9 @@ const BlockContent: React.FC<{
         <div
           style={{
             position: "absolute",
-            top: isVertical ? "40%" : "15%",
-            right: isVertical ? 20 : 40,
-            width: isVertical ? "80%" : "36%",
+            top: isVertical ? "34%" : "20%",
+            right: isVertical ? 20 : 56,
+            width: isVertical ? "84%" : "42%",
             zIndex: 8,
           }}
         >
@@ -866,207 +872,65 @@ const GraphicCard: React.FC<{
     <div style={panelStyle}>
       <div style={accentLineStyle} />
 
-      {block.graphicType === "counter" && (
-        <CounterGraphic data={data} accentColor={accentColor} />
-      )}
-
-      {block.graphicType === "keyFigure" && (
-        <KeyFigureGraphic data={data} accentColor={accentColor} />
-      )}
-
-      {block.graphicType === "comparison" && (
-        <ComparisonGraphic data={data} accentColor={accentColor} />
-      )}
-
-      {/* barChart + bulletList fallback to keyFigure display */}
-      {(block.graphicType === "barChart" ||
-        block.graphicType === "bulletList") && (
-        <KeyFigureGraphic data={data} accentColor={accentColor} />
-      )}
+      <DataGraphic type={block.graphicType} data={data} accentColor={accentColor} />
     </div>
   );
 };
 
-// ── Counter: animated tick-up ──
+// ── DataGraphic — routes graphicData to a real chart form ──
 
-const CounterGraphic: React.FC<{
+const DataGraphic: React.FC<{
+  type: string;
   data: Record<string, unknown>;
   accentColor: string;
-}> = ({ data, accentColor }) => {
-  const raw = String(data.value ?? "0");
-  const numericPart = parseFloat(raw.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0;
-  const hasPct = raw.includes("%");
-  const label = data.label ? String(data.label) : "";
+}> = ({ type, data, accentColor }) => {
+  const label = typeof data.label === "string" ? data.label : undefined;
+  const rawValue =
+    typeof data.value === "string" || typeof data.value === "number"
+      ? String(data.value)
+      : "";
 
-  return (
-    <div style={{ textAlign: "center" }}>
-      <AnimatedCounter
-        value={numericPart}
-        suffix={hasPct ? "%" : ""}
-        accentColor={accentColor}
-        fontSize={typography.scale.hero}
+  // Before / after → two bars on one scale + change badge
+  if (type === "comparison" && data.left && data.right) {
+    const left = data.left as { label?: string; value?: string };
+    const right = data.right as { label?: string; value?: string };
+    return (
+      <BeforeAfterChart
+        left={{ label: left.label || "Før", value: String(left.value ?? "") }}
+        right={{ label: right.label || "Nå", value: String(right.value ?? "") }}
       />
-      {label && (
-        <div
-          style={{
-            fontSize: typography.scale.bodySmall,
-            color: colors.textMuted,
-            fontFamily: typography.fontFamily.primary,
-            marginTop: 8,
-          }}
-        >
-          {label}
-        </div>
-      )}
-    </div>
-  );
-};
+    );
+  }
 
-// ── KeyFigure: static large value ──
+  // Series → real bar chart with direct labels
+  if (type === "barChart" && Array.isArray(data.items)) {
+    const items = (data.items as { label?: string; value?: string | number }[])
+      .filter((it) => it && it.value != null)
+      .map((it) => ({ label: it.label || "", value: it.value as string | number }));
+    if (items.length >= 2) {
+      return <SeriesBarChart items={items} accentColor={accentColor} />;
+    }
+  }
 
-const KeyFigureGraphic: React.FC<{
-  data: Record<string, unknown>;
-  accentColor: string;
-}> = ({ data, accentColor }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const scale = spring({
-    frame,
-    fps,
-    config: { damping: 10, stiffness: 100, mass: 0.6 },
-  });
+  // Share of a whole → donut (only for real 0–100 shares)
+  const pctMatch = rawValue.match(/^(\d+[.,]?\d*)\s*%$/);
+  if (pctMatch) {
+    const pct = parseFloat(pctMatch[1].replace(",", "."));
+    if (pct > 0 && pct <= 100) {
+      return <ShareDonut percent={pct} label={label} accentColor={accentColor} />;
+    }
+  }
 
+  // Everything else → hero figure, with direction when the block carries one
+  const changePct =
+    typeof data.changePct === "number" ? (data.changePct as number) : null;
   return (
-    <div style={{ textAlign: "center", transform: `scale(${scale})` }}>
-      <div
-        style={{
-          fontSize: typography.scale.hero,
-          fontWeight: 900,
-          color: accentColor,
-          fontFamily: typography.fontFamily.primary,
-          lineHeight: 1,
-        }}
-      >
-        {String(data.value ?? "")}
-      </div>
-      {String(data.label || "") !== "" && (
-        <div
-          style={{
-            fontSize: typography.scale.bodySmall,
-            color: colors.textMuted,
-            fontFamily: typography.fontFamily.primary,
-            marginTop: 12,
-            fontWeight: 600,
-          }}
-        >
-          {String(data.label)}
-        </div>
-      )}
-    </div>
+    <DeltaFigure
+      value={rawValue}
+      label={label}
+      changePct={changePct}
+      accentColor={accentColor}
+    />
   );
 };
 
-// ── Comparison: side-by-side boxes ──
-
-const ComparisonGraphic: React.FC<{
-  data: Record<string, unknown>;
-  accentColor: string;
-}> = ({ data, accentColor }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-
-  const left = (data.left as { label: string; value: string }) || {
-    label: "",
-    value: "",
-  };
-  const right = (data.right as { label: string; value: string }) || {
-    label: "",
-    value: "",
-  };
-
-  const leftScale = spring({
-    frame,
-    fps,
-    config: { damping: 12, stiffness: 100 },
-  });
-  const rightScale = spring({
-    frame: Math.max(0, frame - 10),
-    fps,
-    config: { damping: 12, stiffness: 100 },
-  });
-
-  const boxStyle = (
-    s: number,
-    isRight: boolean,
-  ): React.CSSProperties => ({
-    flex: 1,
-    textAlign: "center",
-    padding: "16px 8px",
-    background: isRight ? `${accentColor}20` : "rgba(255,255,255,0.04)",
-    borderRadius: 12,
-    transform: `scale(${s})`,
-    border: isRight
-      ? `1px solid ${accentColor}60`
-      : `1px solid ${glass.border}`,
-  });
-
-  return (
-    <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
-      <div style={boxStyle(leftScale, false)}>
-        <div
-          style={{
-            fontSize: typography.scale.xs,
-            color: colors.textMuted,
-            fontFamily: typography.fontFamily.primary,
-            marginBottom: 8,
-          }}
-        >
-          {left.label}
-        </div>
-        <div
-          style={{
-            fontSize: typography.scale.h5,
-            fontWeight: 700,
-            color: colors.text,
-            fontFamily: typography.fontFamily.primary,
-          }}
-        >
-          {left.value}
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          fontSize: typography.scale.body,
-          color: accentColor,
-          fontWeight: 900,
-        }}
-      >
-        →
-      </div>
-      <div style={boxStyle(rightScale, true)}>
-        <div
-          style={{
-            fontSize: typography.scale.xs,
-            color: colors.textMuted,
-            fontFamily: typography.fontFamily.primary,
-            marginBottom: 8,
-          }}
-        >
-          {right.label}
-        </div>
-        <div
-          style={{
-            fontSize: typography.scale.h5,
-            fontWeight: 700,
-            color: accentColor,
-            fontFamily: typography.fontFamily.primary,
-          }}
-        >
-          {right.value}
-        </div>
-      </div>
-    </div>
-  );
-};
