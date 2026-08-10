@@ -147,7 +147,10 @@ jobs:
       github.event_name == 'repository_dispatch' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'render')
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The pipeline grew a research pass, fact verification and stock b-roll:
+    # the 09.08 comparison renders took 47-52 minutes, too close to the old
+    # 60-minute cap for a run nobody is watching.
+    timeout-minutes: 90
 
     steps:
       - name: Checkout repository
