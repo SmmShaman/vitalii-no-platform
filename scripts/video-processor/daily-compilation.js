@@ -543,24 +543,36 @@ async function notifyBotComplete(dateStr, youtubeUrl) {
 /**
  * Spread b-roll video clips across visual blocks as moving backgrounds.
  * Rhythm: the segment opens on the real article photo (authenticity),
- * then every other eligible block cuts to live stock footage.
- * Blocks that already have a contextual phrase photo or a scene effect keep it.
+ * then every other block cuts to live stock footage — b-roll takes
+ * priority over yet another static photo (that's the whole point).
+ * Only scene-effect blocks keep their animation, and a clip is only
+ * used for a block it can fully cover (clip duration >= block duration).
  */
-function assignBRollToBlocks(visualBlocks, videoFiles) {
+function assignBRollToBlocks(visualBlocks, videosMeta) {
+  if (!videosMeta || videosMeta.length === 0) return 0;
   let assigned = 0;
   let vidIdx = 0;
   let eligibleSeen = 0;
   for (const block of visualBlocks) {
-    if (block.phraseImageSrc) continue;
     if (block.sceneEffect && block.sceneEffect !== 'none') continue;
-    // Pexels clips are >= 5s; never assign footage shorter than the block
-    if (!block.duration || block.duration > 5) continue;
+    if (!block.duration) continue;
     eligibleSeen++;
     if (eligibleSeen === 1) continue; // keep the opening block on the article photo
     if (eligibleSeen % 2 === 0) {
-      block.bRollVideoSrc = videoFiles[vidIdx % videoFiles.length];
-      vidIdx++;
-      assigned++;
+      // Pick the next clip long enough to cover this block
+      let picked = null;
+      for (let tries = 0; tries < videosMeta.length; tries++) {
+        const candidate = videosMeta[(vidIdx + tries) % videosMeta.length];
+        if (candidate.duration >= block.duration + 0.3) {
+          picked = candidate;
+          vidIdx = vidIdx + tries + 1;
+          break;
+        }
+      }
+      if (picked) {
+        block.bRollVideoSrc = picked.filename;
+        assigned++;
+      }
     }
   }
   return assigned;
@@ -1151,10 +1163,10 @@ async function main() {
       const media = pexelsMedia[i];
       if (!media) continue;
 
-      // Fill photos only for visually sparse segments (< 3 images total)
+      // Fill photos: top up cycling variety to ~5 images per segment
       const existing = segments[i].alternateImages || [];
-      if (existing.length < 3 && media.images.length > 0) {
-        segments[i].alternateImages = [...new Set([...existing, ...media.images])].slice(0, 6);
+      if (existing.length < 5 && media.images.length > 0) {
+        segments[i].alternateImages = [...new Set([...existing, ...media.images])].slice(0, 8);
         segments[i].imageCycleDuration = Math.max(
           3,
           Math.round(Number(segments[i].durationSeconds) / (segments[i].alternateImages.length + 1)),
@@ -1164,7 +1176,10 @@ async function main() {
 
       // B-roll videos → assign to visual blocks (moving background instead of static photo)
       if (media.videos.length > 0 && segments[i].visualBlocks && segments[i].visualBlocks.length > 0) {
-        const assigned = assignBRollToBlocks(segments[i].visualBlocks, media.videos);
+        const meta = (media.videosMeta && media.videosMeta.length > 0)
+          ? media.videosMeta
+          : media.videos.map((f) => ({ filename: f, duration: 5 }));
+        const assigned = assignBRollToBlocks(segments[i].visualBlocks, meta);
         console.log(`  🎬 Segment ${i}: ${media.videos.length} b-roll clips → ${assigned} blocks`);
       }
     }

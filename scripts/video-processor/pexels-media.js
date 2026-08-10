@@ -193,7 +193,7 @@ export async function downloadPexelsMedia(segments, publicDir) {
 
   // Initialise empty result for every segment so callers always get a value
   for (let i = 0; i < segments.length; i++) {
-    result[i] = { images: [], videos: [], attribution: [] };
+    result[i] = { images: [], videos: [], videosMeta: [], attribution: [] };
   }
 
   // Bail out early if no API key — silent fallback
@@ -259,6 +259,7 @@ export async function downloadPexelsMedia(segments, publicDir) {
           const destPath = join(publicDir, filename);
           const bytes = await limiter(() => downloadFile(vid.downloadUrl, destPath));
           result[segIndex].videos.push(filename);
+          result[segIndex].videosMeta.push({ filename, duration: vid.duration });
           result[segIndex].attribution.push(`Video by ${vid.photographer} on Pexels`);
           console.log(`[pexels]   Downloaded ${filename} (${(bytes / 1024 / 1024).toFixed(1)} MB)`);
         } catch (err) {
