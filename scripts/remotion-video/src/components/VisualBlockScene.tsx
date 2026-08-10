@@ -49,6 +49,13 @@ import {
   SeriesBarChart,
   ShareDonut,
 } from "./DataViz";
+import {
+  IdentityBar,
+  FactStrip,
+  QuoteCard,
+  buildFactLines,
+  type FactSheet,
+} from "./NewsIdentity";
 
 // ── Props ──
 
@@ -64,6 +71,8 @@ export interface VisualBlockSceneProps {
   mood?: string;
   alternateImages?: string[];
   visualBlocks: VisualBlock[];
+  /** Researched facts for this story — identity bar, fact strip, quote */
+  factSheet?: FactSheet;
 }
 
 // ── Pan direction lookup (per-image variety) ──
@@ -93,6 +102,7 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
   mood,
   alternateImages,
   visualBlocks,
+  factSheet,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width, height, durationInFrames } = useVideoConfig();
@@ -117,15 +127,20 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     b.phraseImageSrc ? resolve(b.phraseImageSrc) : null,
   );
 
-  // ── Fallback image index driven by block boundaries ──
-  const imageIndexPerBlock: number[] = [];
-  let imgIdx = 0;
-  for (let i = 0; i < visualBlocks.length; i++) {
-    if (i > 0 && visualBlocks[i].triggerImageChange && allImages.length > 1) {
-      imgIdx = (imgIdx + 1) % allImages.length;
-    }
-    imageIndexPerBlock.push(imgIdx);
-  }
+  // ── Image rotation on a clock, not on block boundaries ──
+  // Block-driven cycling advanced roughly once per segment, so a story that
+  // downloaded 8 photos showed two of them. A steady clock with a minimum
+  // dwell shows as many as genuinely fit, each long enough to be looked at.
+  const MIN_DWELL_SECONDS = 3;
+  const segmentSeconds = durationInFrames / fps;
+  const dwellSeconds = Math.max(
+    MIN_DWELL_SECONDS,
+    segmentSeconds / Math.max(1, allImages.length),
+  );
+  const imageIndexAt = (t: number) =>
+    allImages.length > 0
+      ? Math.min(allImages.length - 1, Math.floor(t / dwellSeconds))
+      : 0;
 
   // Find active block for current frame
   const currentTime = frame / fps;
@@ -134,20 +149,19 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     if (currentTime >= visualBlocks[i].startTime) activeIdx = i;
   }
 
-  // Active image: per-phrase photo if available, else cycling
+  // Active image: per-phrase photo if available, else the clock's pick
   const activePhraseImage = phraseImages[activeIdx];
-  const curImgIdx = imageIndexPerBlock[activeIdx] ?? 0;
+  const curImgIdx = imageIndexAt(currentTime);
 
   // When a scene effect is active, dim the background image so effects are visible
   const activeBlockHasEffect = resolveSceneEffect(visualBlocks[activeIdx] || {} as VisualBlock) !== null;
   const bgDimFactor = activeBlockHasEffect ? 0.3 : 1.0; // 30% opacity when effect active
 
-  // Crossfade near block boundary when image changes
-  const nextIdx = Math.min(activeIdx + 1, visualBlocks.length - 1);
-  const nextImgIdx = imageIndexPerBlock[nextIdx] ?? curImgIdx;
+  // Crossfade into the next image as its dwell ends
   const XFADE = 12;
-  const blockEnd = visualBlocks[activeIdx]?.endTime ?? 0;
-  const framesLeft = (blockEnd - currentTime) * fps;
+  const nextImgIdx = Math.min(allImages.length - 1, curImgIdx + 1);
+  const dwellEnd = (curImgIdx + 1) * dwellSeconds;
+  const framesLeft = (dwellEnd - currentTime) * fps;
   const isXfading =
     framesLeft > 0 && framesLeft < XFADE && nextImgIdx !== curImgIdx;
   // interpolate requires monotonically increasing inputRange: [0, XFADE]
@@ -216,6 +230,23 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     }
     return undefined;
   };
+
+  // ── Researched context timing ──
+  // The strip needs reading time (~1.6s per line); the quote takes the middle
+  // of the segment, where the narration is deep into the story.
+  const factLines = buildFactLines(factSheet);
+  const factStripSeconds = Math.min(
+    Math.max(4, factLines.length * 1.6 + 1.5),
+    Math.max(4, segmentSeconds * 0.45),
+  );
+  const quoteSeconds = Math.min(5.5, segmentSeconds * 0.35);
+  const quoteStartFrame = Math.round(
+    (Math.max(4 + factStripSeconds + 0.5, segmentSeconds * 0.5)) * fps,
+  );
+  const quoteFrames =
+    quoteStartFrame + Math.round(quoteSeconds * fps) <= durationInFrames
+      ? Math.round(quoteSeconds * fps)
+      : 0;
 
   // ── Fade transitions ──
   const fadeIn = interpolate(
@@ -349,6 +380,43 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
         </div>
       )}
 
+      {/* ─── Layer 5: Researched context — who, where, figures, quote ─── */}
+      {headline && (
+        <Sequence from={Math.round(fps * 3.5)}>
+          <IdentityBar
+            headline={headline}
+            source={factSheet?.source}
+            place={factSheet?.where?.place || factSheet?.where?.country}
+            accentColor={accentColor}
+            isVertical={isVertical}
+          />
+        </Sequence>
+      )}
+
+      {factLines.length > 0 && (
+        <Sequence
+          from={Math.round(fps * 4)}
+          durationInFrames={Math.round(fps * factStripSeconds)}
+        >
+          <FactStrip
+            lines={factLines}
+            accentColor={accentColor}
+            isVertical={isVertical}
+          />
+        </Sequence>
+      )}
+
+      {factSheet?.quote && quoteFrames > 0 && (
+        <Sequence from={quoteStartFrame} durationInFrames={quoteFrames}>
+          <QuoteCard
+            text={factSheet.quote.text}
+            speaker={factSheet.quote.speaker}
+            accentColor={accentColor}
+            isVertical={isVertical}
+          />
+        </Sequence>
+      )}
+
       {/* Ambient particles (mood-driven density: urgent → more, analytical → fewer) */}
       <AbsoluteFill
         style={{
@@ -442,20 +510,11 @@ function detectKeyPhrase(
     return { type: "number", text: numMatch[0].trim() };
   }
 
-  // 2. Company/person name (first mention) → lower third
-  //    Match 2+ capitalized words not at sentence start
-  const nameMatch = text.match(
-    /(?:[\s,])((?:[A-ZÆØÅА-ЯІЇЄҐ][a-zA-ZæøåÆØÅа-яіїєґА-ЯІЇЄҐ]+[\s-]){0,2}[A-ZÆØÅА-ЯІЇЄҐ][a-zA-ZæøåÆØÅа-яіїєґА-ЯІЇЄҐ]{2,})/,
-  );
-  if (nameMatch) {
-    const name = nameMatch[1].trim();
-    const priorMention = allBlocks
-      .slice(0, blockIndex)
-      .some((b) => b.phraseText?.includes(name));
-    if (!priorMention) {
-      return { type: "name", text: name };
-    }
-  }
+  // Name callouts are gone. The regex took any capitalised word it met, so the
+  // 09.08 render captioned frames with "Deretter", "Selskapene", "Dette" and
+  // "Texas Det" — sentence openers and fragments, not names. Real people and
+  // organisations now come from the researched fact sheet (FactStrip), which
+  // knows a name from a first word.
 
   // 3. Quoted text → quote callout
   const quoteMatch = text.match(/["«""]([^"»""]{10,})["»""]/);
@@ -635,8 +694,10 @@ const BlockContent: React.FC<{
       ? detectKeyPhrase(block, blockIndex, allBlocks)
       : null;
 
-  // Show PhraseText only when graphic card is present (labels the data)
-  const showText = hasGraphic && !hasSceneEffect;
+  // The narration sentence is shown only on blocks that carry nothing else.
+  // Printing it beside a data card produced the "33 millioner" overlap — the
+  // same figure twice, in two overlapping boxes.
+  const showText = !hasGraphic && !hasSceneEffect && callout === null;
 
   return (
     <AbsoluteFill style={{ opacity, zIndex: 5 }}>

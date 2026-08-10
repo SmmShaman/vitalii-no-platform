@@ -67,7 +67,12 @@ export const PhotoCollage: React.FC<PhotoCollageProps> = ({
   const identity = (src: string) =>
     src;
 
-  const count = Math.min(images.length, 6);
+  // Photos used to pop every 6 frames (0.2s): the 09.08 render fired 23 visual
+  // changes in five seconds and none of the photos could be looked at. Each one
+  // now gets ~0.9s of its own, and the collage only holds as many as fit.
+  const STAGGER_FRAMES = Math.round(fps * 0.9);
+  const fits = Math.max(2, Math.floor(durationInFrames / STAGGER_FRAMES));
+  const count = Math.min(images.length, 6, fits);
   if (count < 2) return null;
 
   const layout = LAYOUTS[count] || LAYOUTS[4];
@@ -82,16 +87,16 @@ export const PhotoCollage: React.FC<PhotoCollageProps> = ({
     <AbsoluteFill style={{ opacity: fadeOut }}>
       {images.slice(0, count).map((src, i) => {
         const pos = layout[i] || layout[0];
-        const delay = 5 + i * 6;
+        const delay = 5 + i * STAGGER_FRAMES;
 
         const popScale = spring({
           frame: Math.max(0, frame - delay),
           fps,
-          config: { damping: 10, stiffness: 120, mass: 0.5 },
+          config: { damping: 12, stiffness: 90, mass: 0.6 },
         });
         const opacity = interpolate(
           frame,
-          [delay, delay + 6],
+          [delay, delay + 10],
           [0, 1],
           clampBoth,
         );

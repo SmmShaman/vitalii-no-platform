@@ -30,6 +30,7 @@ import { generateAllAvatarClips } from './generate-avatar.js';
 import { downloadPexelsMedia } from './pexels-media.js';
 import { scrapeAllArticleImages } from './scrape-article-images.js';
 import { directVisuals } from './visual-director.js';
+import { buildFactSheets } from './research-facts.js';
 import { callLLMJson } from './llm-helper.js';
 
 // ── Config ──
@@ -761,6 +762,17 @@ async function main() {
     outroVoiceover = await generateVoiceover(plan.outroScript, LANGUAGE, { gender: 'male' });
   }
 
+  // Step 2.4: Independent research — read the ORIGINAL source and build a fact
+  // sheet per story (who/where/what/numbers/quote). Drives everything the
+  // viewer reads on screen; without it a segment is just moving wallpaper.
+  console.log('\n🔎 Step 2.4: Researching the stories...');
+  let factSheets = [];
+  try {
+    factSheets = await buildFactSheets(detailedArticlesForBot);
+  } catch (e) {
+    console.log(`  ⚠️ Research failed, continuing without fact sheets: ${e.message}`);
+  }
+
   // Step 2.5: Visual Director — phrase-level visual planning
   // If the draft has Nano-generated directives (visual_directives_ai — produced via Nano's own
   // Claude subscription, not a metered API), directVisuals() uses them instead of calling the
@@ -969,8 +981,11 @@ async function main() {
       segDuration = voDuration;
       console.log(`     📐 Segment duration: ${segDuration.toFixed(1)}s (voice: ${voDuration.toFixed(1)}s, video: ${videoDurationSec.toFixed(1)}s — clipped to voice)`);
     } else {
-      segDuration = Math.max(voDuration, 8);
-      console.log(`     📐 Segment ${i} duration: ${segDuration.toFixed(1)}s (voice: ${voDuration.toFixed(1)}s)`);
+      // Breathing tail: narration ends, the picture holds. Without it the last
+      // image of a segment is cut off mid-look and the whole show feels rushed.
+      const TAIL_SECONDS = 2;
+      segDuration = Math.max(voDuration + TAIL_SECONDS, 8);
+      console.log(`     📐 Segment ${i} duration: ${segDuration.toFixed(1)}s (voice: ${voDuration.toFixed(1)}s + ${TAIL_SECONDS}s tail)`);
     }
 
     // Merge Visual Director enrichments (overrides basic AI director choices)
@@ -995,6 +1010,8 @@ async function main() {
       facts: vd.facts || undefined,
       // AI-generated image search queries for Pexels (from visual scenario)
       imageSearchQueries: segment.imageSearchQueries || [],
+      // Researched facts — drives the on-screen identity bar, fact strip and quote
+      factSheet: factSheets[i] || undefined,
       // Animated infographic overlays — Visual Director or basic AI director
       dataOverlays: (vd.dataOverlays && vd.dataOverlays.length > 0) ? vd.dataOverlays : (segment.dataOverlays || []),
       // Visual Director: phrase-level visual blocks (consumed by future VisualBlock renderer)
