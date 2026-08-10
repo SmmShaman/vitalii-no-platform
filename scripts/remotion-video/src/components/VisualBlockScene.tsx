@@ -622,7 +622,11 @@ const BlockContent: React.FC<{
   const hasGraphic =
     block.graphicType !== "none" && block.graphicData != null;
 
-  const sceneEffect = resolveSceneEffect(block);
+  // A data card and a scene effect on the same block fight each other — the
+  // 09.08 render showed "1 200" in the card and "1200" in a counterMosaic at
+  // once. The card carries the real value, so it wins.
+  const resolvedEffect = resolveSceneEffect(block);
+  const sceneEffect = hasGraphic ? null : resolvedEffect;
   const hasSceneEffect = sceneEffect !== null;
 
   // For narrative blocks (no graphic, no scene effect), detect key phrases

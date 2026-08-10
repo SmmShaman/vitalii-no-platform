@@ -178,14 +178,27 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
         <PhotoCollage images={images} accentColor={accentColor} />
       ) : null;
 
-    case "photoCompareSlider":
-      return images.length >= 2 ? (
+    case "photoCompareSlider": {
+      // A FØR/NÅ slider asserts that two photos show the same thing at two
+      // points in time. Two unrelated news photos do not — render it only when
+      // the block carries actual before/after data to label.
+      const cmp =
+        block.graphicType === "comparison"
+          ? (block.graphicData as {
+              left?: { label?: string };
+              right?: { label?: string };
+            } | null)
+          : null;
+      return images.length >= 2 && cmp ? (
         <PhotoCompareSlider
           imageBefore={images[0]}
           imageAfter={images[1]}
+          labelBefore={cmp.left?.label}
+          labelAfter={cmp.right?.label}
           accentColor={accentColor}
         />
       ) : null;
+    }
 
     case "photoVerticalScroll":
       return primaryImage ? (
