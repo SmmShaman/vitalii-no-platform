@@ -66,6 +66,10 @@ export function resolveSceneEffect(block: VisualBlock): SceneEffectType {
   if (explicit && VALID_TYPES.has(explicit as SceneEffectType)) {
     return explicit as SceneEffectType;
   }
+  // "none" is a decision, not a gap: the director already dropped effects that
+  // had no data to show. Falling through to keyword guessing here would put
+  // them straight back (that is how "power grid" became a mosaic animation).
+  if (explicit === "none") return null;
 
   const combined = `${block.sceneDescription || ""} ${block.renderHint || ""}`;
   if (!combined.trim()) return null;

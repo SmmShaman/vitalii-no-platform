@@ -64,3 +64,6 @@ deno.lock
 test-results/
 playwright-report/
 blob-report/
+
+# Local test renders (video artifacts, 130-170 MB each — never commit)
+output/test-renders/

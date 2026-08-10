@@ -30,6 +30,8 @@ import { generateAllAvatarClips } from './generate-avatar.js';
 import { downloadPexelsMedia } from './pexels-media.js';
 import { scrapeAllArticleImages } from './scrape-article-images.js';
 import { directVisuals } from './visual-director.js';
+import { buildFactSheets } from './research-facts.js';
+import { buildKeywordSet, describesSameTopic } from './relevance.js';
 import { callLLMJson } from './llm-helper.js';
 
 // ── Config ──
@@ -538,6 +540,113 @@ async function notifyBotComplete(dateStr, youtubeUrl) {
   }
 }
 
+// ── Visual upgrade helpers (iteration 1) ──
+
+/**
+ * Spread b-roll video clips across visual blocks as moving backgrounds.
+ * Rhythm: the segment opens on the real article photo (authenticity),
+ * then every other block cuts to live stock footage — b-roll takes
+ * priority over yet another static photo (that's the whole point).
+ * Only scene-effect blocks keep their animation, and a clip is only
+ * used for a block it can fully cover (clip duration >= block duration).
+ */
+function assignBRollToBlocks(visualBlocks, videosMeta) {
+  if (!videosMeta || videosMeta.length === 0) return 0;
+  let assigned = 0;
+  let vidIdx = 0;
+  let eligibleSeen = 0;
+  for (const block of visualBlocks) {
+    if (block.sceneEffect && block.sceneEffect !== 'none') continue;
+    if (!block.duration) continue;
+    eligibleSeen++;
+    if (eligibleSeen === 1) continue; // keep the opening block on the article photo
+    if (eligibleSeen % 2 === 0) {
+      // Pick the next clip long enough to cover this block
+      let picked = null;
+      for (let tries = 0; tries < videosMeta.length; tries++) {
+        const candidate = videosMeta[(vidIdx + tries) % videosMeta.length];
+        if (candidate.duration >= block.duration + 0.3) {
+          picked = candidate;
+          vidIdx = vidIdx + tries + 1;
+          break;
+        }
+      }
+      if (picked) {
+        block.bRollVideoSrc = picked.filename;
+        assigned++;
+      }
+    }
+  }
+  return assigned;
+}
+
+/**
+ * Generate cinematic AI frames via Cloudflare Workers AI FLUX (free tier).
+ * One unified style suffix per digest so all AI frames look like a single shoot.
+ * Only fills segments that are still visually sparse after scraping + Pexels.
+ */
+async function generateFluxCinematicFrames(segments, publicDir) {
+  const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID;
+  const CF_API_TOKEN = process.env.CF_API_TOKEN;
+  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
+    console.log('  ⏭️ CF credentials missing — skipping FLUX frames');
+    return;
+  }
+
+  const STYLE_SUFFIX =
+    'cinematic editorial photograph, shallow depth of field, soft volumetric light, ' +
+    'muted teal and warm amber color grade, subtle 35mm film grain, photorealistic, ' +
+    'no text, no watermark, no logos';
+  const MAX_TOTAL = 12;
+  let generated = 0;
+
+  for (let i = 0; i < segments.length && generated < MAX_TOTAL; i++) {
+    const seg = segments[i];
+    if (seg.videoSrc) continue;
+    const existing = seg.alternateImages || [];
+    if (existing.length >= 3) continue;
+
+    const queries = (seg.imageSearchQueries || []).slice(0, 2);
+    if (queries.length === 0 && seg.headline) queries.push(seg.headline);
+
+    let segGenerated = 0;
+    for (const q of queries) {
+      if (generated >= MAX_TOTAL) break;
+      try {
+        const res = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell`,
+          {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CF_API_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: `${q}, ${STYLE_SUFFIX}`, steps: 4, width: 1280, height: 720 }),
+          },
+        );
+        if (!res.ok) continue;
+        const data = await res.json();
+        const b64 = data?.result?.image;
+        if (!b64) continue;
+        const filename = `flux_broll_${i}_${segGenerated}.jpg`;
+        await fs.writeFile(path.join(publicDir, filename), Buffer.from(b64, 'base64'));
+        seg.alternateImages = [...(seg.alternateImages || []), filename];
+        generated++;
+        segGenerated++;
+      } catch {
+        // Skip failed generations silently — real photos remain the fallback
+      }
+    }
+
+    if (segGenerated > 0) {
+      seg.imageCycleDuration = Math.max(
+        3,
+        Math.round(Number(seg.durationSeconds) / (seg.alternateImages.length + 1)),
+      );
+      console.log(`  🎨 Segment ${i}: +${segGenerated} FLUX cinematic frames`);
+    }
+  }
+
+  console.log(`  🎨 FLUX total: ${generated} frames`);
+}
+
 // ── Main ──
 
 async function main() {
@@ -615,10 +724,20 @@ async function main() {
   }
 
   // Generate TTS for intro script (male voice — main host)
+  //
+  // The host introduces himself by name. The LLM-written opening was neither
+  // reliable nor always intelligible, and the show never said whose it was.
+  const HOST_NAME = 'Vitalii Berbeha';
+  const introGreeting = LANGUAGE === 'no'
+    ? `Hei, jeg heter ${HOST_NAME}, og dette er dagens nyhetsoppdatering for ${displayDate}.`
+    : `Hi, my name is ${HOST_NAME}, and this is your news update for ${displayDate}.`;
+  const introScript = `${introGreeting} ${plan.introScript || ''}`.trim();
+
   let introVoiceover = null;
-  if (plan.introScript) {
+  if (introScript) {
     console.log('\n  🎙️ Intro voiceover (male)...');
-    introVoiceover = await generateVoiceover(plan.introScript, LANGUAGE, { gender: 'male' });
+    console.log(`     "${introScript.slice(0, 120)}"`);
+    introVoiceover = await generateVoiceover(introScript, LANGUAGE, { gender: 'male' });
   }
 
   // Generate TTS for roundup script (female voice — co-host)
@@ -652,6 +771,17 @@ async function main() {
   if (plan.outroScript) {
     console.log('\n  🎙️ Outro voiceover (male)...');
     outroVoiceover = await generateVoiceover(plan.outroScript, LANGUAGE, { gender: 'male' });
+  }
+
+  // Step 2.4: Independent research — read the ORIGINAL source and build a fact
+  // sheet per story (who/where/what/numbers/quote). Drives everything the
+  // viewer reads on screen; without it a segment is just moving wallpaper.
+  console.log('\n🔎 Step 2.4: Researching the stories...');
+  let factSheets = [];
+  try {
+    factSheets = await buildFactSheets(detailedArticlesForBot);
+  } catch (e) {
+    console.log(`  ⚠️ Research failed, continuing without fact sheets: ${e.message}`);
   }
 
   // Step 2.5: Visual Director — phrase-level visual planning
@@ -690,9 +820,21 @@ async function main() {
   const totalQueries = visualDirectives.reduce((s, vd) => s + (vd?.visualBlocks || []).filter(b => b.imageSearchQuery).length, 0);
   console.log(`  📊 Total blocks: ${totalBlocks}, with imageSearchQuery: ${totalQueries}`);
 
+  // Topic vocabulary per story, so a search result is judged on what its own
+  // title says, not merely on having answered the query string.
+  const phraseKeywords = detailedArticlesForBot.map((a, idx) =>
+    buildKeywordSet(a.title_no || a.title_en || '', factSheets[idx]),
+  );
+  /** Pick the first candidate whose description matches the story; else the first. */
+  const pickOnTopic = (candidates, keywords) => {
+    const hit = candidates.find(c => c.url && describesSameTopic(c.description, keywords));
+    return (hit || candidates.find(c => c.url) || {}).url || null;
+  };
+
   if (hasImageSearch && totalQueries > 0) {
     for (let i = 0; i < visualDirectives.length; i++) {
       const blocks = visualDirectives[i]?.visualBlocks || [];
+      const keywords = phraseKeywords[i] || new Set();
       let phraseImagesFound = 0;
       for (let j = 0; j < blocks.length; j++) {
         const query = blocks[j].imageSearchQuery;
@@ -709,7 +851,10 @@ async function main() {
             });
             if (resp.ok) {
               const data = await resp.json();
-              imgUrl = data.images?.[0]?.imageUrl;
+              imgUrl = pickOnTopic(
+                (data.images || []).map(r => ({ url: r.imageUrl, description: `${r.title || ''} ${r.source || ''}` })),
+                keywords,
+              );
             }
           }
 
@@ -722,7 +867,13 @@ async function main() {
               const resp = await fetch(`https://www.googleapis.com/customsearch/v1?${params}`);
               if (resp.ok) {
                 const data = await resp.json();
-                imgUrl = data.items?.[0]?.link;
+                imgUrl = pickOnTopic(
+                  (data.items || []).map(r => ({
+                    url: r.link,
+                    description: `${r.title || ''} ${r.snippet || ''} ${r.image?.contextLink || ''}`,
+                  })),
+                  keywords,
+                );
               }
             } catch { /* skip */ }
           }
@@ -735,7 +886,11 @@ async function main() {
               });
               if (pxResp.ok) {
                 const pxData = await pxResp.json();
-                imgUrl = pxData.photos?.[0]?.src?.large2x || pxData.photos?.[0]?.src?.large;
+                // Stock is the weakest source: require it to be on topic, or skip
+                const onTopic = (pxData.photos || [])
+                  .map(p => ({ url: p.src?.large2x || p.src?.large, description: p.alt || '' }))
+                  .find(c => c.url && describesSameTopic(c.description, keywords));
+                imgUrl = onTopic ? onTopic.url : null;
               }
             } catch { /* skip */ }
           }
@@ -862,8 +1017,11 @@ async function main() {
       segDuration = voDuration;
       console.log(`     📐 Segment duration: ${segDuration.toFixed(1)}s (voice: ${voDuration.toFixed(1)}s, video: ${videoDurationSec.toFixed(1)}s — clipped to voice)`);
     } else {
-      segDuration = Math.max(voDuration, 8);
-      console.log(`     📐 Segment ${i} duration: ${segDuration.toFixed(1)}s (voice: ${voDuration.toFixed(1)}s)`);
+      // Breathing tail: narration ends, the picture holds. Without it the last
+      // image of a segment is cut off mid-look and the whole show feels rushed.
+      const TAIL_SECONDS = 2;
+      segDuration = Math.max(voDuration + TAIL_SECONDS, 8);
+      console.log(`     📐 Segment ${i} duration: ${segDuration.toFixed(1)}s (voice: ${voDuration.toFixed(1)}s + ${TAIL_SECONDS}s tail)`);
     }
 
     // Merge Visual Director enrichments (overrides basic AI director choices)
@@ -888,12 +1046,20 @@ async function main() {
       facts: vd.facts || undefined,
       // AI-generated image search queries for Pexels (from visual scenario)
       imageSearchQueries: segment.imageSearchQueries || [],
+      // Researched facts — drives the on-screen identity bar, fact strip and quote
+      factSheet: factSheets[i] || undefined,
       // Animated infographic overlays — Visual Director or basic AI director
       dataOverlays: (vd.dataOverlays && vd.dataOverlays.length > 0) ? vd.dataOverlays : (segment.dataOverlays || []),
       // Visual Director: phrase-level visual blocks (consumed by future VisualBlock renderer)
       visualBlocks: vd.visualBlocks || [],
     });
   }
+
+  // What each story is about — headline + researched entities. Used to reject
+  // stock and web photos whose own description is about something else.
+  const segmentKeywords = segments.map((s) =>
+    buildKeywordSet(s.headline, s.factSheet, s.imageSearchQueries || []),
+  );
 
   // Step 3.5: Download web images found during media pre-check (from daily-video-bot)
   // IMPORTANT: Remotion <Img> in headless Chrome can't reliably load external HTTP URLs.
@@ -953,8 +1119,9 @@ async function main() {
     console.log(`⚠️ Article scraping failed, continuing: ${e.message}`);
   }
 
-  // Pexels disabled — only real news photos from Serper + article scraping
-  console.log('\n⏭️ Pexels disabled — using only real news photos');
+  // Pexels stock media re-enabled (visual upgrade iteration 1):
+  // b-roll videos + fill photos are fetched AFTER per-phrase images (Step 3a-5 below),
+  // so block assignment can see which blocks already have contextual photos.
 
   // Step 4a-3: Deduplicate images per segment
   // Problem: same photo from DB, Google Search, and article scraping creates duplicates.
@@ -1038,6 +1205,56 @@ async function main() {
         }
       }
     }
+  }
+
+  // Step 4a-5: Pexels stock media — b-roll videos woven into visual blocks + fill photos
+  console.log('\n🎞️ Step 3a-5: Pexels b-roll videos + fill photos...');
+  try {
+    const pexelsInput = segments.map((s) => ({
+      headline: s.headline,
+      category: s.category,
+      imageSearchQueries: s.imageSearchQueries || [],
+    }));
+    const pexelsMedia = await downloadPexelsMedia(pexelsInput, publicDir, {
+      isRelevant: (segIndex, description) =>
+        describesSameTopic(description, segmentKeywords[segIndex] || new Set()),
+    });
+
+    for (let i = 0; i < segments.length; i++) {
+      if (segments[i].videoSrc) continue; // segment already has the article's own video
+      const media = pexelsMedia[i];
+      if (!media) continue;
+
+      // Fill photos: top up cycling variety to ~5 images per segment
+      const existing = segments[i].alternateImages || [];
+      if (existing.length < 5 && media.images.length > 0) {
+        segments[i].alternateImages = [...new Set([...existing, ...media.images])].slice(0, 8);
+        segments[i].imageCycleDuration = Math.max(
+          3,
+          Math.round(Number(segments[i].durationSeconds) / (segments[i].alternateImages.length + 1)),
+        );
+        console.log(`  🖼️ Segment ${i}: +${segments[i].alternateImages.length - existing.length} Pexels fill photos`);
+      }
+
+      // B-roll videos → assign to visual blocks (moving background instead of static photo)
+      if (media.videos.length > 0 && segments[i].visualBlocks && segments[i].visualBlocks.length > 0) {
+        const meta = (media.videosMeta && media.videosMeta.length > 0)
+          ? media.videosMeta
+          : media.videos.map((f) => ({ filename: f, duration: 5 }));
+        const assigned = assignBRollToBlocks(segments[i].visualBlocks, meta);
+        console.log(`  🎬 Segment ${i}: ${media.videos.length} b-roll clips → ${assigned} blocks`);
+      }
+    }
+  } catch (e) {
+    console.log(`⚠️ Pexels media failed, continuing: ${e.message}`);
+  }
+
+  // Step 4a-6: FLUX cinematic frames — unified visual style for sparse segments
+  console.log('\n🎨 Step 3a-6: FLUX cinematic frames...');
+  try {
+    await generateFluxCinematicFrames(segments, publicDir);
+  } catch (e) {
+    console.log(`⚠️ FLUX frames failed, continuing: ${e.message}`);
   }
 
   // Step 4b: Generate avatar clips (if enabled)

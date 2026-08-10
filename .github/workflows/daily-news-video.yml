@@ -147,7 +147,10 @@ jobs:
       github.event_name == 'repository_dispatch' ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.mode == 'render')
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The pipeline grew a research pass, fact verification and stock b-roll:
+    # the 09.08 comparison renders took 47-52 minutes, too close to the old
+    # 60-minute cap for a run nobody is watching.
+    timeout-minutes: 90
 
     steps:
       - name: Checkout repository
@@ -183,8 +186,12 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
-          # LLM (NVIDIA NIM primary, Claude fallback)
+          # LLM (NVIDIA NIM primary → free Gemini → Claude)
           NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          # llm-helper's middle fallback. Never passed before, so on 2026-08-10
+          # the chain was NVIDIA (aborting at 120s) → Claude (no credits) and the
+          # Visual Director died on all 7 segments.
+          GEMINI_FREE_API_KEY: ${{ secrets.GEMINI_FREE_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
           # Google AI (Gemini — LLM fallback + thumbnail)

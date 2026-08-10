@@ -22,7 +22,13 @@ const ICON_PATHS: Record<string, string> = {
   lightning: "M7 2v11h3v9l7-12h-4l4-8z",
 };
 
-// Parse icon names from scene description
+/**
+ * Legacy fallback: guess icons from the storyboard prose.
+ *
+ * Kept only for blocks that predate explicit `icons`. It matches substrings, so
+ * "startup" scores art→palette and "email"/"Ukraine" score ai→brain; callers
+ * should pass a real list instead.
+ */
 function parseIcons(description: string): string[] {
   const iconMap: Record<string, string> = {
     laptop: "laptop", computer: "laptop", tech: "laptop", software: "laptop",
@@ -50,6 +56,8 @@ function parseIcons(description: string): string[] {
 }
 
 interface IconStaggerProps {
+  /** Explicit icon names chosen for this article — preferred over prose guessing */
+  icons?: string[];
   sceneDescription?: string;
   accentColor: string;
   iconSize?: number;
@@ -57,6 +65,7 @@ interface IconStaggerProps {
 }
 
 export const IconStagger: React.FC<IconStaggerProps> = ({
+  icons: explicitIcons,
   sceneDescription = "",
   accentColor,
   iconSize = 72,
@@ -65,7 +74,10 @@ export const IconStagger: React.FC<IconStaggerProps> = ({
   const frame = useCurrentFrame();
   const { fps, width, height, durationInFrames } = useVideoConfig();
 
-  const icons = parseIcons(sceneDescription);
+  const icons =
+    explicitIcons && explicitIcons.length > 0
+      ? explicitIcons
+      : parseIcons(sceneDescription);
   const totalWidth = icons.length * (iconSize + 40);
   const startX = (width - totalWidth) / 2;
   const centerY = height * 0.4;

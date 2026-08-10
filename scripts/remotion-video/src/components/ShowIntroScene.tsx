@@ -278,6 +278,24 @@ export const ShowIntroScene: React.FC<ShowIntroSceneProps> = ({
           {showTitle}
         </div>
 
+        {/* Host — the show never said whose it was */}
+        <div
+          style={{
+            marginTop: 14,
+            transform: `translateY(${dateY}px)`,
+            opacity: dateOpacity,
+            fontSize: typography.scale.body,
+            fontWeight: 700,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            color: accentColor,
+            fontFamily: typography.fontFamily.primary,
+            textShadow: "0 1px 10px rgba(0,0,0,0.7)",
+          }}
+        >
+          Vitalii Berbeha
+        </div>
+
         {/* Date */}
         <div
           style={{

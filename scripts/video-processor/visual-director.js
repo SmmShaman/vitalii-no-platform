@@ -301,7 +301,39 @@ function extractDataPoints(text) {
     pts.push({ type: 'count', value: m[0].trim(), raw: m[0] });
   }
 
+  // Directional change: "økte med 40 prosent", "falt 12%", "grew by 30 percent"
+  const dirRe = /(økte|steg|vokste|opp|økning|grew|rose|increased|up|falt|sank|ned|nedgang|fell|dropped|decreased|down)\D{0,20}?(\d+[\.,]?\d*)\s*(%|prosent|percent)/gi;
+  while ((m = dirRe.exec(text)) !== null) {
+    const down = /falt|sank|ned|nedgang|fell|dropped|decreased|down/i.test(m[1]);
+    const magnitude = parseFloat(m[2].replace(',', '.'));
+    pts.push({
+      type: 'delta',
+      value: m[2].replace(',', '.') + '%',
+      changePct: down ? -magnitude : magnitude,
+      raw: m[0],
+    });
+  }
+
   return pts;
+}
+
+/**
+ * Build a bar-chart series when a phrase enumerates several comparable numbers,
+ * e.g. "Norge 40 prosent, Sverige 25 prosent, Danmark 18 prosent".
+ * Returns null unless at least two label+value pairs share a unit.
+ */
+function extractSeries(text) {
+  const re = /([A-ZÆØÅА-ЯІЇЄҐ][\wæøåÆØÅ\-]{2,}(?:\s+[A-ZÆØÅ][\wæøå\-]+)?)\s*[:–-]?\s*(\d+[\.,]?\d*)\s*(%|prosent|percent|millioner?|milliarder?)/g;
+  const items = [];
+  let m;
+  while ((m = re.exec(text)) !== null) {
+    const unit = /%|prosent|percent/i.test(m[3]) ? '%' : ` ${m[3]}`;
+    items.push({ label: m[1].trim(), value: m[2].replace(',', '.') + unit });
+  }
+  if (items.length < 2) return null;
+  const units = new Set(items.map(it => it.value.replace(/[\d.,]/g, '')));
+  if (units.size > 1) return null;
+  return items.slice(0, 4);
 }
 
 /**
@@ -449,12 +481,21 @@ PHRASE FIELDS:
 - "textEffect": typewriter | fadeUp | blurReveal | springPop | splitScale | wordFade | slideIn | glitchIn (vary between phrases! glitchIn only for urgent/breaking moods)
 - "graphicType": counter | keyFigure | comparison | barChart | bulletList | none
 - "graphicData": ONLY real numbers from article with meaningful labels
+- "icons": REQUIRED when sceneEffect is "iconStagger" — 3-5 names from this list ONLY, chosen for THIS article's subject:
+  laptop | brain | chart | shield | globe | medical | factory | rocket | palette | dollar | target | lightning
+  (a fish-farming story is factory+globe, a tax story is dollar+chart — never a generic laptop+chart+globe)
+- "milestones": REQUIRED when sceneEffect is "progressTimeline" — 3-5 SHORT real steps from the article
+  (e.g. ["2019: pilot", "2024: 12 fartøy", "2030: hele flåten"]) — never generic "Start/Progress/Goal"
 - "backgroundEffect": kenBurns | zoomPulse | slowPan | colorShift | pushIn | parallaxDrift | pulseGlow (vary!)
 - "triggerImageChange": true every other phrase
 
 RULES:
 - NO effect without specific context — every effect must illustrate the phrase's MEANING
 - sceneEffect is an explicit choice, not a guess — pick "none" rather than force-fitting one of the 17 types to a phrase it doesn't truly match
+- AN EFFECT WITHOUT ITS DATA IS DROPPED, not rendered empty. If you pick counterMosaic/dataDashboard/splitScreen
+  you MUST supply graphicData; iconStagger needs "icons"; progressTimeline needs "milestones". No data → write "none".
+- splitScreen means TWO REAL LABELLED VALUES from the article (before/after, us/them). Never pick it just to
+  divide the screen — an empty Før/Nå panel is the single worst frame this show can produce.
 - Adjacent phrases: different textEffect AND different backgroundEffect
 - graphicData labels must be DESCRIPTIVE (not empty "", but "Daglige ChatGPT-søk" or "Markedsandel")
 - Use 3+ DIFFERENT effect types per segment — don't repeat the same pattern
@@ -477,6 +518,8 @@ Return JSON:
       "textEffect": "springPop",
       "graphicType": "counter",
       "graphicData": { "value": "3000000", "label": "Daglige ChatGPT-søk" },
+      "icons": [],
+      "milestones": [],
       "backgroundEffect": "zoomPulse",
       "triggerImageChange": false
     }
@@ -608,18 +651,49 @@ function fallbackDirectVisuals(segmentScripts, segments, segmentVoiceovers) {
       let graphicType = cls.graphicType;
       let graphicData = null;
 
-      if (graphicType !== 'none' && dataPoints.length > 0) {
-        const dp = dataPoints[0];
-        if (dp.type === 'percentage') {
-          graphicType = 'counter';
-          graphicData = { value: dp.value + '%', label: '' };
-        } else if (dp.type === 'comparison') {
+      // Series (several comparable numbers) outranks a single figure — it's a real chart
+      const series = extractSeries(phrase.text);
+
+      // A phrase carrying real data deserves a chart even when the keyword
+      // classifier saw no data cue — the numbers ARE the cue. (Before this,
+      // graphics only appeared when both the keyword and the number matched,
+      // which is why whole digests rendered without a single chart.)
+      const hasStrongData =
+        series ||
+        dataPoints.some(p =>
+          p.type === 'comparison' || p.type === 'delta' || p.type === 'percentage',
+        );
+      if (graphicType === 'none' && hasStrongData) {
+        graphicType = 'keyFigure';
+      }
+
+      if (graphicType !== 'none' && series) {
+        graphicType = 'barChart';
+        graphicData = { items: series, label: '' };
+      } else if (graphicType !== 'none' && dataPoints.length > 0) {
+        // Prefer the richest form available in this phrase
+        const dp =
+          dataPoints.find(p => p.type === 'comparison') ||
+          dataPoints.find(p => p.type === 'delta') ||
+          dataPoints[0];
+
+        if (dp.type === 'comparison') {
           graphicType = 'comparison';
           const u = (dp.unit === '%' || dp.unit === 'prosent') ? '%' : '';
           graphicData = {
             left:  { label: 'Før', value: dp.from + u },
             right: { label: 'Nå',  value: dp.to + u },
           };
+        } else if (dp.type === 'delta') {
+          graphicType = 'keyFigure';
+          graphicData = {
+            value: dp.value,
+            label: dp.changePct >= 0 ? 'Økning' : 'Nedgang',
+            changePct: dp.changePct,
+          };
+        } else if (dp.type === 'percentage') {
+          graphicType = 'counter';
+          graphicData = { value: dp.value + '%', label: '' };
         } else if (dp.type === 'money' || dp.type === 'count') {
           graphicType = 'keyFigure';
           graphicData = { value: dp.value, label: '' };
@@ -642,6 +716,32 @@ function fallbackDirectVisuals(segmentScripts, segments, segmentVoiceovers) {
         triggerImageChange: j > 0 && j % 2 === 0,
       };
     });
+
+    // 2b. Cap graphics per segment so charts stay an accent, not wallpaper.
+    // Keep the richest forms and never two in a row.
+    const GRAPHIC_RANK = { barChart: 4, comparison: 3, keyFigure: 2, counter: 1 };
+    const MAX_GRAPHICS_PER_SEGMENT = 3;
+    const graphicIdx = visualBlocks
+      .map((b, j) => ({ j, rank: GRAPHIC_RANK[b.graphicType] || 0 }))
+      .filter(x => x.rank > 0)
+      .sort((a, b) => b.rank - a.rank || a.j - b.j);
+
+    const keep = new Set();
+    for (const cand of graphicIdx) {
+      if (keep.size >= MAX_GRAPHICS_PER_SEGMENT) break;
+      if (keep.has(cand.j - 1) || keep.has(cand.j + 1)) continue;
+      keep.add(cand.j);
+    }
+    for (let j = 0; j < visualBlocks.length; j++) {
+      if (visualBlocks[j].graphicType !== 'none' && !keep.has(j)) {
+        visualBlocks[j].graphicType = 'none';
+        visualBlocks[j].graphicData = null;
+      }
+    }
+    const graphicCount = keep.size;
+    if (graphicCount > 0) {
+      console.log(`    📊 Seg ${i + 1}: ${graphicCount} data graphics (${[...keep].map(j => visualBlocks[j].graphicType).join(', ')})`);
+    }
 
     // 3. Segment-level directives (variety across segments)
     const cat = seg.category || 'news';
@@ -754,6 +854,168 @@ function ensureVariety(directives) {
 //  Merge AI phrases with subtitle timestamps
 // ═══════════════════════════════════════════════════════════════════
 
+// Effect types the renderer accepts. Anything else (including "none") means no effect.
+const VALID_SCENE_EFFECTS = new Set([
+  'counterMosaic', 'splitScreen', 'mosaicGrid', 'iconStagger', 'pixelDissolve',
+  'circuitBoard', 'progressTimeline', 'alertPulse', 'globe3D', 'noiseWave',
+  'dataDashboard', 'matrixRain', 'photoScrollColumns', 'photoSplitScreen',
+  'photoZoomReveal', 'photoCollage', 'photoCompareSlider', 'photoVerticalScroll',
+  'photoFilterTransition',
+]);
+
+const VALID_ICONS = new Set([
+  'laptop', 'brain', 'chart', 'shield', 'globe', 'medical', 'factory',
+  'rocket', 'palette', 'dollar', 'target', 'lightning',
+]);
+
+/**
+ * Gate an effect on the data it needs to say anything.
+ *
+ * A data effect with no data does not degrade gracefully: it dims the photo to
+ * 30% and draws an empty shell — the "blurred screen showing only Før/Nå" the
+ * owner flagged. Dropping it here (rather than in the renderer alone) also lets
+ * b-roll reclaim the block, since b-roll skips effect blocks.
+ *
+ * Returns the effect name to keep, or 'none'.
+ */
+function gateSceneEffect(block) {
+  const effect = block.sceneEffect;
+  if (!effect || !VALID_SCENE_EFFECTS.has(effect)) return 'none';
+
+  const data = block.graphicData || {};
+
+  switch (effect) {
+    case 'splitScreen': {
+      const l = data.left, r = data.right;
+      const filled = v => v && String(v.value ?? '').trim().length > 0;
+      return filled(l) && filled(r) ? effect : 'none';
+    }
+    case 'counterMosaic': {
+      const n = parseFloat(String(data.value ?? '').replace(/[^0-9.,]/g, '').replace(',', '.'));
+      return isFinite(n) && n !== 0 ? effect : 'none';
+    }
+    case 'dataDashboard': {
+      const hasItems = Array.isArray(data.items) && data.items.length > 0;
+      const hasValue = String(data.value ?? '').trim().length > 0;
+      return hasItems || hasValue ? effect : 'none';
+    }
+    case 'iconStagger':
+      return Array.isArray(block.icons) && block.icons.length >= 2 ? effect : 'none';
+    case 'progressTimeline':
+      return Array.isArray(block.milestones) && block.milestones.length >= 2 ? effect : 'none';
+    case 'photoCompareSlider':
+      // Asserts a before/after — only honest with real comparison data
+      return block.graphicType === 'comparison' && data.left && data.right ? effect : 'none';
+    default:
+      // Atmospheric effects (globe3D, noiseWave, circuitBoard, …) need no data
+      return effect;
+  }
+}
+
+// Effects that carry article content vs. effects that are pure atmosphere.
+// Atmosphere passes the data gate for free, so it needs its own budget —
+// otherwise it would crowd out the live b-roll (b-roll skips effect blocks).
+const CONTENT_EFFECTS = new Set([
+  'splitScreen', 'counterMosaic', 'dataDashboard', 'iconStagger', 'progressTimeline',
+  'photoCompareSlider', 'photoSplitScreen', 'photoZoomReveal', 'photoCollage',
+  'photoVerticalScroll', 'photoFilterTransition', 'photoScrollColumns',
+]);
+
+/**
+ * Keep at most `max` effects per segment, content-bearing ones first,
+ * never two in a row. Mutates blocks, returns the surviving effect names.
+ */
+function capSceneEffects(visualBlocks, max = 3) {
+  const ranked = visualBlocks
+    .map((b, j) => ({ j, effect: b.sceneEffect }))
+    .filter(x => x.effect && x.effect !== 'none')
+    .sort((a, b) => {
+      const rank = e => (CONTENT_EFFECTS.has(e) ? 1 : 0);
+      return rank(b.effect) - rank(a.effect) || a.j - b.j;
+    });
+
+  const keep = new Set();
+  for (const cand of ranked) {
+    if (keep.size >= max) break;
+    if (keep.has(cand.j - 1) || keep.has(cand.j + 1)) continue;
+    keep.add(cand.j);
+  }
+  for (let j = 0; j < visualBlocks.length; j++) {
+    if (!keep.has(j)) visualBlocks[j].sceneEffect = 'none';
+  }
+  return [...keep].sort((a, b) => a - b).map(j => visualBlocks[j].sceneEffect);
+}
+
+/**
+ * Derive a data graphic straight from a phrase's own numbers.
+ * Used as the floor for BOTH paths: the LLM almost never fills graphicData,
+ * so without this the digest renders with no charts at all.
+ * Returns null when the phrase carries no chartable data.
+ */
+function deriveGraphicFromText(text) {
+  const series = extractSeries(text);
+  if (series) return { graphicType: 'barChart', graphicData: { items: series, label: '' } };
+
+  const dps = extractDataPoints(text);
+  const dp =
+    dps.find(p => p.type === 'comparison') ||
+    dps.find(p => p.type === 'delta') ||
+    dps.find(p => p.type === 'percentage') ||
+    dps.find(p => p.type === 'money' || p.type === 'count');
+  if (!dp) return null;
+
+  if (dp.type === 'comparison') {
+    const u = (dp.unit === '%' || dp.unit === 'prosent') ? '%' : '';
+    return {
+      graphicType: 'comparison',
+      graphicData: {
+        left:  { label: 'Før', value: dp.from + u },
+        right: { label: 'Nå',  value: dp.to + u },
+      },
+    };
+  }
+  if (dp.type === 'delta') {
+    return {
+      graphicType: 'keyFigure',
+      graphicData: {
+        value: dp.value,
+        label: dp.changePct >= 0 ? 'Økning' : 'Nedgang',
+        changePct: dp.changePct,
+      },
+    };
+  }
+  if (dp.type === 'percentage') {
+    return { graphicType: 'counter', graphicData: { value: dp.value + '%', label: '' } };
+  }
+  return { graphicType: 'keyFigure', graphicData: { value: dp.value, label: '' } };
+}
+
+/**
+ * Keep at most MAX graphics per segment, richest first, never two adjacent.
+ * Charts should punctuate the segment, not wallpaper it.
+ */
+function capGraphics(visualBlocks, max = 3) {
+  const RANK = { barChart: 4, comparison: 3, keyFigure: 2, counter: 1 };
+  const ranked = visualBlocks
+    .map((b, j) => ({ j, rank: RANK[b.graphicType] || 0 }))
+    .filter(x => x.rank > 0 && visualBlocks[x.j].graphicData)
+    .sort((a, b) => b.rank - a.rank || a.j - b.j);
+
+  const keep = new Set();
+  for (const cand of ranked) {
+    if (keep.size >= max) break;
+    if (keep.has(cand.j - 1) || keep.has(cand.j + 1)) continue;
+    keep.add(cand.j);
+  }
+  for (let j = 0; j < visualBlocks.length; j++) {
+    if (visualBlocks[j].graphicType !== 'none' && !keep.has(j)) {
+      visualBlocks[j].graphicType = 'none';
+      visualBlocks[j].graphicData = null;
+    }
+  }
+  return [...keep].map(j => visualBlocks[j].graphicType);
+}
+
 /**
  * AI returns phrases without precise timestamps.
  * We align them with subtitle-based phrase boundaries.
@@ -765,7 +1027,31 @@ function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
   const visualBlocks = timedPhrases.map((tp, j) => {
     // Pick the closest AI phrase (by index, since order should match)
     const ap = aiPhrases[j] || aiPhrases[aiPhrases.length - 1] || {};
-    return {
+
+    // The LLM rarely fills graphicData — fall back to the phrase's own numbers
+    let graphicType = ap.graphicType || 'none';
+    let graphicData = ap.graphicData || null;
+    if (graphicType === 'none' || !graphicData) {
+      const derived = deriveGraphicFromText(tp.text);
+      if (derived) {
+        graphicType = derived.graphicType;
+        graphicData = derived.graphicData;
+      } else {
+        graphicType = 'none';
+        graphicData = null;
+      }
+    }
+
+    // Structured content for symbol effects — taken from the model's explicit
+    // fields, not scraped out of its English storyboard prose.
+    const icons = Array.isArray(ap.icons)
+      ? ap.icons.map(s => String(s).toLowerCase().trim()).filter(s => VALID_ICONS.has(s)).slice(0, 6)
+      : [];
+    const milestones = Array.isArray(ap.milestones)
+      ? ap.milestones.map(s => String(s).trim()).filter(Boolean).slice(0, 5)
+      : [];
+
+    const block = {
       phraseText: tp.text,
       startTime: tp.startTime,
       endTime: tp.endTime,
@@ -775,12 +1061,33 @@ function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
       renderHint: ap.renderHint || '',
       visualMetaphor: ap.metaphor || 'narrative',
       textEffect: ap.textEffect || 'fadeUp',
-      graphicType: ap.graphicType || 'none',
-      graphicData: ap.graphicData || null,
+      // The model's explicit choice is now honoured; keyword-guessing the
+      // storyboard prose was picking effects off words like "grid" and "wave".
+      sceneEffect: ap.sceneEffect,
+      icons,
+      milestones,
+      graphicType,
+      graphicData,
       backgroundEffect: ap.backgroundEffect || 'kenBurns',
       triggerImageChange: ap.triggerImageChange ?? (j > 0 && j % 2 === 0),
     };
+
+    block.sceneEffect = gateSceneEffect(block);
+    return block;
   });
+
+  const kept = capGraphics(visualBlocks);
+  if (kept.length > 0) {
+    console.log(`    📊 ${kept.length} data graphics: ${kept.join(', ')}`);
+  }
+
+  const asked = aiPhrases.filter(p => p.sceneEffect && p.sceneEffect !== 'none').length;
+  const gated = visualBlocks.filter(b => b.sceneEffect !== 'none').length;
+  const liveEffects = capSceneEffects(visualBlocks);
+  console.log(
+    `    🎭 scene effects: ${asked} requested → ${gated} had data → ${liveEffects.length} kept` +
+    (liveEffects.length ? ` (${liveEffects.join(', ')})` : ''),
+  );
 
   return visualBlocks;
 }

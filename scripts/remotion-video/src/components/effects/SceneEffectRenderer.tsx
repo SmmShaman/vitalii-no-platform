@@ -58,17 +58,20 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
         />
       );
 
-    case "iconStagger":
-      return (
-        <IconStagger
-          sceneDescription={desc}
-          accentColor={accentColor}
-        />
-      );
+    case "iconStagger": {
+      // Icons must name what the story is about. Substring-matching the English
+      // storyboard put a palette on every "startup" and a brain on every
+      // "email"; without a real list there is nothing worth showing.
+      const icons = block.icons || [];
+      return icons.length >= 2 ? (
+        <IconStagger icons={icons} accentColor={accentColor} />
+      ) : null;
+    }
 
     case "counterMosaic": {
       const raw = String(data.value || "");
       const num = parseFloat(raw.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0;
+      if (!num) return null; // a giant animated zero says nothing
       const suffix = raw.includes("%") ? "%" : raw.includes("M") ? "M" : "";
       const label = String(data.label || "");
       return (
@@ -82,15 +85,17 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
     }
 
     case "splitScreen": {
-      // Extract left/right from graphicData (comparison type) or parse from description
-      const left = data.left as { label: string; value: string } | undefined;
-      const right = data.right as { label: string; value: string } | undefined;
+      // Empty Før/Nå panels over a dimmed photo were the worst frames in the
+      // 09.08 render — no values, no effect.
+      const left = data.left as { label?: string; value?: string } | undefined;
+      const right = data.right as { label?: string; value?: string } | undefined;
+      if (!left?.value || !right?.value) return null;
       return (
         <SplitScreenPanel
-          leftLabel={left?.label || "Før"}
-          leftContent={left?.value || ""}
-          rightLabel={right?.label || "Nå"}
-          rightContent={right?.value || ""}
+          leftLabel={left.label || "Før"}
+          leftContent={left.value}
+          rightLabel={right.label || "Nå"}
+          rightContent={right.value}
           accentColor={accentColor}
         />
       );
@@ -114,13 +119,19 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
       );
 
     case "progressTimeline": {
-      const milestones = parseMilestones(desc);
-      return (
-        <ProgressTimeline
-          milestones={milestones}
-          accentColor={accentColor}
-        />
-      );
+      // Real steps from the article, or nothing — the old parser fell back to
+      // a generic "Start → Progress → Goal" that fit any story and told none.
+      const milestones =
+        block.milestones && block.milestones.length >= 2
+          ? block.milestones
+          : parseMilestones(desc);
+      const isPlaceholder =
+        milestones.length === 3 &&
+        milestones[0] === "Start" &&
+        milestones[2] === "Goal";
+      return milestones.length >= 2 && !isPlaceholder ? (
+        <ProgressTimeline milestones={milestones} accentColor={accentColor} />
+      ) : null;
     }
 
     case "globe3D":
@@ -131,7 +142,9 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
 
     case "dataDashboard": {
       const values = extractValues(data);
-      return <DataDashboard accentColor={accentColor} values={values} />;
+      return values.length > 0 ? (
+        <DataDashboard accentColor={accentColor} values={values} />
+      ) : null;
     }
 
     case "matrixRain":
@@ -178,14 +191,27 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
         <PhotoCollage images={images} accentColor={accentColor} />
       ) : null;
 
-    case "photoCompareSlider":
-      return images.length >= 2 ? (
+    case "photoCompareSlider": {
+      // A FØR/NÅ slider asserts that two photos show the same thing at two
+      // points in time. Two unrelated news photos do not — render it only when
+      // the block carries actual before/after data to label.
+      const cmp =
+        block.graphicType === "comparison"
+          ? (block.graphicData as {
+              left?: { label?: string };
+              right?: { label?: string };
+            } | null)
+          : null;
+      return images.length >= 2 && cmp ? (
         <PhotoCompareSlider
           imageBefore={images[0]}
           imageAfter={images[1]}
+          labelBefore={cmp.left?.label}
+          labelAfter={cmp.right?.label}
           accentColor={accentColor}
         />
       ) : null;
+    }
 
     case "photoVerticalScroll":
       return primaryImage ? (

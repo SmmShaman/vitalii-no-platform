@@ -43,6 +43,19 @@ import { getMoodConfig } from "../design-system/moods";
 import { Particles, Spawner, Behavior } from "remotion-bits";
 import type { VisualBlock } from "../compositions/DailyNewsShow";
 import { resolveSceneEffect, SceneEffectRenderer } from "./effects";
+import {
+  BeforeAfterChart,
+  DeltaFigure,
+  SeriesBarChart,
+  ShareDonut,
+} from "./DataViz";
+import {
+  IdentityBar,
+  FactStrip,
+  QuoteCard,
+  buildFactLines,
+  type FactSheet,
+} from "./NewsIdentity";
 
 // ── Props ──
 
@@ -58,6 +71,8 @@ export interface VisualBlockSceneProps {
   mood?: string;
   alternateImages?: string[];
   visualBlocks: VisualBlock[];
+  /** Researched facts for this story — identity bar, fact strip, quote */
+  factSheet?: FactSheet;
 }
 
 // ── Pan direction lookup (per-image variety) ──
@@ -87,6 +102,7 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
   mood,
   alternateImages,
   visualBlocks,
+  factSheet,
 }) => {
   const frame = useCurrentFrame();
   const { fps, width, height, durationInFrames } = useVideoConfig();
@@ -111,15 +127,43 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     b.phraseImageSrc ? resolve(b.phraseImageSrc) : null,
   );
 
-  // ── Fallback image index driven by block boundaries ──
-  const imageIndexPerBlock: number[] = [];
-  let imgIdx = 0;
-  for (let i = 0; i < visualBlocks.length; i++) {
-    if (i > 0 && visualBlocks[i].triggerImageChange && allImages.length > 1) {
-      imgIdx = (imgIdx + 1) % allImages.length;
+  // ── One background schedule, minimum three seconds per picture ──
+  //
+  // Two separate mechanisms used to fight over the background: a clock rotating
+  // `allImages`, and per-phrase photos swapped on every block. A block can be
+  // 1.5s long, so a phrase photo could flash and vanish — the half-second
+  // flicker the owner kept seeing. Both now feed ONE schedule whose entries are
+  // never shorter than MIN_DWELL_SECONDS.
+  const MIN_DWELL_SECONDS = 3;
+  const segmentSeconds = durationInFrames / fps;
+
+  const backgroundSchedule: { start: number; src: string }[] = [];
+  if (allImages.length > 0 || phraseImages.some(Boolean)) {
+    let clock = 0;
+    const nextClockImage = () =>
+      allImages.length > 0 ? allImages[clock++ % allImages.length] : "";
+
+    for (let t = 0; t < segmentSeconds; t += MIN_DWELL_SECONDS) {
+      // Which phrase is speaking when this window opens?
+      let blockAt = 0;
+      for (let i = 0; i < visualBlocks.length; i++) {
+        if (t >= visualBlocks[i].startTime) blockAt = i;
+      }
+      const src = phraseImages[blockAt] || nextClockImage();
+      if (!src) continue;
+      const last = backgroundSchedule[backgroundSchedule.length - 1];
+      if (last && last.src === src) continue; // extend, don't re-cut
+      backgroundSchedule.push({ start: t, src });
     }
-    imageIndexPerBlock.push(imgIdx);
   }
+
+  const scheduleIndexAt = (t: number) => {
+    let idx = 0;
+    for (let i = 0; i < backgroundSchedule.length; i++) {
+      if (t >= backgroundSchedule[i].start) idx = i;
+    }
+    return idx;
+  };
 
   // Find active block for current frame
   const currentTime = frame / fps;
@@ -128,22 +172,21 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     if (currentTime >= visualBlocks[i].startTime) activeIdx = i;
   }
 
-  // Active image: per-phrase photo if available, else cycling
-  const activePhraseImage = phraseImages[activeIdx];
-  const curImgIdx = imageIndexPerBlock[activeIdx] ?? 0;
+  // Active background comes from the schedule, never straight from the block
+  const schedIdx = scheduleIndexAt(currentTime);
+  const currentBg = backgroundSchedule[schedIdx]?.src || "";
+  const nextBg = backgroundSchedule[schedIdx + 1]?.src || currentBg;
 
   // When a scene effect is active, dim the background image so effects are visible
   const activeBlockHasEffect = resolveSceneEffect(visualBlocks[activeIdx] || {} as VisualBlock) !== null;
   const bgDimFactor = activeBlockHasEffect ? 0.3 : 1.0; // 30% opacity when effect active
 
-  // Crossfade near block boundary when image changes
-  const nextIdx = Math.min(activeIdx + 1, visualBlocks.length - 1);
-  const nextImgIdx = imageIndexPerBlock[nextIdx] ?? curImgIdx;
+  // Crossfade into the next scheduled picture
   const XFADE = 12;
-  const blockEnd = visualBlocks[activeIdx]?.endTime ?? 0;
-  const framesLeft = (blockEnd - currentTime) * fps;
-  const isXfading =
-    framesLeft > 0 && framesLeft < XFADE && nextImgIdx !== curImgIdx;
+  const dwellEnd =
+    backgroundSchedule[schedIdx + 1]?.start ?? segmentSeconds + 999;
+  const framesLeft = (dwellEnd - currentTime) * fps;
+  const isXfading = framesLeft > 0 && framesLeft < XFADE && nextBg !== currentBg;
   // interpolate requires monotonically increasing inputRange: [0, XFADE]
   // framesElapsedInCrossfade goes from 0 (start) to XFADE (end)
   const framesElapsedInXfade = XFADE - framesLeft;
@@ -211,6 +254,50 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     return undefined;
   };
 
+  // ── Block windows, clamped so they never overlap ──
+  // TTS phrase timings can run past the next phrase's start. Two overlapping
+  // Sequences meant two narration lines drawn on top of each other — the
+  // doubled, unreadable text on the Lørenskog and Flamingo frames.
+  const blockWindow = (i: number) => {
+    const startF = Math.round(visualBlocks[i].startTime * fps);
+    const nextStartF =
+      i + 1 < visualBlocks.length
+        ? Math.round(visualBlocks[i + 1].startTime * fps)
+        : durationInFrames;
+    const natural = Math.round(visualBlocks[i].duration * fps);
+    return { startF, durF: Math.max(1, Math.min(natural, nextStartF - startF)) };
+  };
+
+  // ── Researched context timing ──
+  // The strip needs reading time (~1.6s per line); the quote takes the middle
+  // of the segment, where the narration is deep into the story.
+  // Figures this segment already shows on a data card — the strip must not
+  // repeat them.
+  const cardValues: string[] = [];
+  for (const b of visualBlocks) {
+    const d = b.graphicData as Record<string, any> | null | undefined;
+    if (!d) continue;
+    if (d.value != null) cardValues.push(String(d.value));
+    if (d.left?.value != null) cardValues.push(String(d.left.value));
+    if (d.right?.value != null) cardValues.push(String(d.right.value));
+    if (Array.isArray(d.items)) {
+      for (const it of d.items) if (it?.value != null) cardValues.push(String(it.value));
+    }
+  }
+  const factLines = buildFactLines(factSheet, cardValues);
+  const factStripSeconds = Math.min(
+    Math.max(4, factLines.length * 1.6 + 1.5),
+    Math.max(4, segmentSeconds * 0.45),
+  );
+  const quoteSeconds = Math.min(5.5, segmentSeconds * 0.35);
+  const quoteStartFrame = Math.round(
+    (Math.max(4 + factStripSeconds + 0.5, segmentSeconds * 0.5)) * fps,
+  );
+  const quoteFrames =
+    quoteStartFrame + Math.round(quoteSeconds * fps) <= durationInFrames
+      ? Math.round(quoteSeconds * fps)
+      : 0;
+
   // ── Fade transitions ──
   const fadeIn = interpolate(
     frame,
@@ -234,31 +321,31 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
           style={{ width: "100%", height: "100%", objectFit: "cover" }}
           volume={0}
         />
-      ) : (activePhraseImage || hasImages) ? (
+      ) : currentBg ? (
         <>
           <Img
-            key={`vb-bg-${activePhraseImage || curImgIdx}`}
-            src={activePhraseImage || allImages[curImgIdx]}
+            key={`vb-bg-${currentBg}`}
+            src={currentBg}
             style={{
               position: "absolute",
               width: "100%",
               height: "100%",
               objectFit: "cover",
-              transform: bgTransform(bgEffect, curImgIdx),
+              transform: bgTransform(bgEffect, schedIdx),
               filter: [bgFilter(bgEffect), activeBlockHasEffect ? `brightness(${bgDimFactor})` : ''].filter(Boolean).join(' ') || undefined,
               opacity: isXfading ? 1 - xfadeProgress : 1,
             }}
           />
           {isXfading && (
             <Img
-              key={`vb-bg-next-${nextImgIdx}`}
-              src={allImages[nextImgIdx]}
+              key={`vb-bg-next-${nextBg}`}
+              src={nextBg}
               style={{
                 position: "absolute",
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                transform: bgTransform(bgEffect, nextImgIdx),
+                transform: bgTransform(bgEffect, schedIdx + 1),
                 filter: bgFilter(bgEffect),
                 opacity: xfadeProgress,
               }}
@@ -275,6 +362,18 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
         />
       )}
 
+      {/* ─── Layer 1.2: Per-block b-roll video backgrounds (live footage) ─── */}
+      {!hasVideo &&
+        visualBlocks.map((block, bi) => {
+          if (!block.bRollVideoSrc) return null;
+          const { startF, durF } = blockWindow(bi);
+          return (
+            <Sequence key={`broll-${bi}`} from={startF} durationInFrames={durF}>
+              <BRollBackground src={resolve(block.bRollVideoSrc)} durationInFrames={durF} />
+            </Sequence>
+          );
+        })}
+
       {/* ─── Layer 1.5: Gradient overlay (mood-driven darkness) ─── */}
       <div
         style={{
@@ -286,8 +385,7 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
 
       {/* ─── Layer 2: Per-block text + graphics + key phrase callouts ─── */}
       {visualBlocks.map((block, bi) => {
-        const startF = Math.round(block.startTime * fps);
-        const durF = Math.max(1, Math.round(block.duration * fps));
+        const { startF, durF } = blockWindow(bi);
         return (
           <Sequence key={bi} from={startF} durationInFrames={durF}>
             <BlockContent
@@ -298,6 +396,12 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
               images={allImages}
               blockIndex={bi}
               allBlocks={visualBlocks}
+              // The quote card owns the centre of the screen while it is up
+              muteText={
+                quoteFrames > 0 &&
+                startF < quoteStartFrame + quoteFrames &&
+                startF + durF > quoteStartFrame
+              }
             />
           </Sequence>
         );
@@ -328,6 +432,43 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
             accentColor={accentColor}
           />
         </div>
+      )}
+
+      {/* ─── Layer 5: Researched context — who, where, figures, quote ─── */}
+      {headline && (
+        <Sequence from={Math.round(fps * 3.5)}>
+          <IdentityBar
+            headline={headline}
+            source={factSheet?.source}
+            place={factSheet?.where?.place || factSheet?.where?.country}
+            accentColor={accentColor}
+            isVertical={isVertical}
+          />
+        </Sequence>
+      )}
+
+      {factLines.length > 0 && (
+        <Sequence
+          from={Math.round(fps * 4)}
+          durationInFrames={Math.round(fps * factStripSeconds)}
+        >
+          <FactStrip
+            lines={factLines}
+            accentColor={accentColor}
+            isVertical={isVertical}
+          />
+        </Sequence>
+      )}
+
+      {factSheet?.quote && quoteFrames > 0 && (
+        <Sequence from={quoteStartFrame} durationInFrames={quoteFrames}>
+          <QuoteCard
+            text={factSheet.quote.text}
+            speaker={factSheet.quote.speaker}
+            accentColor={accentColor}
+            isVertical={isVertical}
+          />
+        </Sequence>
       )}
 
       {/* Ambient particles (mood-driven density: urgent → more, analytical → fewer) */}
@@ -364,6 +505,39 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
 };
 
 // ══════════════════════════════════════════════════════════════════
+//  BRollBackground — full-bleed muted stock footage for one block
+// ══════════════════════════════════════════════════════════════════
+
+const BRollBackground: React.FC<{
+  src: string;
+  durationInFrames: number;
+}> = ({ src, durationInFrames }) => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(
+    frame,
+    [0, 8, Math.max(9, durationInFrames - 8), durationInFrames],
+    [0, 1, 1, 0],
+    clampBoth,
+  );
+  // Slow push-in so the footage never feels static even on calm clips
+  const scale = interpolate(frame, [0, durationInFrames], [1.02, 1.1], clampBoth);
+  return (
+    <AbsoluteFill style={{ opacity }}>
+      <OffthreadVideo
+        src={src}
+        volume={0}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          transform: `scale(${scale})`,
+        }}
+      />
+    </AbsoluteFill>
+  );
+};
+
+// ══════════════════════════════════════════════════════════════════
 //  BlockContent — text effect + graphic overlay for a single block
 // ══════════════════════════════════════════════════════════════════
 
@@ -390,20 +564,11 @@ function detectKeyPhrase(
     return { type: "number", text: numMatch[0].trim() };
   }
 
-  // 2. Company/person name (first mention) → lower third
-  //    Match 2+ capitalized words not at sentence start
-  const nameMatch = text.match(
-    /(?:[\s,])((?:[A-ZÆØÅА-ЯІЇЄҐ][a-zA-ZæøåÆØÅа-яіїєґА-ЯІЇЄҐ]+[\s-]){0,2}[A-ZÆØÅА-ЯІЇЄҐ][a-zA-ZæøåÆØÅа-яіїєґА-ЯІЇЄҐ]{2,})/,
-  );
-  if (nameMatch) {
-    const name = nameMatch[1].trim();
-    const priorMention = allBlocks
-      .slice(0, blockIndex)
-      .some((b) => b.phraseText?.includes(name));
-    if (!priorMention) {
-      return { type: "name", text: name };
-    }
-  }
+  // Name callouts are gone. The regex took any capitalised word it met, so the
+  // 09.08 render captioned frames with "Deretter", "Selskapene", "Dette" and
+  // "Texas Det" — sentence openers and fragments, not names. Real people and
+  // organisations now come from the researched fact sheet (FactStrip), which
+  // knows a name from a first word.
 
   // 3. Quoted text → quote callout
   const quoteMatch = text.match(/["«""]([^"»""]{10,})["»""]/);
@@ -553,7 +718,9 @@ const BlockContent: React.FC<{
   images?: string[];
   blockIndex: number;
   allBlocks: VisualBlock[];
-}> = ({ block, accentColor, isVertical, moodTempo = 1.0, images = [], blockIndex, allBlocks }) => {
+  /** True while the quote card occupies the middle of the frame */
+  muteText?: boolean;
+}> = ({ block, accentColor, isVertical, moodTempo = 1.0, images = [], blockIndex, allBlocks, muteText = false }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 
@@ -570,7 +737,11 @@ const BlockContent: React.FC<{
   const hasGraphic =
     block.graphicType !== "none" && block.graphicData != null;
 
-  const sceneEffect = resolveSceneEffect(block);
+  // A data card and a scene effect on the same block fight each other — the
+  // 09.08 render showed "1 200" in the card and "1200" in a counterMosaic at
+  // once. The card carries the real value, so it wins.
+  const resolvedEffect = resolveSceneEffect(block);
+  const sceneEffect = hasGraphic ? null : resolvedEffect;
   const hasSceneEffect = sceneEffect !== null;
 
   // For narrative blocks (no graphic, no scene effect), detect key phrases
@@ -579,8 +750,17 @@ const BlockContent: React.FC<{
       ? detectKeyPhrase(block, blockIndex, allBlocks)
       : null;
 
-  // Show PhraseText only when graphic card is present (labels the data)
-  const showText = hasGraphic && !hasSceneEffect;
+  // The narration sentence is shown only on blocks that carry nothing else.
+  // Printing it beside a data card produced the "33 millioner" overlap — the
+  // same figure twice, in two overlapping boxes.
+  //
+  // A fragment is never worth printing: the owner kept seeing lone connectives
+  // ("Deretter", "Selskapene", "Dette") on screen. Anything under four words
+  // stays off — narration already carries it.
+  const phraseWordCount = (block.phraseText || "").trim().split(/\s+/).filter(Boolean).length;
+  const phraseIsSubstantial = phraseWordCount >= 4;
+  const showText =
+    !hasGraphic && !hasSceneEffect && callout === null && phraseIsSubstantial && !muteText;
 
   return (
     <AbsoluteFill style={{ opacity, zIndex: 5 }}>
@@ -610,9 +790,9 @@ const BlockContent: React.FC<{
         <div
           style={{
             position: "absolute",
-            top: isVertical ? "40%" : "15%",
-            right: isVertical ? 20 : 40,
-            width: isVertical ? "80%" : "36%",
+            top: isVertical ? "34%" : "20%",
+            right: isVertical ? 20 : 56,
+            width: isVertical ? "84%" : "42%",
             zIndex: 8,
           }}
         >
@@ -795,6 +975,11 @@ const GraphicCard: React.FC<{
   const data = block.graphicData as Record<string, unknown> | null;
   if (!data) return null;
 
+  // Render the panel only if something actually goes inside it. An empty card
+  // is a dark rectangle sitting on the photo for no reason — the "empty spaces"
+  // the owner reported.
+  if (!dataGraphicHasContent(block.graphicType, data)) return null;
+
   const panelStyle: React.CSSProperties = {
     position: "relative",
     background: "rgba(0, 0, 0, 0.75)",
@@ -820,207 +1005,84 @@ const GraphicCard: React.FC<{
     <div style={panelStyle}>
       <div style={accentLineStyle} />
 
-      {block.graphicType === "counter" && (
-        <CounterGraphic data={data} accentColor={accentColor} />
-      )}
-
-      {block.graphicType === "keyFigure" && (
-        <KeyFigureGraphic data={data} accentColor={accentColor} />
-      )}
-
-      {block.graphicType === "comparison" && (
-        <ComparisonGraphic data={data} accentColor={accentColor} />
-      )}
-
-      {/* barChart + bulletList fallback to keyFigure display */}
-      {(block.graphicType === "barChart" ||
-        block.graphicType === "bulletList") && (
-        <KeyFigureGraphic data={data} accentColor={accentColor} />
-      )}
+      <DataGraphic type={block.graphicType} data={data} accentColor={accentColor} />
     </div>
   );
 };
 
-// ── Counter: animated tick-up ──
+/** Is there a real value behind this card, or would it draw an empty box? */
+function dataGraphicHasContent(
+  type: string,
+  data: Record<string, unknown>,
+): boolean {
+  const hasDigits = (v: unknown) => /\d/.test(String(v ?? ""));
 
-const CounterGraphic: React.FC<{
+  if (type === "comparison") {
+    const l = data.left as { value?: unknown } | undefined;
+    const r = data.right as { value?: unknown } | undefined;
+    return hasDigits(l?.value) && hasDigits(r?.value);
+  }
+  if (type === "barChart") {
+    const items = Array.isArray(data.items) ? data.items : [];
+    return items.filter((it: any) => hasDigits(it?.value)).length >= 2;
+  }
+  return hasDigits(data.value);
+}
+
+// ── DataGraphic — routes graphicData to a real chart form ──
+
+const DataGraphic: React.FC<{
+  type: string;
   data: Record<string, unknown>;
   accentColor: string;
-}> = ({ data, accentColor }) => {
-  const raw = String(data.value ?? "0");
-  const numericPart = parseFloat(raw.replace(/[^0-9.,]/g, "").replace(",", ".")) || 0;
-  const hasPct = raw.includes("%");
-  const label = data.label ? String(data.label) : "";
+}> = ({ type, data, accentColor }) => {
+  const label = typeof data.label === "string" ? data.label : undefined;
+  const rawValue =
+    typeof data.value === "string" || typeof data.value === "number"
+      ? String(data.value)
+      : "";
 
-  return (
-    <div style={{ textAlign: "center" }}>
-      <AnimatedCounter
-        value={numericPart}
-        suffix={hasPct ? "%" : ""}
-        accentColor={accentColor}
-        fontSize={typography.scale.hero}
+  // Before / after → two bars on one scale + change badge
+  if (type === "comparison" && data.left && data.right) {
+    const left = data.left as { label?: string; value?: string };
+    const right = data.right as { label?: string; value?: string };
+    return (
+      <BeforeAfterChart
+        left={{ label: left.label || "Før", value: String(left.value ?? "") }}
+        right={{ label: right.label || "Nå", value: String(right.value ?? "") }}
       />
-      {label && (
-        <div
-          style={{
-            fontSize: typography.scale.bodySmall,
-            color: colors.textMuted,
-            fontFamily: typography.fontFamily.primary,
-            marginTop: 8,
-          }}
-        >
-          {label}
-        </div>
-      )}
-    </div>
-  );
-};
+    );
+  }
 
-// ── KeyFigure: static large value ──
+  // Series → real bar chart with direct labels
+  if (type === "barChart" && Array.isArray(data.items)) {
+    const items = (data.items as { label?: string; value?: string | number }[])
+      .filter((it) => it && it.value != null)
+      .map((it) => ({ label: it.label || "", value: it.value as string | number }));
+    if (items.length >= 2) {
+      return <SeriesBarChart items={items} accentColor={accentColor} />;
+    }
+  }
 
-const KeyFigureGraphic: React.FC<{
-  data: Record<string, unknown>;
-  accentColor: string;
-}> = ({ data, accentColor }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const scale = spring({
-    frame,
-    fps,
-    config: { damping: 10, stiffness: 100, mass: 0.6 },
-  });
+  // Share of a whole → donut (only for real 0–100 shares)
+  const pctMatch = rawValue.match(/^(\d+[.,]?\d*)\s*%$/);
+  if (pctMatch) {
+    const pct = parseFloat(pctMatch[1].replace(",", "."));
+    if (pct > 0 && pct <= 100) {
+      return <ShareDonut percent={pct} label={label} accentColor={accentColor} />;
+    }
+  }
 
+  // Everything else → hero figure, with direction when the block carries one
+  const changePct =
+    typeof data.changePct === "number" ? (data.changePct as number) : null;
   return (
-    <div style={{ textAlign: "center", transform: `scale(${scale})` }}>
-      <div
-        style={{
-          fontSize: typography.scale.hero,
-          fontWeight: 900,
-          color: accentColor,
-          fontFamily: typography.fontFamily.primary,
-          lineHeight: 1,
-        }}
-      >
-        {String(data.value ?? "")}
-      </div>
-      {String(data.label || "") !== "" && (
-        <div
-          style={{
-            fontSize: typography.scale.bodySmall,
-            color: colors.textMuted,
-            fontFamily: typography.fontFamily.primary,
-            marginTop: 12,
-            fontWeight: 600,
-          }}
-        >
-          {String(data.label)}
-        </div>
-      )}
-    </div>
+    <DeltaFigure
+      value={rawValue}
+      label={label}
+      changePct={changePct}
+      accentColor={accentColor}
+    />
   );
 };
 
-// ── Comparison: side-by-side boxes ──
-
-const ComparisonGraphic: React.FC<{
-  data: Record<string, unknown>;
-  accentColor: string;
-}> = ({ data, accentColor }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-
-  const left = (data.left as { label: string; value: string }) || {
-    label: "",
-    value: "",
-  };
-  const right = (data.right as { label: string; value: string }) || {
-    label: "",
-    value: "",
-  };
-
-  const leftScale = spring({
-    frame,
-    fps,
-    config: { damping: 12, stiffness: 100 },
-  });
-  const rightScale = spring({
-    frame: Math.max(0, frame - 10),
-    fps,
-    config: { damping: 12, stiffness: 100 },
-  });
-
-  const boxStyle = (
-    s: number,
-    isRight: boolean,
-  ): React.CSSProperties => ({
-    flex: 1,
-    textAlign: "center",
-    padding: "16px 8px",
-    background: isRight ? `${accentColor}20` : "rgba(255,255,255,0.04)",
-    borderRadius: 12,
-    transform: `scale(${s})`,
-    border: isRight
-      ? `1px solid ${accentColor}60`
-      : `1px solid ${glass.border}`,
-  });
-
-  return (
-    <div style={{ display: "flex", gap: 12, alignItems: "stretch" }}>
-      <div style={boxStyle(leftScale, false)}>
-        <div
-          style={{
-            fontSize: typography.scale.xs,
-            color: colors.textMuted,
-            fontFamily: typography.fontFamily.primary,
-            marginBottom: 8,
-          }}
-        >
-          {left.label}
-        </div>
-        <div
-          style={{
-            fontSize: typography.scale.h5,
-            fontWeight: 700,
-            color: colors.text,
-            fontFamily: typography.fontFamily.primary,
-          }}
-        >
-          {left.value}
-        </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          fontSize: typography.scale.body,
-          color: accentColor,
-          fontWeight: 900,
-        }}
-      >
-        →
-      </div>
-      <div style={boxStyle(rightScale, true)}>
-        <div
-          style={{
-            fontSize: typography.scale.xs,
-            color: colors.textMuted,
-            fontFamily: typography.fontFamily.primary,
-            marginBottom: 8,
-          }}
-        >
-          {right.label}
-        </div>
-        <div
-          style={{
-            fontSize: typography.scale.h5,
-            fontWeight: 700,
-            color: accentColor,
-            fontFamily: typography.fontFamily.primary,
-          }}
-        >
-          {right.value}
-        </div>
-      </div>
-    </div>
-  );
-};

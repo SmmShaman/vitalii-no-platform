@@ -100,6 +100,9 @@ export async function searchPexelsImages(query, count = 3) {
     height: p.height,
     photographer: p.photographer,
     photographerUrl: p.photographer_url,
+    // Pexels' own description of the shot — the only clue we get about what is
+    // actually IN the photo, and the basis of the relevance gate.
+    description: p.alt || '',
   }));
 }
 
@@ -188,12 +191,14 @@ async function downloadFile(url, destPath) {
  * @param {string} publicDir - Absolute path to download directory
  * @returns {Promise<Record<number, {images:string[], videos:string[], attribution:string[]}>>}
  */
-export async function downloadPexelsMedia(segments, publicDir) {
+export async function downloadPexelsMedia(segments, publicDir, options = {}) {
+  // Optional per-segment topic gate: (segIndex, description) => boolean
+  const isRelevant = options.isRelevant || null;
   const result = {};
 
   // Initialise empty result for every segment so callers always get a value
   for (let i = 0; i < segments.length; i++) {
-    result[i] = { images: [], videos: [], attribution: [] };
+    result[i] = { images: [], videos: [], videosMeta: [], attribution: [] };
   }
 
   // Bail out early if no API key — silent fallback
@@ -218,7 +223,7 @@ export async function downloadPexelsMedia(segments, publicDir) {
       // Search with primary query first
       const [primaryImages, videos] = await Promise.all([
         limiter(() => searchPexelsImages(primaryQuery, 3)),
-        limiter(() => searchPexelsVideos(primaryQuery, 1)),
+        limiter(() => searchPexelsVideos(primaryQuery, 2)),
       ]);
 
       // Search with alternative queries for more diverse images
@@ -234,6 +239,18 @@ export async function downloadPexelsMedia(segments, publicDir) {
             console.log(`[pexels]   +${newImages.length} from alt query "${allQueries[q].substring(0, 30)}"`);
           }
         } catch { /* skip failed alt query */ }
+      }
+
+      // Topic gate: drop stock photos whose own description is about something
+      // else (the graffiti wall that illustrated a satellite story on 09.08).
+      if (isRelevant) {
+        const before = images.length;
+        const onTopic = images.filter(img => isRelevant(segIndex, img.description));
+        // Keep at least two so a segment never falls back to a single image
+        images = onTopic.length >= 2 ? onTopic : images.slice(0, 2);
+        if (images.length < before) {
+          console.log(`[pexels] Segment ${segIndex}: ${before - images.length} off-topic photos dropped`);
+        }
       }
 
       console.log(`[pexels] Segment ${segIndex}: found ${images.length} images, ${videos.length} videos`);
@@ -259,6 +276,7 @@ export async function downloadPexelsMedia(segments, publicDir) {
           const destPath = join(publicDir, filename);
           const bytes = await limiter(() => downloadFile(vid.downloadUrl, destPath));
           result[segIndex].videos.push(filename);
+          result[segIndex].videosMeta.push({ filename, duration: vid.duration });
           result[segIndex].attribution.push(`Video by ${vid.photographer} on Pexels`);
           console.log(`[pexels]   Downloaded ${filename} (${(bytes / 1024 / 1024).toFixed(1)} MB)`);
         } catch (err) {
