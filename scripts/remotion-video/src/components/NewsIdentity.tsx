@@ -21,14 +21,23 @@ import { colors, typography, clampBoth } from "../design-system";
 
 const FONT = typography.fontFamily.primary;
 
+/** How well an outside search backed a fact up. */
+export type FactStatus = "confirmed" | "single-source" | "conflicting";
+
 export interface FactSheet {
   what?: string;
-  who?: { name: string; role?: string }[];
+  who?: { name: string; role?: string; status?: FactStatus; sources?: string[] }[];
   where?: { place?: string; country?: string };
   when?: string;
-  numbers?: { value: string; label: string }[];
+  numbers?: { value: string; label: string; status?: FactStatus; sources?: string[] }[];
   quote?: { text: string; speaker?: string } | null;
   source?: string;
+}
+
+export interface FactLine {
+  text: string;
+  status?: FactStatus;
+  sourceCount?: number;
 }
 
 // ── Identity bar ───────────────────────────────────────────────────
@@ -116,26 +125,36 @@ export const IdentityBar: React.FC<{
 // ── Fact strip ─────────────────────────────────────────────────────
 
 /** Turn a fact sheet into at most three short, readable lines. */
-export function buildFactLines(sheet: FactSheet | undefined): string[] {
+export function buildFactLines(sheet: FactSheet | undefined): FactLine[] {
   if (!sheet) return [];
-  const lines: string[] = [];
+  const lines: FactLine[] = [];
 
   for (const person of (sheet.who || []).slice(0, 2)) {
-    lines.push(person.role ? `${person.name} — ${person.role}` : person.name);
+    if (person.status === "conflicting") continue;
+    lines.push({
+      text: person.role ? `${person.name} — ${person.role}` : person.name,
+      status: person.status,
+      sourceCount: person.sources?.length,
+    });
   }
 
   const place = [sheet.where?.place, sheet.where?.country].filter(Boolean).join(", ");
-  if (place) lines.push(place);
+  if (place) lines.push({ text: place });
 
   for (const n of (sheet.numbers || []).slice(0, 2)) {
-    lines.push(`${n.value} ${n.label}`);
+    if (n.status === "conflicting") continue;
+    lines.push({
+      text: `${n.value} ${n.label}`,
+      status: n.status,
+      sourceCount: n.sources?.length,
+    });
   }
 
   return lines.slice(0, 3);
 }
 
 export const FactStrip: React.FC<{
-  lines: string[];
+  lines: FactLine[];
   accentColor: string;
   isVertical?: boolean;
 }> = ({ lines, accentColor, isVertical = false }) => {
@@ -203,8 +222,29 @@ export const FactStrip: React.FC<{
                 textShadow: "0 2px 10px rgba(0,0,0,0.9)",
               }}
             >
-              {line}
+              {line.text}
             </span>
+            {/* Verification badge: a tick means another publisher says the same */}
+            {line.status === "confirmed" && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 5,
+                  padding: "3px 9px",
+                  borderRadius: 6,
+                  background: "rgba(47,181,111,0.18)",
+                  border: "1px solid #2FB56F",
+                  color: "#2FB56F",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  fontFamily: FONT,
+                  flexShrink: 0,
+                }}
+              >
+                ✓{line.sourceCount ? ` ${line.sourceCount + 1}` : ""}
+              </span>
+            )}
           </div>
         );
       })}

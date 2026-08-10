@@ -697,7 +697,14 @@ const BlockContent: React.FC<{
   // The narration sentence is shown only on blocks that carry nothing else.
   // Printing it beside a data card produced the "33 millioner" overlap — the
   // same figure twice, in two overlapping boxes.
-  const showText = !hasGraphic && !hasSceneEffect && callout === null;
+  //
+  // A fragment is never worth printing: the owner kept seeing lone connectives
+  // ("Deretter", "Selskapene", "Dette") on screen. Anything under four words
+  // stays off — narration already carries it.
+  const phraseWordCount = (block.phraseText || "").trim().split(/\s+/).filter(Boolean).length;
+  const phraseIsSubstantial = phraseWordCount >= 4;
+  const showText =
+    !hasGraphic && !hasSceneEffect && callout === null && phraseIsSubstantial;
 
   return (
     <AbsoluteFill style={{ opacity, zIndex: 5 }}>
