@@ -20,6 +20,11 @@ const LLM_TIMEOUT_MS = 120_000;
 // NVIDIA NIM has its own per-key rate limits — this does NOT touch the Groq 70b pool.
 const NVIDIA_MODEL = process.env.NVIDIA_MODEL || 'meta/llama-3.3-70b-instruct';
 
+// Per-process circuit breaker for NVIDIA (see the failure path in callLLM).
+const NVIDIA_FAILURE_LIMIT = 2;
+let nvidiaConsecutiveFailures = 0;
+let nvidiaCircuitOpen = false;
+
 /** Fetch with AbortController timeout */
 async function fetchWithTimeout(url, options, timeoutMs = LLM_TIMEOUT_MS) {
   const controller = new AbortController();
@@ -42,11 +47,13 @@ export async function callLLM(systemPrompt, userPrompt, options = {}) {
   // Try NVIDIA NIM first (free tier, OpenAI-compatible). Back-to-back per-segment
   // calls trip its burst limit ("Worker local total request limit reached", 503) —
   // retry those with a pause instead of burning the whole fallback chain.
-  if (NVIDIA_API_KEY) {
+  if (NVIDIA_API_KEY && !nvidiaCircuitOpen) {
     const NVIDIA_ATTEMPTS = 3;
     for (let attempt = 1; attempt <= NVIDIA_ATTEMPTS; attempt++) {
       try {
-        return await callNvidia(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode });
+        const out = await callNvidia(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode });
+        nvidiaConsecutiveFailures = 0;
+        return out;
       } catch (err) {
         const transient = /503|429|aborted/i.test(err.message);
         if (transient && attempt < NVIDIA_ATTEMPTS) {
@@ -57,6 +64,13 @@ export async function callLLM(systemPrompt, userPrompt, options = {}) {
         }
         errors.push(`NVIDIA: ${err.message}`);
         console.warn(`⚠️ NVIDIA NIM failed: ${err.message}, falling back`);
+        // When NVIDIA is down rather than merely bursty, every later segment
+        // pays 3 × 120s before reaching the fallback — 42 wasted minutes across
+        // a 7-segment digest on 2026-08-10. Two dead segments = stop asking.
+        if (++nvidiaConsecutiveFailures >= NVIDIA_FAILURE_LIMIT) {
+          nvidiaCircuitOpen = true;
+          console.warn(`⛔ NVIDIA NIM disabled for this run after ${nvidiaConsecutiveFailures} consecutive failures`);
+        }
         break;
       }
     }
