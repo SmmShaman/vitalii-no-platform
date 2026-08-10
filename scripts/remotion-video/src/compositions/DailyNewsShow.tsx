@@ -119,6 +119,10 @@ export interface VisualBlock {
   triggerImageChange: boolean;
   /** Local filename of a stock b-roll video played as this block's moving background */
   bRollVideoSrc?: string;
+  /** Icon names for iconStagger, chosen by the director from the article's subject */
+  icons?: string[];
+  /** Real milestones from the article for progressTimeline */
+  milestones?: string[];
 }
 
 export interface DailyNewsShowProps {

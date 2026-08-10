@@ -481,12 +481,21 @@ PHRASE FIELDS:
 - "textEffect": typewriter | fadeUp | blurReveal | springPop | splitScale | wordFade | slideIn | glitchIn (vary between phrases! glitchIn only for urgent/breaking moods)
 - "graphicType": counter | keyFigure | comparison | barChart | bulletList | none
 - "graphicData": ONLY real numbers from article with meaningful labels
+- "icons": REQUIRED when sceneEffect is "iconStagger" — 3-5 names from this list ONLY, chosen for THIS article's subject:
+  laptop | brain | chart | shield | globe | medical | factory | rocket | palette | dollar | target | lightning
+  (a fish-farming story is factory+globe, a tax story is dollar+chart — never a generic laptop+chart+globe)
+- "milestones": REQUIRED when sceneEffect is "progressTimeline" — 3-5 SHORT real steps from the article
+  (e.g. ["2019: pilot", "2024: 12 fartøy", "2030: hele flåten"]) — never generic "Start/Progress/Goal"
 - "backgroundEffect": kenBurns | zoomPulse | slowPan | colorShift | pushIn | parallaxDrift | pulseGlow (vary!)
 - "triggerImageChange": true every other phrase
 
 RULES:
 - NO effect without specific context — every effect must illustrate the phrase's MEANING
 - sceneEffect is an explicit choice, not a guess — pick "none" rather than force-fitting one of the 17 types to a phrase it doesn't truly match
+- AN EFFECT WITHOUT ITS DATA IS DROPPED, not rendered empty. If you pick counterMosaic/dataDashboard/splitScreen
+  you MUST supply graphicData; iconStagger needs "icons"; progressTimeline needs "milestones". No data → write "none".
+- splitScreen means TWO REAL LABELLED VALUES from the article (before/after, us/them). Never pick it just to
+  divide the screen — an empty Før/Nå panel is the single worst frame this show can produce.
 - Adjacent phrases: different textEffect AND different backgroundEffect
 - graphicData labels must be DESCRIPTIVE (not empty "", but "Daglige ChatGPT-søk" or "Markedsandel")
 - Use 3+ DIFFERENT effect types per segment — don't repeat the same pattern
@@ -509,6 +518,8 @@ Return JSON:
       "textEffect": "springPop",
       "graphicType": "counter",
       "graphicData": { "value": "3000000", "label": "Daglige ChatGPT-søk" },
+      "icons": [],
+      "milestones": [],
       "backgroundEffect": "zoomPulse",
       "triggerImageChange": false
     }
@@ -843,6 +854,98 @@ function ensureVariety(directives) {
 //  Merge AI phrases with subtitle timestamps
 // ═══════════════════════════════════════════════════════════════════
 
+// Effect types the renderer accepts. Anything else (including "none") means no effect.
+const VALID_SCENE_EFFECTS = new Set([
+  'counterMosaic', 'splitScreen', 'mosaicGrid', 'iconStagger', 'pixelDissolve',
+  'circuitBoard', 'progressTimeline', 'alertPulse', 'globe3D', 'noiseWave',
+  'dataDashboard', 'matrixRain', 'photoScrollColumns', 'photoSplitScreen',
+  'photoZoomReveal', 'photoCollage', 'photoCompareSlider', 'photoVerticalScroll',
+  'photoFilterTransition',
+]);
+
+const VALID_ICONS = new Set([
+  'laptop', 'brain', 'chart', 'shield', 'globe', 'medical', 'factory',
+  'rocket', 'palette', 'dollar', 'target', 'lightning',
+]);
+
+/**
+ * Gate an effect on the data it needs to say anything.
+ *
+ * A data effect with no data does not degrade gracefully: it dims the photo to
+ * 30% and draws an empty shell — the "blurred screen showing only Før/Nå" the
+ * owner flagged. Dropping it here (rather than in the renderer alone) also lets
+ * b-roll reclaim the block, since b-roll skips effect blocks.
+ *
+ * Returns the effect name to keep, or 'none'.
+ */
+function gateSceneEffect(block) {
+  const effect = block.sceneEffect;
+  if (!effect || !VALID_SCENE_EFFECTS.has(effect)) return 'none';
+
+  const data = block.graphicData || {};
+
+  switch (effect) {
+    case 'splitScreen': {
+      const l = data.left, r = data.right;
+      const filled = v => v && String(v.value ?? '').trim().length > 0;
+      return filled(l) && filled(r) ? effect : 'none';
+    }
+    case 'counterMosaic': {
+      const n = parseFloat(String(data.value ?? '').replace(/[^0-9.,]/g, '').replace(',', '.'));
+      return isFinite(n) && n !== 0 ? effect : 'none';
+    }
+    case 'dataDashboard': {
+      const hasItems = Array.isArray(data.items) && data.items.length > 0;
+      const hasValue = String(data.value ?? '').trim().length > 0;
+      return hasItems || hasValue ? effect : 'none';
+    }
+    case 'iconStagger':
+      return Array.isArray(block.icons) && block.icons.length >= 2 ? effect : 'none';
+    case 'progressTimeline':
+      return Array.isArray(block.milestones) && block.milestones.length >= 2 ? effect : 'none';
+    case 'photoCompareSlider':
+      // Asserts a before/after — only honest with real comparison data
+      return block.graphicType === 'comparison' && data.left && data.right ? effect : 'none';
+    default:
+      // Atmospheric effects (globe3D, noiseWave, circuitBoard, …) need no data
+      return effect;
+  }
+}
+
+// Effects that carry article content vs. effects that are pure atmosphere.
+// Atmosphere passes the data gate for free, so it needs its own budget —
+// otherwise it would crowd out the live b-roll (b-roll skips effect blocks).
+const CONTENT_EFFECTS = new Set([
+  'splitScreen', 'counterMosaic', 'dataDashboard', 'iconStagger', 'progressTimeline',
+  'photoCompareSlider', 'photoSplitScreen', 'photoZoomReveal', 'photoCollage',
+  'photoVerticalScroll', 'photoFilterTransition', 'photoScrollColumns',
+]);
+
+/**
+ * Keep at most `max` effects per segment, content-bearing ones first,
+ * never two in a row. Mutates blocks, returns the surviving effect names.
+ */
+function capSceneEffects(visualBlocks, max = 3) {
+  const ranked = visualBlocks
+    .map((b, j) => ({ j, effect: b.sceneEffect }))
+    .filter(x => x.effect && x.effect !== 'none')
+    .sort((a, b) => {
+      const rank = e => (CONTENT_EFFECTS.has(e) ? 1 : 0);
+      return rank(b.effect) - rank(a.effect) || a.j - b.j;
+    });
+
+  const keep = new Set();
+  for (const cand of ranked) {
+    if (keep.size >= max) break;
+    if (keep.has(cand.j - 1) || keep.has(cand.j + 1)) continue;
+    keep.add(cand.j);
+  }
+  for (let j = 0; j < visualBlocks.length; j++) {
+    if (!keep.has(j)) visualBlocks[j].sceneEffect = 'none';
+  }
+  return [...keep].sort((a, b) => a - b).map(j => visualBlocks[j].sceneEffect);
+}
+
 /**
  * Derive a data graphic straight from a phrase's own numbers.
  * Used as the floor for BOTH paths: the LLM almost never fills graphicData,
@@ -939,7 +1042,16 @@ function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
       }
     }
 
-    return {
+    // Structured content for symbol effects — taken from the model's explicit
+    // fields, not scraped out of its English storyboard prose.
+    const icons = Array.isArray(ap.icons)
+      ? ap.icons.map(s => String(s).toLowerCase().trim()).filter(s => VALID_ICONS.has(s)).slice(0, 6)
+      : [];
+    const milestones = Array.isArray(ap.milestones)
+      ? ap.milestones.map(s => String(s).trim()).filter(Boolean).slice(0, 5)
+      : [];
+
+    const block = {
       phraseText: tp.text,
       startTime: tp.startTime,
       endTime: tp.endTime,
@@ -949,20 +1061,33 @@ function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
       renderHint: ap.renderHint || '',
       visualMetaphor: ap.metaphor || 'narrative',
       textEffect: ap.textEffect || 'fadeUp',
-      // NOTE: ap.sceneEffect is deliberately NOT merged yet — wiring the LLM's
-      // explicit effect choice changes effect density AND suppresses b-roll
-      // (b-roll skips scene-effect blocks). Ship it as its own iteration.
+      // The model's explicit choice is now honoured; keyword-guessing the
+      // storyboard prose was picking effects off words like "grid" and "wave".
+      sceneEffect: ap.sceneEffect,
+      icons,
+      milestones,
       graphicType,
       graphicData,
       backgroundEffect: ap.backgroundEffect || 'kenBurns',
       triggerImageChange: ap.triggerImageChange ?? (j > 0 && j % 2 === 0),
     };
+
+    block.sceneEffect = gateSceneEffect(block);
+    return block;
   });
 
   const kept = capGraphics(visualBlocks);
   if (kept.length > 0) {
     console.log(`    📊 ${kept.length} data graphics: ${kept.join(', ')}`);
   }
+
+  const asked = aiPhrases.filter(p => p.sceneEffect && p.sceneEffect !== 'none').length;
+  const gated = visualBlocks.filter(b => b.sceneEffect !== 'none').length;
+  const liveEffects = capSceneEffects(visualBlocks);
+  console.log(
+    `    🎭 scene effects: ${asked} requested → ${gated} had data → ${liveEffects.length} kept` +
+    (liveEffects.length ? ` (${liveEffects.join(', ')})` : ''),
+  );
 
   return visualBlocks;
 }
