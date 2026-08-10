@@ -117,6 +117,8 @@ export interface VisualBlock {
   backgroundEffect: string;
   /** Whether to cycle to the next image at this block's start */
   triggerImageChange: boolean;
+  /** Local filename of a stock b-roll video played as this block's moving background */
+  bRollVideoSrc?: string;
 }
 
 export interface DailyNewsShowProps {

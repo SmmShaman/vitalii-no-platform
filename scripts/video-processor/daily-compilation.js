@@ -538,6 +538,101 @@ async function notifyBotComplete(dateStr, youtubeUrl) {
   }
 }
 
+// ── Visual upgrade helpers (iteration 1) ──
+
+/**
+ * Spread b-roll video clips across visual blocks as moving backgrounds.
+ * Rhythm: the segment opens on the real article photo (authenticity),
+ * then every other eligible block cuts to live stock footage.
+ * Blocks that already have a contextual phrase photo or a scene effect keep it.
+ */
+function assignBRollToBlocks(visualBlocks, videoFiles) {
+  let assigned = 0;
+  let vidIdx = 0;
+  let eligibleSeen = 0;
+  for (const block of visualBlocks) {
+    if (block.phraseImageSrc) continue;
+    if (block.sceneEffect && block.sceneEffect !== 'none') continue;
+    // Pexels clips are >= 5s; never assign footage shorter than the block
+    if (!block.duration || block.duration > 5) continue;
+    eligibleSeen++;
+    if (eligibleSeen === 1) continue; // keep the opening block on the article photo
+    if (eligibleSeen % 2 === 0) {
+      block.bRollVideoSrc = videoFiles[vidIdx % videoFiles.length];
+      vidIdx++;
+      assigned++;
+    }
+  }
+  return assigned;
+}
+
+/**
+ * Generate cinematic AI frames via Cloudflare Workers AI FLUX (free tier).
+ * One unified style suffix per digest so all AI frames look like a single shoot.
+ * Only fills segments that are still visually sparse after scraping + Pexels.
+ */
+async function generateFluxCinematicFrames(segments, publicDir) {
+  const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID;
+  const CF_API_TOKEN = process.env.CF_API_TOKEN;
+  if (!CF_ACCOUNT_ID || !CF_API_TOKEN) {
+    console.log('  ⏭️ CF credentials missing — skipping FLUX frames');
+    return;
+  }
+
+  const STYLE_SUFFIX =
+    'cinematic editorial photograph, shallow depth of field, soft volumetric light, ' +
+    'muted teal and warm amber color grade, subtle 35mm film grain, photorealistic, ' +
+    'no text, no watermark, no logos';
+  const MAX_TOTAL = 12;
+  let generated = 0;
+
+  for (let i = 0; i < segments.length && generated < MAX_TOTAL; i++) {
+    const seg = segments[i];
+    if (seg.videoSrc) continue;
+    const existing = seg.alternateImages || [];
+    if (existing.length >= 3) continue;
+
+    const queries = (seg.imageSearchQueries || []).slice(0, 2);
+    if (queries.length === 0 && seg.headline) queries.push(seg.headline);
+
+    let segGenerated = 0;
+    for (const q of queries) {
+      if (generated >= MAX_TOTAL) break;
+      try {
+        const res = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell`,
+          {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${CF_API_TOKEN}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: `${q}, ${STYLE_SUFFIX}`, steps: 4, width: 1280, height: 720 }),
+          },
+        );
+        if (!res.ok) continue;
+        const data = await res.json();
+        const b64 = data?.result?.image;
+        if (!b64) continue;
+        const filename = `flux_broll_${i}_${segGenerated}.jpg`;
+        await fs.writeFile(path.join(publicDir, filename), Buffer.from(b64, 'base64'));
+        seg.alternateImages = [...(seg.alternateImages || []), filename];
+        generated++;
+        segGenerated++;
+      } catch {
+        // Skip failed generations silently — real photos remain the fallback
+      }
+    }
+
+    if (segGenerated > 0) {
+      seg.imageCycleDuration = Math.max(
+        3,
+        Math.round(Number(seg.durationSeconds) / (seg.alternateImages.length + 1)),
+      );
+      console.log(`  🎨 Segment ${i}: +${segGenerated} FLUX cinematic frames`);
+    }
+  }
+
+  console.log(`  🎨 FLUX total: ${generated} frames`);
+}
+
 // ── Main ──
 
 async function main() {
@@ -953,8 +1048,9 @@ async function main() {
     console.log(`⚠️ Article scraping failed, continuing: ${e.message}`);
   }
 
-  // Pexels disabled — only real news photos from Serper + article scraping
-  console.log('\n⏭️ Pexels disabled — using only real news photos');
+  // Pexels stock media re-enabled (visual upgrade iteration 1):
+  // b-roll videos + fill photos are fetched AFTER per-phrase images (Step 3a-5 below),
+  // so block assignment can see which blocks already have contextual photos.
 
   // Step 4a-3: Deduplicate images per segment
   // Problem: same photo from DB, Google Search, and article scraping creates duplicates.
@@ -1038,6 +1134,50 @@ async function main() {
         }
       }
     }
+  }
+
+  // Step 4a-5: Pexels stock media — b-roll videos woven into visual blocks + fill photos
+  console.log('\n🎞️ Step 3a-5: Pexels b-roll videos + fill photos...');
+  try {
+    const pexelsInput = segments.map((s) => ({
+      headline: s.headline,
+      category: s.category,
+      imageSearchQueries: s.imageSearchQueries || [],
+    }));
+    const pexelsMedia = await downloadPexelsMedia(pexelsInput, publicDir);
+
+    for (let i = 0; i < segments.length; i++) {
+      if (segments[i].videoSrc) continue; // segment already has the article's own video
+      const media = pexelsMedia[i];
+      if (!media) continue;
+
+      // Fill photos only for visually sparse segments (< 3 images total)
+      const existing = segments[i].alternateImages || [];
+      if (existing.length < 3 && media.images.length > 0) {
+        segments[i].alternateImages = [...new Set([...existing, ...media.images])].slice(0, 6);
+        segments[i].imageCycleDuration = Math.max(
+          3,
+          Math.round(Number(segments[i].durationSeconds) / (segments[i].alternateImages.length + 1)),
+        );
+        console.log(`  🖼️ Segment ${i}: +${segments[i].alternateImages.length - existing.length} Pexels fill photos`);
+      }
+
+      // B-roll videos → assign to visual blocks (moving background instead of static photo)
+      if (media.videos.length > 0 && segments[i].visualBlocks && segments[i].visualBlocks.length > 0) {
+        const assigned = assignBRollToBlocks(segments[i].visualBlocks, media.videos);
+        console.log(`  🎬 Segment ${i}: ${media.videos.length} b-roll clips → ${assigned} blocks`);
+      }
+    }
+  } catch (e) {
+    console.log(`⚠️ Pexels media failed, continuing: ${e.message}`);
+  }
+
+  // Step 4a-6: FLUX cinematic frames — unified visual style for sparse segments
+  console.log('\n🎨 Step 3a-6: FLUX cinematic frames...');
+  try {
+    await generateFluxCinematicFrames(segments, publicDir);
+  } catch (e) {
+    console.log(`⚠️ FLUX frames failed, continuing: ${e.message}`);
   }
 
   // Step 4b: Generate avatar clips (if enabled)

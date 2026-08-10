@@ -275,6 +275,19 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
         />
       )}
 
+      {/* ─── Layer 1.2: Per-block b-roll video backgrounds (live footage) ─── */}
+      {!hasVideo &&
+        visualBlocks.map((block, bi) => {
+          if (!block.bRollVideoSrc) return null;
+          const startF = Math.round(block.startTime * fps);
+          const durF = Math.max(1, Math.round(block.duration * fps));
+          return (
+            <Sequence key={`broll-${bi}`} from={startF} durationInFrames={durF}>
+              <BRollBackground src={resolve(block.bRollVideoSrc)} durationInFrames={durF} />
+            </Sequence>
+          );
+        })}
+
       {/* ─── Layer 1.5: Gradient overlay (mood-driven darkness) ─── */}
       <div
         style={{
@@ -359,6 +372,39 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
           />
         </Particles>
       </AbsoluteFill>
+    </AbsoluteFill>
+  );
+};
+
+// ══════════════════════════════════════════════════════════════════
+//  BRollBackground — full-bleed muted stock footage for one block
+// ══════════════════════════════════════════════════════════════════
+
+const BRollBackground: React.FC<{
+  src: string;
+  durationInFrames: number;
+}> = ({ src, durationInFrames }) => {
+  const frame = useCurrentFrame();
+  const opacity = interpolate(
+    frame,
+    [0, 8, Math.max(9, durationInFrames - 8), durationInFrames],
+    [0, 1, 1, 0],
+    clampBoth,
+  );
+  // Slow push-in so the footage never feels static even on calm clips
+  const scale = interpolate(frame, [0, durationInFrames], [1.02, 1.1], clampBoth);
+  return (
+    <AbsoluteFill style={{ opacity }}>
+      <OffthreadVideo
+        src={src}
+        volume={0}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          transform: `scale(${scale})`,
+        }}
+      />
     </AbsoluteFill>
   );
 };

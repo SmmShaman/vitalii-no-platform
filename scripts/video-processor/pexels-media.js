@@ -218,7 +218,7 @@ export async function downloadPexelsMedia(segments, publicDir) {
       // Search with primary query first
       const [primaryImages, videos] = await Promise.all([
         limiter(() => searchPexelsImages(primaryQuery, 3)),
-        limiter(() => searchPexelsVideos(primaryQuery, 1)),
+        limiter(() => searchPexelsVideos(primaryQuery, 2)),
       ]);
 
       // Search with alternative queries for more diverse images
