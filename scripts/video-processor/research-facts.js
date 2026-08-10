@@ -225,6 +225,7 @@ Return JSON only:
 // already spends ~30 of them, so verification gets a hard budget per run.
 const MAX_VERIFY_QUERIES = 21;
 let verifyQueriesUsed = 0;
+let searchFailureLogged = false;
 
 /** Web search (not image search) via Google CSE, or Serper when a key exists. */
 async function webSearch(query, num = 4) {
@@ -264,9 +265,23 @@ async function webSearch(query, num = 4) {
           snippet: r.snippet || '',
         }));
       }
+      // Say WHY nothing came back. A silent empty result reads as "nothing
+      // confirms this fact" when the truth is "we never got to ask" — the free
+      // CSE tier is 100 queries/day and image search shares it.
+      if (!searchFailureLogged) {
+        searchFailureLogged = true;
+        const body = await res.text().catch(() => '');
+        const reason = res.status === 429 || /quota|rateLimit/i.test(body)
+          ? 'DAILY QUOTA EXHAUSTED — verification is off until it resets'
+          : `HTTP ${res.status}`;
+        console.log(`    ⚠️ Web search unavailable: ${reason}`);
+      }
     }
-  } catch {
-    // Search is best-effort; an unverified fact is still usable, just unmarked
+  } catch (err) {
+    if (!searchFailureLogged) {
+      searchFailureLogged = true;
+      console.log(`    ⚠️ Web search failed: ${err.message.slice(0, 80)}`);
+    }
   }
   return [];
 }
@@ -371,6 +386,7 @@ async function verifySheet(sheet, index) {
 export async function buildFactSheets(articles) {
   const sheets = [];
   verifyQueriesUsed = 0;
+  searchFailureLogged = false;
   for (let i = 0; i < articles.length; i++) {
     let sheet = await buildOne(articles[i], i);
     try {
