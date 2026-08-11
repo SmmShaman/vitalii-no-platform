@@ -144,13 +144,19 @@ export function FeatureArticle({ slug, initialLanguage, initialData }: FeatureAr
           {/* Badges */}
           <ScrollReveal delay={0.05}>
             <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full ${catInfo.color.bg} ${catInfo.color.text}`}>
+              <Link
+                href={`/features?category=${encodeURIComponent(feature.category)}`}
+                className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full ${catInfo.color.bg} ${catInfo.color.text} hover:brightness-125 transition-all`}
+              >
                 {Icon && <Icon className="w-3.5 h-3.5" />}
                 {catInfo.label[lang]}
-              </span>
-              <span className={`text-xs px-2.5 py-1 rounded-full ${project.color.bg} ${project.color.text}`}>
+              </Link>
+              <Link
+                href={`/features?project=${encodeURIComponent(feature.project_id)}`}
+                className={`text-xs px-2.5 py-1 rounded-full ${project.color.bg} ${project.color.text} hover:brightness-125 transition-all`}
+              >
                 {project.name[lang]}
-              </span>
+              </Link>
             </div>
           </ScrollReveal>
 

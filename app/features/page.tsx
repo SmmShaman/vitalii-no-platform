@@ -71,13 +71,14 @@ function staticFeatureRows(): FeatureRow[] {
 }
 
 interface Props {
-  searchParams: Promise<{ tag?: string; category?: string }>
+  searchParams: Promise<{ tag?: string; category?: string; project?: string }>
 }
 
 export default async function FeaturesListingPage({ searchParams }: Props) {
   const params = await searchParams
   const tagFilter = params.tag?.trim() || null
   const categoryFilter = params.category?.trim() || null
+  const projectFilter = params.project?.trim() || null
 
   let features: FeatureRow[] = (await getFeaturesList()) as FeatureRow[]
   if (!features || features.length === 0) {
@@ -86,6 +87,10 @@ export default async function FeaturesListingPage({ searchParams }: Props) {
 
   if (categoryFilter) {
     features = features.filter((f) => f.category === categoryFilter)
+  }
+
+  if (projectFilter) {
+    features = features.filter((f) => f.project_id === projectFilter)
   }
 
   if (tagFilter) {
@@ -134,10 +139,15 @@ export default async function FeaturesListingPage({ searchParams }: Props) {
           ))}
         </nav>
 
-        {/* Active tag filter indicator */}
-        {tagFilter && (
+        {/* Active tag/project filter indicator */}
+        {(tagFilter || projectFilter) && (
           <p className="text-sm text-content-muted mb-6">
-            Filtered by tag: <span className="text-brand-light">#{tagFilter.replace(/^#/, '')}</span>{' '}
+            {tagFilter && (
+              <>Filtered by tag: <span className="text-brand-light">#{tagFilter.replace(/^#/, '')}</span></>
+            )}
+            {projectFilter && (
+              <>{tagFilter ? ' · ' : ''}Project: <span className="text-brand-light">{getProjectInfo(projectFilter).name.en}</span></>
+            )}{' '}
             <Link href="/features" className="ml-2 underline hover:text-content transition-colors">
               Clear
             </Link>
