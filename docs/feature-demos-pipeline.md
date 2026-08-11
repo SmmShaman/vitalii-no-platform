@@ -69,8 +69,23 @@ the owner re-consents with the full `youtube` scope and updates
 `YOUTUBE_REFRESH_TOKEN` on the VPS. Until then: upload works, playlist step is
 queued (idempotent part of upload.py).
 
-## Budget notes (measured in pilot)
+## Budget & session strategy (measured 2026-08-11, FINAL)
 
-Template build (one-off, done): ~240k tokens. Marginal per clip:
-schema ≈ 40–60k, live-UI filming ≈ 80–120k. Remaining ~211 features ≈ 15M
-tokens total — run on Sonnet 5, batches of 3–4/day per owner's cadence.
+Measured: the pilot mega-session (analysis + fixes + infra + 3 clips + YouTube)
+cost **$75.60 API-equivalent**, of which all 7 subagents were only ~630k tokens
+(~$10–15). The dominant cost was the ORCHESTRATOR: a long-lived session on the
+top-tier model re-reading a huge context every turn.
+
+**Therefore the conveyor rules are:**
+
+1. **Every batch runs in a FRESH, dedicated session on Sonnet 5** (`/model
+   sonnet` or `claude --model sonnet`). Never continue a long mixed session.
+   Context = this doc + the 4 feature rows from the DB. Nothing else.
+2. All batch agents explicitly `model: sonnet`. Opus 5 only for one-off
+   template/harness work in its own short session.
+3. Batch size: **4 features per session** (3 schema + 1 live-UI). Expected
+   spend per batch: ~500–700k tokens ≈ $3–6 Sonnet API-equivalent (vs $75 for
+   the pilot mega-session). Remaining ~211 features ≈ 53 batches.
+4. Marginal per clip (templates ready): schema ≈ 30–40k, live-UI ≈ 50–70k,
+   YouTube layer with full SEO description ≈ 25k. All-in per feature ≈ 60–100k.
+5. Weekly: one short Opus QA pass over a random sample of the week's clips.
