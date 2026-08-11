@@ -11,6 +11,7 @@ import { ServicesAnimation } from '@/components/ui/ServicesAnimation';
 import { FeaturesPreview } from '@/components/ui/FeaturesPreview';
 import { FeatureModal } from '@/components/ui/FeatureModal';
 import type { FeatureCategory } from '@/data/features';
+import { readFeatureParams, writeFeatureParams } from '@/utils/featureModalUrl';
 import { useFeatures } from '@/hooks/useFeatures';
 import { useProjects, useProjectsCarousel } from '@/hooks/useProjects';
 import { AboutAnimation } from '@/components/ui/AboutAnimation';
@@ -128,6 +129,20 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
   useEffect(() => {
     onHoveredSectionChange?.(hoveredSection);
   }, [hoveredSection, onHoveredSectionChange]);
+
+  // Deep-link support: open the Features modal from ?fid= / ?fcat= on mount
+  useEffect(() => {
+    const { featureId, category } = readFeatureParams();
+    if (featureId) {
+      setSelectedFeatureId(featureId);
+      setSelectedFeatureCategory(undefined);
+      setIsFeaturesModalOpen(true);
+    } else if (category) {
+      setSelectedFeatureCategory(category);
+      setSelectedFeatureId(undefined);
+      setIsFeaturesModalOpen(true);
+    }
+  }, []);
 
   // Detect mobile screen size handled by useIsMobile hook
 
@@ -408,18 +423,28 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
     setSelectedFeatureCategory(undefined);
     setSelectedFeatureId(undefined);
     setIsFeaturesModalOpen(true);
+    writeFeatureParams();
   };
 
   const handleFeatureCategoryClick = (category: FeatureCategory) => {
     setSelectedFeatureCategory(category);
     setSelectedFeatureId(undefined);
     setIsFeaturesModalOpen(true);
+    writeFeatureParams(category);
   };
 
   const handleFeatureItemClick = (featureId: string) => {
     setSelectedFeatureId(featureId);
     setSelectedFeatureCategory(undefined);
     setIsFeaturesModalOpen(true);
+    writeFeatureParams(undefined, featureId);
+  };
+
+  const handleFeaturesModalOpenChange = (open: boolean) => {
+    setIsFeaturesModalOpen(open);
+    if (!open) {
+      writeFeatureParams(); // remove fcat/fid from the URL on close
+    }
   };
 
   const handleServicesClick = () => {
@@ -1116,7 +1141,7 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
       {/* Features Modal */}
       <FeatureModal
         open={isFeaturesModalOpen}
-        onOpenChange={setIsFeaturesModalOpen}
+        onOpenChange={handleFeaturesModalOpenChange}
         features={allFeatures}
         projects={allProjects}
         initialCategory={selectedFeatureCategory}

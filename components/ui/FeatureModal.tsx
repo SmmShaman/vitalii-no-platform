@@ -67,12 +67,14 @@ export const FeatureModal = ({
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [projectFilter, setProjectFilter] = useState<ProjectId | 'all'>('all');
   const [techFilter, setTechFilter] = useState<string | null>(null);
+  const [hashtagFilter, setHashtagFilter] = useState<string | null>(null);
 
   // Sync state when props change (modal opens with new initialFeatureId/initialCategory)
   React.useEffect(() => {
     if (!open) return;
     setProjectFilter('all');
     setTechFilter(null);
+    setHashtagFilter(null);
     if (initialFeatureId) {
       const feature = features.find((f) => f.id === initialFeatureId);
       if (feature) {
@@ -91,23 +93,21 @@ export const FeatureModal = ({
     onOpenChange(isOpen);
   };
 
-  const activeFilter = techFilter;
+  const activeFilter = techFilter || hashtagFilter;
 
   const filteredFeatures = useMemo(() => {
     return features.filter((f) => {
       if (techFilter) {
         return f.techStack.some(t => t.toLowerCase() === techFilter.toLowerCase());
       }
+      if (hashtagFilter) {
+        return f.hashtags.some(h => h.replace('#', '').toLowerCase() === hashtagFilter.toLowerCase());
+      }
       if (f.category !== activeCategory) return false;
       if (projectFilter !== 'all' && f.projectId !== projectFilter) return false;
       return true;
     });
-  }, [features, activeCategory, projectFilter, techFilter]);
-
-  const categoryFeatures = useMemo(() => {
-    if (activeFilter) return filteredFeatures;
-    return features.filter((f) => f.category === activeCategory);
-  }, [features, activeCategory, activeFilter, filteredFeatures]);
+  }, [features, activeCategory, projectFilter, techFilter, hashtagFilter]);
 
   const handleFeatureClick = (feature: Feature) => {
     setSelectedFeature(feature);
@@ -115,13 +115,16 @@ export const FeatureModal = ({
   };
 
   const handleHashtagClick = (tag: string) => {
-    // Navigate to /search with tag filter (news/blog articles)
-    const cleanTag = tag.replace('#', '');
-    window.location.href = `/search?tag=${encodeURIComponent(cleanTag)}`;
+    // Filter features by hashtag inside the modal (same UX as tech filter)
+    setHashtagFilter(tag.replace('#', ''));
+    setTechFilter(null);
+    setIsDetailOpen(false);
+    setSelectedFeature(null);
   };
 
   const handleTechClick = (tech: string) => {
     setTechFilter(tech);
+    setHashtagFilter(null);
     setIsDetailOpen(false);
     setSelectedFeature(null);
   };
@@ -133,11 +136,13 @@ export const FeatureModal = ({
 
   const navigateFeature = (direction: 'prev' | 'next') => {
     if (!selectedFeature) return;
-    const idx = categoryFeatures.findIndex((f) => f.id === selectedFeature.id);
+    if (filteredFeatures.length === 0) return;
+    const idx = filteredFeatures.findIndex((f) => f.id === selectedFeature.id);
+    if (idx === -1) return;
     const newIdx = direction === 'next'
-      ? (idx + 1) % categoryFeatures.length
-      : (idx - 1 + categoryFeatures.length) % categoryFeatures.length;
-    setSelectedFeature(categoryFeatures[newIdx]);
+      ? (idx + 1) % filteredFeatures.length
+      : (idx - 1 + filteredFeatures.length) % filteredFeatures.length;
+    setSelectedFeature(filteredFeatures[newIdx]);
   };
 
   const labels = {
@@ -153,6 +158,7 @@ export const FeatureModal = ({
       project: 'Project',
       featureOf: 'of',
       viewPage: 'View full page',
+      noMatch: 'No features match the selected filters',
     },
     no: {
       title: 'Funksjoner',
@@ -166,6 +172,7 @@ export const FeatureModal = ({
       project: 'Prosjekt',
       featureOf: 'av',
       viewPage: 'Se hele siden',
+      noMatch: 'Ingen funksjoner samsvarer med valgte filtre',
     },
     ua: {
       title: 'Функції',
@@ -179,6 +186,7 @@ export const FeatureModal = ({
       project: 'Проект',
       featureOf: 'з',
       viewPage: 'Переглянути повну сторінку',
+      noMatch: 'Немає функцій за обраними фільтрами',
     },
   };
 
@@ -197,10 +205,10 @@ export const FeatureModal = ({
                 {activeFilter ? (
                   <>
                     <span className="text-sm font-normal text-content-muted">{t.title} /</span>
-                    <span className={`text-lg ${techFilter ? 'text-brand-light' : 'text-content-secondary'}`}>{activeFilter}</span>
+                    <span className={`text-lg ${techFilter ? 'text-brand-light' : 'text-content-secondary'}`}>{hashtagFilter ? `#${hashtagFilter}` : activeFilter}</span>
                     <span className="text-xs text-content-faint">({filteredFeatures.length})</span>
                     <button
-                      onClick={() => setTechFilter(null)}
+                      onClick={() => { setTechFilter(null); setHashtagFilter(null); }}
                       className="ml-1 text-content-faint hover:text-content-secondary"
                     >
                       <X className="w-4 h-4" />
@@ -316,7 +324,7 @@ export const FeatureModal = ({
 
               {filteredFeatures.length === 0 && (
                 <div className="text-center py-12 text-content-faint">
-                  No features in this category for selected project
+                  {t.noMatch}
                 </div>
               )}
             </div>
@@ -338,7 +346,7 @@ export const FeatureModal = ({
               const catInfo = getCategoryInfo(selectedFeature.category);
               const project = getProjectInfo(selectedFeature.projectId, projectList);
               const Icon = iconMap[catInfo.icon];
-              const currentIdx = categoryFeatures.findIndex((f) => f.id === selectedFeature.id);
+              const currentIdx = filteredFeatures.findIndex((f) => f.id === selectedFeature.id);
 
               return (
                 <>
@@ -357,7 +365,7 @@ export const FeatureModal = ({
                             {project.name[lang]}
                           </span>
                           <span className="text-xs text-content-faint">
-                            {currentIdx + 1} {t.featureOf} {categoryFeatures.length}
+                            {currentIdx + 1} {t.featureOf} {filteredFeatures.length}
                           </span>
                         </div>
                       </div>

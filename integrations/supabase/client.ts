@@ -343,21 +343,21 @@ export const getFeatureBySlug = async (slug: string, language: 'en' | 'no' | 'ua
     .select('*')
     .eq(slugColumn, slug)
     .eq('status', 'published')
-    .single();
+    .maybeSingle();
 
-  // If not found, try other slug columns
-  if (error || !data) {
+  // If not found, try other slug columns (maybeSingle: a miss is data=null, not an error)
+  if (!data) {
     const otherLanguages = ['en', 'no', 'ua'].filter(l => l !== language);
 
     for (const lang of otherLanguages) {
-      const { data: foundData, error: foundError } = await supabase
+      const { data: foundData } = await supabase
         .from('features')
         .select('*')
         .eq(`slug_${lang}`, slug)
         .eq('status', 'published')
-        .single();
+        .maybeSingle();
 
-      if (!foundError && foundData) {
+      if (foundData) {
         data = foundData;
         error = null;
         console.log(`Feature found with slug_${lang}:`, slug);
@@ -372,6 +372,26 @@ export const getFeatureBySlug = async (slug: string, language: 'en' | 'no' | 'ua
   }
 
   return data;
+};
+
+/**
+ * Get published features for the /features listing page
+ */
+export const getFeaturesList = async () => {
+  if (!isSupabaseConfigured()) return [];
+
+  const { data, error } = await supabase
+    .from('features')
+    .select('id, feature_id, project_id, category, slug_en, slug_no, slug_ua, title_en, title_no, title_ua, short_description_en, short_description_no, short_description_ua, tech_stack, hashtags, published_at, discovered_at, created_at')
+    .eq('status', 'published')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching features list:', error);
+    return [];
+  }
+
+  return data || [];
 };
 
 /**

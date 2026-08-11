@@ -119,7 +119,7 @@ export function FeatureArticle({ slug, initialLanguage, initialData }: FeatureAr
             </li>
             <ChevronRight className="w-4 h-4 text-content-faint" />
             <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem" className="flex items-center">
-              <a href="/" itemProp="item" className="text-brand-light hover:text-brand-light/80 transition-colors">
+              <a href="/features" itemProp="item" className="text-brand-light hover:text-brand-light/80 transition-colors">
                 <span itemProp="name">{t.features}</span>
               </a>
               <meta itemProp="position" content="2" />
@@ -249,7 +249,7 @@ export function FeatureArticle({ slug, initialLanguage, initialData }: FeatureAr
                 {feature.hashtags.map((tag: string) => (
                   <Link
                     key={tag}
-                    href={`/search?tag=${encodeURIComponent(tag.replace('#', ''))}`}
+                    href={`/features?tag=${encodeURIComponent(tag.replace('#', ''))}`}
                     className="text-xs text-content-faint hover:text-content-secondary hover:bg-surface-elevated px-1.5 py-0.5 rounded transition-all"
                   >
                     {tag}

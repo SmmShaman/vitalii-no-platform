@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { allFeatures, categories, getCategoryInfo } from '@/data/features'
 import { FeatureModal } from '@/components/ui/FeatureModal'
 import { sectionColors } from './types'
 import { VerticalLabel } from './VerticalLabel'
+import { readFeatureParams, writeFeatureParams } from '@/utils/featureModalUrl'
 import type { FeatureCategory } from '@/data/features'
 import type { TranslateFn } from './types'
 
@@ -19,6 +20,28 @@ export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: Mobile
   const langKey = currentLanguage.toLowerCase() as 'en' | 'no' | 'ua'
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false)
   const [selectedFeatureCategory, setSelectedFeatureCategory] = useState<FeatureCategory | undefined>(undefined)
+  const [selectedFeatureId, setSelectedFeatureId] = useState<string | undefined>(undefined)
+
+  // Deep-link support: open the Features modal from ?fid= / ?fcat= on mount
+  useEffect(() => {
+    const { featureId, category } = readFeatureParams()
+    if (featureId) {
+      setSelectedFeatureId(featureId)
+      setSelectedFeatureCategory(undefined)
+      setIsFeaturesModalOpen(true)
+    } else if (category) {
+      setSelectedFeatureCategory(category)
+      setSelectedFeatureId(undefined)
+      setIsFeaturesModalOpen(true)
+    }
+  }, [])
+
+  const handleModalOpenChange = (open: boolean) => {
+    setIsFeaturesModalOpen(open)
+    if (!open) {
+      writeFeatureParams() // remove fcat/fid from the URL on close
+    }
+  }
 
   const latestFeatures = allFeatures.slice(0, 4)
 
@@ -46,7 +69,9 @@ export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: Mobile
                   transition={{ delay: idx * 0.1 }}
                   onClick={() => {
                     setSelectedFeatureCategory(undefined)
+                    setSelectedFeatureId(undefined)
                     setIsFeaturesModalOpen(true)
+                    writeFeatureParams()
                   }}
                   className="flex items-center gap-2 p-1.5 rounded-md mb-1 bg-white/5 active:bg-white/10"
                 >
@@ -75,7 +100,9 @@ export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: Mobile
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
                     setSelectedFeatureCategory(cat.id)
+                    setSelectedFeatureId(undefined)
                     setIsFeaturesModalOpen(true)
+                    writeFeatureParams(cat.id)
                   }}
                   className={`flex flex-col items-center flex-shrink-0 p-1.5 rounded-lg ${cat.color.bg} border border-white/5`}
                 >
@@ -93,9 +120,10 @@ export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: Mobile
       {/* Features Modal (mobile) */}
       <FeatureModal
         open={isFeaturesModalOpen}
-        onOpenChange={setIsFeaturesModalOpen}
+        onOpenChange={handleModalOpenChange}
         features={allFeatures}
         initialCategory={selectedFeatureCategory}
+        initialFeatureId={selectedFeatureId}
         currentLanguage={langKey as 'en' | 'no' | 'ua'}
       />
     </>
