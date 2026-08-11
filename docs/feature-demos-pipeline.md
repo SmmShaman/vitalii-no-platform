@@ -1,0 +1,76 @@
+# Feature Demo Clips — Pipeline Prompt (canonical)
+
+This is the instruction sheet for every session/agent that produces feature demo
+clips. The pilot (v06, v12, j59 — 2026-08-11) proved the flow; follow it exactly.
+
+## Owner rules (non-negotiable)
+
+1. **NO SCHEDULED AUTOMATION UNTIL A FULL DRY-RUN PASSES.** Before enabling any
+   cron/timer that produces 3–4 clips per day, run ONE complete end-to-end cycle
+   in a supervised session and verify EVERY step:
+   pick feature → render → frame-verify → R2 upload → public URL answers
+   200/206 with `video/mp4` → DB `demo_media_url` set → live site HTML contains
+   the URL → YouTube upload with full SEO description → video `processed` →
+   playlist insert. Only after all checks pass may the schedule be enabled.
+2. **Batch runs verify every artifact and stop on first failure.** A nightly
+   batch must check each clip the same way as the dry-run; on any failure it
+   stops and reports instead of continuing blind.
+3. **Every YouTube video gets a full SEO description** (see template below).
+   A two-line description is a defect, not a draft.
+4. Scenario style rules from demo-video CLAUDE.md apply: ≥3 s per beat,
+   framed callouts (not subtitles), commercial benefit-led voiceover,
+   loop-friendly silent site version.
+
+## The proven flow (per feature)
+
+| Step | Tool | Where |
+|---|---|---|
+| 1. Pick feature + write 4-beat scenario | Sonnet 5 (Opus only for new templates) | Claude Code (subscription) |
+| 2a. UI feature → film live site | `demo-video/pilot/v06-live.mjs` pattern (Playwright, cursor+callouts) | VPS |
+| 2b. Backend feature → schema animation | `scripts/remotion-video` → `src/compositions/feature-demos/` primitives | local PC or VPS |
+| 3. Silent 15 s loop, 1280×720, h264, ≤2.5 MB, loop-clean seam | ffmpeg `-an`, check frame 0 ≈ last frame | — |
+| 4. Frame-verify (≤480px jpgs, ≤4 per clip, contact sheet preferred) | ffmpeg | — |
+| 5. Upload R2 `news-images/features/feature-<id>.mp4` | curl inside VPS, creds from `portfolio-edge-functions` env (never print) | VPS |
+| 6. `UPDATE features SET demo_media_url=...` | psql in `portfolio-db` | VPS |
+| 7. Check live: hub HTML contains the URL | curl vitalii.no/features | — |
+| 8. Voiced version: edge-tts (en-US-AndrewNeural), tpad last frame to VO+1 s, adelay 500 ms | `/root/feature-demos/yt/upload.py` pattern | VPS |
+| 9. YouTube upload (public, categoryId 28) + SEO description + playlist | YouTube Data API, creds from same container env | VPS |
+
+## YouTube SEO description template (MANDATORY per video)
+
+**Title** (≤70 chars): main keyword first, concrete benefit, ` | vitalii.no`
+(or ` | JobBot`) suffix. Never a bare feature name.
+
+**Description** (150–300 words, structured):
+
+```
+<Line 1–2: hook with the primary keywords — this is what shows before "…more">
+
+<Paragraph "Problem": 2–3 sentences, plain language, includes secondary keywords>
+
+<Paragraph "How it works": 3–4 sentences naming the real tech (Next.js, Supabase,
+Playwright, Groq, Remotion…) — tech names are search keywords>
+
+<Paragraph "Result": 1–2 sentences with a number/metric where the feature has one>
+
+🔗 Full write-up: https://vitalii.no/features/<slug>
+📚 All 214 features: https://vitalii.no/features
+👨‍💻 Built by Vitalii Berbeha — https://vitalii.no
+
+#<3–5 hashtags: mix of broad (#webdevelopment #ai) and niche (#nextjs #llmops)>
+```
+
+**Tags:** 10–15, mixing broad ("web development", "ai automation") and long-tail
+("nextjs isr seo", "llm fallback chain", "playwright automation demo").
+
+**Playlist:** "Features — vitalii.no" (public). NOTE: current refresh token has
+only `youtube.upload` + `youtube.readonly` scopes — playlist insert 403s until
+the owner re-consents with the full `youtube` scope and updates
+`YOUTUBE_REFRESH_TOKEN` on the VPS. Until then: upload works, playlist step is
+queued (idempotent part of upload.py).
+
+## Budget notes (measured in pilot)
+
+Template build (one-off, done): ~240k tokens. Marginal per clip:
+schema ≈ 40–60k, live-UI filming ≈ 80–120k. Remaining ~211 features ≈ 15M
+tokens total — run on Sonnet 5, batches of 3–4/day per owner's cadence.
