@@ -11,6 +11,7 @@ import { useTrackingSafe } from '@/contexts/TrackingContext'
 import { ShareButtons } from '@/components/ui/ShareButtons'
 import { ArticleSkeleton } from '@/components/ui/Skeleton'
 import { ScrollReveal } from '@/components/ui/ScrollReveal'
+import { FeatureDemoClip } from '@/components/ui/FeatureDemoClip'
 import { generateFeatureSchema, formatDate } from '@/utils/seo'
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -176,6 +177,18 @@ export function FeatureArticle({ slug, initialLanguage, initialData }: FeatureAr
               )}
             </div>
           </ScrollReveal>
+
+          {/* Demo clip */}
+          {feature.demo_media_url && (
+            <ScrollReveal delay={0.18}>
+              <FeatureDemoClip
+                src={feature.demo_media_url}
+                type={feature.demo_media_type}
+                title={title}
+                className="mb-6"
+              />
+            </ScrollReveal>
+          )}
 
           {shortDescription && (
             <ScrollReveal delay={0.2}>

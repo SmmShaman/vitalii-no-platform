@@ -40,6 +40,8 @@ interface FeatureRow {
   published_at: string | null
   discovered_at: string | null
   created_at: string | null
+  demo_media_url?: string | null
+  demo_media_type?: string | null
 }
 
 // Map the static fallback data to the same row shape as the DB query
@@ -63,6 +65,8 @@ function staticFeatureRows(): FeatureRow[] {
     published_at: null,
     discovered_at: null,
     created_at: f.createdAt || null,
+    demo_media_url: f.demoMediaUrl ?? null,
+    demo_media_type: f.demoMediaType ?? null,
   }))
 }
 
@@ -162,6 +166,19 @@ export default async function FeaturesListingPage({ searchParams }: Props) {
                   className="flex flex-col rounded-xl border border-surface-border bg-surface-elevated/40 hover:bg-surface-elevated transition-colors p-5"
                 >
                   <Link href={`/features/${slug}`} className="flex-1 group">
+                    {feature.demo_media_url && (
+                      <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="none"
+                        aria-label={title}
+                        className="w-full h-auto rounded-md mb-3"
+                      >
+                        <source src={feature.demo_media_url} type={feature.demo_media_type || 'video/mp4'} />
+                      </video>
+                    )}
                     <div className="flex flex-wrap items-center gap-2 mb-3">
                       <span className={`text-[11px] px-2 py-0.5 rounded-full ${catInfo.color.bg} ${catInfo.color.text}`}>
                         {catInfo.label.en}

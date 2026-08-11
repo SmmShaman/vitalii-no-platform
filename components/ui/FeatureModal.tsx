@@ -7,6 +7,7 @@ import { X, ChevronLeft, ChevronRight, Brain, Video, Bot, Palette, Server, Layer
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Feature, FeatureCategory, ProjectId, ProjectInfo } from '@/data/features';
 import { categories, getCategoryInfo, getProjectInfo, projects as staticProjects } from '@/data/features';
+import { FeatureDemoClip } from '@/components/ui/FeatureDemoClip';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Brain, Video, Bot, Palette, Server, Layers,
@@ -380,6 +381,16 @@ export const FeatureModal = ({
 
                   {/* Content */}
                   <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-160px)]">
+                    {/* Demo clip */}
+                    {selectedFeature.demoMediaUrl && (
+                      <FeatureDemoClip
+                        src={selectedFeature.demoMediaUrl}
+                        type={selectedFeature.demoMediaType}
+                        title={selectedFeature.title[lang]}
+                        className="mb-6"
+                      />
+                    )}
+
                     {/* Problem */}
                     <div className="mb-6">
                       <h4 className="text-sm font-semibold text-content-secondary uppercase tracking-wider mb-2">

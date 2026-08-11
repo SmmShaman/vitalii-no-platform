@@ -40,6 +40,8 @@ export async function GET() {
       hashtags: f.hashtags || [],
       sourceCommits: f.source_commits || [],
       createdAt: f.created_at,
+      demoMediaUrl: f.demo_media_url || null,
+      demoMediaType: f.demo_media_type || null,
       repoUrl: (f.feature_projects as { repo_url?: string } | null)?.repo_url || null,
     }))
 

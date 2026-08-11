@@ -382,7 +382,7 @@ export const getFeaturesList = async () => {
 
   const { data, error } = await supabase
     .from('features')
-    .select('id, feature_id, project_id, category, slug_en, slug_no, slug_ua, title_en, title_no, title_ua, short_description_en, short_description_no, short_description_ua, tech_stack, hashtags, published_at, discovered_at, created_at')
+    .select('id, feature_id, project_id, category, slug_en, slug_no, slug_ua, title_en, title_no, title_ua, short_description_en, short_description_no, short_description_ua, tech_stack, hashtags, published_at, discovered_at, created_at, demo_media_url, demo_media_type')
     .eq('status', 'published')
     .order('created_at', { ascending: false });
 

@@ -23,6 +23,8 @@ export interface Feature {
   techStack: string[];
   hashtags: string[];
   createdAt?: string;
+  demoMediaUrl?: string | null;
+  demoMediaType?: string | null;
 }
 
 export interface CategoryInfo {
