@@ -14,6 +14,8 @@ import { NewsVideo } from "./compositions/NewsVideo";
 import { DirectedNewsVideo } from "./compositions/DirectedNewsVideo";
 import { DailyNewsShow } from "./compositions/DailyNewsShow";
 import { ThumbnailHorizontal } from "./compositions/ThumbnailHorizontal";
+import { FeatureLLMFallback } from "./compositions/feature-demos/FeatureLLMFallback";
+import { FeatureAgentSubmit } from "./compositions/feature-demos/FeatureAgentSubmit";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -172,6 +174,24 @@ export const RemotionRoot: React.FC = () => {
           return { durationInFrames: Math.ceil(seconds * 30) };
         }}
       />
+      {/* ── Feature schema demos (silent looping diagrams for /features) ── */}
+      <Composition
+        id="FeatureLLMFallback"
+        component={FeatureLLMFallback}
+        durationInFrames={450}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+      <Composition
+        id="FeatureAgentSubmit"
+        component={FeatureAgentSubmit}
+        durationInFrames={450}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
       {/* ── Thumbnail (Still) ── */}
       <Still
         id="ThumbnailHorizontal"
