@@ -92,3 +92,17 @@ machine — for real accounting sum the session log.)
 4. Marginal per clip (templates ready): schema ≈ 30–40k, live-UI ≈ 50–70k,
    YouTube layer with full SEO description ≈ 25k. All-in per feature ≈ 60–100k.
 5. Weekly: one short Opus QA pass over a random sample of the week's clips.
+
+### Accelerated mode (owner-approved 2026-08-12, when weekly quota is abundant)
+
+- After the 2-feature dry-run passes clean IN THE SAME DAY, batch size may grow
+  to **15–20 features per fresh Sonnet session**, sessions run back-to-back.
+- Prioritize SITE clips (render → R2 → DB → site check); the YouTube layer is
+  hard-capped externally at **~6 uploads/day** (YouTube Data API quota: 10k
+  units/day, upload = 1600) — maintain an upload queue table/list and drip 6
+  per day, oldest first, full SEO description each.
+- Stop-on-first-failure still applies within a batch; between batches check
+  `/usage` and STOP for the week when weekly usage reserve drops to ~30–35%
+  (jobbot and other projects share the same subscription).
+- VPS render wall-clock is the other bottleneck (~3–5 min/clip): run renders
+  sequentially in the background, never parallel Playwright recordings.
