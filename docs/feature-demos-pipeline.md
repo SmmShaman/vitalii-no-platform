@@ -71,10 +71,13 @@ queued (idempotent part of upload.py).
 
 ## Budget & session strategy (measured 2026-08-11, FINAL)
 
-Measured: the pilot mega-session (analysis + fixes + infra + 3 clips + YouTube)
-cost **$75.60 API-equivalent**, of which all 7 subagents were only ~630k tokens
-(~$10–15). The dominant cost was the ORCHESTRATOR: a long-lived session on the
-top-tier model re-reading a huge context every turn.
+Measured from the session JSONL log: the pilot mega-session (analysis + fixes +
+infra + 3 clips + YouTube) cost **≈$130 API-equivalent for the day**, of which
+all 7 subagents were only ~630k tokens (~$10–15). The dominant term: **71.6M
+cached-token reads across 231 main-loop calls (avg ~310k context re-read per
+call) = $72 alone**. A long-lived session's context tail is the cost, not the
+work itself. (The `/usage` screen shows only the current 5h window on one
+machine — for real accounting sum the session log.)
 
 **Therefore the conveyor rules are:**
 
