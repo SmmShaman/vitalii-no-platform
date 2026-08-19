@@ -275,31 +275,44 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
 
   if ((LLM_PROVIDER === "groq" || LLM_PROVIDER === "gemini") && GROQ_API_KEY) {
     // 2026-08-19: llama-4-scout decommissioned by Groq (404) — this dead fallback
-    // stranded the 18.08 digest at pending_digest. qwen3.6-27b sits on its own
-    // Groq pool (independent of the gpt-oss TPD the rewrites burn) and supports
-    // json_object; reasoning_format=hidden keeps <think> out of the content.
-    console.log("🤖 Using Groq (qwen3.6-27b)");
-    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "qwen/qwen3.6-27b",
+    // stranded the 18.08 digest at pending_digest. Try gpt-oss-120b first (best
+    // Norwegian of the surviving catalog), then qwen3.6-27b, which sits on its
+    // own Groq pool (independent of the gpt-oss TPD the rewrites burn).
+    // Both are thinking models: give max_tokens headroom, hide/strip the thinking.
+    let lastErr = "";
+    for (const model of ["openai/gpt-oss-120b", "qwen/qwen3.6-27b"]) {
+      console.log(`🤖 Using Groq (${model})`);
+      const groqBody: Record<string, unknown> = {
+        model,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
         max_tokens: Math.min(maxTokens + 1500, 8192),
-        reasoning_format: "hidden",
         response_format: { type: "json_object" },
-      }),
-    });
-    if (!resp.ok) throw new Error(`Groq: ${resp.status} ${await resp.text()}`);
-    const data = await resp.json();
-    return (data.choices?.[0]?.message?.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+      };
+      if (model.startsWith("openai/gpt-oss")) groqBody.reasoning_effort = "low";
+      if (model.startsWith("qwen/")) groqBody.reasoning_format = "hidden";
+      const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${GROQ_API_KEY}`,
+        },
+        body: JSON.stringify(groqBody),
+      });
+      if (!resp.ok) {
+        lastErr = `Groq ${model}: ${resp.status} ${await resp.text()}`;
+        console.warn(`⚠️ ${lastErr.substring(0, 200)} — trying next model`);
+        continue;
+      }
+      const data = await resp.json();
+      const text = (data.choices?.[0]?.message?.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+      if (text) return text;
+      lastErr = `Groq ${model}: empty completion`;
+    }
+    throw new Error(lastErr || "Groq: all models failed");
   }
 
   // No other provider available

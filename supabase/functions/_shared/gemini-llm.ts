@@ -77,9 +77,12 @@ async function callGroq(
   const budget = Math.max(11500 - promptTokens, 1000)
   const maxTokens = Math.min(options.maxTokens ?? 8000, budget)
 
-  // 2026-08-19: llama-3.3-70b-versatile decommissioned by Groq (404). qwen3.6-27b
-  // is the remaining general chat model; it reasons in-band, so hide the thinking.
-  const model = Deno.env.get('GROQ_MODEL') || 'qwen/qwen3.6-27b'
+  // 2026-08-19: llama-3.3-70b-versatile decommissioned by Groq (404).
+  // gpt-oss-120b is the best remaining Norwegian writer (measured 2026-07-25:
+  // beats even the old 70b); qwen3.6-27b writes Danish-tinted bokmål, so it is
+  // NOT the default here — override via GROQ_MODEL_REWRITE only if 120b dies.
+  const model = Deno.env.get('GROQ_MODEL_REWRITE') || 'openai/gpt-oss-120b'
+  const isGptOss = model.startsWith('openai/gpt-oss')
   const body: Record<string, unknown> = {
     model,
     messages: [
@@ -87,8 +90,11 @@ async function callGroq(
       { role: 'user', content: userPrompt },
     ],
     temperature,
-    max_tokens: maxTokens,
+    // Reasoning tokens count against max_tokens — give thinking models headroom
+    // or they return an empty completion.
+    max_tokens: isGptOss || model.startsWith('qwen/') ? Math.min(maxTokens + 1500, 8192) : maxTokens,
   }
+  if (isGptOss) body.reasoning_effort = Deno.env.get('GROQ_REASONING_EFFORT') || 'low'
   if (model.startsWith('qwen/')) body.reasoning_format = 'hidden'
 
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
