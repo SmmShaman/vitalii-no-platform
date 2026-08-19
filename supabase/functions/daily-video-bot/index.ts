@@ -2754,26 +2754,29 @@ OPPGAVE: Lag EN kort, slagkraftig overskrift for thumbnail (2-4 ord).
 REGLER:
 - Maks 4 ord, helst 2-3
 - STORE BOKSTAVER (UPPERCASE)
-- Norsk bokmal
+- KORREKT norsk bokmål: riktige bokstaver Å/Ø/Æ (ALDRI tyske Ö/Ä/Ü), riktig grammatikk og bøyning (f.eks. "HAR LØPT LØPSK", ikke "HAR LØPET LÖPSK"), bindestrek i sammensetninger ("KI-EPOKEN", ikke "KI EPOKEN")
+- Skriv "KI", ikke "AI" — kanalen bruker konsekvent KI
 - INGEN emojier, INGEN tall, INGEN tegnsetting
-- Fokuser pa den mest sjokerende/spennende nyheten
-- Bruk sterke verb og folelsesord
-- Skap nysgjerrighet — la noe vare usagt
+- Fokuser på den mest sjokkerende/spennende nyheten
+- Bruk sterke verb og følelsesord
+- Skap nysgjerrighet — la noe være usagt
+- Ikke gjenta gårsdagens vinkel: varier ordvalget (ikke KNUSER/TAR OVER hver dag)
 
 GODE EKSEMPLER:
 - DETTE ENDRER ALT
-- AI OVERTAR NORGE
-- APPLE SJOKKER ALLE
-- NY TECH REVOLUSJON
-- INGEN SA DETTE KOMME
+- KI OVERTAR NORGE
+- APPLE SJOKKERER ALLE
+- NY TECH-REVOLUSJON
+- INGEN SÅ DETTE KOMME
 - NORSK GJENNOMBRUDD
 - FREMTIDEN ER HER
 - MARKEDET KOLLAPSER
 
-DARLIGE EKSEMPLER (IKKE bruk):
+DÅRLIGE EKSEMPLER (IKKE bruk):
 - 7 TECH-NYHETER (kjedelig, med tall)
 - DAGLIG OPPDATERING (generisk)
 - SE DETTE (vagt)
+- KI HAR LØPET LÖPSK (feil bøyning og tysk Ö)
 
 Svar med KUN overskriften, ingenting annet.` }] },
           contents: [{ role: "user", parts: [{ text: `Dagens nyheter:\n- ${headlines}\n\nLag thumbnail-overskrift:` }] }],
@@ -2793,6 +2796,8 @@ Svar med KUN overskriften, ingenting annet.` }] },
     let headline = (parts[parts.length - 1]?.text || "").trim();
     // Clean: remove quotes, emojis, ensure uppercase
     headline = headline.replace(/["""'']/g, "").replace(/[\u{1F000}-\u{1FFFF}]/gu, "").trim().toUpperCase();
+    // Norwegian has no umlauts — LLMs sometimes emit German Ö/Ä (seen live: "LÖPSK" 17.08)
+    headline = headline.replace(/Ö/g, "Ø").replace(/Ä/g, "Æ").replace(/Ü/g, "U");
     console.log(`📝 Thumbnail headline: "${headline}"`);
     return headline;
   } catch (err: any) {
