@@ -139,12 +139,15 @@ async function generateImageViaCloudflareFlux(
     return null
   }
 
-  const sizeMap: Record<string, { w: number; h: number }> = {
-    '1:1': { w: 1024, h: 1024 },
-    '16:9': { w: 1280, h: 720 },
-    '4:5': { w: 832, h: 1024 },
-  }
-  const { w, h } = sizeMap[aspectRatio] || sizeMap['1:1']
+  // 2026-08-19: CF now REJECTS width/height on flux-1-schnell ("Additional or
+  // unevaluated properties '/width, /height' not allowed", HTTP 400) — the model
+  // takes only prompt+steps and always returns a square image. The aspect-ratio
+  // hint goes into the prompt instead; the render crops to fit.
+  const arHint = aspectRatio === '16:9'
+    ? ' Wide 16:9 landscape framing with safe margins for horizontal crop.'
+    : aspectRatio === '4:5'
+      ? ' Vertical portrait framing with safe margins for vertical crop.'
+      : ''
 
   // FLUX is bad at rendering text; strip branding/text blocks and add a guard.
   const cleanedPrompt = prompt
@@ -153,7 +156,7 @@ async function generateImageViaCloudflareFlux(
     .replace(/\s+/g, ' ')
     .trim()
     .substring(0, 1500)
-  const finalPrompt = `${cleanedPrompt}\n\nStyle: professional editorial photography, no text in image, no watermarks, clean composition, photorealistic`
+  const finalPrompt = `${cleanedPrompt}\n\nStyle: professional editorial photography, no text in image, no watermarks, clean composition, photorealistic.${arHint}`
 
   try {
     const t0 = Date.now()
@@ -162,7 +165,7 @@ async function generateImageViaCloudflareFlux(
       {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${aiToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: finalPrompt, steps: 4, width: w, height: h }),
+        body: JSON.stringify({ prompt: finalPrompt, steps: 4 }),
       },
     )
     const dt = Date.now() - t0

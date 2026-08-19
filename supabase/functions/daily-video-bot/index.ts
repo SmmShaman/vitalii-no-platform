@@ -26,7 +26,7 @@ import { triggerDailyVideoRender } from "../_shared/github-actions.ts";
 import { HUMANIZER_VIDEO, VOICE_SPOKEN } from "../_shared/humanizer-prompt.ts";
 import { generateImageFree, generateImageFluxFree } from "../_shared/free-image.ts";
 
-const VERSION = "2026-08-06-v37-free-llm-only";
+const VERSION = "2026-08-19-v38-groq-qwen-flux-schema";
 const MAX_DETAILED = 10;
 
 const supabase = createClient(
@@ -274,7 +274,11 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
   }
 
   if ((LLM_PROVIDER === "groq" || LLM_PROVIDER === "gemini") && GROQ_API_KEY) {
-    console.log("🤖 Using Groq (Llama 4 Scout)");
+    // 2026-08-19: llama-4-scout decommissioned by Groq (404) — this dead fallback
+    // stranded the 18.08 digest at pending_digest. qwen3.6-27b sits on its own
+    // Groq pool (independent of the gpt-oss TPD the rewrites burn) and supports
+    // json_object; reasoning_format=hidden keeps <think> out of the content.
+    console.log("🤖 Using Groq (qwen3.6-27b)");
     const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -282,19 +286,20 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
         "Authorization": `Bearer ${GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-4-scout-17b-16e-instruct",
+        model: "qwen/qwen3.6-27b",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
-        max_tokens: Math.min(maxTokens, 8192),
+        max_tokens: Math.min(maxTokens + 1500, 8192),
+        reasoning_format: "hidden",
         response_format: { type: "json_object" },
       }),
     });
     if (!resp.ok) throw new Error(`Groq: ${resp.status} ${await resp.text()}`);
     const data = await resp.json();
-    return data.choices?.[0]?.message?.content?.trim() || "";
+    return (data.choices?.[0]?.message?.content || "").replace(/<think>[\s\S]*?<\/think>/g, "").trim();
   }
 
   // No other provider available
@@ -1091,8 +1096,11 @@ Return JSON: {"introScript": "Velkommen til dagens nyhetsdigest fra Vitalii Berb
       }
       const prompt = `Photorealistic editorial b-roll photograph for a technology news broadcast, illustrating: ${prompts[i]}. Wide cinematic composition, realistic lighting, news documentary style.`;
       const res = await generateImageFluxFree(prompt, "16:9");
-      aiBrollUsed++;
+      // Count only successful generations against the cap — a FLUX outage (e.g. the
+      // 2026-08-16..18 400-storm) otherwise burns the whole budget in seconds and
+      // starves every later group. Attempts stay bounded by groups × needed.
       if (!res) continue;
+      aiBrollUsed++;
       try {
         const bStr = atob(res.base64);
         const bytes = new Uint8Array(bStr.length);

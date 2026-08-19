@@ -36,26 +36,29 @@ async function callGeminiDirect(systemPrompt, userPrompt, opts = {}) {
 async function callGroq(systemPrompt, userPrompt, opts = {}) {
   const key = process.env.GROQ_API_KEY
   if (!key) throw new Error('GROQ_API_KEY not set')
-  const model = opts.groqModel || 'llama-3.3-70b-versatile'
+  // 2026-08-19: Groq killed all Llama chat models; qwen3.6-27b is the survivor.
+  const model = opts.groqModel || 'qwen/qwen3.6-27b'
+  const body = {
+    model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    temperature: opts.temperature ?? 0.5,
+    max_tokens: opts.maxTokens ?? 8000,
+  }
+  if (model.startsWith('qwen/')) body.reasoning_format = 'hidden'
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: opts.temperature ?? 0.5,
-      max_tokens: opts.maxTokens ?? 8000,
-    }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) {
     const err = await res.text()
     throw new Error(`Groq ${model} ${res.status}: ${err.slice(0, 200)}`)
   }
   const data = await res.json()
-  const text = data?.choices?.[0]?.message?.content || ''
+  const text = (data?.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim()
   if (!text) throw new Error('Groq returned empty response')
   return text
 }

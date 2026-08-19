@@ -3,18 +3,18 @@
  * Drop-in replacement for Azure OpenAI calls.
  *
  * Routes (callers pass `llm_route` in the request body, default 'default'):
- *   quality    — gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA → free-Gemini  (rewrites + translations)
- *   moderation — free-Gemini Lite → Groq 8b-instant → gpt-oss-20b → NVIDIA     (pre-moderation scoring)
- *   bulk       — Groq 8b-instant → gpt-oss-20b → Gemini → NVIDIA               (high-volume internal scoring)
- *   default    — gpt-oss-120b → gpt-oss-20b → Groq 70b → Gemini → NVIDIA       (creative EN: teasers, prompts)
+ *   quality    — gpt-oss-120b → gpt-oss-20b → Groq qwen → NVIDIA → free-Gemini (rewrites + translations)
+ *   moderation — free-Gemini Lite → Groq qwen → gpt-oss-20b → NVIDIA           (pre-moderation scoring)
+ *   bulk       — Groq qwen → gpt-oss-20b → Gemini → NVIDIA                     (high-volume internal scoring)
+ *   default    — gpt-oss-120b → gpt-oss-20b → Groq qwen → Gemini → NVIDIA      (creative EN: teasers, prompts)
  *
  * Each gpt-oss model carries only 8k TPM, and one article-sized call is ~4k, so
  * the two of them are chained to double the per-minute headroom before the
- * scarce 70b pool or paid Gemini are touched.
+ * qwen pool or paid Gemini are touched.
  *
  * Groq rate limits are per-model, so every model in the chain draws from its own
- * pool. The 70b pool (100k TPD) is the scarcest and is shared with the jobbot
- * project, so it is no longer the first choice on any route.
+ * pool. 2026-08-19: every Llama chat model 404s on Groq (decommissioned) — the
+ * catalog is now gpt-oss-120b / gpt-oss-20b / qwen3.6-27b only.
  */
 
 const NVIDIA_API_KEY = Deno.env.get('NVIDIA_API_KEY') || ''
@@ -25,8 +25,12 @@ const GOOGLE_API_KEY = Deno.env.get('GOOGLE_API_KEY') || ''
 const GEMINI_DAILY_LIMIT = parseInt(Deno.env.get('GEMINI_DAILY_LIMIT') || '150', 10)
 const NVIDIA_MODEL = Deno.env.get('NVIDIA_MODEL') || 'meta/llama-3.1-70b-instruct'
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash'
-const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'llama-3.3-70b-versatile'
-const GROQ_MODEL_BULK = Deno.env.get('GROQ_MODEL_BULK') || 'llama-3.1-8b-instant'
+// 2026-08-19: Groq decommissioned ALL Llama chat models (llama-3.3-70b-versatile,
+// llama-3.1-8b-instant, llama-4-scout → 404 model_not_found). qwen3.6-27b is the
+// only remaining general chat model besides the gpt-oss pair, and sits on its own
+// per-model pool — keeping bulk traffic off the gpt-oss 200k TPD budget.
+const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'qwen/qwen3.6-27b'
+const GROQ_MODEL_BULK = Deno.env.get('GROQ_MODEL_BULK') || 'qwen/qwen3.6-27b'
 // gpt-oss models sit on their own Groq pools and reason before answering.
 const GROQ_MODEL_REASON = Deno.env.get('GROQ_MODEL_REASON') || 'openai/gpt-oss-120b'
 const GROQ_MODEL_REASON_SMALL = Deno.env.get('GROQ_MODEL_REASON_SMALL') || 'openai/gpt-oss-20b'
@@ -95,11 +99,12 @@ async function tryGroq(call: LlmCall, model: string): Promise<Response | null> {
   if (GROQ_KEYS.length === 0) return null
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
-      const isReasoning = model.startsWith('openai/gpt-oss')
+      const isGptOss = model.startsWith('openai/gpt-oss')
+      const isQwen = model.startsWith('qwen/')
       // Reasoning tokens are charged against max_tokens, so a tight budget comes
       // back as an empty completion. Give reasoning models headroom on top of
       // whatever the caller asked for.
-      const tokenBudget = isReasoning
+      const tokenBudget = (isGptOss || isQwen)
         ? Math.min(Math.max(call.maxTokens + 1500, 2000), 8192)
         : Math.min(call.maxTokens, 8192)
       const groqBody: Record<string, unknown> = {
@@ -108,7 +113,9 @@ async function tryGroq(call: LlmCall, model: string): Promise<Response | null> {
         temperature: call.temperature,
         max_tokens: tokenBudget,
       }
-      if (isReasoning) groqBody.reasoning_effort = GROQ_REASONING_EFFORT
+      if (isGptOss) groqBody.reasoning_effort = GROQ_REASONING_EFFORT
+      // qwen thinks in-band (<think>…</think> inside content) unless told otherwise.
+      if (isQwen) groqBody.reasoning_format = 'hidden'
       if (call.expectsJson) groqBody.response_format = { type: 'json_object' }
 
       const groqRes = await fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
@@ -122,7 +129,9 @@ async function tryGroq(call: LlmCall, model: string): Promise<Response | null> {
 
       if (groqRes.ok) {
         const groqData = await groqRes.json()
-        const text = stripFence(groqData?.choices?.[0]?.message?.content?.trim() || '')
+        // Defensive: strip any in-band thinking a reasoning model leaks anyway.
+        const raw = (groqData?.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim()
+        const text = stripFence(raw)
         if (text) {
           const u = groqData.usage || {}
           console.log(`🟢 Groq (${model}) — ${text.length} chars | tokens: ${u.prompt_tokens || 0}+${u.completion_tokens || 0}`)

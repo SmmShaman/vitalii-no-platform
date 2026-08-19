@@ -77,21 +77,27 @@ async function callGroq(
   const budget = Math.max(11500 - promptTokens, 1000)
   const maxTokens = Math.min(options.maxTokens ?? 8000, budget)
 
+  // 2026-08-19: llama-3.3-70b-versatile decommissioned by Groq (404). qwen3.6-27b
+  // is the remaining general chat model; it reasons in-band, so hide the thinking.
+  const model = Deno.env.get('GROQ_MODEL') || 'qwen/qwen3.6-27b'
+  const body: Record<string, unknown> = {
+    model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    temperature,
+    max_tokens: maxTokens,
+  }
+  if (model.startsWith('qwen/')) body.reasoning_format = 'hidden'
+
   const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      model: 'llama-3.3-70b-versatile',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature,
-      max_tokens: maxTokens,
-    }),
+    body: JSON.stringify(body),
   })
 
   if (!res.ok) {
@@ -100,7 +106,7 @@ async function callGroq(
   }
 
   const data = await res.json()
-  const text = data?.choices?.[0]?.message?.content || ''
+  const text = (data?.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim()
   if (!text) throw new Error('Groq returned empty response')
 
   const usage = data.usage
