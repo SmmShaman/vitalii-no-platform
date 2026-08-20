@@ -54,14 +54,17 @@ All v2 uploads confirmed `uploadStatus=processed processing=succeeded`.
 Only ~6 uploads/day fit the 10k-unit quota (upload = 1600 units) and the daily
 Norwegian digest needs its own upload from the same quota — hence 5/day here.
 
-**2026-08-20: owner approved deleting the defective originals.** Deletion needs
-the full-scope token (`token-full.json`, minted via loopback OAuth consent) —
-the upload-only refresh token 403s on `videos.delete`. All old ids above sit in
-`/root/feature-demos/yt/delete-queue.txt` and are removed by the daily
-`feature-yt-queue.timer` runner as soon as the full-scope token is in place.
-The same runner uploads the remaining v2s (j06/j07/j08/p01/p02/p30, 4/day),
-then continues with the new-feature queue (j09–j12 artifacts ready 2026-08-20),
-and adds every clean video to the public playlist "Features — vitalii.no".
+**2026-08-20 evening — DONE:** owner completed the OAuth consent (playground
+redirect is the one registered on the client; localhost is NOT). Full-scope
+token saved as `/root/feature-demos/yt/token-full.json` (channel verified:
+UCho6BqD_HVmwdg_06EWaQQQ). **All 6 defective originals deleted** (204 each).
+Public playlist **"Features — vitalii.no"** created:
+https://www.youtube.com/playlist?list=PLBBQx1yDXs1c — seeded with the 9 clean
+videos (3 pilots + p41-v2 + j01–j05 v2). The daily `feature-yt-queue.timer`
+runner (07:30 UTC, max 4/day) now: uploads the remaining v2s
+(j06/j07/j08/p01/p02/p30) deleting each defective original right after its v2
+lands, then continues with new features (j09–j12 artifacts ready), and
+auto-adds every upload to the playlist.
 
 ## Notes
 
