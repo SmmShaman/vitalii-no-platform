@@ -784,21 +784,23 @@ Return JSON:
     const introResponse = await callAI(
       `You are a Norwegian news anchor. Write intro and outro for a daily news digest with ${groups.length} stories.
 
+INTRO RULE: Do NOT greet the viewer, do NOT introduce or name the host, do NOT mention the date or weekday (no "Velkommen...", no "Hei, jeg heter...", no "God mandag..."). A host greeting with name and date is prepended automatically at render time. Start directly with what today's digest covers: tease the 2-3 most interesting of today's topics in one or two sentences — do not list every story.
+
 ${HUMANIZER_VIDEO}
 
 ${VOICE_SPOKEN}
 
-Return JSON: {"introScript": "Velkommen til dagens nyhetsdigest fra Vitalii Berbeha. ...", "outroScript": "Det var alt for i dag. Abonner på kanalen og trykk liker-knappen! ...", "introTranslationEn": "...", "outroTranslationEn": "..."}`,
-      `Write intro/outro for ${displayDate} digest with ${groups.length} stories`,
+Return JSON: {"introScript": "Her er de viktigste teknologinyhetene. I dag har vi ... saker, blant annet ...", "outroScript": "Det var alt for i dag. Abonner på kanalen og trykk liker-knappen! ...", "introTranslationEn": "...", "outroTranslationEn": "..."}`,
+      `Write intro/outro for ${displayDate} digest with ${groups.length} stories.\nToday's topics:\n- ${groups.map((g: any) => g.topic || "").filter(Boolean).join("\n- ")}`,
       1000,
     );
     const intro = JSON.parse(introResponse.match(/\{[\s\S]*\}/)?.[0] || introResponse);
-    plan.introScript = intro.introScript || `Velkommen til dagens nyhetsdigest fra Vitalii Berbeha. I dag har vi ${groups.length} saker.`;
+    plan.introScript = intro.introScript || `Her er de viktigste teknologinyhetene. I dag har vi ${groups.length} saker.`;
     plan.outroScript = intro.outroScript || "Det var alt for i dag. Abonner på kanalen og trykk liker-knappen!";
     plan.introTranslationEn = intro.introTranslationEn || "";
     plan.outroTranslationEn = intro.outroTranslationEn || "";
   } catch {
-    plan.introScript = `Velkommen til dagens nyhetsdigest fra Vitalii Berbeha. I dag har vi ${groups.length} saker.`;
+    plan.introScript = `Her er de viktigste teknologinyhetene. I dag har vi ${groups.length} saker.`;
     plan.outroScript = "Det var alt for i dag. Abonner på kanalen og trykk liker-knappen!";
   }
 
@@ -1456,7 +1458,7 @@ The video is a compilation of ${orderedArticles.length} news stories from ${disp
 Target duration: ~${targetDuration} seconds. There is NO maximum length — take the time needed for each story.
 
 Write SEPARATE scripts for each part:
-1. "introScript" — news digest opening (~8-12s, ~25-30 words). MUST start with "Velkommen til dagens nyhetsdigest fra Vitalii Berbeha. Her er de viktigste teknologinyhetene." Then mention article count (${orderedArticles.length} saker i dag).${roundupPromptBlock}
+1. "introScript" — news digest opening (~8-12s, ~25-30 words). MUST start with "Her er de viktigste teknologinyhetene." Do NOT greet the viewer, do NOT name the host, do NOT mention the date — the host greeting with name and date is prepended automatically at render time. Then mention article count (${orderedArticles.length} saker i dag).${roundupPromptBlock}
 ${hasOverflow ? "3" : "2"}. "segmentScripts" — one narration for each of the ${detailedCount} detailed articles (~25-35s each, ~${wordsPerArticle * 2} words each). 5-8 sentences each. Include CONTEXT: why this matters, who is affected, key numbers/facts, brief background. Make each segment substantive — the viewer should understand the story fully from the narration alone.
 ${hasOverflow ? "4" : "3"}. "outroScript" — closing with subscribe CTA (~4-5s, ~${wordsPerArticle} words). MUST include "Abonner på kanalen og trykk liker-knappen!"${overflowPromptBlock}
 - "segmentTranslations" — Ukrainian translations of each segmentScript (for moderator review)
@@ -1482,11 +1484,11 @@ ${VOICE_SPOKEN}
 
 Return JSON:
 {
-  "introScript": "Velkommen til dagens nyhetsdigest fra Vitalii Berbeha...",${hasOverflow ? '\n  "roundupScript": "I dag dekker vi N nyheter...",' : ""}${hasOverflow ? '\n  "roundupTranslation": "Сьогодні ми розглянемо...",' : ""}
+  "introScript": "Her er de viktigste teknologinyhetene...",${hasOverflow ? '\n  "roundupScript": "I dag dekker vi N nyheter...",' : ""}${hasOverflow ? '\n  "roundupTranslation": "Сьогодні ми розглянемо...",' : ""}
   "segmentScripts": ["...", ...],
   "outroScript": "Det var alt for i dag. Abonner på kanalen...",${hasOverflow ? '\n  "overflowScript": "Du finner N flere nyheter på vitalii punkt no.",' : ""}${hasOverflow ? '\n  "overflowTranslation": "Ще N новин читайте на...",' : ""}
   "segmentTranslations": ["Почнімо з...", ...],
-  "introTranslation": "Привіт, я Віталій...",
+  "introTranslation": "Ось найважливіші технологічні новини...",
   "outroTranslation": "На сьогодні все..."
 }`;
 

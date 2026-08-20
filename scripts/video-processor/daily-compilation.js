@@ -157,13 +157,13 @@ NARRATIVE STYLE:
 - NEVER list articles ("Sak nummer 1...", "Neste nyhet..."). Instead, use natural transitions ("I en relatert utvikling...", "På den andre siden av teknologilandskapet...", "Et av de mest overraskende funnene i dag...")
 
 You must write SEPARATE scripts for each part:
-1. "introScript" — atmospheric opening (~5-6 seconds). Start with "Velkommen til dagens nyhetsdigest fra Vitalii Berbeha." Then set the MOOD of the day — what themes dominate? What's the big picture? Do NOT list headlines.
+1. "introScript" — atmospheric opening (~5-6 seconds). Do NOT greet the viewer, do NOT introduce or name the host, do NOT mention the date or weekday — a host greeting with name and date is prepended automatically at render time. Start directly with the MOOD of the day — what themes dominate? What's the big picture? Do NOT list headlines.
 2. "segmentScripts" — one narrative script per each of the ${detailedCount} stories (~15-25 seconds each, ~${wordsPerArticle * 2} words). Each must be a self-contained mini-story with hook → context → impact.${overflowPromptBlock}
 ${hasOverflow ? '4' : '3'}. "outroScript" — reflective closing (~5-6 seconds). Wrap up the day's themes, end with "Abonner på kanalen og trykk liker-knappen! Vi ses i morgen."
 ${hasOverflow ? '5' : '4'}. "segments" — visual metadata for each of the ${detailedCount} stories
 
 SCRIPT RULES:
-- introScript: Set the atmosphere. "Today the tech world woke up to..." style. No headline listing.
+- introScript: Set the atmosphere. "Today the tech world woke up to..." style. No greeting, no host name, no headline listing.
 - NO "roundupScript" — we do NOT read all headlines. The intro sets the mood, then we dive into stories.
 - Each segmentScript: hook sentence → 2-3 sentences of context/analysis → impact/takeaway. Natural, flowing, JOURNALISTIC.
 - outroScript: Reflect on the day's themes. "Abonner på kanalen og trykk liker-knappen!"
@@ -198,7 +198,7 @@ RULES:
 
 Return valid JSON:
 {
-  "introScript": "Velkommen til dagens nyhetsdigest fra Vitalii Berbeha...",
+  "introScript": "Teknologiverdenen våknet i dag til ...",
   "segmentScripts": ["...", "...", ...],
   "outroScript": "...",${hasOverflow ? '\n  "overflowScript": "Du finner N flere nyheter på vitalii punkt no.",' : ''}
   "segments": [{headline, keyQuote, category, accentColor, mood, transition, textReveal}, ...],
@@ -260,7 +260,7 @@ function templateShowScript(articles, dateStr) {
     };
   });
 
-  const introScript = `Velkommen til dagens nyhetsdigest fra Vitalii Berbeha. Her er de viktigste teknologinyhetene. Vi har ${articles.length} saker i dag.`;
+  const introScript = `Her er de viktigste teknologinyhetene. Vi har ${articles.length} saker i dag.`;
 
   const roundupScript = hasOverflow
     ? `I dag dekker vi ${articles.length} nyheter. Blant annet: ${articles.map(a => (a.title_no || a.title_en || '').substring(0, 40)).join(', ')}.`
@@ -292,6 +292,33 @@ function templateShowScript(articles, dateStr) {
     hasOverflow,
     overflowCount,
   };
+}
+
+/**
+ * Remove a leading greeting / host self-introduction / date sentence from an
+ * LLM-written intro. The render prepends its own host greeting with name and
+ * date, so an opening like "Velkommen til dagens nyhetsdigest fra Vitalii
+ * Berbeha." or "God mandag. Det er 17. august." would greet the viewer twice
+ * (and the LLM date is the news date, not the publish date).
+ */
+const LLM_GREETING_PATTERNS = [
+  /^velkommen til dagens (nyhetsdigest|nyhetsoppdatering)( fra vitalii berbeha)?[.!,]?\s*/i,
+  /^(hei|hallo)[,!]?\s+(og\s+)?(jeg heter|mitt navn er)\s+vitalii\s+berbeha[.!,]?\s*/i,
+  /^(jeg heter|mitt navn er)\s+vitalii\s+berbeha[.!,]?\s*/i,
+  /^god\s+(morgen|dag|kveld|formiddag|ettermiddag|mandag|tirsdag|onsdag|torsdag|fredag|lørdag|søndag)[.!]?\s*/i,
+  /^det er \d{1,2}\.?\s+\p{L}+[.!]?\s*/iu,
+  /^hi[,!]?\s+(my name is|i'?m)\s+vitalii\s+berbeha[.!,]?\s*/i,
+];
+
+function stripLlmGreeting(text) {
+  let out = String(text || '').trim();
+  for (let pass = 0; pass < 4; pass++) {
+    const before = out;
+    for (const re of LLM_GREETING_PATTERNS) out = out.replace(re, '');
+    out = out.trim();
+    if (out === before) break;
+  }
+  return out;
 }
 
 /**
@@ -727,11 +754,14 @@ async function main() {
   //
   // The host introduces himself by name. The LLM-written opening was neither
   // reliable nor always intelligible, and the show never said whose it was.
+  // The LLM intro may still open with its own greeting/self-introduction
+  // ("Velkommen til dagens nyhetsdigest fra Vitalii Berbeha.", "God mandag. Det er
+  // 17. august.") — strip it, or the show greets the viewer and names the host twice.
   const HOST_NAME = 'Vitalii Berbeha';
   const introGreeting = LANGUAGE === 'no'
     ? `Hei, jeg heter ${HOST_NAME}, og dette er dagens nyhetsoppdatering for ${displayDate}.`
     : `Hi, my name is ${HOST_NAME}, and this is your news update for ${displayDate}.`;
-  const introScript = `${introGreeting} ${plan.introScript || ''}`.trim();
+  const introScript = `${introGreeting} ${stripLlmGreeting(plan.introScript)}`.trim();
 
   let introVoiceover = null;
   if (introScript) {
