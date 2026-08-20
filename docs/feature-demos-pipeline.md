@@ -33,8 +33,41 @@ clips. The pilot (v06, v12, j59 — 2026-08-11) proved the flow; follow it exact
 | 5. Upload R2 `news-images/features/feature-<id>.mp4` | curl inside VPS, creds from `portfolio-edge-functions` env (never print) | VPS |
 | 6. `UPDATE features SET demo_media_url=...` | psql in `portfolio-db` | VPS |
 | 7. Check live: hub HTML contains the URL | curl vitalii.no/features | — |
-| 8. Voiced version: edge-tts (en-US-AndrewNeural), **LOOP the seamless clip** (`-stream_loop`) to cover VO+1.5 s — NEVER tpad/freeze the last frame (the 2026-08-13 defect: 21–24 s VO over a 15 s clip froze the visual for the last ~35–40% of every video), adelay 500 ms, trim to VO+1.5 s | `/root/feature-demos/yt/upload.py` pattern | VPS |
-| 9. YouTube upload (public, categoryId 28) + SEO description + playlist | YouTube Data API, creds from same container env | VPS |
+| 8. Voiced version: edge-tts (en-US-AndrewNeural), **LOOP the seamless clip** (`-stream_loop`) to cover VO+1.5 s — NEVER tpad/freeze the last frame (the 2026-08-13 defect: 21–24 s VO over a 15 s clip froze the visual for the last ~35–40% of every video), adelay 500 ms, trim to VO+1.5 s | `/root/feature-demos/yt/mux_v2.sh <id>` (canonical implementation of this recipe) | VPS |
+| 9. YouTube upload: append the id to the queue, the daily runner ships it | `echo <id> >> /root/feature-demos/yt/queue.txt` (see below) | VPS |
+
+## YouTube upload queue runner (installed 2026-08-20)
+
+The YouTube leg is no longer hand-fired per session. A systemd timer
+`feature-yt-queue.timer` runs `/root/feature-demos/yt/upload_queue.sh` daily at
+**07:30 UTC** (right after the quota reset at 07:00 UTC):
+
+1. Processes `delete-queue.txt` (defective originals to remove — needs the
+   full-scope `token-full.json`; the upload-only refresh token 403s on delete).
+2. Uploads up to **4** videos/day from `queue.txt` (4×1600 units leaves room for
+   the Norwegian daily digest's 1600-unit upload in the shared 10k quota).
+   Line format: `<meta_id>[|<old_video_id_to_delete_after_success>]`.
+   Stops on first failure (owner rule) and reports via Telegram.
+3. Adds each uploaded video to the public playlist "Features — vitalii.no"
+   (`playlist_sync.py`, needs full-scope token; skipped silently otherwise).
+
+**A batch session's job is now only to produce artifacts:** write `vo-<id>.txt`
+(55–75 words, benefit-led) + `meta-<id>.json` (full SEO template below), run
+`edge-tts --voice en-US-AndrewNeural --file vo-<id>.txt --write-media vo-<id>.mp3`,
+run `mux_v2.sh <id>`, frame-verify the tail is NOT frozen, then append the id to
+`queue.txt`. The runner does the rest on its own schedule.
+
+## Social cross-post (state 2026-08-20)
+
+The daily feature social post (one feature/day, 08:00 UTC, Facebook + LinkedIn,
+**EN-only by owner decision**) is made by the nanoclaw agent task
+`task-1784111012050-zh8cby` (dm-with-smmshaman group) via the
+`nano-social-publish` Edge Function. Since 2026-08-20 the function accepts
+`videoUrl` and posts the feature's `demo_media_url` clip as **native video**
+(FB `/videos` file_url; LinkedIn Assets API upload), falling back to text-only
+on any media failure (`videoUsed` in the response tells which happened).
+pg_cron job#9 (`publish-feature-social-daily`) is deliberately **disabled** —
+re-enabling it would double-post; the NO-language track died with it (accepted).
 
 ## YouTube SEO description template (MANDATORY per video)
 

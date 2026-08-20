@@ -53,8 +53,15 @@ tpad/freeze defect (visual frozen for the last ~35–40% of every video). Fixed
 All v2 uploads confirmed `uploadStatus=processed processing=succeeded`.
 Only ~6 uploads/day fit the 10k-unit quota (upload = 1600 units) and the daily
 Norwegian digest needs its own upload from the same quota — hence 5/day here.
-**Old defective originals are still live (duplicates!). Deleting them is a
-destructive step awaiting owner approval; `delete_old.py <video_id>` is ready.**
+
+**2026-08-20: owner approved deleting the defective originals.** Deletion needs
+the full-scope token (`token-full.json`, minted via loopback OAuth consent) —
+the upload-only refresh token 403s on `videos.delete`. All old ids above sit in
+`/root/feature-demos/yt/delete-queue.txt` and are removed by the daily
+`feature-yt-queue.timer` runner as soon as the full-scope token is in place.
+The same runner uploads the remaining v2s (j06/j07/j08/p01/p02/p30, 4/day),
+then continues with the new-feature queue (j09–j12 artifacts ready 2026-08-20),
+and adds every clean video to the public playlist "Features — vitalii.no".
 
 ## Notes
 
