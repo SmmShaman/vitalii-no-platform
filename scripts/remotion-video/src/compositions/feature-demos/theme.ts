@@ -33,17 +33,22 @@ export const stateColor = (s: NodeState): string => {
   }
 };
 
-/** Linear-interpolate two hex colors (#rrggbb). */
+/** Linear-interpolate two hex colors (#rrggbb) -> hex (#rrggbb), so the result stays hexA()-compatible. */
 export const lerpColor = (a: string, b: string, t: number): string => {
   const cl = Math.min(1, Math.max(0, t));
   const pa = [1, 3, 5].map((i) => parseInt(a.slice(i, i + 2), 16));
   const pb = [1, 3, 5].map((i) => parseInt(b.slice(i, i + 2), 16));
   const out = pa.map((v, i) => Math.round(v + (pb[i] - v) * cl));
-  return `rgb(${out[0]},${out[1]},${out[2]})`;
+  return `#${out.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 };
 
-/** Hex color -> rgba() string with alpha. */
+/** Hex (#rrggbb) or rgb(r,g,b) color -> rgba() string with alpha. */
 export const hexA = (hex: string, alpha: number): string => {
+  const a = Math.min(1, Math.max(0, alpha));
+  if (hex.startsWith("rgb")) {
+    const m = hex.match(/[\d.]+/g) || ["0", "0", "0"];
+    return `rgba(${m[0]},${m[1]},${m[2]},${a})`;
+  }
   const p = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-  return `rgba(${p[0]},${p[1]},${p[2]},${Math.min(1, Math.max(0, alpha))})`;
+  return `rgba(${p[0]},${p[1]},${p[2]},${a})`;
 };

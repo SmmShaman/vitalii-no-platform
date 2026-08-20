@@ -33,7 +33,7 @@ clips. The pilot (v06, v12, j59 — 2026-08-11) proved the flow; follow it exact
 | 5. Upload R2 `news-images/features/feature-<id>.mp4` | curl inside VPS, creds from `portfolio-edge-functions` env (never print) | VPS |
 | 6. `UPDATE features SET demo_media_url=...` | psql in `portfolio-db` | VPS |
 | 7. Check live: hub HTML contains the URL | curl vitalii.no/features | — |
-| 8. Voiced version: edge-tts (en-US-AndrewNeural), tpad last frame to VO+1 s, adelay 500 ms | `/root/feature-demos/yt/upload.py` pattern | VPS |
+| 8. Voiced version: edge-tts (en-US-AndrewNeural), **LOOP the seamless clip** (`-stream_loop`) to cover VO+1.5 s — NEVER tpad/freeze the last frame (the 2026-08-13 defect: 21–24 s VO over a 15 s clip froze the visual for the last ~35–40% of every video), adelay 500 ms, trim to VO+1.5 s | `/root/feature-demos/yt/upload.py` pattern | VPS |
 | 9. YouTube upload (public, categoryId 28) + SEO description + playlist | YouTube Data API, creds from same container env | VPS |
 
 ## YouTube SEO description template (MANDATORY per video)
