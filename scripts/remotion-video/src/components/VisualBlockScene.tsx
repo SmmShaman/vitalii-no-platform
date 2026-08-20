@@ -137,7 +137,11 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
   const MIN_DWELL_SECONDS = 3;
   const segmentSeconds = durationInFrames / fps;
 
-  const backgroundSchedule: { start: number; src: string }[] = [];
+  // Each schedule entry also pins ONE background motion effect for its whole
+  // dwell. The effect used to come from the active phrase block, which changes
+  // every 1.5-2s — the same picture's transform jumped discontinuously
+  // (kenBurns scale → zoomPulse scale) mid-dwell and read as flicker.
+  const backgroundSchedule: { start: number; src: string; effect: string }[] = [];
   if (allImages.length > 0 || phraseImages.some(Boolean)) {
     let clock = 0;
     const nextClockImage = () =>
@@ -153,7 +157,11 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
       if (!src) continue;
       const last = backgroundSchedule[backgroundSchedule.length - 1];
       if (last && last.src === src) continue; // extend, don't re-cut
-      backgroundSchedule.push({ start: t, src });
+      backgroundSchedule.push({
+        start: t,
+        src,
+        effect: visualBlocks[blockAt]?.backgroundEffect ?? "kenBurns",
+      });
     }
   }
 
@@ -172,14 +180,52 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     if (currentTime >= visualBlocks[i].startTime) activeIdx = i;
   }
 
+  // ── Block windows, clamped so they never overlap ──
+  // TTS phrase timings can run past the next phrase's start. Two overlapping
+  // Sequences meant two narration lines drawn on top of each other — the
+  // doubled, unreadable text on the Lørenskog and Flamingo frames.
+  const blockWindow = (i: number) => {
+    const startF = Math.round(visualBlocks[i].startTime * fps);
+    const nextStartF =
+      i + 1 < visualBlocks.length
+        ? Math.round(visualBlocks[i + 1].startTime * fps)
+        : durationInFrames;
+    const natural = Math.round(visualBlocks[i].duration * fps);
+    return { startF, durF: Math.max(1, Math.min(natural, nextStartF - startF)) };
+  };
+
   // Active background comes from the schedule, never straight from the block
   const schedIdx = scheduleIndexAt(currentTime);
   const currentBg = backgroundSchedule[schedIdx]?.src || "";
   const nextBg = backgroundSchedule[schedIdx + 1]?.src || currentBg;
 
-  // When a scene effect is active, dim the background image so effects are visible
+  // When a scene effect is active, dim the background image so effects are
+  // visible — but EASE the dim in/out (~8 frames) at the effect block's edges.
+  // An instant brightness(0.3) snap on every effect block start/end read as
+  // dark/bright flashing on short blocks.
+  const DIM = 0.3;
+  const DIM_RAMP_FRAMES = 8;
   const activeBlockHasEffect = resolveSceneEffect(visualBlocks[activeIdx] || {} as VisualBlock) !== null;
-  const bgDimFactor = activeBlockHasEffect ? 0.3 : 1.0; // 30% opacity when effect active
+  let bgDimFactor = 1.0;
+  if (activeBlockHasEffect && visualBlocks.length > 0) {
+    const { startF, durF } = blockWindow(activeIdx);
+    const local = frame - startF;
+    const prevHasEffect =
+      activeIdx > 0 && resolveSceneEffect(visualBlocks[activeIdx - 1]) !== null;
+    const nextHasEffect =
+      activeIdx + 1 < visualBlocks.length &&
+      resolveSceneEffect(visualBlocks[activeIdx + 1]) !== null;
+    // Ramp only against non-effect neighbours; back-to-back effect blocks
+    // must not blink bright between them.
+    const dimIn = prevHasEffect
+      ? DIM
+      : interpolate(local, [0, DIM_RAMP_FRAMES], [1, DIM], clampBoth);
+    const dimOut = nextHasEffect
+      ? DIM
+      : interpolate(local, [durF - DIM_RAMP_FRAMES, durF], [DIM, 1], clampBoth);
+    bgDimFactor = Math.max(dimIn, dimOut);
+  }
+  const bgIsDimmed = bgDimFactor < 1;
 
   // Crossfade into the next scheduled picture
   const XFADE = 12;
@@ -194,8 +240,9 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     ? interpolate(framesElapsedInXfade, [0, XFADE], [0, 1], clampBoth)
     : 0;
 
-  // ── Background effect (from active block) ──
-  const bgEffect = visualBlocks[activeIdx]?.backgroundEffect ?? "kenBurns";
+  // ── Background effect (pinned per schedule entry, stable for the dwell) ──
+  const bgEffect = backgroundSchedule[schedIdx]?.effect ?? "kenBurns";
+  const nextBgEffect = backgroundSchedule[schedIdx + 1]?.effect ?? bgEffect;
   const progress = interpolate(frame, [0, durationInFrames], [0, 1], clampBoth);
 
   const bgTransform = (effect: string, idx: number): string => {
@@ -254,20 +301,6 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     return undefined;
   };
 
-  // ── Block windows, clamped so they never overlap ──
-  // TTS phrase timings can run past the next phrase's start. Two overlapping
-  // Sequences meant two narration lines drawn on top of each other — the
-  // doubled, unreadable text on the Lørenskog and Flamingo frames.
-  const blockWindow = (i: number) => {
-    const startF = Math.round(visualBlocks[i].startTime * fps);
-    const nextStartF =
-      i + 1 < visualBlocks.length
-        ? Math.round(visualBlocks[i + 1].startTime * fps)
-        : durationInFrames;
-    const natural = Math.round(visualBlocks[i].duration * fps);
-    return { startF, durF: Math.max(1, Math.min(natural, nextStartF - startF)) };
-  };
-
   // ── Researched context timing ──
   // The strip needs reading time (~1.6s per line); the quote takes the middle
   // of the segment, where the narration is deep into the story.
@@ -323,6 +356,9 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
         />
       ) : currentBg ? (
         <>
+          {/* Bottom layer stays fully opaque during the crossfade. Fading it
+              out while the top fades in let the black composition background
+              bleed through mid-fade — a dark pulse on every image change. */}
           <Img
             key={`vb-bg-${currentBg}`}
             src={currentBg}
@@ -332,8 +368,8 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
               height: "100%",
               objectFit: "cover",
               transform: bgTransform(bgEffect, schedIdx),
-              filter: [bgFilter(bgEffect), activeBlockHasEffect ? `brightness(${bgDimFactor})` : ''].filter(Boolean).join(' ') || undefined,
-              opacity: isXfading ? 1 - xfadeProgress : 1,
+              filter: [bgFilter(bgEffect), bgIsDimmed ? `brightness(${bgDimFactor})` : ''].filter(Boolean).join(' ') || undefined,
+              opacity: 1,
             }}
           />
           {isXfading && (
@@ -345,8 +381,8 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                transform: bgTransform(bgEffect, schedIdx + 1),
-                filter: bgFilter(bgEffect),
+                transform: bgTransform(nextBgEffect, schedIdx + 1),
+                filter: [bgFilter(nextBgEffect), bgIsDimmed ? `brightness(${bgDimFactor})` : ''].filter(Boolean).join(' ') || undefined,
                 opacity: xfadeProgress,
               }}
             />
@@ -718,7 +754,9 @@ const BlockContent: React.FC<{
   images?: string[];
   blockIndex: number;
   allBlocks: VisualBlock[];
-  /** True while the quote card occupies the middle of the frame */
+  /** True while the quote card occupies the middle of the frame —
+   *  suppresses phrase text, callouts AND graphic cards (all share
+   *  the top-centre region the quote draws in) */
   muteText?: boolean;
 }> = ({ block, accentColor, isVertical, moodTempo = 1.0, images = [], blockIndex, allBlocks, muteText = false }) => {
   const frame = useCurrentFrame();
@@ -785,8 +823,9 @@ const BlockContent: React.FC<{
         />
       )}
 
-      {/* Motion graphic */}
-      {hasGraphic && (
+      {/* Motion graphic — suppressed while the quote card is up: the card
+          (top 20-34%) and the quote (top 24-30%) drew on top of each other */}
+      {hasGraphic && !muteText && (
         <div
           style={{
             position: "absolute",
@@ -800,8 +839,9 @@ const BlockContent: React.FC<{
         </div>
       )}
 
-      {/* Key phrase callout (numbers, names, quotes — NOT every word) */}
-      {callout && (
+      {/* Key phrase callout (numbers, names, quotes — NOT every word).
+          Also muted under the quote card — same screen region. */}
+      {callout && !muteText && (
         <KeyPhraseCallout
           callout={callout}
           accentColor={accentColor}
