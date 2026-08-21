@@ -21,6 +21,76 @@ clips. The pilot (v06, v12, j59 — 2026-08-11) proved the flow; follow it exact
    framed callouts (not subtitles), commercial benefit-led voiceover,
    loop-friendly silent site version.
 
+## Two visual templates — pick ONE per clip (2026-08-21)
+
+The Remotion feature-demo compositions now have two design systems in
+`scripts/remotion-video/src/compositions/feature-demos/`:
+
+| | **Dark schema** (v1) | **Bright infographic** (v2) |
+|---|---|---|
+| Files | `theme.ts` + `primitives.tsx` | `bright-theme.ts` + `bright-primitives.tsx` |
+| Audience | developers / technical viewers | general audience ("explain it to a non-engineer") |
+| Language | node boxes with tech labels, connectors, data tokens | problem/solution color zones, real UI mockups with real data, emoji icon cards, big before→after metrics |
+| Reference clip | most existing `Feature*.tsx` | `FeatureJobTable.tsx` (j26, rebuilt 2026-08-21) |
+
+**When to choose bright (v2):** the feature has a story a non-technical person
+feels — time saved, clicks removed, chaos → order, money, safety. That covers
+most UI features and most "assistant does X for you" features. Keep dark (v1)
+for genuinely internal plumbing (retry chains, schedulers, token monitors)
+where the viewer IS a developer.
+
+**Bright template rules (all owner rules above still apply):**
+
+1. **4-beat arc, plain language:** Problem (red zone, a human task in words a
+   sticky-note could hold) → Solution (the SAME task solved on screen) →
+   How-it-works strip (≤3 emoji icon cards with arrows) → Result (before/after
+   cards + one big number). One beat = one full-screen scene, crossfade between
+   beats, ≥3 s each.
+2. **Real data, never lorem:** table rows / names / scores must be plausible
+   project data (e.g. `Frontend Developer · TechCorp · Gjøvik · 92 · FINN`).
+   A realistic `BrowserWindow` mockup beats an abstract node.
+3. **Exactly ONE tech-credibility line per clip** (small caption: component
+   name, library, size). Everything else is benefit language. Tech names still
+   go in the YouTube SEO description as before.
+4. **Numbers are the heroes:** every clip ends with a quantified before→after
+   (clicks, minutes, ×-faster). If the feature has no number, find one before
+   writing the scenario.
+5. EN-only (owner decision 2026-08-20), silent 15 s loop, `loopFade` at the
+   tail, same render/mux/queue steps as v1 — nothing downstream changes.
+
+### Story cut (long-form, owner-approved 2026-08-21)
+
+For ~20–30 flagship features with a strong human story, a **Story cut** exists
+alongside the standard 15 s clip: 35–55 s, narrated, built **VOICE-FIRST**.
+Reference: `FeatureJobTableStory.tsx` (j26) + `scripts/remotion-video/vo-scripts/j26-story.py`.
+
+Recipe (all steps proven on the j26 pilot, runnable on the local PC):
+1. Write the VO as 6–7 numbered beats (~100–140 words total, conversational,
+   one plain-language analogy — e.g. "like a librarian who sorted every book
+   before you walked in"). Generate each beat as its OWN mp3 with edge-tts
+   (en-US-AndrewNeural) and measure durations with ffprobe.
+2. Compute frame offsets: 0.5 s lead + beats back-to-back with 0.3 s gaps +
+   ~1.5 s tail, fps 30. Bake the S/E constants into the story file header AND
+   build the full audio track with the same numbers (ffmpeg aevalsrc silences +
+   concat). Visual events must land on the words that name them.
+3. The Story composition is a separate Root.tsx id (`Feature<X>Story`), same
+   bright system, NOT loop-friendly (it ends, it doesn't loop). The 15 s
+   silent clip remains the site-hub loop — two products, one style.
+4. Render silent, then mux: `ffmpeg -map 0:v -map 1:a -c:v copy -c:a aac`.
+5. Headless-render traps: ZWJ emoji (🧑‍💻) split into separate glyphs — use
+   single-codepoint emoji only; two beats that use the same screen area must
+   not crossfade — kill the earlier beat fully before the next fades in.
+
+Standard clips stay the default; a Story cut is justified only when the
+feature has a persona, a before/after number AND an everyday analogy.
+
+**Bright primitives inventory:** `LightBg`, `Group` (beat wrapper), `Headline`,
+`Panel` (toned zone), `BrowserWindow`, `SkeletonScroll` (the "wall of data"),
+`JobsTable` (+`JobRow`), `FilterChip`, `ToggleSwitch`, `StatPill`, `IconCard`,
+`FlowArrow`, `StickyNote`, `Cursor` (with click ripple), `CheckBadge`,
+`CaptionBand`; shared `seg`/`loopFade`/`fontFamily` re-exported from v1, so
+beat-timing code is identical across both styles.
+
 ## The proven flow (per feature)
 
 | Step | Tool | Where |

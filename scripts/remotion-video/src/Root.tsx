@@ -68,6 +68,7 @@ import { FeatureEdgeFunctionsCost } from "./compositions/feature-demos/FeatureEd
 import { FeatureCascadingImageProviders } from "./compositions/feature-demos/FeatureCascadingImageProviders";
 import { FeatureJobMap } from "./compositions/feature-demos/FeatureJobMap";
 import { FeatureJobTable } from "./compositions/feature-demos/FeatureJobTable";
+import { FeatureJobTableStory } from "./compositions/feature-demos/FeatureJobTableStory";
 import { FeatureJobExports } from "./compositions/feature-demos/FeatureJobExports";
 import { FeatureCvEditor } from "./compositions/feature-demos/FeatureCvEditor";
 import { FeatureTrilingualUx } from "./compositions/feature-demos/FeatureTrilingualUx";
@@ -754,6 +755,14 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureJobTable"
         component={FeatureJobTable}
         durationInFrames={450}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+      <Composition
+        id="FeatureJobTableStory"
+        component={FeatureJobTableStory}
+        durationInFrames={1620}
         fps={30}
         width={1280}
         height={720}
