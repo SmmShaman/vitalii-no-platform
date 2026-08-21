@@ -26,7 +26,7 @@ import { triggerDailyVideoRender } from "../_shared/github-actions.ts";
 import { HUMANIZER_VIDEO, VOICE_SPOKEN } from "../_shared/humanizer-prompt.ts";
 import { generateImageFree, generateImageFluxFree } from "../_shared/free-image.ts";
 
-const VERSION = "2026-08-19-v38-groq-qwen-flux-schema";
+const VERSION = "2026-08-21-v39-agent-submit-digest";
 const MAX_DETAILED = 10;
 
 const supabase = createClient(
@@ -478,6 +478,116 @@ async function initiateDigest(targetDate?: string): Promise<Response> {
 // ══════════════════════════════════════════════════════════════
 // STEP 1-AUTO: Auto Digest (LLM ranks + writes script in one step)
 // ══════════════════════════════════════════════════════════════
+
+/**
+ * agent_submit_digest — the NanoClaw agent (Claude by subscription) delivers a
+ * complete digest package: article selection, narration scripts AND the visual
+ * scenario, written with its own reasoning instead of the free-LLM cascade.
+ * The function validates, upserts the draft and resumes the chain at
+ * auto_chain_2 (images + render) — generateScenario is skipped entirely.
+ *
+ * Race safety: if a draft already exists past pending_digest (the GH-cron
+ * autoDigest got there first), we refuse with 409 and the agent backs off.
+ * Symmetrically, autoDigest's own guard skips when the agent's draft exists,
+ * so whichever writer runs first wins and the other becomes a no-op.
+ */
+async function agentSubmitDigest(body: any): Promise<Response> {
+  const date = body.target_date;
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(String(date))) {
+    return json({ error: "target_date (YYYY-MM-DD) required" }, 400);
+  }
+
+  const articleIds: string[] = Array.isArray(body.article_ids) ? body.article_ids : [];
+  const segmentScripts: any[] = Array.isArray(body.segment_scripts) ? body.segment_scripts : [];
+  const scenario: any[] = Array.isArray(body.visual_scenario) ? body.visual_scenario : [];
+  const headlines: any[] = Array.isArray(body.article_headlines) ? body.article_headlines : [];
+  const introScript = String(body.intro_script || "").trim();
+  const outroScript = String(body.outro_script || "").trim();
+
+  if (articleIds.length === 0) return json({ error: "article_ids empty" }, 400);
+  if (segmentScripts.length !== articleIds.length) {
+    return json({ error: `segment_scripts length ${segmentScripts.length} != article_ids length ${articleIds.length}` }, 400);
+  }
+  if (scenario.length !== articleIds.length) {
+    return json({ error: `visual_scenario length ${scenario.length} != article_ids length ${articleIds.length}` }, 400);
+  }
+  if (!introScript || !outroScript) return json({ error: "intro_script and outro_script required" }, 400);
+
+  for (let i = 0; i < segmentScripts.length; i++) {
+    const s = segmentScripts[i];
+    if (!s || typeof s.scriptNo !== "string" || s.scriptNo.trim().split(/\s+/).length < 15) {
+      return json({ error: `segment_scripts[${i}].scriptNo missing or too short (<15 words)` }, 400);
+    }
+  }
+  const SCENARIO_REQUIRED = ["headline", "category", "mood", "transition", "textReveal"];
+  for (let i = 0; i < scenario.length; i++) {
+    const seg = scenario[i];
+    for (const f of SCENARIO_REQUIRED) {
+      if (!seg || typeof seg[f] !== "string" || !seg[f]) {
+        return json({ error: `visual_scenario[${i}].${f} missing` }, 400);
+      }
+    }
+    if (!Array.isArray(seg.imageSearchQueries) || seg.imageSearchQueries.length < 2) {
+      return json({ error: `visual_scenario[${i}].imageSearchQueries needs >=2 queries` }, 400);
+    }
+  }
+
+  // Race guard against the cron autoDigest path
+  const { data: existing } = await supabase
+    .from("daily_video_drafts")
+    .select("status")
+    .eq("target_date", date)
+    .maybeSingle();
+  if (existing && existing.status !== "pending_digest") {
+    console.log(`⏭ agent_submit_digest: draft for ${date} already ${existing.status} — refusing`);
+    return json({ ok: false, skipped: true, status: existing.status }, 409);
+  }
+
+  const { error: upsertError } = await supabase
+    .from("daily_video_drafts")
+    .upsert({
+      target_date: date,
+      status: "pending_scenario",
+      article_ids: articleIds,
+      article_headlines: headlines,
+      excluded_article_ids: [],
+      telegram_chat_id: Number(TELEGRAM_CHAT_ID),
+      intro_script: introScript,
+      segment_scripts: segmentScripts.map((s: any, i: number) => ({
+        articleId: articleIds[i],
+        scriptNo: s.scriptNo,
+        scriptUa: "",
+        scriptEn: s.scriptEn || "",
+        webImages: [],
+        entities: s.entities || null,
+      })),
+      outro_script: outroScript,
+      visual_scenario: scenario,
+      visual_scenario_text: String(body.visual_scenario_text || ""),
+      llm_provider: "agent-opus",
+      youtube_privacy: body.youtube_privacy || "public",
+      error_message: null,
+    }, { onConflict: "target_date" });
+  if (upsertError) return json({ error: `Draft upsert: ${upsertError.message}` }, 500);
+
+  console.log(`✅ agent_submit_digest: draft ${date} accepted (${articleIds.length} segments), dispatching auto_chain_2`);
+
+  const baseUrl = Deno.env.get("SUPABASE_URL")!;
+  const srvKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  try {
+    const resp = await fetch(`${baseUrl}/functions/v1/daily-video-bot?action=auto_chain_2&target_date=${date}`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${srvKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({}),
+    });
+    console.log(`✅ auto_chain_2 dispatched from agent submit: HTTP ${resp.status}`);
+  } catch (e: any) {
+    console.error(`⚠️ auto_chain_2 dispatch failed: ${e.message}`);
+    await sendMessage(TELEGRAM_CHAT_ID, `⚠️ <b>Agent digest accepted, але auto_chain_2 dispatch failed:</b> ${e.message}`);
+  }
+
+  return json({ ok: true, segments: articleIds.length, message: "Agent digest accepted, images+render dispatched" });
+}
 
 async function autoDigest(targetDate?: string, youtubePrivacy = "public"): Promise<Response> {
   const date = targetDate || getYesterdayDate();
@@ -3480,6 +3590,11 @@ Deno.serve(async (req) => {
         }
         return json({ ok: true, message: "Visual directives saved, chain resumed" });
       }
+
+      case "agent_submit_digest":
+        // NanoClaw agent delivers selection + scripts + visual scenario in one
+        // package; chain resumes at images+render (scenario LLMs skipped).
+        return await agentSubmitDigest(body);
 
       case "auto_chain": {
         // Step 1 of auto chain: generate scenario, then dispatch step 2

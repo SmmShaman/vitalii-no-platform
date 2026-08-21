@@ -379,6 +379,49 @@ async function getVideoDuration(filePath) {
 }
 
 /**
+ * Upload the final digest mp4 to Cloudflare R2 (daily-videos bucket) so
+ * social publishers (nano-social-publish) can attach it as NATIVE video —
+ * LinkedIn Assets API and Facebook file_url both need a public file URL,
+ * and YouTube links can't be re-uploaded natively.
+ *
+ * Key is deterministic (digest/<date>.mp4) so consumers can construct the
+ * URL from the date alone. Keeps ~1 week of files: deletes <date-8 days>.
+ */
+async function uploadDigestToR2(filePath, dateStr) {
+  const token = process.env.CF_API_TOKEN;
+  const accountId = process.env.CF_ACCOUNT_ID;
+  if (!token || !accountId) {
+    console.log('⏭️ R2 digest upload skipped (no CF credentials)');
+    return null;
+  }
+  const bucket = 'daily-videos';
+  const key = `digest/${dateStr}.mp4`;
+  const apiBase = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/${bucket}/objects`;
+
+  const data = await fs.readFile(filePath);
+  console.log(`📤 Uploading digest to R2: ${key} (${Math.round(data.length / 1024 / 1024)} MB)`);
+  const res = await fetch(`${apiBase}/${encodeURIComponent(key)}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'video/mp4' },
+    body: data,
+  });
+  if (!res.ok) throw new Error(`R2 PUT ${res.status}: ${(await res.text()).slice(0, 200)}`);
+
+  // Rolling cleanup: remove the digest from 8 days ago (deterministic key, no listing needed)
+  const old = new Date(`${dateStr}T00:00:00Z`);
+  old.setUTCDate(old.getUTCDate() - 8);
+  const oldKey = `digest/${old.toISOString().slice(0, 10)}.mp4`;
+  await fetch(`${apiBase}/${encodeURIComponent(oldKey)}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  }).catch(() => {});
+
+  const publicUrl = `https://pub-7661840103ab403f956452c3a70df9de.r2.dev/${key}`;
+  console.log(`✅ Digest on R2: ${publicUrl}`);
+  return publicUrl;
+}
+
+/**
  * Upload video to YouTube.
  */
 async function uploadToYouTube(filePath, title, description, tags) {
@@ -1536,6 +1579,13 @@ async function main() {
     } catch (e) {
       console.log(`⚠️ Thumbnail generation/upload failed: ${e.message}`);
     }
+  }
+
+  // Step 5e: Copy the final mp4 to R2 for native social video posts
+  try {
+    await uploadDigestToR2(outputPath, dateStr);
+  } catch (r2Err) {
+    console.log(`⚠️ R2 digest upload failed (non-fatal): ${r2Err.message}`);
   }
 
   // Copy video to workspace for artifact upload if YouTube failed

@@ -1,0 +1,7 @@
+[Unit]
+Description=Re-trigger the daily video digest pipeline when a draft is stuck
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/flock -n /tmp/digest-watchdog.lock /home/stuar/Projects/vitalii_claude-code-in-browser/scripts/vps/digest-watchdog.sh
