@@ -1,42 +1,155 @@
 /**
  * FeatureCommentReplies — feature p05 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2, 2026-08-21) — written for a NON-TECHNICAL
+ * viewer: problem/solution color zones, a real browser+table mockup with
+ * real-looking comments, platform chips clicked by a cursor, and a big
+ * before→after metric.
  *
- * Story: 20+ daily comments across Facebook, Instagram, and the blog cost
- * 1-2 manual hours → sync-comments (every 30 min) pulls them in, each one
- * scored -1..+1 by Azure sentiment analysis, then generate-comment-reply
- * drafts a context-aware reply → the draft lands in Telegram with
- * Reply/Edit/Ignore buttons, a human taps one → "1-2 hours → under 10
- * minutes, human-in-the-loop keeps the brand voice".
+ * Story (4 beats):
+ *  1. Problem — 20+ comments a day across Facebook, Instagram and the blog;
+ *     a plain-language task on a sticky note; 1-2 hours reading tone and
+ *     typing replies, every single day. Red zone.
+ *  2. Solution — platform chips + "auto-draft replies" toggle; a table shows
+ *     real-looking comments scored for sentiment with a draft reply ready for
+ *     each one, pulled in automatically every 30 minutes.
+ *  3. How it works — sentiment scored first, a draft written using the
+ *     article as context, then sent to Telegram for a human to approve. One
+ *     small tech-credibility line (Azure OpenAI + Supabase Edge Function).
+ *  4. Result — before/after cards: 1-2 hours a day → under 10 minutes,
+ *     ≈9× faster, human still taps Reply/Edit/Ignore. Green zone, check badge.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Badge, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B, toneEdge } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  BrowserWindow,
+  SkeletonScroll,
+  FilterChip,
+  ToggleSwitch,
+  StatPill,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  Cursor,
+  CheckBadge,
+  CaptionBand,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const SRC = [
-  { x: 90, y: 50, w: 220, h: 80, label: "Facebook" },
-  { x: 530, y: 50, w: 220, h: 80, label: "Instagram" },
-  { x: 970, y: 50, w: 220, h: 80, label: "Blog" },
+type CommentRow = { text: string; platform: string; score: number; emoji: string };
+
+const COMMENTS: CommentRow[] = [
+  { text: "This looks amazing, when's it launching?", platform: "Instagram", score: 0.8, emoji: "😊" },
+  { text: "How do you handle rate limits?", platform: "Blog", score: 0.2, emoji: "🙂" },
+  { text: "Not sure this works for small blogs", platform: "Blog", score: -0.1, emoji: "😐" },
+  { text: "Same old AI hype, nothing new here", platform: "Facebook", score: -0.4, emoji: "😕" },
+  { text: "🔥 need this yesterday", platform: "Instagram", score: 0.9, emoji: "😍" },
 ];
-const SYNC = { x: 465, y: 200, w: 350, h: 88 };
-const SENTIMENT = { x: 260, y: 344, w: 320, h: 92 };
-const REPLY = { x: 700, y: 344, w: 320, h: 92 };
-const TG = { x: 465, y: 494, w: 350, h: 88 };
 
-const SRC_B: Pt[] = SRC.map((s) => ({ x: s.x + s.w / 2, y: s.y + s.h }));
-const SYNC_T: Pt = { x: SYNC.x + SYNC.w / 2, y: SYNC.y };
-const SYNC_B: Pt = { x: SYNC.x + SYNC.w / 2, y: SYNC.y + SYNC.h };
-const SENTIMENT_T: Pt = { x: SENTIMENT.x + SENTIMENT.w / 2, y: SENTIMENT.y };
-const SENTIMENT_R: Pt = { x: SENTIMENT.x + SENTIMENT.w, y: SENTIMENT.y + SENTIMENT.h / 2 };
-const REPLY_L: Pt = { x: REPLY.x, y: REPLY.y + REPLY.h / 2 };
-const REPLY_B: Pt = { x: REPLY.x + REPLY.w / 2, y: REPLY.y + REPLY.h };
-const TG_T: Pt = { x: TG.x + TG.w / 2, y: TG.y };
-
-const P_SRC_SYNC: Pt[][] = SRC_B.map((p) => [p, SYNC_T]);
-const P_SS: Pt[] = [SYNC_B, SENTIMENT_T];
-const P_SR: Pt[] = [SENTIMENT_R, REPLY_L];
-const P_RT: Pt[] = [REPLY_B, { x: REPLY_B.x, y: 466 }, TG_T];
+/** Real-looking comments with a sentiment score badge and a draft-ready status. */
+const CommentsTable: React.FC<{ w: number; rows: CommentRow[]; frame: number; appearStart: number; stagger?: number }> = ({
+  w,
+  rows,
+  frame,
+  appearStart,
+  stagger = 7,
+}) => {
+  const cols = [0.44, 0.16, 0.18, 0.22];
+  const heads = ["Comment", "Platform", "Sentiment", "Status"];
+  const cell = (f: number): React.CSSProperties => ({
+    width: w * f - 14,
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+  });
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: w, fontFamily }}>
+      <div
+        style={{
+          display: "flex",
+          padding: "10px 18px",
+          gap: 14,
+          background: "#F4F7FC",
+          borderBottom: `1.5px solid ${B.border}`,
+          fontSize: 14,
+          fontWeight: 700,
+          color: B.muted,
+          letterSpacing: 0.4,
+        }}
+      >
+        {heads.map((hd, i) => (
+          <div key={hd} style={cell(cols[i])}>
+            {hd}
+          </div>
+        ))}
+      </div>
+      {rows.map((r, i) => {
+        const t = seg(frame, appearStart + i * stagger, appearStart + i * stagger + 12);
+        const tone = r.score > 0.4 ? "success" : r.score < 0 ? "danger" : "accent";
+        const toneColor = tone === "success" ? B.success : tone === "danger" ? B.danger : B.accent;
+        const toneBg2 = tone === "success" ? B.successBg : tone === "danger" ? B.dangerBg : B.accentBg;
+        return (
+          <div
+            key={r.text}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "9px 18px",
+              gap: 14,
+              borderBottom: `1px solid ${B.border}`,
+              fontSize: 15,
+              color: B.ink,
+              opacity: t,
+              transform: `translateX(${(1 - t) * 26}px)`,
+            }}
+          >
+            <div style={{ ...cell(cols[0]), fontWeight: 600 }}>“{r.text}”</div>
+            <div style={{ ...cell(cols[1]), color: B.muted, fontWeight: 500 }}>{r.platform}</div>
+            <div style={cell(cols[2])}>
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "2px 10px",
+                  borderRadius: 8,
+                  background: toneBg2,
+                  border: `1px solid ${toneEdge(tone)}`,
+                  color: toneColor,
+                  fontWeight: 700,
+                  fontSize: 14,
+                }}
+              >
+                {r.emoji} {r.score > 0 ? `+${r.score.toFixed(1)}` : r.score.toFixed(1)}
+              </span>
+            </div>
+            <div style={cell(cols[3])}>
+              <span
+                style={{
+                  padding: "2.5px 10px",
+                  borderRadius: 999,
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  background: B.successBg,
+                  border: `1px solid ${toneEdge("success")}`,
+                  color: B.success,
+                }}
+              >
+                Draft ready
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 export const FeatureCommentReplies: React.FC = () => {
   const frame = useCurrentFrame();
@@ -45,151 +158,172 @@ export const FeatureCommentReplies: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // ── Beat 1 (0–118): 20+ comments a day, all answered by hand ──
-  const srcOp = SRC.map((_, i) => appear(8 + i * 12) * lf);
-  const syncOp = Math.min(1, pop(38)) * lf;
-  const syncLit = interpolate(frame, [38, 62, 100, 118], [0, 0.55, 0.55, 0.15], {
+  // ── Beat windows ──────────────────────────────────────────────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
+
+  // ── Beat 1: the problem ───────────────────────────────────────────
+  const scroll = frame * 2.2;
+  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
+  const pill1 = pop(46);
+  const pill2 = pop(58);
+  const pill3 = pop(70);
+
+  // ── Beat 2: the solution ──────────────────────────────────────────
+  const chip1 = pop(132);
+  const chip2 = pop(142);
+  const chip3 = pop(152);
+  const chip4 = pop(164);
+  const togOn = seg(frame, 180, 192, Easing.inOut(Easing.cubic));
+  const cx = interpolate(frame, [124, 134, 152, 166, 182, 205], [700, 235, 480, 660, 1020, 1080], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
-  }) * lf;
-  const connOp = SRC.map((_, i) => 0.4 * Math.min(srcOp[i], syncOp));
-  const pillIn = seg(frame, 48, 70, Easing.out(Easing.cubic));
-  const pillOp = pillIn * interpolate(frame, [100, 120], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap1In = seg(frame, 46, 68, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [102, 122], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
-
-  // ── Beat 2 (126–246): sentiment scored, reply drafted ──
-  const tSs = seg(frame, 128, 150);
-  const tSsVis = frame >= 128 && frame < 178 ? 1 : 0;
-  const sentimentOp = appear(130, 18) * lf;
-  const sentimentLit = interpolate(frame, [138, 160, 330, 350], [0, 0.7, 0.7, 0.2], {
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cy = interpolate(frame, [124, 134, 152, 166, 182, 205], [400, 152, 152, 152, 155, 300], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
-  }) * lf;
-  const gaugeX = seg(frame, 150, 200, Easing.out(Easing.cubic));
-  const tSr = seg(frame, 182, 204);
-  const tSrVis = frame >= 182 && frame < 230 ? 1 : 0;
-  const replyOp = appear(184, 18) * lf;
-  const replyLit = interpolate(frame, [192, 214, 330, 350], [0, 0.75, 0.75, 0.2], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  }) * lf;
-  const cap2In = seg(frame, 166, 188, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [232, 252], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cursorOp = seg(frame, 124, 132) * (1 - seg(frame, 205, 218));
+  const click1 = seg(frame, 134, 146, Easing.out(Easing.quad));
+  const click2 = seg(frame, 152, 164, Easing.out(Easing.quad));
+  const click3 = seg(frame, 182, 194, Easing.out(Easing.quad));
+  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
 
-  // ── Beat 3 (250–340): Telegram — Reply / Edit / Ignore, human taps ──
-  const tRt = seg(frame, 250, 272);
-  const tRtVis = frame >= 250 && frame < 300 ? 1 : 0;
-  const tgOp = appear(254, 18) * lf;
-  const tgLit = interpolate(frame, [262, 284, 330, 350], [0, 0.7, 0.7, 0.25], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  }) * lf;
-  const btnOp = [0, 1, 2].map((i) => appear(268 + i * 10, 12) * lf);
-  const cap3In = seg(frame, 262, 284, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [326, 346], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
+  // ── Beat 3: how it works ──────────────────────────────────────────
+  const card1 = pop(252);
+  const card2 = pop(272);
+  const card3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
 
-  // ── Beat 4 (350–450): result ──
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
-  const metricOp = seg(frame, 358, 380, Easing.out(Easing.cubic)) * lf;
+  // ── Beat 4: the result ────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const speedX = Math.round(interpolate(frame, [384, 414], [1, 9], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }));
+  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      {P_SRC_SYNC.map((pts, i) => (
-        <Connector key={i} pts={pts} color={T.danger} width={2} opacity={connOp[i]} />
-      ))}
-      <Connector pts={P_SS} color={T.accent} width={2.5} progress={tSs} opacity={0.8 * tSsVis * lf} />
-      <Connector pts={P_SR} color={T.accent} width={2.5} progress={tSr} opacity={0.8 * tSrVis * lf} />
-      <Connector pts={P_RT} color={T.accent} width={2.5} progress={tRt} opacity={0.8 * tRtVis * lf} />
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="Answer 20+ comments a day," accentText="by hand?" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <BrowserWindow x={80} y={116} w={700} h={452} title="Comments inbox — Facebook, Instagram, Blog" opacity={Math.min(1, pop(8))}>
+          <SkeletonScroll w={700} h={410} offset={scroll} />
+        </BrowserWindow>
+        <StickyNote
+          x={830}
+          y={150}
+          w={350}
+          opacity={noteOp}
+          text="Need: read every comment, judge the tone, and reply like a real person — on 3 different platforms"
+        />
+        <StatPill x={846} y={340} emoji="⏰" text="1-2 hours, every day" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+        <StatPill x={846} y={402} emoji="😣" text="Tone and sentiment easy to miss" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+        <StatPill x={846} y={464} emoji="🌙" text="Comments wait until you're free" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
+        <CaptionBand text="Three platforms, one inbox to read, one reply to type — every single comment" tone="danger" opacity={seg(frame, 30, 46)} />
+      </Group>
 
-      {SRC.map((s, i) => (
-        <SchemaNode key={s.label} {...s} state="danger" lit={0.2 * lf} opacity={srcOp[i]} label={s.label} fontSize={20} />
-      ))}
-      <SchemaNode {...SYNC} state="danger" lit={syncLit} opacity={syncOp} label="20+ comments / day" fontSize={22}>
-        <div style={{ fontSize: 13, color: T.muted, fontWeight: 500, marginTop: 2 }}>sync-comments · every 30 min</div>
-      </SchemaNode>
-      <Pill x={SYNC.x - 20} y={SYNC.y - 46} text="1-2 hours, manually, every day" color={T.danger} opacity={pillOp} fontSize={19} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="Sentiment scored, reply drafted" accentText="automatically" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <FilterChip x={140} y={132} text="Facebook" icon="✓" scale={chip1} opacity={Math.min(1, chip1)} />
+        <FilterChip x={340} y={132} text="Instagram" icon="✓" scale={chip2} opacity={Math.min(1, chip2)} />
+        <FilterChip x={540} y={132} text="Blog" icon="✓" scale={chip3} opacity={Math.min(1, chip3)} />
+        <FilterChip x={680} y={132} text="Every 30 min" icon="🔄" scale={chip4} opacity={Math.min(1, chip4)} />
+        <ToggleSwitch x={900} y={138} label="Auto-draft replies" on={togOn} opacity={seg(frame, 172, 184)} />
+        <BrowserWindow x={110} y={196} w={1060} h={396} title="sync-comments — new activity" opacity={seg(frame, 168, 182)}>
+          <CommentsTable w={1060} rows={COMMENTS} frame={frame} appearStart={184} stagger={7} />
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 288,
+              width: 1060,
+              textAlign: "center",
+              fontSize: 15.5,
+              fontWeight: 600,
+              color: B.muted,
+              opacity: seg(frame, 214, 228) * 0.9,
+            }}
+          >
+            Every draft matches your usual tone — before a human ever sees it
+          </div>
+        </BrowserWindow>
+        <Cursor x={cx} y={cy} opacity={cursorOp} click={Math.max(click1 % 1, click2 % 1, click3 % 1)} />
+        <CaptionBand text="Comments in, sentiment scored, a draft written — every 30 minutes, automatically" tone="accent" opacity={cap2} />
+      </Group>
 
-      <SchemaNode {...SENTIMENT} state="accent" lit={sentimentLit} opacity={sentimentOp} label="Sentiment score" fontSize={19}>
+      {/* ════ Beat 3 — HOW IT WORKS ════ */}
+      <Group opacity={b3}>
+        <Headline text="You stay" accentText="in control" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        <IconCard x={110} y={218} w={300} emoji="🎯" title="Sentiment scored first" sub="−1 angry to +1 thrilled" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
+        <IconCard x={490} y={218} w={300} emoji="🧠" title="Draft matches your tone" sub="uses the article as context" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
+        <IconCard x={870} y={218} w={300} emoji="📲" title="Sent to Telegram for review" sub="Reply · Edit · Ignore" tone="success" scale={card3} opacity={Math.min(1, card3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="Under the hood: Azure OpenAI sentiment scoring plus a Supabase Edge Function on Deno"
+          opacity={cap3}
+          fontSize={21}
+          y={580}
+        />
+      </Group>
+
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>1-2 hours</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>typing every reply, every day</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>under 10 min</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>tap Reply, Edit, or Ignore</div>
+          </div>
+        </Panel>
         <div
           style={{
-            width: 220,
-            height: 6,
-            borderRadius: 3,
-            background: T.border,
-            marginTop: 8,
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
-          <div style={{ position: "absolute", left: 0, top: 0, height: "100%", width: `${gaugeX * 78}%`, background: `linear-gradient(90deg, ${T.danger}, ${T.success})` }} />
-        </div>
-        <div style={{ fontSize: 11, color: T.muted, fontWeight: 500, marginTop: 4 }}>−1 ··· +1</div>
-      </SchemaNode>
-      <SchemaNode {...REPLY} state="accent" lit={replyLit} opacity={replyOp} label="generate-comment-reply" fontSize={16}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>article context + sentiment</div>
-      </SchemaNode>
-      <Token pts={P_SS} t={tSs} opacity={tSsVis * lf} />
-      <Token pts={P_SR} t={tSr} opacity={tSrVis * lf} />
-      <Token pts={P_RT} t={tRt} opacity={tRtVis * lf} />
-
-      <SchemaNode {...TG} state="accent" lit={tgLit} opacity={tgOp} label="Telegram bot" fontSize={21}>
-        <div style={{ fontSize: 13, color: T.muted, fontWeight: 500, marginTop: 2 }}>draft ready for review</div>
-      </SchemaNode>
-      <Pill x={TG.x + 20} y={TG.y + TG.h + 14} text="✓ Reply" color={T.success} opacity={btnOp[0]} fontSize={17} />
-      <Pill x={TG.x + 140} y={TG.y + TG.h + 14} text="Edit" color={T.amber} opacity={btnOp[1]} fontSize={17} />
-      <Pill x={TG.x + 240} y={TG.y + TG.h + 14} text="Ignore" color={T.muted} opacity={btnOp[2]} fontSize={17} />
-
-      <Caption x={90} y={648} w={1100} text="20+ comments a day, every reply typed out by hand" color={T.danger} opacity={cap1} fontSize={23} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Sentiment scored, then a context-aware draft is written" color={T.text} opacity={cap2} fontSize={23} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Human taps Reply, Edit, or Ignore — full control preserved" color={T.success} opacity={cap3} fontSize={22} weight={600} />
-
-      <div style={{ position: "absolute", left: 0, top: 598, width: 1280, textAlign: "center", opacity: metricOp }}>
-        <div style={{ fontSize: 22, fontWeight: 600, color: T.muted }}>1-2 hours → under 10 minutes daily</div>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
-        <div
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
+            position: "absolute",
+            left: 0,
+            top: 424,
+            width: 1280,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
+            gap: 20,
+            opacity: speedOp,
+            fontFamily,
           }}
         >
-          ✓
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>≈{speedX}× faster</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>Human-in-the-loop keeps the brand voice</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            Every reply still sounds like you — you just stopped typing them.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>AI Comment Replies · vitalii.no</div>
+        </div>
+      </Group>
+    </div>
   );
 };
