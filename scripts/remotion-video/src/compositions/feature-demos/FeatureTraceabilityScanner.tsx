@@ -1,37 +1,151 @@
 /**
  * FeatureTraceabilityScanner — feature p61 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
+ * viewer: problem/solution color zones, a real browser mockup with a plausible
+ * feature index (real feature names, direct commit links), an admin-override
+ * toggle, and a big before→after metric.
  *
- * Story: across 5+ repos and 100+ features, verifying "where did this come
- * from" cost 15-30 minutes per feature of manual commit-history digging.
- * The rebuilt feature-scanner GitHub Action iterates repo_list.txt, hits
- * the GitHub API for commit messages and file changes, and a custom
- * parseFeatureData function extracts feature details plus the precise
- * commit URL into public/features.json. The React frontend renders direct
- * commit links; FeatureAdminPanel.tsx allows manual overrides for edge cases.
+ * Story (4 beats):
+ *  1. Problem — 100+ features spread across 5+ repos; proving exactly where
+ *     and when one shipped means 15-30 minutes of manual digging, every
+ *     time. Red zone.
+ *  2. Solution — repo tabs + "Admin override" toggle; a table instantly
+ *     lists Feature / Repo / commit link / Status for real project features,
+ *     and flipping the toggle shows one row switch from Auto to a manual
+ *     Edited override.
+ *  3. How it stays accurate — repo_list.txt drives the scan, the GitHub API
+ *     + parseFeatureData resolve each commit URL, and FeatureAdminPanel.tsx
+ *     catches the edge cases. One tech-credibility line (public/features.json
+ *     written by a GitHub Action).
+ *  4. Result — before/after cards: 15-30 min of manual digging → seconds,
+ *     one click to the exact commit, 95% less investigation time. Green
+ *     zone, check badge.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B, toneEdge } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  BrowserWindow,
+  SkeletonScroll,
+  FilterChip,
+  ToggleSwitch,
+  StatPill,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  Cursor,
+  CheckBadge,
+  CaptionBand,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const SOURCE = { x: 460, y: 50, w: 360, h: 92 };
-const SOURCE_B: Pt = { x: SOURCE.x + SOURCE.w / 2, y: SOURCE.y + SOURCE.h };
+type LinkRow = { feature: string; repo: string };
 
-const SCANNER = { x: 460, y: 210, w: 360, h: 108 };
-const SCANNER_T: Pt = { x: SCANNER.x + SCANNER.w / 2, y: SCANNER.y };
-const SCANNER_B: Pt = { x: SCANNER.x + SCANNER.w / 2, y: SCANNER.y + SCANNER.h };
+const ROWS: LinkRow[] = [
+  { feature: "AI Creative Builder", repo: "vitalii-portfolio" },
+  { feature: "43 Edge Functions", repo: "vitalii-portfolio" },
+  { feature: "Feature Traceability", repo: "vitalii-portfolio" },
+  { feature: "Scheduled Publishing", repo: "vitalii-portfolio" },
+];
 
-const JSON_NODE = { x: 460, y: 380, w: 360, h: 90 };
-const JSON_T: Pt = { x: JSON_NODE.x + JSON_NODE.w / 2, y: JSON_NODE.y };
-const JSON_L: Pt = { x: JSON_NODE.x, y: JSON_NODE.y + JSON_NODE.h / 2 };
-const JSON_R: Pt = { x: JSON_NODE.x + JSON_NODE.w, y: JSON_NODE.y + JSON_NODE.h / 2 };
-
-const FRONTEND = { x: 110, y: 530, w: 280, h: 96 };
-const FRONTEND_T: Pt = { x: FRONTEND.x + FRONTEND.w / 2, y: FRONTEND.y };
-
-const ADMIN = { x: 890, y: 530, w: 280, h: 96 };
-const ADMIN_T: Pt = { x: ADMIN.x + ADMIN.w / 2, y: ADMIN.y };
+/** Feature index table — Feature / Repo / direct commit-link pill / auto-vs-edited Status. */
+const FeatureLinkTable: React.FC<{
+  w: number;
+  rows: LinkRow[];
+  frame: number;
+  appearStart: number;
+  stagger?: number;
+  overrideFrame: number;
+}> = ({ w, rows, frame, appearStart, stagger = 7, overrideFrame }) => {
+  const cols = [0.34, 0.24, 0.2, 0.22];
+  const heads = ["Feature", "Repo", "Commit", "Status"];
+  const cell = (f: number): React.CSSProperties => ({ width: w * f - 14, overflow: "hidden", whiteSpace: "nowrap" });
+  const edited = frame >= overrideFrame;
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: w, fontFamily }}>
+      <div
+        style={{
+          display: "flex",
+          padding: "10px 18px",
+          gap: 14,
+          background: "#F4F7FC",
+          borderBottom: `1.5px solid ${B.border}`,
+          fontSize: 14,
+          fontWeight: 700,
+          color: B.muted,
+          letterSpacing: 0.4,
+        }}
+      >
+        {heads.map((hd, i) => (
+          <div key={hd} style={cell(cols[i])}>
+            {hd}
+          </div>
+        ))}
+      </div>
+      {rows.map((r, i) => {
+        const t = seg(frame, appearStart + i * stagger, appearStart + i * stagger + 12);
+        const isLast = i === rows.length - 1;
+        const showEdited = isLast && edited;
+        return (
+          <div
+            key={r.feature}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "9px 18px",
+              gap: 14,
+              borderBottom: `1px solid ${B.border}`,
+              fontSize: 15.5,
+              color: B.ink,
+              opacity: t,
+              transform: `translateX(${(1 - t) * 26}px)`,
+            }}
+          >
+            <div style={{ ...cell(cols[0]), fontWeight: 600 }}>{r.feature}</div>
+            <div style={{ ...cell(cols[1]), color: B.muted, fontWeight: 500 }}>{r.repo}</div>
+            <div style={cell(cols[2])}>
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "2.5px 10px",
+                  borderRadius: 999,
+                  background: B.accentBg,
+                  border: `1px solid ${toneEdge("accent")}`,
+                  color: B.accent,
+                  fontWeight: 700,
+                  fontSize: 13.5,
+                }}
+              >
+                🔗 View commit
+              </span>
+            </div>
+            <div style={cell(cols[3])}>
+              <span
+                style={{
+                  padding: "2.5px 10px",
+                  borderRadius: 999,
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  background: showEdited ? "#FEF3C7" : B.successBg,
+                  border: `1px solid ${showEdited ? "#F3D98B" : toneEdge("success")}`,
+                  color: showEdited ? "#92650B" : B.success,
+                }}
+              >
+                {showEdited ? "Edited ✎" : "Auto"}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 export const FeatureTraceabilityScanner: React.FC = () => {
   const frame = useCurrentFrame();
@@ -40,126 +154,172 @@ export const FeatureTraceabilityScanner: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // Beat 1: 5+ repos, 100+ features, 15-30 min/feature manual digging
-  const sourceOp = appear(6) * lf;
-  const sourceLit = interpolate(frame, [6, 30, 96, 116], [0, 0.5, 0.5, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill1In = seg(frame, 40, 62, Easing.out(Easing.cubic));
-  const pill1Op = pill1In * interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill1Dx = (1 - pill1In) * 40;
-  const cap1In = seg(frame, 20, 42, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
+  // ── Beat windows ──────────────────────────────────────────────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
 
-  // Beat 2: feature-scanner Action -> GitHub API -> parseFeatureData
-  const tA = seg(frame, 130, 154);
-  const tAVis = frame >= 130 && frame < 190 ? 1 : 0;
-  const scannerOp = appear(140, 18) * lf;
-  const scannerLit = interpolate(frame, [148, 172, 330, 350], [0, 0.75, 0.75, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2In = seg(frame, 160, 182, Easing.out(Easing.cubic));
-  const pill2Op = pill2In * interpolate(frame, [216, 236], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2Dx = (1 - pill2In) * 40;
-  const cap2In = seg(frame, 158, 180, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [216, 236], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
+  // ── Beat 1: the problem ───────────────────────────────────────────
+  const scroll = frame * 2.2;
+  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
+  const pill1 = pop(46);
+  const pill2 = pop(58);
+  const pill3 = pop(70);
 
-  // Beat 3: public/features.json -> React frontend + FeatureAdminPanel.tsx
-  const tB = seg(frame, 226, 250);
-  const tBVis = frame >= 226 && frame < 296 ? 1 : 0;
-  const tC = seg(frame, 250, 274);
-  const tCVis = frame >= 250 && frame < 320 ? 1 : 0;
-  const tD = seg(frame, 250, 274);
-  const tDVis = frame >= 250 && frame < 320 ? 1 : 0;
-  const jsonOp = appear(232, 18) * lf;
-  const jsonLit = interpolate(frame, [240, 262, 330, 350], [0, 0.7, 0.7, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const frontendOp = appear(256, 18) * lf;
-  const adminOp = appear(256, 18) * lf;
-  const frontendLit = interpolate(frame, [264, 286, 330, 350], [0, 0.6, 0.6, 0.16], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const adminLit = interpolate(frame, [264, 286, 330, 350], [0, 0.6, 0.6, 0.16], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3In = seg(frame, 282, 304, Easing.out(Easing.cubic));
-  const pill3Op = pill3In * interpolate(frame, [318, 340], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3Dx = (1 - pill3In) * 40;
-  const cap3In = seg(frame, 276, 298, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [318, 340], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
+  // ── Beat 2: the solution ──────────────────────────────────────────
+  const chip1 = pop(132);
+  const chip2 = pop(142);
+  const chip3 = pop(152);
+  const chip4 = pop(164);
+  const togOn = seg(frame, 180, 192, Easing.inOut(Easing.cubic));
+  const cx = interpolate(frame, [124, 134, 152, 166, 182, 205], [700, 235, 480, 660, 1020, 1080], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cy = interpolate(frame, [124, 134, 152, 166, 182, 205], [400, 152, 152, 152, 155, 300], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cursorOp = seg(frame, 124, 132) * (1 - seg(frame, 205, 218));
+  const click1 = seg(frame, 134, 146, Easing.out(Easing.quad));
+  const click2 = seg(frame, 152, 164, Easing.out(Easing.quad));
+  const click3 = seg(frame, 182, 194, Easing.out(Easing.quad));
+  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
 
-  // Beat 4: result
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
+  // ── Beat 3: how it stays accurate ─────────────────────────────────
+  const card1 = pop(252);
+  const card2 = pop(272);
+  const card3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+
+  // ── Beat 4: the result ────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const pct = Math.round(interpolate(frame, [384, 414], [0, 95], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }));
+  const pctOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      <Connector pts={[SOURCE_B, SCANNER_T]} color={T.accent} width={2.5} progress={tA} opacity={0.8 * tAVis * lf} />
-      <Connector pts={[SCANNER_B, JSON_T]} color={T.accent} width={2.5} progress={tB} opacity={0.8 * tBVis * lf} />
-      <Connector pts={[JSON_L, FRONTEND_T]} color={T.success} width={2.5} progress={tC} opacity={0.8 * tCVis * lf} />
-      <Connector pts={[JSON_R, ADMIN_T]} color={T.success} width={2.5} progress={tD} opacity={0.8 * tDVis * lf} />
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="Verify 100+ features across" accentText="5+ repos?" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <BrowserWindow x={80} y={116} w={700} h={452} title="audit — 100+ features, 5+ repos" opacity={Math.min(1, pop(8))}>
+          <SkeletonScroll w={700} h={410} offset={scroll} />
+        </BrowserWindow>
+        <StickyNote
+          x={830}
+          y={150}
+          w={350}
+          opacity={noteOp}
+          text="Need: proof that 'AI Creative Builder' really shipped — with a link I can click"
+        />
+        <StatPill x={846} y={340} emoji="🔍" text="15-30 min per feature" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+        <StatPill x={846} y={402} emoji="🗂️" text="100+ features to verify" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+        <StatPill x={846} y={464} emoji="📉" text="Confidence fades over time" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
+        <CaptionBand text="One feature, five-plus repos — its commit history buried deep inside" tone="danger" opacity={seg(frame, 30, 46)} />
+      </Group>
 
-      <SchemaNode {...SOURCE} state="danger" lit={sourceLit} opacity={sourceOp} label="5+ repos, 100+ features" fontSize={21}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>"where did this come from?"</div>
-      </SchemaNode>
-      <Pill x={SOURCE.x + 30} y={SOURCE.y - 46} dx={pill1Dx} text="15-30 min per feature, manually" color={T.danger} opacity={pill1Op} fontSize={16} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="Every feature," accentText="one precise commit link" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <FilterChip x={160} y={132} text="vitalii-portfolio" icon="📁" scale={chip1} opacity={Math.min(1, chip1)} />
+        <FilterChip x={400} y={132} text="boytasks" icon="📁" scale={chip2} opacity={Math.min(1, chip2)} />
+        <FilterChip x={560} y={132} text="jobbot-no" icon="📁" scale={chip3} opacity={Math.min(1, chip3)} />
+        <FilterChip x={720} y={132} text="+2 more" icon="📁" scale={chip4} opacity={Math.min(1, chip4)} />
+        <ToggleSwitch x={940} y={138} label="Admin override" on={togOn} opacity={seg(frame, 172, 184)} />
+        <BrowserWindow x={110} y={196} w={1060} h={396} title="features.json — live index" opacity={seg(frame, 168, 182)}>
+          <FeatureLinkTable w={1060} rows={ROWS} frame={frame} appearStart={184} stagger={7} overrideFrame={192} />
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 288,
+              width: 1060,
+              textAlign: "center",
+              fontSize: 15.5,
+              fontWeight: 600,
+              color: B.muted,
+              opacity: seg(frame, 214, 228) * 0.9,
+            }}
+          >
+            …and 96 more features — each with its own direct commit link
+          </div>
+        </BrowserWindow>
+        <Cursor x={cx} y={cy} opacity={cursorOp} click={Math.max(click1 % 1, click2 % 1, click3 % 1)} />
+        <CaptionBand text="parseFeatureData resolves every commit URL; the admin panel handles the rest" tone="accent" opacity={cap2} />
+      </Group>
 
-      <SchemaNode {...SCANNER} state="accent" lit={scannerLit} opacity={scannerOp} label="feature-scanner Action" fontSize={19}>
-        <div style={{ fontSize: 11, color: T.muted, fontWeight: 500, marginTop: 2, textAlign: "center" }}>repo_list.txt → GitHub API → parseFeatureData</div>
-      </SchemaNode>
-      <Token pts={[SOURCE_B, SCANNER_T]} t={tA} opacity={tAVis * lf} />
-      <Pill x={SCANNER.x - 10} y={SCANNER.y + SCANNER.h + 14} dx={pill2Dx} text="extracts details + precise commit URL" color={T.accent} opacity={pill2Op} fontSize={15} />
+      {/* ════ Beat 3 — HOW IT STAYS ACCURATE ════ */}
+      <Group opacity={b3}>
+        <Headline text="Scanned, resolved," accentText="always accurate" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        <IconCard x={110} y={218} w={300} emoji="📋" title="repo_list.txt drives the scan" sub="5+ GitHub repos" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
+        <IconCard x={490} y={218} w={300} emoji="🔗" title="GitHub API resolves each commit" sub="parseFeatureData extracts the URL" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
+        <IconCard x={870} y={218} w={300} emoji="🛠️" title="FeatureAdminPanel.tsx" sub="manual override, used 10+ times" tone="success" scale={card3} opacity={Math.min(1, card3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="Written straight to public/features.json by a GitHub Action"
+          opacity={cap3}
+          fontSize={21}
+          y={580}
+        />
+      </Group>
 
-      <SchemaNode {...JSON_NODE} state="success" lit={jsonLit} opacity={jsonOp} label="public/features.json" fontSize={19} />
-      <Token pts={[SCANNER_B, JSON_T]} t={tB} opacity={tBVis * lf} />
-
-      <SchemaNode {...FRONTEND} state="success" lit={frontendLit} opacity={frontendOp} label="React frontend" fontSize={17}>
-        <div style={{ fontSize: 11, color: T.muted, fontWeight: 500, marginTop: 2 }}>renders commit links</div>
-      </SchemaNode>
-      <SchemaNode {...ADMIN} state="amber" lit={adminLit} opacity={adminOp} label="FeatureAdminPanel.tsx" fontSize={16}>
-        <div style={{ fontSize: 11, color: T.muted, fontWeight: 500, marginTop: 2 }}>manual override, edge cases</div>
-      </SchemaNode>
-      <Token pts={[JSON_L, FRONTEND_T]} t={tC} color={T.success} opacity={tCVis * lf} />
-      <Token pts={[JSON_R, ADMIN_T]} t={tD} color={T.amber} opacity={tDVis * lf} />
-      <Pill x={430} y={JSON_NODE.y + JSON_NODE.h + 12} dx={pill3Dx} text="100% data accuracy, edge cases covered" color={T.amber} opacity={pill3Op} fontSize={15} />
-
-      <Caption x={90} y={648} w={1100} text="Verifying a feature's origin: 15-30 minutes of manual digging" color={T.danger} opacity={cap1} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Every repo scanned, every commit resolved to a direct URL" color={T.text} opacity={cap2} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="The frontend links straight to commits; an admin panel handles the rest" color={T.success} opacity={cap3} fontSize={22} weight={600} />
-
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>15-30 min</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>manual digging, per feature</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>Seconds</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>one click to the exact commit</div>
+          </div>
+        </Panel>
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
+            position: "absolute",
+            left: 0,
+            top: 424,
+            width: 1280,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
+            gap: 20,
+            opacity: pctOp,
+            fontFamily,
           }}
         >
-          ✓
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>≈{pct}% less investigation time</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>Seconds, not 15-30 min — 95% less investigation time</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            100% data accuracy — every feature accounted for.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>vitalii.no</div>
+        </div>
+      </Group>
+    </div>
   );
 };

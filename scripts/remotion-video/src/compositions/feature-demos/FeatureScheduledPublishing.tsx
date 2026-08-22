@@ -1,37 +1,51 @@
 /**
  * FeatureScheduledPublishing — feature p25 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
+ * viewer: problem/solution color zones, a real feed mockup showing a
+ * "content wall", a spaced-out post timeline, and a big before→after panel.
  *
- * Story: 10-15 articles/day pushed simultaneously created a "content wall"
- * on social feeds, unfollows + algorithmic penalties → schedule-publisher
- * Deno Edge Function, run every 5 min by GitHub Actions, queries
- * posts_queue and enforces min_gap_seconds (default 60s) → AI priority_score
- * (0-100) lets breaking news jump the queue within publish_windows →
- * manual scheduling eliminated (~30 min/day), engagement +15-20%.
+ * Story (4 beats):
+ *  1. Problem — 10-15 articles a day, all posted at once; a feed wall of
+ *     "Just now" posts; followers unfollow, the algorithm penalizes it,
+ *     and staggering them by hand eats ~30 minutes daily. Red zone.
+ *  2. Solution — posts are checked every 5 minutes and released one at a
+ *     time, at least 60 seconds apart — a visible, evenly-spaced timeline
+ *     instead of a pile-up.
+ *  3. How it stays fair — every post waits in one queue, a priority score
+ *     lets breaking news skip ahead, and a publish window keeps posts out
+ *     of the middle of the night. One tech-credibility line (Deno Edge
+ *     Function on a 5-minute GitHub Actions cron).
+ *  4. Result — before/after cards: a content wall / ~30 min manual work →
+ *     a smooth automatic cadence, engagement up 15-20%. Green zone, check
+ *     badge.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Badge, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  BrowserWindow,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  StatPill,
+  FilterChip,
+  CheckBadge,
+  CaptionBand,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const TOP = { x: 440, y: 50, w: 400, h: 88, label: "10-15 articles/day, all at once" };
-const TOP_B: Pt = { x: TOP.x + TOP.w / 2, y: TOP.y + TOP.h };
-
-const RIGHT1 = { x: 850, y: 210, w: 300, h: 78, label: "content wall on feeds" };
-const RIGHT1_T: Pt = { x: RIGHT1.x + RIGHT1.w / 2, y: RIGHT1.y };
-
-const LEFT1 = { x: 130, y: 210, w: 280, h: 78, label: "GitHub Actions, every 5 min" };
-const LEFT1_T: Pt = { x: LEFT1.x + LEFT1.w / 2, y: LEFT1.y };
-const LEFT1_B: Pt = { x: LEFT1.x + LEFT1.w / 2, y: LEFT1.y + LEFT1.h };
-
-const MID = { x: 470, y: 350, w: 340, h: 90 };
-const MID_T: Pt = { x: MID.x + MID.w / 2, y: MID.y };
-const MID_B: Pt = { x: MID.x + MID.w / 2, y: MID.y + MID.h };
-
-const BOTLEFT = { x: 130, y: 500, w: 260, h: 78 };
-const BOTRIGHT = { x: 850, y: 500, w: 300, h: 78 };
-const BOTLEFT_T: Pt = { x: BOTLEFT.x + BOTLEFT.w / 2, y: BOTLEFT.y };
-const BOTRIGHT_T: Pt = { x: BOTRIGHT.x + BOTRIGHT.w / 2, y: BOTRIGHT.y };
+const POSTS = [
+  { title: "AI chip shortage deepens", time: "Just now" },
+  { title: "New JS framework ships v2", time: "Just now" },
+  { title: "Cloud outage hits EU banks", time: "Just now" },
+  { title: "Startup raises Series B", time: "Just now" },
+];
 
 export const FeatureScheduledPublishing: React.FC = () => {
   const frame = useCurrentFrame();
@@ -40,132 +54,156 @@ export const FeatureScheduledPublishing: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // ── Beat 1 (0–116): 10-15 posts/day, all at once → content wall → unfollows ──
-  const topOp = Math.min(1, pop(6)) * lf;
-  const topLit = interpolate(frame, [6, 28, 96, 116], [0, 0.5, 0.5, 0.14], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const tCi = seg(frame, 30, 54);
-  const tCiVis = frame >= 30 && frame < 96 ? 1 : 0;
-  const rightOp = appear(38, 18) * lf;
-  const rightLit = interpolate(frame, [38, 60, 96, 116], [0, 0.5, 0.5, 0.14], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const xScale = pop(70) * interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill1In = seg(frame, 22, 44, Easing.out(Easing.cubic));
-  const pill1Op = pill1In * interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap1In = seg(frame, 24, 46, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
+  // ── Beat windows ──────────────────────────────────────────────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
 
-  // ── Beat 2 (128–232): schedule-publisher enforces min_gap_seconds between posts ──
-  const tCe = seg(frame, 138, 162);
-  const tCeVis = frame >= 138 && frame < 184 ? 1 : 0;
-  const leftOp = appear(148, 18) * lf;
-  const leftLit = interpolate(frame, [148, 170, 330, 350], [0, 0.7, 0.7, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const tEf = seg(frame, 168, 192);
-  const tEfVis = frame >= 168 && frame < 214 ? 1 : 0;
-  const midOp = appear(178, 18) * lf;
-  const midLit = interpolate(frame, [186, 208, 330, 350], [0, 0.75, 0.75, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap2In = seg(frame, 158, 180, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [222, 242], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
+  // ── Beat 1: the problem ───────────────────────────────────────────
+  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
+  const pill1 = pop(46);
+  const pill2 = pop(58);
 
-  // ── Beat 3 (246–340): priority_score lets breaking news jump the queue ──
-  const tFl = seg(frame, 250, 274);
-  const tFlVis = frame >= 250 && frame < 300 ? 1 : 0;
-  const tFc = seg(frame, 256, 280);
-  const tFcVis = frame >= 256 && frame < 306 ? 1 : 0;
-  const botLeftOp = appear(266, 18) * lf;
-  const botRightOp = appear(272, 18) * lf;
-  const botLeftLit = interpolate(frame, [274, 296, 330, 350], [0, 0.65, 0.65, 0.18], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const botRightLit = interpolate(frame, [280, 302, 330, 350], [0, 0.6, 0.6, 0.16], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3In = seg(frame, 284, 306, Easing.out(Easing.cubic));
-  const pill3Op = pill3In * interpolate(frame, [316, 336], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap3In = seg(frame, 264, 286, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [316, 336], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
+  // ── Beat 2: the solution ──────────────────────────────────────────
+  const cardA = pop(132);
+  const cardB = pop(146);
+  const chip1 = pop(160);
+  const chip2 = pop(170);
+  const chip3 = pop(180);
+  const chip4 = pop(190);
+  const chip5 = pop(200);
+  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
 
-  // ── Beat 4 (346–450): result ──
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
-  const metricOp = seg(frame, 358, 380, Easing.out(Easing.cubic)) * lf;
+  // ── Beat 3: how it stays fair ──────────────────────────────────────
+  const card1 = pop(252);
+  const card2 = pop(272);
+  const card3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+
+  // ── Beat 4: the result ─────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const metricOp = seg(frame, 384, 400, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      <Connector pts={[TOP_B, RIGHT1_T]} color={T.danger} width={2.5} progress={tCi} opacity={0.8 * tCiVis * lf} />
-      <Connector pts={[TOP_B, LEFT1_T]} color={T.accent} width={2.5} progress={tCe} opacity={0.8 * tCeVis * lf} />
-      <Connector pts={[LEFT1_B, MID_T]} color={T.accent} width={2.5} progress={tEf} opacity={0.8 * tEfVis * lf} />
-      <Connector pts={[MID_B, BOTLEFT_T]} color={T.amber} width={2.5} progress={tFl} opacity={0.8 * tFlVis * lf} />
-      <Connector pts={[MID_B, BOTRIGHT_T]} color={T.amber} width={2.5} progress={tFc} opacity={0.8 * tFcVis * lf} />
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="10-15 articles a day," accentText="all posted at once" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <BrowserWindow x={80} y={124} w={660} h={430} title="LinkedIn feed — @vitalii.no" opacity={Math.min(1, pop(8))}>
+          {POSTS.map((p, i) => {
+            const t = seg(frame, 24 + i * 12, 24 + i * 12 + 14);
+            return (
+              <div
+                key={p.title}
+                style={{
+                  position: "absolute",
+                  left: 20,
+                  top: 16 + i * 96,
+                  width: 620,
+                  height: 82,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: "0 18px",
+                  borderRadius: 14,
+                  background: B.dangerBg,
+                  border: "1.5px solid #F3C2C7",
+                  opacity: t,
+                  transform: `translateX(${(1 - t) * 24}px)`,
+                }}
+              >
+                <div style={{ fontSize: 30 }}>📰</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: B.ink }}>{p.title}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: B.danger, marginTop: 3 }}>{p.time}</div>
+                </div>
+              </div>
+            );
+          })}
+        </BrowserWindow>
+        <StickyNote
+          x={780}
+          y={150}
+          w={380}
+          opacity={noteOp}
+          text="Every article published the moment it's ready — all 10-15 of them landing on the feed within minutes of each other"
+        />
+        <StatPill x={796} y={392} emoji="📉" text="Unfollows + algorithm penalty" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+        <StatPill x={796} y={454} emoji="😩" text="~30 min/day staggering by hand" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+        <CaptionBand text="A content wall on the feed — followers see everything at once, or nothing" tone="danger" opacity={seg(frame, 30, 46)} />
+      </Group>
 
-      <SchemaNode {...TOP} state="idle" lit={topLit} opacity={topOp} label={TOP.label} fontSize={20} />
-      <Token pts={[TOP_B, RIGHT1_T]} t={tCi} color={T.danger} opacity={tCiVis * lf} />
-      <SchemaNode {...RIGHT1} state="danger" lit={rightLit} opacity={rightOp} label={RIGHT1.label} fontSize={19}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>unfollows + algo penalty</div>
-      </SchemaNode>
-      <Badge x={RIGHT1.x + RIGHT1.w / 2 - 16} y={RIGHT1.y - 34} kind="cross" scale={xScale} opacity={xScale} size={32} />
-      <Pill x={TOP.x - 40} y={TOP.y - 44} text="pushed to LinkedIn, Instagram, Facebook at once" color={T.danger} opacity={pill1Op} fontSize={16} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="Now released" accentText="one at a time" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <IconCard x={160} y={166} w={280} emoji="🤖" title="Checked every 5 minutes" sub="an automated queue" tone="accent" scale={cardA} opacity={Math.min(1, cardA)} />
+        <IconCard x={840} y={166} w={280} emoji="⏱️" title="60s minimum gap" sub="between any two posts" tone="success" scale={cardB} opacity={Math.min(1, cardB)} />
+        <div style={{ position: "absolute", left: 160, top: 358, width: 960, height: 2, background: B.border }} />
+        <FilterChip x={168} y={334} text="Post 1" icon="✓" color={B.success} scale={chip1} opacity={Math.min(1, chip1)} />
+        <FilterChip x={352} y={334} text="Post 2" icon="✓" color={B.success} scale={chip2} opacity={Math.min(1, chip2)} />
+        <FilterChip x={548} y={334} text="Post 3" icon="✓" color={B.success} scale={chip3} opacity={Math.min(1, chip3)} />
+        <FilterChip x={744} y={334} text="Post 4" icon="✓" color={B.success} scale={chip4} opacity={Math.min(1, chip4)} />
+        <FilterChip x={952} y={334} text="Post 5" icon="✓" color={B.success} scale={chip5} opacity={Math.min(1, chip5)} />
+        <CaptionBand text="The queue is checked every 5 minutes and enforces a minimum gap between posts" tone="accent" opacity={cap2} />
+      </Group>
 
-      <SchemaNode {...LEFT1} state="accent" lit={leftLit} opacity={leftOp} label={LEFT1.label} fontSize={18} />
-      <Token pts={[TOP_B, LEFT1_T]} t={tCe} opacity={tCeVis * lf} />
-      <SchemaNode {...MID} state="accent" lit={midLit} opacity={midOp} label="schedule-publisher (Deno)" fontSize={19}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2, textAlign: "center" }}>posts_queue · min_gap_seconds = 60s</div>
-      </SchemaNode>
-      <Token pts={[LEFT1_B, MID_T]} t={tEf} opacity={tEfVis * lf} />
+      {/* ════ Beat 3 — HOW IT STAYS FAIR ════ */}
+      <Group opacity={b3}>
+        <Headline text="And it's" accentText="fair to breaking news" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        <IconCard x={110} y={218} w={300} emoji="🗄️" title="One shared queue" sub="posts_queue table" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
+        <IconCard x={490} y={218} w={300} emoji="🚦" title="Priority score 0-100" sub="breaking news jumps ahead" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
+        <IconCard x={870} y={218} w={300} emoji="⏰" title="08:00-22:00 window" sub="no posts in the middle of the night" tone="success" scale={card3} opacity={Math.min(1, card3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="Under the hood: a Deno Edge Function, triggered by GitHub Actions every 5 minutes"
+          opacity={cap3}
+          fontSize={21}
+          y={580}
+        />
+      </Group>
 
-      <SchemaNode {...BOTLEFT} state="amber" lit={botLeftLit} opacity={botLeftOp} label="priority_score 90+" fontSize={19}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>jumps the queue</div>
-      </SchemaNode>
-      <SchemaNode {...BOTRIGHT} state="amber" lit={botRightLit} opacity={botRightOp} label="publish_windows 08:00–22:00" fontSize={17}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>social_channel_config per platform</div>
-      </SchemaNode>
-      <Token pts={[MID_B, BOTLEFT_T]} t={tFl} color={T.amber} opacity={tFlVis * lf} />
-      <Token pts={[MID_B, BOTRIGHT_T]} t={tFc} color={T.amber} opacity={tFcVis * lf} />
-      <Pill x={BOTLEFT.x - 10} y={BOTLEFT.y + BOTLEFT.h + 14} text="priority 90 breaking news vs priority 20 listicle" color={T.amber} opacity={pill3Op} fontSize={15} />
-
-      <Caption x={90} y={648} w={1100} text="10-15 daily articles hitting social feeds simultaneously built a content wall" color={T.danger} opacity={cap1} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="schedule-publisher runs every 5 minutes, enforcing a minimum gap between posts" color={T.text} opacity={cap2} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="AI priority_score lets breaking news jump the queue within publish windows" color={T.amber} opacity={cap3} fontSize={22} weight={600} />
-
-      <div style={{ position: "absolute", left: 0, top: 598, width: 1280, textAlign: "center", opacity: metricOp }}>
-        <div style={{ fontSize: 22, fontWeight: 600, color: T.muted }}>~30 minutes of manual scheduling eliminated daily</div>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
-        <div
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
-          }}
-        >
-          ✓
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 34, fontWeight: 800, color: B.ink, marginTop: 14 }}>10-15 posts at once</div>
+            <div style={{ fontSize: 24, fontWeight: 650, color: B.muted, marginTop: 6 }}>~30 min/day, by hand</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 34, fontWeight: 800, color: B.ink, marginTop: 14 }}>60s+ apart, automatic</div>
+            <div style={{ fontSize: 24, fontWeight: 650, color: B.muted, marginTop: 6 }}>zero manual scheduling</div>
+          </div>
+        </Panel>
+        <div style={{ position: "absolute", left: 0, top: 424, width: 1280, display: "flex", alignItems: "center", justifyContent: "center", gap: 20, opacity: metricOp, fontFamily }}>
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 46, fontWeight: 800, color: B.success }}>+15-20% engagement</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>Engagement up 15-20%, priority content live in minutes</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            Breaking news still skips the line — live within minutes, not stuck behind a listicle.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>vitalii.no</div>
+        </div>
+      </Group>
+    </div>
   );
 };

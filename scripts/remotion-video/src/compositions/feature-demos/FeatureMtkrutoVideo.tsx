@@ -1,42 +1,48 @@
 /**
  * FeatureMtkrutoVideo — feature p21 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
+ * viewer: problem/solution color zones, a browser mockup of the stuck video
+ * queue, an animated bypass-then-distribute chain, and a big before→after
+ * capacity metric.
  *
- * Story: Telegram Bot API's 20MB wall chokes on the 50-500MB videos flowing
- * from 6 channels → a Deno service built on MTKruto connects as a full
- * MTProto client, bypassing the Bot API to pull files up to 2GB →
- * processAndUploadVideo pushes to YouTube (unlisted, Data API v3) and
- * LinkedIn/Instagram/Facebook Graph APIs, with the heavy lifting offloaded
- * to GitHub Actions to sidestep Edge Function /tmp limits → "100% of
- * video-too-large failures eliminated".
+ * Story (4 beats):
+ *  1. Problem — 6 Telegram channels send 50-500MB+ videos; the Bot API's
+ *     hard 20MB ceiling rejects them; content is uningested, opportunities
+ *     missed. Red zone.
+ *  2. Solution — MTKruto connects as a full MTProto client, sidestepping
+ *     the Bot API entirely, downloading up to 2GB per file.
+ *  3. How it stays smooth — processAndUploadVideo() hands the big files to
+ *     GitHub Actions, which uploads to YouTube (unlisted) and pushes to
+ *     LinkedIn/Instagram/Facebook — no Edge Function size limit involved.
+ *  4. Result — before/after cards: 20MB ceiling → 2GB per file, ≈100× more
+ *     capacity, 100% of "video too large" failures gone. Green zone.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Badge, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  StatPill,
+  CheckBadge,
+  CaptionBand,
+  BrowserWindow,
+  SkeletonScroll,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const VIDEOS = { x: 465, y: 56, w: 350, h: 96 };
-const VIDEOS_BOTTOM: Pt = { x: VIDEOS.x + VIDEOS.w / 2, y: VIDEOS.y + VIDEOS.h };
-
-const BOTAPI = { x: 465, y: 200, w: 350, h: 80 };
-const BOTAPI_BOTTOM: Pt = { x: BOTAPI.x + BOTAPI.w / 2, y: BOTAPI.y + BOTAPI.h };
-
-const MTKRUTO = { x: 465, y: 330, w: 350, h: 96 };
-const MTKRUTO_TOP: Pt = { x: MTKRUTO.x + MTKRUTO.w / 2, y: MTKRUTO.y };
-const MTKRUTO_BOTTOM: Pt = { x: MTKRUTO.x + MTKRUTO.w / 2, y: MTKRUTO.y + MTKRUTO.h };
-
-const GH = { x: 850, y: 330, w: 280, h: 96 };
-const GH_L: Pt = { x: GH.x, y: GH.y + GH.h / 2 };
-const MTKRUTO_R: Pt = { x: MTKRUTO.x + MTKRUTO.w, y: MTKRUTO.y + MTKRUTO.h / 2 };
-
-const DESTS = [
-  { x: 90, y: 500, w: 190, h: 70, label: "YouTube" },
-  { x: 310, y: 500, w: 190, h: 70, label: "LinkedIn" },
-  { x: 530, y: 500, w: 190, h: 70, label: "Instagram" },
+const DIST = [
+  { emoji: "🎬", title: "One function, every platform", sub: "processAndUploadVideo()", tone: "accent" as const },
+  { emoji: "⚙️", title: "GitHub Actions", sub: "handles the big files", tone: "accent" as const },
+  { emoji: "📲", title: "YouTube · LinkedIn · IG · FB", sub: "uploaded automatically", tone: "success" as const },
 ];
-
-const VIDEOS_TO_BOTAPI: Pt[] = [VIDEOS_BOTTOM, { x: BOTAPI.x + BOTAPI.w / 2, y: BOTAPI.y }];
-const MTKRUTO_TO_DESTS: Pt[][] = DESTS.map((d) => [MTKRUTO_BOTTOM, { x: d.x + d.w / 2, y: d.y }]);
 
 export const FeatureMtkrutoVideo: React.FC = () => {
   const frame = useCurrentFrame();
@@ -45,121 +51,139 @@ export const FeatureMtkrutoVideo: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // ── Beat 1 (0–120): Bot API's 20MB wall chokes on big videos ──
-  const vidOp = appear(6) * lf;
-  const vidLit = interpolate(frame, [6, 30, 108, 128], [0, 0.5, 0.5, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const botOp = appear(20) * lf;
-  const botLit = interpolate(frame, [20, 44, 108, 128], [0, 0.5, 0.5, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const crossScale = pop(48) * interpolate(frame, [104, 126], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap1In = seg(frame, 50, 72, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [108, 128], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
+  // ── Beat windows ──────────────────────────────────────────────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
 
-  // ── Beat 2 (130–235): MTKruto MTProto bypasses the limit ──
-  const mtOp = appear(140, 18) * lf;
-  const mtLit = interpolate(frame, [148, 175, 330, 350], [0, 0.8, 0.8, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const t2 = seg(frame, 150, 178);
-  const t2Vis = frame >= 150 && frame < 214 ? 1 : 0;
-  const pill2In = seg(frame, 194, 216, Easing.out(Easing.cubic));
-  const pill2Op = pill2In * interpolate(frame, [296, 318], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2Dx = (1 - pill2In) * 40;
-  const cap2In = seg(frame, 164, 186, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [220, 240], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
+  // ── Beat 1: the problem ───────────────────────────────────────────
+  const scroll = frame * 2.0;
+  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
+  const pill1 = pop(46);
+  const pill2 = pop(58);
+  const pill3 = pop(70);
 
-  // ── Beat 3 (236–340): GitHub Actions offload + fan-out to platforms ──
-  const ghOp = appear(244, 16) * lf;
-  const ghLit = interpolate(frame, [252, 274, 330, 350], [0, 0.7, 0.7, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const t3 = seg(frame, 254, 280);
-  const t3Vis = frame >= 254 && frame < 300 ? 1 : 0;
-  const destOp = DESTS.map((_, i) => appear(268 + i * 10, 14) * lf);
-  const t3d = DESTS.map((_, i) => seg(frame, 262 + i * 8, 292 + i * 8));
-  const t3dVis = DESTS.map((_, i) => (frame >= 262 + i * 8 && frame < 330 ? 1 : 0));
-  const pill3In = seg(frame, 260, 282, Easing.out(Easing.cubic));
-  const pill3Op = pill3In * interpolate(frame, [316, 338], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3Dx = (1 - pill3In) * 40;
-  const cap3In = seg(frame, 264, 286, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [326, 346], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
+  // ── Beat 2: the solution — MTKruto bypasses the wall ───────────────
+  const card1Pop = pop(134);
+  const card2Pop = pop(160);
+  const bypassArr = seg(frame, 150, 170, Easing.inOut(Easing.cubic));
+  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
 
-  // ── Beat 4 (346–450): result ──
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
+  // ── Beat 3: how it stays smooth — distribution ────────────────────
+  const card1 = pop(252);
+  const card2 = pop(272);
+  const card3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+
+  // ── Beat 4: the result ────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const capX = Math.round(interpolate(frame, [384, 414], [1, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }));
+  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      <Connector pts={VIDEOS_TO_BOTAPI} color={T.danger} width={2} opacity={0.4 * Math.min(vidOp, botOp)} />
-      <Connector pts={[BOTAPI_BOTTOM, MTKRUTO_TOP]} color={T.accent} width={2.5} progress={t2} opacity={0.8 * t2Vis * lf} />
-      <Connector pts={[MTKRUTO_R, GH_L]} color={T.amber} width={2.5} progress={t3} opacity={0.8 * t3Vis * lf} />
-      {MTKRUTO_TO_DESTS.map((pts, i) => (
-        <Connector key={i} pts={pts} color={T.success} width={2} progress={t3d[i]} opacity={0.7 * t3dVis[i] * lf} />
-      ))}
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="Bot API chokes on" accentText="big videos" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <BrowserWindow x={80} y={116} w={700} h={452} title="Telegram — video queue (6 channels)" opacity={Math.min(1, pop(8))}>
+          <SkeletonScroll w={700} h={410} offset={scroll} />
+        </BrowserWindow>
+        <StickyNote
+          x={830}
+          y={150}
+          w={350}
+          opacity={noteOp}
+          text="Videos keep arriving at 50-500MB+ — the Bot API's hard limit is 20MB"
+        />
+        <StatPill x={846} y={340} emoji="📦" text="20MB Bot API ceiling" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+        <StatPill x={846} y={402} emoji="🎥" text="Real videos: 50-500MB+" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+        <StatPill x={846} y={464} emoji="🚫" text="Uningested, opportunities missed" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
+        <CaptionBand text="One hard wall stops every large video before it even starts downloading" tone="danger" opacity={seg(frame, 30, 46)} />
+      </Group>
 
-      <SchemaNode {...VIDEOS} state="danger" lit={vidLit} opacity={vidOp} label="50–500MB+ videos" fontSize={22}>
-        <div style={{ fontSize: 14, color: T.muted, fontWeight: 500, marginTop: 2 }}>6 Telegram channels</div>
-      </SchemaNode>
-      <SchemaNode {...BOTAPI} state="danger" lit={botLit} opacity={botOp} label="Bot API — 20MB limit" fontSize={19} />
-      <Badge x={BOTAPI.x + BOTAPI.w / 2 - 18} y={BOTAPI.y - 42} kind="cross" scale={crossScale} opacity={crossScale} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="MTKruto opens" accentText="the back door" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <IconCard x={160} y={210} w={340} emoji="📡" title="MTKruto" sub="full MTProto client, not Bot API" tone="accent" scale={card1Pop} opacity={Math.min(1, card1Pop)} />
+        <IconCard x={780} y={210} w={340} emoji="⬇️" title="Up to 2GB per file" sub="20MB wall bypassed entirely" tone="success" scale={card2Pop} opacity={Math.min(1, card2Pop)} />
+        <FlowArrow x={500} y={254} len={280} progress={bypassArr} color={B.success} />
+        <CaptionBand
+          text="MTKruto connects as a full MTProto client — no more 20MB Bot API ceiling"
+          tone="accent"
+          opacity={cap2}
+        />
+      </Group>
 
-      <SchemaNode {...MTKRUTO} state="accent" lit={mtLit} opacity={mtOp} label="MTKruto — MTProto client" fontSize={20}>
-        <div style={{ fontSize: 13, color: T.muted, fontWeight: 500, marginTop: 2 }}>up to 2GB, no Bot API wall</div>
-      </SchemaNode>
-      <Token pts={[BOTAPI_BOTTOM, MTKRUTO_TOP]} t={t2} opacity={t2Vis * lf} />
-      <Pill x={MTKRUTO.x + 10} y={MTKRUTO.y - 42} dx={pill2Dx} text="full MTProto client access" color={T.accent} opacity={pill2Op} fontSize={18} />
+      {/* ════ Beat 3 — HOW IT STAYS SMOOTH ════ */}
+      <Group opacity={b3}>
+        <Headline text="Then it flows" accentText="straight out" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        <IconCard x={110} y={218} w={300} emoji={DIST[0].emoji} title={DIST[0].title} sub={DIST[0].sub} tone={DIST[0].tone} scale={card1} opacity={Math.min(1, card1)} />
+        <IconCard x={490} y={218} w={300} emoji={DIST[1].emoji} title={DIST[1].title} sub={DIST[1].sub} tone={DIST[1].tone} scale={card2} opacity={Math.min(1, card2)} />
+        <IconCard x={870} y={218} w={300} emoji={DIST[2].emoji} title={DIST[2].title} sub={DIST[2].sub} tone={DIST[2].tone} scale={card3} opacity={Math.min(1, card3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="The heavy lifting happens off to the side — nothing here ever hits a size limit again"
+          opacity={cap3}
+          fontSize={21}
+          y={580}
+        />
+      </Group>
 
-      <SchemaNode {...GH} state="amber" lit={ghLit} opacity={ghOp} label="GitHub Actions" fontSize={20}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>sidesteps Edge Function /tmp limits</div>
-      </SchemaNode>
-      <Token pts={[MTKRUTO_R, GH_L]} t={t3} color={T.amber} opacity={t3Vis * lf} />
-
-      {DESTS.map((d, i) => (
-        <SchemaNode key={i} {...d} state="success" lit={0.4 * destOp[i]} opacity={destOp[i]} label={d.label} fontSize={17} />
-      ))}
-      <Pill x={DESTS[0].x + 10} y={DESTS[0].y + DESTS[0].h + 12} dx={pill3Dx} text="processAndUploadVideo() fans out" color={T.success} opacity={pill3Op} fontSize={17} />
-
-      <Caption x={90} y={648} w={1100} text="News videos regularly blew past the Bot API's 20MB ceiling" color={T.danger} opacity={cap1} fontSize={24} weight={600} />
-      <Caption x={90} y={648} w={1100} text="A full MTProto client pulls files up to 2GB" color={T.text} opacity={cap2} fontSize={24} weight={600} />
-      <Caption x={90} y={648} w={1100} text="GitHub Actions does the heavy lifting off the Edge Function" color={T.amber} opacity={cap3} fontSize={24} weight={600} />
-
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>20MB limit</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>big videos rejected</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>2GB per file</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>every video ingested</div>
+          </div>
+        </Panel>
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
+            position: "absolute",
+            left: 0,
+            top: 424,
+            width: 1280,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
+            gap: 20,
+            opacity: speedOp,
+            fontFamily,
           }}
         >
-          ✓
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>≈{capX}× more capacity</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>100% of "video too large" failures gone</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            100% of "video too large" failures gone — from 50MB clips to full documentaries.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>MTKruto Video Pipeline · vitalii.no</div>
+        </div>
+      </Group>
+    </div>
   );
 };

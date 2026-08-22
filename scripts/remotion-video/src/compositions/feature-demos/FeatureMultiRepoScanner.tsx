@@ -1,36 +1,133 @@
 /**
  * FeatureMultiRepoScanner — feature p59 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
+ * viewer: problem/solution color zones, a real browser mockup with a plausible
+ * feature→commit index, repo tabs clicked by a cursor, and a big before→after
+ * metric.
  *
- * Story: managing 7 GitHub repos meant pinpointing a feature's origin was a
- * daily git-log battle, jumping between repos chasing elusive commits.
- * feature-scanner.yml triggers on push across all 7 repos, running
- * scanFeatures.ts, which clones each repo, parses package.json and config
- * files, and uses octokit/rest to fetch the latest commit hash per feature
- * file. The result compiles into feature_map.json, uploaded to Vercel Blob
- * Storage, which the Next.js site consumes for click-through traceability.
+ * Story (4 beats):
+ *  1. Problem — 7 separate GitHub repos; finding which one shipped a given
+ *     feature (and when) means a manual git-log hunt through every one of
+ *     them. Red zone.
+ *  2. Solution — pick the repo tabs, flip "show commit links" on, and a
+ *     table instantly lists Feature / Repo / Commit / Shipped for real
+ *     project features, each row a direct link to its commit.
+ *  3. How it stays in sync — every push to any of the 7 repos re-triggers
+ *     the scan; octokit resolves the exact commit hash per feature file;
+ *     everything compiles into one live map. One tech-credibility line
+ *     (scanFeatures.ts + octokit/rest → Vercel Blob Storage).
+ *  4. Result — before/after cards: hours chasing commits across 7 repos →
+ *     one click to the exact commit, ≈70% less context-switching. Green
+ *     zone, check badge.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B, toneEdge } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  BrowserWindow,
+  SkeletonScroll,
+  FilterChip,
+  ToggleSwitch,
+  StatPill,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  Cursor,
+  CheckBadge,
+  CaptionBand,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const REPO_COUNT = 5; // visually represents "7 repos"
-const REPOS = Array.from({ length: REPO_COUNT }, (_, i) => ({
-  x: 110 + i * 220,
-  y: 56,
-  w: 170,
-  h: 76,
-}));
-const REPO_B: Pt[] = REPOS.map((r) => ({ x: r.x + r.w / 2, y: r.y + r.h }));
+type CommitRow = { feature: string; repo: string; commit: string; shipped: string };
 
-const SCANNER = { x: 460, y: 210, w: 360, h: 108 };
-const SCANNER_T: Pt = { x: SCANNER.x + SCANNER.w / 2, y: SCANNER.y };
-const SCANNER_B: Pt = { x: SCANNER.x + SCANNER.w / 2, y: SCANNER.y + SCANNER.h };
+const ROWS: CommitRow[] = [
+  { feature: "LinkedIn Native Image Upload", repo: "vitalii-portfolio", commit: "a3f9c12", shipped: "2 days ago" },
+  { feature: "MTKruto Video Bypass", repo: "vitalii-portfolio", commit: "7e21bd4", shipped: "1 week ago" },
+  { feature: "Two-Tier Screen Gate", repo: "boytasks", commit: "5c88a01", shipped: "3 weeks ago" },
+  { feature: "Skyvern VPS Deploy", repo: "jobbot-no", commit: "d40f3aa", shipped: "1 month ago" },
+];
 
-const MAP = { x: 480, y: 390, w: 320, h: 90 };
-const MAP_T: Pt = { x: MAP.x + MAP.w / 2, y: MAP.y };
-const MAP_B: Pt = { x: MAP.x + MAP.w / 2, y: MAP.y + MAP.h };
+/** Small feature→commit index table — Feature / Repo / Commit hash / Shipped. */
+const CommitTable: React.FC<{ w: number; rows: CommitRow[]; frame: number; appearStart: number; stagger?: number }> = ({
+  w,
+  rows,
+  frame,
+  appearStart,
+  stagger = 7,
+}) => {
+  const cols = [0.36, 0.24, 0.18, 0.22];
+  const heads = ["Feature", "Repo", "Commit", "Shipped"];
+  const cell = (f: number): React.CSSProperties => ({ width: w * f - 14, overflow: "hidden", whiteSpace: "nowrap" });
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: w, fontFamily }}>
+      <div
+        style={{
+          display: "flex",
+          padding: "10px 18px",
+          gap: 14,
+          background: "#F4F7FC",
+          borderBottom: `1.5px solid ${B.border}`,
+          fontSize: 14,
+          fontWeight: 700,
+          color: B.muted,
+          letterSpacing: 0.4,
+        }}
+      >
+        {heads.map((hd, i) => (
+          <div key={hd} style={cell(cols[i])}>
+            {hd}
+          </div>
+        ))}
+      </div>
+      {rows.map((r, i) => {
+        const t = seg(frame, appearStart + i * stagger, appearStart + i * stagger + 12);
+        return (
+          <div
+            key={r.feature}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              padding: "9px 18px",
+              gap: 14,
+              borderBottom: `1px solid ${B.border}`,
+              fontSize: 15.5,
+              color: B.ink,
+              opacity: t,
+              transform: `translateX(${(1 - t) * 26}px)`,
+            }}
+          >
+            <div style={{ ...cell(cols[0]), fontWeight: 600 }}>{r.feature}</div>
+            <div style={{ ...cell(cols[1]), color: B.muted, fontWeight: 500 }}>{r.repo}</div>
+            <div style={cell(cols[2])}>
+              <span
+                style={{
+                  display: "inline-block",
+                  padding: "2px 9px",
+                  borderRadius: 8,
+                  background: B.accentBg,
+                  border: `1px solid ${toneEdge("accent")}`,
+                  color: B.accent,
+                  fontWeight: 700,
+                  fontSize: 13.5,
+                  fontFamily: "monospace",
+                }}
+              >
+                {r.commit}
+              </span>
+            </div>
+            <div style={{ ...cell(cols[3]), color: B.muted, fontWeight: 500 }}>{r.shipped}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 export const FeatureMultiRepoScanner: React.FC = () => {
   const frame = useCurrentFrame();
@@ -39,113 +136,172 @@ export const FeatureMultiRepoScanner: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // Beat 1: 7 repos, daily git-log battle
-  const repoOp = REPOS.map((_, i) => appear(6 + i * 6) * lf);
-  const repoLit = REPOS.map((_, i) =>
-    interpolate(frame, [6 + i * 6, 30 + i * 6, 96, 116], [0, 0.45, 0.45, 0.13], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf,
-  );
-  const pill1In = seg(frame, 48, 70, Easing.out(Easing.cubic));
-  const pill1Op = pill1In * interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill1Dx = (1 - pill1In) * 40;
-  const cap1In = seg(frame, 24, 46, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
+  // ── Beat windows ──────────────────────────────────────────────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
 
-  // Beat 2: feature-scanner.yml -> scanFeatures.ts -> octokit/rest
-  const tRepo = REPO_B.map((_, i) => seg(frame, 132 + i * 4, 156 + i * 4));
-  const tRepoVis = REPO_B.map((_, i) => (frame >= 132 + i * 4 && frame < 200 ? 1 : 0));
-  const scannerOp = appear(150, 18) * lf;
-  const scannerLit = interpolate(frame, [158, 182, 330, 350], [0, 0.75, 0.75, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2In = seg(frame, 178, 200, Easing.out(Easing.cubic));
-  const pill2Op = pill2In * interpolate(frame, [226, 246], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2Dx = (1 - pill2In) * 40;
-  const cap2In = seg(frame, 168, 190, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [226, 246], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
+  // ── Beat 1: the problem ───────────────────────────────────────────
+  const scroll = frame * 2.2;
+  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
+  const pill1 = pop(46);
+  const pill2 = pop(58);
+  const pill3 = pop(70);
 
-  // Beat 3: feature_map.json -> Vercel Blob Storage
-  const tC = seg(frame, 236, 260);
-  const tCVis = frame >= 236 && frame < 306 ? 1 : 0;
-  const mapOp = appear(242, 18) * lf;
-  const mapLit = interpolate(frame, [250, 272, 330, 350], [0, 0.6, 0.6, 0.16], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3In = seg(frame, 272, 294, Easing.out(Easing.cubic));
-  const pill3Op = pill3In * interpolate(frame, [318, 340], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3Dx = (1 - pill3In) * 40;
-  const cap3In = seg(frame, 266, 288, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [318, 340], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
+  // ── Beat 2: the solution ──────────────────────────────────────────
+  const chip1 = pop(132);
+  const chip2 = pop(142);
+  const chip3 = pop(152);
+  const chip4 = pop(164);
+  const togOn = seg(frame, 180, 192, Easing.inOut(Easing.cubic));
+  const cx = interpolate(frame, [124, 134, 152, 166, 182, 205], [700, 235, 480, 660, 1020, 1080], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cy = interpolate(frame, [124, 134, 152, 166, 182, 205], [400, 152, 152, 152, 155, 300], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cursorOp = seg(frame, 124, 132) * (1 - seg(frame, 205, 218));
+  const click1 = seg(frame, 134, 146, Easing.out(Easing.quad));
+  const click2 = seg(frame, 152, 164, Easing.out(Easing.quad));
+  const click3 = seg(frame, 182, 194, Easing.out(Easing.quad));
+  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
 
-  // Beat 4: result
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
+  // ── Beat 3: how it stays in sync ──────────────────────────────────
+  const card1 = pop(252);
+  const card2 = pop(272);
+  const card3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+
+  // ── Beat 4: the result ────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const pct = Math.round(interpolate(frame, [384, 414], [0, 70], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }));
+  const pctOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      {REPO_B.map((p, i) => (
-        <Connector key={i} pts={[p, SCANNER_T]} color={T.accent} width={2} progress={tRepo[i]} opacity={0.7 * tRepoVis[i] * lf} />
-      ))}
-      <Connector pts={[SCANNER_B, MAP_T]} color={T.success} width={2.5} progress={tC} opacity={0.8 * tCVis * lf} />
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="Which repo shipped" accentText="that feature?" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <BrowserWindow x={80} y={116} w={700} h={452} title="7 repos — git log search" opacity={Math.min(1, pop(8))}>
+          <SkeletonScroll w={700} h={410} offset={scroll} />
+        </BrowserWindow>
+        <StickyNote
+          x={830}
+          y={150}
+          w={350}
+          opacity={noteOp}
+          text="Need: which repo and commit shipped the LinkedIn video upload — and when?"
+        />
+        <StatPill x={846} y={340} emoji="🗂️" text="7 repos to search" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+        <StatPill x={846} y={402} emoji="⏱️" text="Hours lost every week" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+        <StatPill x={846} y={464} emoji="😩" text="Constant context-switching" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
+        <CaptionBand text="Seven repos, one feature — the shipping commit could be anywhere" tone="danger" opacity={seg(frame, 30, 46)} />
+      </Group>
 
-      {REPOS.map((r, i) => (
-        <SchemaNode key={i} {...r} state="danger" lit={repoLit[i]} opacity={repoOp[i]} label={`repo ${i + 1}`} fontSize={16} />
-      ))}
-      <Pill x={370} y={REPOS[0].y - 44} dx={pill1Dx} text="7 repos, hours lost chasing commits" color={T.danger} opacity={pill1Op} fontSize={16} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="Click the feature," accentText="land on the exact commit" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <FilterChip x={160} y={132} text="vitalii-portfolio" icon="📁" scale={chip1} opacity={Math.min(1, chip1)} />
+        <FilterChip x={400} y={132} text="boytasks" icon="📁" scale={chip2} opacity={Math.min(1, chip2)} />
+        <FilterChip x={560} y={132} text="jobbot-no" icon="📁" scale={chip3} opacity={Math.min(1, chip3)} />
+        <FilterChip x={720} y={132} text="+4 more" icon="📁" scale={chip4} opacity={Math.min(1, chip4)} />
+        <ToggleSwitch x={940} y={138} label="Show commit links" on={togOn} opacity={seg(frame, 172, 184)} />
+        <BrowserWindow x={110} y={196} w={1060} h={396} title="vitalii.no — feature index" opacity={seg(frame, 168, 182)}>
+          <CommitTable w={1060} rows={ROWS} frame={frame} appearStart={184} stagger={7} />
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 288,
+              width: 1060,
+              textAlign: "center",
+              fontSize: 15.5,
+              fontWeight: 600,
+              color: B.muted,
+              opacity: seg(frame, 214, 228) * 0.9,
+            }}
+          >
+            …and every other feature — click through to any commit
+          </div>
+        </BrowserWindow>
+        <Cursor x={cx} y={cy} opacity={cursorOp} click={Math.max(click1 % 1, click2 % 1, click3 % 1)} />
+        <CaptionBand text="Every push scans all 7 repos and resolves the commit that shipped it" tone="accent" opacity={cap2} />
+      </Group>
 
-      <SchemaNode {...SCANNER} state="accent" lit={scannerLit} opacity={scannerOp} label="feature-scanner.yml → scanFeatures.ts" fontSize={16}>
-        <div style={{ fontSize: 11, color: T.muted, fontWeight: 500, marginTop: 2, textAlign: "center" }}>octokit/rest fetches commit hashes</div>
-      </SchemaNode>
-      {REPO_B.map((p, i) => (
-        <Token key={i} pts={[p, SCANNER_T]} t={tRepo[i]} opacity={tRepoVis[i] * lf} size={10} />
-      ))}
-      <Pill x={SCANNER.x - 10} y={SCANNER.y + SCANNER.h + 14} dx={pill2Dx} text="triggers on push, across every repo" color={T.accent} opacity={pill2Op} fontSize={16} />
+      {/* ════ Beat 3 — HOW IT STAYS IN SYNC ════ */}
+      <Group opacity={b3}>
+        <Headline text="Scanned automatically," accentText="on every push" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        <IconCard x={110} y={218} w={300} emoji="🔁" title="Triggers on every push" sub="across all 7 repos" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
+        <IconCard x={490} y={218} w={300} emoji="🔎" title="octokit fetches the commit" sub="for each feature file" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
+        <IconCard x={870} y={218} w={300} emoji="🗺️" title="Compiles one live map" sub="always in sync" tone="success" scale={card3} opacity={Math.min(1, card3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="Under the hood: scanFeatures.ts + octokit/rest, uploaded to Vercel Blob Storage"
+          opacity={cap3}
+          fontSize={21}
+          y={580}
+        />
+      </Group>
 
-      <SchemaNode {...MAP} state="success" lit={mapLit} opacity={mapOp} label="feature_map.json → Vercel Blob" fontSize={16} />
-      <Token pts={[SCANNER_B, MAP_T]} t={tC} color={T.success} opacity={tCVis * lf} />
-      <Pill x={MAP.x - 10} y={MAP.y + MAP.h + 14} dx={pill3Dx} text="portfolio reads it for live traceability" color={T.success} opacity={pill3Op} fontSize={15} />
-
-      <Caption x={90} y={648} w={1100} text="Pinpointing a feature's origin meant chasing commits across 7 repos" color={T.danger} opacity={cap1} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Every push, all 7 repos get scanned for feature-defining changes" color={T.text} opacity={cap2} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="One compiled map, uploaded and served straight to the site" color={T.success} opacity={cap3} fontSize={22} weight={600} />
-
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>Hours</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>chasing commits across 7 repos</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>One click</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>straight to the exact commit</div>
+          </div>
+        </Panel>
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
+            position: "absolute",
+            left: 0,
+            top: 424,
+            width: 1280,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
+            gap: 20,
+            opacity: pctOp,
+            fontFamily,
           }}
         >
-          ✓
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>≈{pct}% less context-switching</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>70-80% less context-switching, instant traceability</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            Every feature's origin — one click away, every time.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>vitalii.no</div>
+        </div>
+      </Group>
+    </div>
   );
 };

@@ -1,35 +1,125 @@
 /**
  * FeatureTimeZoneTamer — feature p58 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
+ * viewer: problem/solution color zones, a real scheduler dashboard mockup,
+ * an icon strip explaining the hourly check, and a big before→after metric.
  *
- * Story: a single UTC publish time hit NYC and Oslo unevenly — 10 AM UTC
- * meant 6 AM for NYC (too early) and 12 PM for Oslo (too late). An hourly
- * GitHub Action runs a TypeScript script against Supabase's scheduled_posts
- * table, filtered by locale and scheduled_at_utc; it computes each locale's
- * target 10 AM local time (America/New_York, Europe/Oslo), converts to UTC,
- * and checks a +/-15 minute window before invoking publish_feature_post.
+ * Story (4 beats):
+ *  1. Problem — one UTC publish time; NYC sees it at 6 AM (too early), Oslo
+ *     at 12 PM (too late). One audience always misses the window.
+ *  2. Solution — a scheduler dashboard mockup: an hourly check computes each
+ *     city's own 10 AM in UTC and marks it "within window" the moment it
+ *     matches, publishing right on time for both.
+ *  3. How it works — three icon cards (hourly trigger / per-locale 10 AM /
+ *     ±15 min match), one small tech-credibility line (Supabase table).
+ *  4. Result — before/after cards: 1 UTC time (wrong for someone) → 2 local
+ *     10 AMs (right for everyone), 20-30% higher click-through, first hour.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  BrowserWindow,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  Cursor,
+  CheckBadge,
+  CaptionBand,
+  StatPill,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const UTC = { x: 490, y: 50, w: 300, h: 84 };
-const UTC_L: Pt = { x: UTC.x, y: UTC.y + UTC.h / 2 };
-const UTC_R: Pt = { x: UTC.x + UTC.w, y: UTC.y + UTC.h / 2 };
+/** Small round clock face showing a fixed time, for the "problem" cards. */
+const ClockFace: React.FC<{ hour: number; minute: number; tone: "danger" | "accent" | "success" }> = ({ hour, minute, tone }) => {
+  const c = tone === "danger" ? B.danger : tone === "success" ? B.success : B.accent;
+  const hourAngle = ((hour % 12) + minute / 60) * 30 - 90;
+  const minAngle = minute * 6 - 90;
+  return (
+    <svg width={64} height={64} viewBox="0 0 64 64">
+      <circle cx={32} cy={32} r={30} fill="#fff" stroke={c} strokeWidth={3} />
+      <line
+        x1={32}
+        y1={32}
+        x2={32 + 15 * Math.cos((hourAngle * Math.PI) / 180)}
+        y2={32 + 15 * Math.sin((hourAngle * Math.PI) / 180)}
+        stroke={B.ink}
+        strokeWidth={3.5}
+        strokeLinecap="round"
+      />
+      <line
+        x1={32}
+        y1={32}
+        x2={32 + 22 * Math.cos((minAngle * Math.PI) / 180)}
+        y2={32 + 22 * Math.sin((minAngle * Math.PI) / 180)}
+        stroke={c}
+        strokeWidth={3}
+        strokeLinecap="round"
+      />
+      <circle cx={32} cy={32} r={3} fill={c} />
+    </svg>
+  );
+};
 
-const NYC = { x: 110, y: 50, w: 250, h: 84 };
-const NYC_R: Pt = { x: NYC.x + NYC.w, y: NYC.y + NYC.h / 2 };
+type SchedRow = { city: string; local: string; utc: string };
+const ROWS: SchedRow[] = [
+  { city: "New York", local: "10:00 AM EDT", utc: "14:00 UTC" },
+  { city: "Oslo", local: "10:00 AM CEST", utc: "08:00 UTC" },
+];
 
-const OSLO = { x: 920, y: 50, w: 250, h: 84 };
-const OSLO_L: Pt = { x: OSLO.x, y: OSLO.y + OSLO.h / 2 };
-
-const ACTION = { x: 490, y: 220, w: 300, h: 100 };
-const ACTION_T: Pt = { x: ACTION.x + ACTION.w / 2, y: ACTION.y };
-const ACTION_B: Pt = { x: ACTION.x + ACTION.w / 2, y: ACTION.y + ACTION.h };
-
-const WINDOW = { x: 460, y: 390, w: 360, h: 100 };
-const WINDOW_T: Pt = { x: WINDOW.x + WINDOW.w / 2, y: WINDOW.y };
+/** Scheduler dashboard row that appears and ticks to "within window". */
+const SchedRowView: React.FC<{ row: SchedRow; t: number; okT: number }> = ({ row, t, okT }) => {
+  if (t <= 0.004) return null;
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "12px 16px",
+        marginBottom: 10,
+        borderRadius: 12,
+        background: "#F4F7FC",
+        border: `1.5px solid ${B.border}`,
+        opacity: Math.min(1, t * 1.6),
+        transform: `translateX(${(1 - Math.min(1, t * 1.6)) * 26}px)`,
+      }}
+    >
+      <div style={{ width: 118, fontSize: 15.5, fontWeight: 700, color: B.ink }}>{row.city}</div>
+      <div style={{ width: 140, fontSize: 14, fontWeight: 600, color: B.muted }}>{row.local}</div>
+      <div style={{ width: 110, fontSize: 14, fontWeight: 600, color: B.muted }}>{row.utc}</div>
+      <div style={{ flex: 1, textAlign: "right" }}>
+        {okT > 0.01 ? (
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "3px 10px",
+              borderRadius: 999,
+              background: B.successBg,
+              border: `1px solid #BFE7CD`,
+              color: B.success,
+              fontSize: 13,
+              fontWeight: 700,
+              opacity: Math.min(1, okT * 1.6),
+              transform: `scale(${0.85 + 0.15 * Math.min(1, okT * 1.6)})`,
+            }}
+          >
+            ✓ within window
+          </span>
+        ) : (
+          <span style={{ fontSize: 13, fontWeight: 600, color: B.muted }}>checking…</span>
+        )}
+      </div>
+    </div>
+  );
+};
 
 export const FeatureTimeZoneTamer: React.FC = () => {
   const frame = useCurrentFrame();
@@ -38,119 +128,202 @@ export const FeatureTimeZoneTamer: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // Beat 1: single UTC time, both audiences miss the window
-  const utcOp = appear(6) * lf;
-  const utcLit = interpolate(frame, [6, 30, 96, 116], [0, 0.5, 0.5, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const nycOp = appear(20) * lf;
-  const osloOp = appear(20) * lf;
-  const nycLit = interpolate(frame, [20, 44, 96, 116], [0, 0.5, 0.5, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const osloLit = interpolate(frame, [20, 44, 96, 116], [0, 0.5, 0.5, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill1In = seg(frame, 44, 66, Easing.out(Easing.cubic));
-  const pill1Op = pill1In * interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill1Dx = (1 - pill1In) * 40;
-  const cap1In = seg(frame, 24, 46, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
+  // ── Beat windows (matches reference clip exactly) ──────────────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
 
-  // Beat 2: hourly GitHub Action -> per-locale target time
-  const tA = seg(frame, 130, 154);
-  const tAVis = frame >= 130 && frame < 190 ? 1 : 0;
-  const tB = seg(frame, 130, 154);
-  const tBVis = frame >= 130 && frame < 190 ? 1 : 0;
-  const actionOp = appear(140, 18) * lf;
-  const actionLit = interpolate(frame, [148, 172, 330, 350], [0, 0.75, 0.75, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2In = seg(frame, 160, 182, Easing.out(Easing.cubic));
-  const pill2Op = pill2In * interpolate(frame, [216, 236], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2Dx = (1 - pill2In) * 40;
-  const cap2In = seg(frame, 158, 180, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [216, 236], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
+  // ── Beat 1: the problem ───────────────────────────────────────────
+  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
+  const pill1 = pop(46);
+  const pill2 = pop(58);
+  const pill3 = pop(70);
+  const clocksOp = seg(frame, 20, 36);
+  const arrLeft = seg(frame, 30, 46, Easing.inOut(Easing.cubic));
+  const arrRight = seg(frame, 30, 46, Easing.inOut(Easing.cubic));
 
-  // Beat 3: +/-15 min window check -> publish_feature_post
-  const tC = seg(frame, 226, 250);
-  const tCVis = frame >= 226 && frame < 300 ? 1 : 0;
-  const windowOp = appear(232, 18) * lf;
-  const windowLit = interpolate(frame, [240, 262, 330, 350], [0, 0.6, 0.6, 0.16], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3In = seg(frame, 258, 280, Easing.out(Easing.cubic));
-  const pill3Op = pill3In * interpolate(frame, [316, 338], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3Dx = (1 - pill3In) * 40;
-  const cap3In = seg(frame, 250, 272, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [316, 338], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
+  // ── Beat 2: the solution ──────────────────────────────────────────
+  const boardOp = seg(frame, 116, 130);
+  const cx = interpolate(frame, [124, 148, 168], [700, 300, 300], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cy = interpolate(frame, [124, 148, 168], [420, 232, 232], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cursorOp = seg(frame, 124, 132) * (1 - seg(frame, 176, 190));
+  const click1 = seg(frame, 148, 162, Easing.out(Easing.quad));
+  const row1T = seg(frame, 164, 184, Easing.out(Easing.cubic));
+  const row2T = seg(frame, 176, 196, Easing.out(Easing.cubic));
+  const ok1 = seg(frame, 188, 204, Easing.out(Easing.cubic));
+  const ok2 = seg(frame, 198, 214, Easing.out(Easing.cubic));
+  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
 
-  // Beat 4: result
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
+  // ── Beat 3: how it works ──────────────────────────────────────────
+  const card1 = pop(252);
+  const card2 = pop(272);
+  const card3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+
+  // ── Beat 4: the result ─────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      <Connector pts={[NYC_R, UTC_L]} color={T.danger} width={2} dashed opacity={0.5 * nycOp} />
-      <Connector pts={[UTC_R, OSLO_L]} color={T.danger} width={2} dashed opacity={0.5 * osloOp} />
-      <Connector pts={[{ x: UTC.x + UTC.w / 2, y: UTC.y + UTC.h }, ACTION_T]} color={T.accent} width={2.5} progress={tA} opacity={0.8 * tAVis * lf} />
-      <Connector pts={[ACTION_B, WINDOW_T]} color={T.accent} width={2.5} progress={tC} opacity={0.8 * tCVis * lf} />
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="One post time can't please" accentText="two timezones" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <div style={{ position: "absolute", left: 0, top: 130, width: 1280, display: "flex", justifyContent: "center", gap: 80, opacity: clocksOp }}>
+          <div style={{ position: "static", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <ClockFace hour={6} minute={0} tone="danger" />
+            <div style={{ fontSize: 20, fontWeight: 800, color: B.ink }}>New York — 6:00 AM</div>
+            <div style={{ fontSize: 15, fontWeight: 650, color: B.danger }}>too early</div>
+          </div>
+          <div style={{ position: "static", display: "flex", flexDirection: "column", alignItems: "center", gap: 10, opacity: 0.85 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: B.muted, letterSpacing: 0.5 }}>ONE POST</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: B.ink }}>10:00 AM UTC</div>
+          </div>
+          <div style={{ position: "static", display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <ClockFace hour={12} minute={0} tone="danger" />
+            <div style={{ fontSize: 20, fontWeight: 800, color: B.ink }}>Oslo — 12:00 PM</div>
+            <div style={{ fontSize: 15, fontWeight: 650, color: B.danger }}>too late</div>
+          </div>
+        </div>
+        <FlowArrow x={420} y={198} len={100} progress={arrLeft} color={B.danger} />
+        <FlowArrow x={760} y={198} len={100} progress={arrRight} color={B.danger} />
+        <StickyNote
+          x={880}
+          y={300}
+          w={310}
+          opacity={noteOp}
+          text="Post once, and someone always sees it at the worst possible time"
+        />
+        <StatPill x={100} y={430} emoji="🌍" text="2 target audiences" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+        <StatPill x={100} y={492} emoji="😴" text="NYC misses it at 6 AM" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+        <StatPill x={100} y={554} emoji="🌙" text="Oslo sees it too late" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
+        <CaptionBand text="A single UTC time can't be right for two timezones at once" tone="danger" opacity={seg(frame, 30, 46)} />
+      </Group>
 
-      <SchemaNode {...NYC} state="danger" lit={nycLit} opacity={nycOp} label="NYC — 6 AM" fontSize={20}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>too early</div>
-      </SchemaNode>
-      <SchemaNode {...UTC} state="idle" lit={utcLit} opacity={utcOp} label="One post, 10 AM UTC" fontSize={20} />
-      <SchemaNode {...OSLO} state="danger" lit={osloLit} opacity={osloOp} label="Oslo — 12 PM" fontSize={20}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>too late</div>
-      </SchemaNode>
-      <Pill x={UTC.x + 10} y={UTC.y - 46} dx={pill1Dx} text="one audience always misses the window" color={T.danger} opacity={pill1Op} fontSize={16} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="A script finds each city's own" accentText="10 AM" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <BrowserWindow x={190} y={196} w={900} h={340} title="vitalii.no — feature scheduler" opacity={boardOp}>
+          <div style={{ padding: "20px 24px", fontFamily }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                padding: "0 16px 10px",
+                fontSize: 13,
+                fontWeight: 700,
+                color: B.muted,
+                letterSpacing: 0.4,
+              }}
+            >
+              <div style={{ width: 118 }}>LOCALE</div>
+              <div style={{ width: 140 }}>TARGET 10 AM</div>
+              <div style={{ width: 110 }}>UTC</div>
+              <div style={{ flex: 1, textAlign: "right" }}>STATUS</div>
+            </div>
+            <SchedRowView row={ROWS[0]} t={row1T} okT={ok1} />
+            <SchedRowView row={ROWS[1]} t={row2T} okT={ok2} />
+            <div
+              style={{
+                marginTop: 6,
+                width: 168,
+                height: 36,
+                borderRadius: 10,
+                background: B.accent,
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              Run hourly check
+            </div>
+          </div>
+        </BrowserWindow>
+        <Cursor x={cx} y={cy} opacity={cursorOp} click={click1 % 1} />
+        <CaptionBand text="Every hour, it converts each city's own 10 AM into UTC and checks for a match" tone="accent" opacity={cap2} />
+      </Group>
 
-      <SchemaNode {...ACTION} state="accent" lit={actionLit} opacity={actionOp} label="Hourly GitHub Action" fontSize={18}>
-        <div style={{ fontSize: 11, color: T.muted, fontWeight: 500, marginTop: 2, textAlign: "center" }}>scheduled_posts: locale, scheduled_at_utc</div>
-      </SchemaNode>
-      <Token pts={[{ x: UTC.x + UTC.w / 2, y: UTC.y + UTC.h }, ACTION_T]} t={tB} opacity={tBVis * lf} />
-      <Pill x={ACTION.x - 10} y={ACTION.y + ACTION.h + 14} dx={pill2Dx} text="target 10 AM local, per timezone" color={T.accent} opacity={pill2Op} fontSize={16} />
+      {/* ════ Beat 3 — HOW IT WORKS ════ */}
+      <Group opacity={b3}>
+        <Headline text="One check, every hour," accentText="both cities on time" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        <IconCard x={110} y={218} w={300} emoji="⏰" title="Hourly GitHub Action" sub="runs quietly in the background" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
+        <IconCard x={490} y={218} w={300} emoji="🧮" title="Local 10 AM → UTC" sub="computed per locale" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
+        <IconCard x={870} y={218} w={300} emoji="🎯" title="±15 min match window" sub="then it publishes" tone="success" scale={card3} opacity={Math.min(1, card3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="A TypeScript script checks Supabase's scheduled_posts table once an hour, for every locale"
+          opacity={cap3}
+          fontSize={21}
+          y={580}
+        />
+      </Group>
 
-      <SchemaNode {...WINDOW} state="success" lit={windowLit} opacity={windowOp} label="±15 min window → publish_feature_post" fontSize={16} />
-      <Token pts={[ACTION_B, WINDOW_T]} t={tC} color={T.success} opacity={tCVis * lf} />
-      <Pill x={WINDOW.x + 20} y={WINDOW.y + WINDOW.h + 14} dx={pill3Dx} text="status set to published" color={T.success} opacity={pill3Op} fontSize={16} />
-
-      <Caption x={90} y={648} w={1100} text="A single UTC time means someone always gets it at the wrong hour" color={T.danger} opacity={cap1} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Every hour, a script computes each locale's true 10 AM in UTC" color={T.text} opacity={cap2} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="A tight time window keeps publishing precise, not just close enough" color={T.success} opacity={cap3} fontSize={22} weight={600} />
-
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>1 UTC time</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>always wrong somewhere</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>2 local 10 AMs</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>right on time, every day</div>
+          </div>
+        </Panel>
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
+            position: "absolute",
+            left: 0,
+            top: 424,
+            width: 1280,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
+            gap: 20,
+            opacity: speedOp,
+            fontFamily,
           }}
         >
-          ✓
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 44, fontWeight: 800, color: B.success }}>20-30% higher click-through, first hour</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>20-30% higher click-through in the first hour</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            10 AM in New York. 10 AM in Oslo. Same feature, right on time for both.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>vitalii.no · Feature scheduler</div>
+        </div>
+      </Group>
+    </div>
   );
 };

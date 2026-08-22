@@ -1,45 +1,42 @@
 /**
  * FeatureSocialAnalyticsDashboard — feature p16 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
+ * viewer: problem/solution color zones, a real browser+invoice mockup and a
+ * real dashboard mockup, an icon strip for how the sync works, and a big
+ * before→after cost metric.
  *
- * Story: paying $25/month/profile for Shield App felt wasteful — the
- * platform already processes all the raw post and engagement data itself
- * → sync-social-metrics (Deno) runs every 6 hours, pulling Facebook Graph
- * API + Instagram Media API into posts and a new follower_history table →
- * daily snapshots feed a Recharts admin dashboard — summary cards,
- * engagement charts, top posts, follower trends, a posting heatmap, CSV
- * export → $25/month drops to $0, zero recurring cost.
+ * Story (4 beats):
+ *  1. Problem — Shield App bills $25/month per profile for analytics built
+ *     from data the platform already owns. Red zone, invoice mockup.
+ *  2. Solution — flip "Live sync" on: a real admin dashboard appears with
+ *     Impressions / Engagement rate / Followers cards, synced automatically.
+ *  3. How it stays current — Facebook Graph API + Instagram Media API +
+ *     follower_history feed a Recharts dashboard every 6 hours (one small
+ *     tech-credibility line: Recharts).
+ *  4. Result — before/after cards: $25/month per profile → $0/month,
+ *     100% of that cost eliminated. Green zone, check badge.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Badge, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
-
-// ── Layout ──────────────────────────────────────────────────────────
-const SHIELD = { x: 460, y: 30, w: 360, h: 80 };
-const SYNC = { x: 460, y: 150, w: 360, h: 80 };
-const FB = { x: 90, y: 290, w: 280, h: 90 };
-const IG = { x: 500, y: 290, w: 280, h: 90 };
-const FOLLOWERS = { x: 900, y: 290, w: 280, h: 90 };
-const DASH = { x: 390, y: 430, w: 500, h: 80 };
-
-const SHIELD_B: Pt = { x: SHIELD.x + SHIELD.w / 2, y: SHIELD.y + SHIELD.h };
-const SYNC_T: Pt = { x: SYNC.x + SYNC.w / 2, y: SYNC.y };
-const SYNC_B: Pt = { x: SYNC.x + SYNC.w / 2, y: SYNC.y + SYNC.h };
-const FB_T: Pt = { x: FB.x + FB.w / 2, y: FB.y };
-const FB_B: Pt = { x: FB.x + FB.w / 2, y: FB.y + FB.h };
-const IG_T: Pt = { x: IG.x + IG.w / 2, y: IG.y };
-const IG_B: Pt = { x: IG.x + IG.w / 2, y: IG.y + IG.h };
-const FOLLOWERS_T: Pt = { x: FOLLOWERS.x + FOLLOWERS.w / 2, y: FOLLOWERS.y };
-const FOLLOWERS_B: Pt = { x: FOLLOWERS.x + FOLLOWERS.w / 2, y: FOLLOWERS.y + FOLLOWERS.h };
-const DASH_T: Pt = { x: DASH.x + DASH.w / 2, y: DASH.y };
-
-const P_SHIELD_SYNC: Pt[] = [SHIELD_B, SYNC_T];
-const P_SYNC_FB: Pt[] = [SYNC_B, FB_T];
-const P_SYNC_IG: Pt[] = [SYNC_B, IG_T];
-const P_SYNC_FOL: Pt[] = [SYNC_B, FOLLOWERS_T];
-const P_FB_DASH: Pt[] = [FB_B, DASH_T];
-const P_IG_DASH: Pt[] = [IG_B, DASH_T];
-const P_FOL_DASH: Pt[] = [FOLLOWERS_B, DASH_T];
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  BrowserWindow,
+  ToggleSwitch,
+  StatPill,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  Cursor,
+  CheckBadge,
+  CaptionBand,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
 export const FeatureSocialAnalyticsDashboard: React.FC = () => {
   const frame = useCurrentFrame();
@@ -48,145 +45,258 @@ export const FeatureSocialAnalyticsDashboard: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // ── Beat 1 (0–108): paying for data the platform already has ──
-  const shieldOp = Math.min(1, pop(4)) * lf;
-  const shieldLit = interpolate(frame, [4, 26, 86, 106], [0, 0.5, 0.5, 0.15], {
+  // ── Beat windows ──────────────────────────────────────────────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
+
+  // ── Beat 1: the problem ───────────────────────────────────────────
+  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
+  const price = pop(18);
+  const item1 = pop(56);
+  const item2 = pop(66);
+  const item3 = pop(76);
+  const pill1 = pop(46);
+  const pill2 = pop(58);
+  const pill3 = pop(70);
+
+  // ── Beat 2: the solution ───────────────────────────────────────────
+  const card1 = pop(132);
+  const card2 = pop(142);
+  const card3 = pop(152);
+  const togOn = seg(frame, 160, 172, Easing.inOut(Easing.cubic));
+  const cx = interpolate(frame, [124, 150, 168], [560, 900, 900], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
-  }) * lf;
-  const crossScale = pop(38) * interpolate(frame, [86, 106], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const wastePillIn = seg(frame, 42, 64, Easing.out(Easing.cubic));
-  const wastePillOp = wastePillIn * interpolate(frame, [88, 108], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap1In = seg(frame, 18, 40, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [90, 110], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
-
-  // ── Beat 2 (112–252): sync-social-metrics pulls FB + IG + follower history ──
-  const tSs = seg(frame, 114, 136);
-  const tSsVis = frame >= 114 && frame < 190 ? 1 : 0;
-  const syncOp = appear(118, 18) * lf;
-  const syncLit = interpolate(frame, [126, 148, 330, 350], [0, 0.7, 0.7, 0.2], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  }) * lf;
-  const tSf = [0, 1, 2].map((i) => seg(frame, 150 + i * 16, 170 + i * 16));
-  const tSfVis = [0, 1, 2].map((i) => (frame >= 150 + i * 16 && frame < 330 ? 1 : 0));
-  const srcOp = [FB, IG, FOLLOWERS].map((_, i) => appear(154 + i * 16, 16) * lf);
-  const srcLit = [FB, IG, FOLLOWERS].map((_, i) => {
-    const s = 150 + i * 16;
-    return interpolate(frame, [s, s + 16, 330, 350], [0, 0.7, 0.7, 0.2], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }) * lf;
+    easing: Easing.inOut(Easing.quad),
   });
-  const sixHourPillIn = seg(frame, 202, 224, Easing.out(Easing.cubic));
-  const sixHourPillOp = sixHourPillIn * interpolate(frame, [246, 266], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap2In = seg(frame, 156, 178, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [246, 266], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
-
-  // ── Beat 3 (256–350): daily snapshots feed the Recharts dashboard ──
-  const tFd = seg(frame, 258, 280);
-  const tFdVis = frame >= 258 && frame < 330 ? 1 : 0;
-  const tId = seg(frame, 264, 286);
-  const tIdVis = frame >= 264 && frame < 330 ? 1 : 0;
-  const tFold = seg(frame, 270, 292);
-  const tFoldVis = frame >= 270 && frame < 330 ? 1 : 0;
-  const dashOp = appear(262, 18) * lf;
-  const dashLit = interpolate(frame, [278, 300, 330, 350], [0, 0.8, 0.8, 0.25], {
+  const cy = interpolate(frame, [124, 150, 168], [420, 152, 152], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
-  }) * lf;
-  const chartsPillIn = seg(frame, 296, 318, Easing.out(Easing.cubic));
-  const chartsPillOp = chartsPillIn * interpolate(frame, [354, 374], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap3In = seg(frame, 266, 288, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [354, 374], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cursorOp = seg(frame, 124, 132) * (1 - seg(frame, 176, 188));
+  const click1 = seg(frame, 160, 172, Easing.out(Easing.quad));
+  const winOp = seg(frame, 168, 182, Easing.out(Easing.cubic));
+  const barsAppear = 186;
+  const footNoteOp = seg(frame, 214, 228) * 0.9;
+  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
 
-  // ── Beat 4 (360–450): result ──
-  const finalCapIn = seg(frame, 380, 402, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(386) * lf;
-  const metricOp = seg(frame, 366, 388, Easing.out(Easing.cubic)) * lf;
+  // ── Beat 3: how it stays current ────────────────────────────────────
+  const icard1 = pop(252);
+  const icard2 = pop(272);
+  const icard3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+
+  // ── Beat 4: the result ────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const pctSaved = Math.round(
+    interpolate(frame, [384, 414], [0, 100], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) })
+  );
+  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
+
+  const BARS = [38, 52, 44, 68, 58, 82, 74];
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      <Connector pts={P_SHIELD_SYNC} color={T.danger} width={2.5} progress={tSs} opacity={0.8 * tSsVis * lf} />
-      <Connector pts={P_SYNC_FB} color={T.accent} width={2} progress={tSf[0]} opacity={0.8 * tSfVis[0] * lf} />
-      <Connector pts={P_SYNC_IG} color={T.accent} width={2} progress={tSf[1]} opacity={0.8 * tSfVis[1] * lf} />
-      <Connector pts={P_SYNC_FOL} color={T.accent} width={2} progress={tSf[2]} opacity={0.8 * tSfVis[2] * lf} />
-      <Connector pts={P_FB_DASH} color={T.success} width={2} progress={tFd} opacity={0.7 * tFdVis * lf} />
-      <Connector pts={P_IG_DASH} color={T.success} width={2} progress={tId} opacity={0.7 * tIdVis * lf} />
-      <Connector pts={P_FOL_DASH} color={T.success} width={2} progress={tFold} opacity={0.7 * tFoldVis * lf} />
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="Still paying" accentText="$25/month for your own data?" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <BrowserWindow x={80} y={116} w={700} h={452} title="Shield App — subscription" opacity={Math.min(1, pop(8))}>
+          <div style={{ position: "absolute", left: 0, top: 0, width: 700, padding: "30px 36px", fontFamily }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: B.muted, letterSpacing: 0.6 }}>SHIELD APP · SUBSCRIPTION</div>
+            <div style={{ fontSize: 27, fontWeight: 800, color: B.ink, marginTop: 10 }}>Analytics Pro</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 16, opacity: Math.min(1, price) }}>
+              <div style={{ fontSize: 48, fontWeight: 800, color: B.danger }}>$25.00</div>
+              <div style={{ fontSize: 18, fontWeight: 600, color: B.muted }}>/ month / profile</div>
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: B.muted, marginTop: 6, opacity: Math.min(1, price) }}>
+              × 2 profiles = $50/month
+            </div>
+            <div style={{ height: 1, background: B.border, margin: "24px 0 18px" }} />
+            {[
+              { op: item1, text: "Facebook post analytics" },
+              { op: item2, text: "Instagram post analytics" },
+              { op: item3, text: "Follower growth history" },
+            ].map((row) => (
+              <div
+                key={row.text}
+                style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 14, opacity: Math.min(1, row.op) }}
+              >
+                <span
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: "50%",
+                    background: B.successBg,
+                    border: `1.5px solid #BFE7CD`,
+                    color: B.success,
+                    fontSize: 13,
+                    fontWeight: 800,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  ✓
+                </span>
+                <span style={{ fontSize: 18, fontWeight: 600, color: B.ink }}>{row.text}</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: B.muted, marginLeft: "auto" }}>already in our DB</span>
+              </div>
+            ))}
+          </div>
+        </BrowserWindow>
+        <StickyNote
+          x={830}
+          y={150}
+          w={350}
+          opacity={noteOp}
+          text="Our own pipeline already stores this exact data — every post, every day"
+        />
+        <StatPill x={846} y={340} emoji="💸" text="$25/month, per profile" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+        <StatPill x={846} y={402} emoji="🗄️" text="Data already in our own DB" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+        <StatPill x={846} y={464} emoji="😩" text="Paying twice for our own numbers" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
+        <CaptionBand text="A monthly bill for insights already sitting in our own database" tone="danger" opacity={seg(frame, 30, 46)} />
+      </Group>
 
-      <SchemaNode {...SHIELD} state="danger" lit={shieldLit} opacity={shieldOp} label="Shield App" fontSize={19}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>$25/month/profile</div>
-      </SchemaNode>
-      <Badge x={SHIELD.x + SHIELD.w - 18} y={SHIELD.y - 18} kind="cross" scale={crossScale} opacity={crossScale} />
-      <Pill x={SHIELD.x - 20} y={SHIELD.y + SHIELD.h + 14} text="paying for data the platform already has" color={T.danger} opacity={wastePillOp} fontSize={15} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="Now it's built in —" accentText="for $0" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <ToggleSwitch x={860} y={138} label="Live sync" on={togOn} opacity={seg(frame, 138, 150)} />
+        <Cursor x={cx} y={cy} opacity={cursorOp} click={click1 % 1} />
+        <BrowserWindow x={110} y={196} w={1060} h={396} title="admin — social analytics" opacity={winOp}>
+          <Panel x={24} y={20} w={320} h={112} tone="accent" opacity={Math.min(1, card1)}>
+            <div style={{ padding: "18px 22px", fontFamily }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: B.muted, letterSpacing: 0.4 }}>IMPRESSIONS</div>
+              <div style={{ fontSize: 34, fontWeight: 800, color: B.ink, marginTop: 6 }}>12,400</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: B.success, marginTop: 4 }}>▲ 18% vs last week</div>
+            </div>
+          </Panel>
+          <Panel x={372} y={20} w={320} h={112} tone="accent" opacity={Math.min(1, card2)}>
+            <div style={{ padding: "18px 22px", fontFamily }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: B.muted, letterSpacing: 0.4 }}>ENGAGEMENT RATE</div>
+              <div style={{ fontSize: 34, fontWeight: 800, color: B.ink, marginTop: 6 }}>4.2%</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: B.success, marginTop: 4 }}>▲ 0.6pp vs last week</div>
+            </div>
+          </Panel>
+          <Panel x={720} y={20} w={320} h={112} tone="accent" opacity={Math.min(1, card3)}>
+            <div style={{ padding: "18px 22px", fontFamily }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: B.muted, letterSpacing: 0.4 }}>FOLLOWERS</div>
+              <div style={{ fontSize: 34, fontWeight: 800, color: B.ink, marginTop: 6 }}>3,180</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: B.success, marginTop: 4 }}>▲ 54 this week</div>
+            </div>
+          </Panel>
+          <div style={{ position: "absolute", left: 24, top: 158, width: 1012 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: B.muted, letterSpacing: 0.4, marginBottom: 10 }}>
+              ENGAGEMENT — LAST 7 DAYS
+            </div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 16, height: 110 }}>
+              {BARS.map((h, i) => {
+                const t = seg(frame, barsAppear + i * 6, barsAppear + i * 6 + 14, Easing.out(Easing.cubic));
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      width: 44,
+                      height: Math.max(4, h * t),
+                      borderRadius: 8,
+                      background: i === BARS.length - 1 ? B.success : B.accent,
+                      opacity: 0.85,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 300,
+              width: 1060,
+              textAlign: "center",
+              fontSize: 15.5,
+              fontWeight: 600,
+              color: B.muted,
+              opacity: footNoteOp,
+            }}
+          >
+            Top posts · follower trends · CSV export — all in one place
+          </div>
+        </BrowserWindow>
+        <CaptionBand text="Facebook + Instagram, engagement and followers — one dashboard" tone="accent" opacity={cap2} />
+      </Group>
 
-      <SchemaNode {...SYNC} state="accent" lit={syncLit} opacity={syncOp} label="sync-social-metrics" fontSize={18} />
-      <Token pts={P_SHIELD_SYNC} t={tSs} color={T.danger} opacity={tSsVis * lf} />
-      <Pill x={SYNC.x - 10} y={SYNC.y - 46} text="runs every 6 hours" color={T.accent} opacity={sixHourPillOp} fontSize={15} />
+      {/* ════ Beat 3 — HOW IT STAYS CURRENT ════ */}
+      <Group opacity={b3}>
+        <Headline text="Kept fresh" accentText="every 6 hours" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        <IconCard x={110} y={218} w={300} emoji="🔵" title="Facebook Graph API" sub="posts + engagement" tone="accent" scale={icard1} opacity={Math.min(1, icard1)} />
+        <IconCard x={490} y={218} w={300} emoji="📷" title="Instagram Media API" sub="posts + engagement" tone="accent" scale={icard2} opacity={Math.min(1, icard2)} />
+        <IconCard x={870} y={218} w={300} emoji="📈" title="Recharts dashboard" sub="updated automatically" tone="success" scale={icard3} opacity={Math.min(1, icard3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="Built with Recharts, reading data that's already synced every 6 hours"
+          opacity={cap3}
+          fontSize={21}
+          y={580}
+        />
+      </Group>
 
-      <SchemaNode {...FB} state="accent" lit={srcLit[0]} opacity={srcOp[0]} label="Facebook Graph API" fontSize={16} />
-      <Token pts={P_SYNC_FB} t={tSf[0]} opacity={tSfVis[0] * lf} />
-      <SchemaNode {...IG} state="accent" lit={srcLit[1]} opacity={srcOp[1]} label="Instagram Media API" fontSize={16} />
-      <Token pts={P_SYNC_IG} t={tSf[1]} opacity={tSfVis[1] * lf} />
-      <SchemaNode {...FOLLOWERS} state="accent" lit={srcLit[2]} opacity={srcOp[2]} label="follower_history" fontSize={16} />
-      <Token pts={P_SYNC_FOL} t={tSf[2]} opacity={tSfVis[2] * lf} />
-
-      <SchemaNode {...DASH} state="success" lit={dashLit} opacity={dashOp} label="Recharts admin dashboard" fontSize={18} />
-      <Token pts={P_FB_DASH} t={tFd} color={T.success} opacity={tFdVis * lf} />
-      <Token pts={P_IG_DASH} t={tId} color={T.success} opacity={tIdVis * lf} />
-      <Token pts={P_FOL_DASH} t={tFold} color={T.success} opacity={tFoldVis * lf} />
-      <Pill x={DASH.x - 10} y={DASH.y - 46} text="summary cards · engagement · top posts · heatmap" color={T.success} opacity={chartsPillOp} fontSize={15} />
-
-      <Caption x={90} y={648} w={1100} text="A $25/month subscription for insights from data we already own" color={T.danger} opacity={cap1} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Every 6 hours, engagement and follower data syncs automatically" color={T.text} opacity={cap2} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Daily snapshots power a full dashboard — trends, rankings, exports" color={T.success} opacity={cap3} fontSize={22} weight={600} />
-
-      <div style={{ position: "absolute", left: 0, top: 598, width: 1280, textAlign: "center", opacity: metricOp }}>
-        <div style={{ fontSize: 22, fontWeight: 600, color: T.muted }}>Actionable insight, zero recurring cost</div>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>$25/month</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>per profile, 3rd-party tool</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>$0/month</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>our own dashboard</div>
+          </div>
+        </Panel>
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
+            position: "absolute",
+            left: 0,
+            top: 424,
+            width: 1280,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
+            gap: 20,
+            opacity: speedOp,
+            fontFamily,
           }}
         >
-          ✓
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>{pctSaved}% of that cost — gone</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>$25/month → $0</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            Same Facebook + Instagram data, now inside our own admin panel.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>vitalii.no</div>
+        </div>
+      </Group>
+    </div>
   );
 };
