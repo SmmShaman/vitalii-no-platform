@@ -1,5 +1,54 @@
 # CLAUDE.md - Project Documentation
 
+---
+
+## 🔴 START OF EVERY SESSION — ASK THIS FIRST (owner rule, 2026-08-23)
+
+**Applies to this project folder only.** Before answering whatever the owner actually asked —
+no matter the topic — the FIRST message of a session must report lux-wave progress and ask
+one question:
+
+> Зроблено **N / <total>** фіч у новому стилі, залишилось **M**.
+> Черга LinkedIn: **K** постів до **<дата>**. Продовжуємо наступний батч? (так / ні)
+
+- **"ні"** → do nothing about it. No prep, no counting, no subagents. Just do what the owner
+  asked. This is an explicit token-saving order.
+- **"так"** → launch the next batch **in parallel** with the owner's actual task (Sonnet
+  subagents in the background while the main work proceeds).
+
+Ask it every session, regardless of the owner's question. Pull the numbers live (never from
+memory) with one command:
+
+```bash
+ssh -i ~/.ssh/contabo_vps root@173.249.31.179 "docker exec portfolio-db psql -U postgres -t -A -F'|' \
+ -c \"SELECT count(*), count(demo_media_url) FROM features;\" \
+ -c \"SELECT status, count(*), min(scheduled_for), max(scheduled_for) FROM feature_video_repost_queue GROUP BY status;\""
+```
+
+Lux-done = number of rows in `feature_video_repost_queue` (one row per reworked feature) + j26.
+
+**How to actually do the work — read these before starting a batch:**
+
+| Need | File |
+|---|---|
+| Canonical rules (styles, Story cut, SEO, budgets) | `docs/feature-demos-pipeline.md` |
+| Ready-made subagent prompt for a batch | `scripts/remotion-video/out/lux-batch-instructions.md` |
+| Bright clip reference (4-beat structure) | `scripts/remotion-video/src/compositions/feature-demos/FeatureJobTable.tsx` |
+| Story cut reference (54 s, voice-first) | `.../feature-demos/FeatureJobTableStory.tsx` |
+| v2 primitives + colors | `.../feature-demos/bright-primitives.tsx`, `bright-theme.ts` |
+| Per-beat voiceover generator | `scripts/remotion-video/vo-scripts/j26-story.py` |
+
+Batch recipe: pick N features → dump rows to `out/lux-batchN-data.json` → N/2 subagents
+(`model: sonnet`, pointed at `lux-batch-instructions.md`) → render loop with auto-retry
+(~50 s/clip, `--timeout 120000`) → contact sheets to verify → scp to VPS → PUT to R2 on the
+SAME keys → INSERT into `feature_video_repost_queue` with dates → send the owner one md with
+all texts → commit the story files.
+
+Full context: `~/.claude/memory-shared/portfolio_feature_demos_pipeline.md` and the newest
+`session_handoff_*.md`.
+
+---
+
 ## Project Overview
 
 **Vitalii Berbeha Portfolio** - Professional portfolio with blog and news section. Built on Next.js 15 with Supabase backend.
