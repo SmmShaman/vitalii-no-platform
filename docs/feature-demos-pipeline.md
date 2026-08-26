@@ -145,17 +145,63 @@ The YouTube leg is no longer hand-fired per session. A systemd timer
 run `mux_v2.sh <id>`, frame-verify the tail is NOT frozen, then append the id to
 `queue.txt`. The runner does the rest on its own schedule.
 
-## Social cross-post (state 2026-08-20)
+## Publishing model — owner rebuild 2026-08-26
 
-The daily feature social post (one feature/day, 08:00 UTC, Facebook + LinkedIn,
-**EN-only by owner decision**) is made by the nanoclaw agent task
-`task-1784111012050-zh8cby` (dm-with-smmshaman group) via the
-`nano-social-publish` Edge Function. Since 2026-08-20 the function accepts
-`videoUrl` and posts the feature's `demo_media_url` clip as **native video**
-(FB `/videos` file_url; LinkedIn Assets API upload), falling back to text-only
-on any media failure (`videoUsed` in the response tells which happened).
-pg_cron job#9 (`publish-feature-social-daily`) is deliberately **disabled** —
-re-enabling it would double-post; the NO-language track died with it (accepted).
+Three owner rules replaced the old two-task setup:
+
+1. **A dark v1 clip must NEVER reach LinkedIn.** Not "preferably not" — never.
+2. **The post text is written on the day it goes out**, fitted to the clip that
+   is actually going out. Texts written weeks ahead are forbidden.
+3. **Site, LinkedIn and YouTube ship together and link to each other.**
+
+### What enforces rule 1
+
+`features.demo_style` (`bright` | `dark` | NULL), added by
+`20260826120000_features_demo_style_and_youtube.sql`. Every publisher query
+filters on `demo_style = 'bright'`. State at that date: **35 bright, 118 dark,
+85 with no clip at all** out of 238 features.
+
+The old morning task `task-1784111012050-zh8cby` (08:00 UTC, FB + LinkedIn, took
+the oldest feature with no post regardless of style) is **PAUSED**
+(`messages_in.status = 'paused'`, reversible by flipping back to `'pending'`).
+It would have published j32 with a dark clip on 2026-08-27. Do not resume it —
+it has no style gate.
+
+### The single daily publisher
+
+`task-1787348379037-luxrp1` (17:00 UTC, LinkedIn only, EN only). Its pre-task
+script joins `feature_video_repost_queue` to `features`, filters
+`demo_style = 'bright'`, and hands the agent up to **2 rows** (two = the queue is
+behind and is catching up). The agent then:
+
+- writes the post text **from scratch** out of `problem_en` / `solution_en` /
+  `result_en` — `feature_video_repost_queue.post_text` is NULL on a pending row
+  and is only filled in *after* posting, with what was actually published;
+- always links `https://vitalii.no/features/<slug_en>`, and additionally
+  `https://www.youtube.com/watch?v=<youtube_video_id>` when that column is set;
+- posts native video through `nano-social-publish` and treats
+  `ok:true, videoUsed:false` as a partial failure worth shouting about;
+- never fails silently: a broken query wakes the agent with `data.debug` set and
+  the instruction to send a Telegram warning instead of posting.
+
+The August texts that used to sit in the queue are backed up on the VPS at
+`/root/feature-demos/queue-post_text-backup-20260826.json`.
+
+### Closing the three-way loop
+
+- YouTube description → site feature page (already did).
+- LinkedIn post → site feature page **and** the YouTube video.
+- Site feature page → YouTube (`FeatureArticle.tsx`, shown when
+  `youtube_video_id` is set).
+- `upload_queue.sh` writes `features.youtube_video_id` + `youtube_uploaded_at`
+  back to `portfolio-db` after each successful upload, so the link appears
+  everywhere without a manual step. Backup of the pre-patch script:
+  `upload_queue.sh.bak-20260826`.
+
+Historical note: pg_cron job#9 (`publish-feature-social-daily`) is deliberately
+**disabled** — re-enabling it would double-post; the NO-language track died with
+it (accepted). Facebook is currently NOT part of the daily publisher; the lux
+wave was an owner-approved LinkedIn-only decision and was not silently widened.
 
 ## YouTube SEO description template (MANDATORY per video)
 

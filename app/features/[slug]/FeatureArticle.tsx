@@ -5,7 +5,7 @@ import { getFeatureBySlug } from '@/integrations/supabase/client'
 import { getCategoryInfo, getProjectInfo } from '@/data/features'
 import type { FeatureCategory, ProjectId } from '@/data/features'
 import Link from 'next/link'
-import { Calendar, ChevronRight, Home, ExternalLink, Brain, Video, Bot, Palette, Server, Layers } from 'lucide-react'
+import { Calendar, ChevronRight, Home, ExternalLink, Brain, Video, Bot, Palette, Server, Layers, Youtube } from 'lucide-react'
 import { useTranslations } from '@/contexts/TranslationContext'
 import { useTrackingSafe } from '@/contexts/TrackingContext'
 import { ShareButtons } from '@/components/ui/ShareButtons'
@@ -19,9 +19,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 }
 
 const labels = {
-  en: { features: 'Features', problem: 'Problem', solution: 'How it works', result: 'Result', techStack: 'Tech Stack', notFound: 'Feature Not Found', backHome: 'Back to Home' },
-  no: { features: 'Funksjoner', problem: 'Problem', solution: 'Hvordan det fungerer', result: 'Resultat', techStack: 'Teknologier', notFound: 'Funksjon ikke funnet', backHome: 'Tilbake til hjem' },
-  ua: { features: 'Функції', problem: 'Проблема', solution: 'Як це працює', result: 'Результат', techStack: 'Технології', notFound: 'Функцію не знайдено', backHome: 'На головну' },
+  en: { features: 'Features', problem: 'Problem', solution: 'How it works', result: 'Result', techStack: 'Tech Stack', notFound: 'Feature Not Found', backHome: 'Back to Home', watchNarrated: 'Watch the narrated version on YouTube' },
+  no: { features: 'Funksjoner', problem: 'Problem', solution: 'Hvordan det fungerer', result: 'Resultat', techStack: 'Teknologier', notFound: 'Funksjon ikke funnet', backHome: 'Tilbake til hjem', watchNarrated: 'Se den fortalte versjonen på YouTube' },
+  ua: { features: 'Функції', problem: 'Проблема', solution: 'Як це працює', result: 'Результат', techStack: 'Технології', notFound: 'Функцію не знайдено', backHome: 'На головну', watchNarrated: 'Дивитись озвучену версію на YouTube' },
 }
 
 interface FeatureArticleProps {
@@ -191,8 +191,26 @@ export function FeatureArticle({ slug, initialLanguage, initialData }: FeatureAr
                 src={feature.demo_media_url}
                 type={feature.demo_media_type}
                 title={title}
-                className="mb-6"
+                className={feature.youtube_video_id ? 'mb-3' : 'mb-6'}
               />
+            </ScrollReveal>
+          )}
+
+          {/* Narrated cut on YouTube. The YouTube description already links back
+              here, so this closes the loop the other way — added 2026-08-26 when
+              the site was the only one of the three channels with no way out. */}
+          {feature.youtube_video_id && (
+            <ScrollReveal delay={0.19}>
+              <a
+                href={`https://www.youtube.com/watch?v=${feature.youtube_video_id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mb-6 text-sm font-medium text-content-secondary hover:text-content-primary transition-colors"
+              >
+                <Youtube className="w-4 h-4" />
+                {t.watchNarrated}
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
             </ScrollReveal>
           )}
 
