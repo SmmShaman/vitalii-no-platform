@@ -33,11 +33,23 @@ The Remotion feature-demo compositions now have two design systems in
 | Language | node boxes with tech labels, connectors, data tokens | problem/solution color zones, real UI mockups with real data, emoji icon cards, big before→after metrics |
 | Reference clip | most existing `Feature*.tsx` | `FeatureJobTable.tsx` (j26, rebuilt 2026-08-21) |
 
-**When to choose bright (v2):** the feature has a story a non-technical person
-feels — time saved, clicks removed, chaos → order, money, safety. That covers
-most UI features and most "assistant does X for you" features. Keep dark (v1)
-for genuinely internal plumbing (retry chains, schedulers, token monitors)
-where the viewer IS a developer.
+**Bright (v2) is the DEFAULT for every new clip (owner decision 2026-08-26).**
+Any feature that gets its first clip from now on is rendered bright — no
+per-clip judgement call, no exceptions to argue about. Dark (v1) is allowed
+only when the owner asks for it by name on a specific feature.
+
+Why the rule got hard: between 22.08 and 26.08 the discovery run kept adding
+features (j28–j31) whose clips were written dark, and the daily 08:00 UTC
+social task published them to LinkedIn. Every day of "decide per clip" grew
+the dark backlog faster than the lux wave shrank it. Reference for the choice
+that used to be optional: bright suits time-saved / clicks-removed / chaos →
+order stories, which is nearly every feature; dark only ever fit internal
+plumbing where the viewer IS a developer.
+
+**Known dark debt (2026-08-26):** j28, j29, j30, j31 already have dark clips on
+R2 and have already been posted. They are rebuild candidates on the same
+same-R2-key swap the lux wave uses — but they are NOT part of
+`feature_video_repost_queue` and need the owner's word before re-posting.
 
 **Bright template rules (all owner rules above still apply):**
 
@@ -95,7 +107,7 @@ beat-timing code is identical across both styles.
 
 | Step | Tool | Where |
 |---|---|---|
-| 1. Pick feature + write 4-beat scenario | Sonnet 5 (Opus only for new templates) | Claude Code (subscription) |
+| 1. Pick feature + write 4-beat scenario **in bright v2** (`bright-theme.ts` + `bright-primitives.tsx`) | Sonnet 5 (Opus only for new templates) | Claude Code (subscription) |
 | 2a. UI feature → film live site | `demo-video/pilot/v06-live.mjs` pattern (Playwright, cursor+callouts) | VPS |
 | 2b. Backend feature → schema animation | `scripts/remotion-video` → `src/compositions/feature-demos/` primitives | local PC or VPS |
 | 3. Silent 15 s loop, 1280×720, h264, ≤2.5 MB, loop-clean seam | ffmpeg `-an`, check frame 0 ≈ last frame | — |

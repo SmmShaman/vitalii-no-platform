@@ -3,10 +3,10 @@
  * Drop-in replacement for Azure OpenAI calls.
  *
  * Routes (callers pass `llm_route` in the request body, default 'default'):
- *   quality    — gpt-oss-120b → gpt-oss-20b → Groq qwen → NVIDIA → free-Gemini (rewrites + translations)
- *   moderation — free-Gemini Lite → Groq qwen → gpt-oss-20b → NVIDIA           (pre-moderation scoring)
- *   bulk       — Groq qwen → gpt-oss-20b → Gemini → NVIDIA                     (high-volume internal scoring)
- *   default    — gpt-oss-120b → gpt-oss-20b → Groq qwen → Gemini → NVIDIA      (creative EN: teasers, prompts)
+ *   quality    — gpt-oss-120b → gpt-oss-20b → Groq qwen → CF llama-70b → CF gpt-oss-120b → NVIDIA → free-Gemini
+ *   moderation — free-Gemini Lite → Groq qwen → gpt-oss-20b → CF llama-70b → NVIDIA
+ *   bulk       — Groq qwen → gpt-oss-20b → free-Gemini Lite → CF llama-70b → NVIDIA
+ *   default    — gpt-oss-120b → gpt-oss-20b → Groq qwen → free-Gemini Lite → CF llama-70b → NVIDIA
  *
  * Each gpt-oss model carries only 8k TPM, and one article-sized call is ~4k, so
  * the two of them are chained to double the per-minute headroom before the
@@ -48,6 +48,30 @@ const GEMINI_FREE_MODEL_LITE = Deno.env.get('GEMINI_FREE_MODEL_LITE') || 'gemini
 // Full Flash: best bokmål of anything we have, but only 20 req/day → last resort.
 // Pinned deliberately: `gemini-flash-latest` is an alias that moves under us.
 const GEMINI_FREE_MODEL_FULL = Deno.env.get('GEMINI_FREE_MODEL_FULL') || 'gemini-3.6-flash'
+
+// ── Cloudflare Workers AI (added 2026-08-26) ───────────────────────────────────
+// A pool that is completely independent of Groq's TPM/TPD, reached with the
+// CF_AI_TOKEN + CF_ACCOUNT_ID this project already holds — no new signup. The
+// OpenAI-compatible endpoint lives at /accounts/<id>/ai/v1/chat/completions.
+//
+// Why it matters here: Groq decommissioned every Llama chat model on 2026-08-19,
+// and llama-3.3-70b was the best bokmål writer we had. Cloudflare still serves it
+// (`@cf/meta/llama-3.3-70b-instruct-fp8-fast`), and also carries a SECOND
+// gpt-oss-120b that does not draw on Groq's 200k TPD budget — which is exactly
+// the failure that killed 10 rewrites on 2026-07-25.
+//
+// Measured 2026-08-26 on our account: llama-3.3-70b ≈1.2 s / 12.5 neurons for a
+// 123-token call, gpt-oss-120b ≈2.2 s. Free allowance is 10k neurons/day, so the
+// budget guard below (CLOUDFLARE_DAILY_LIMIT calls/day) keeps us inside it —
+// never remove it, the account has a payment method attached for R2.
+//
+// NOT used: `@cf/zai-org/glm-4.7-flash` — it is a thinking model that returned
+// `content: null` with the whole budget spent on `reasoning` in testing.
+const CF_AI_TOKEN = Deno.env.get('CF_AI_TOKEN') || ''
+const CF_ACCOUNT_ID = Deno.env.get('CF_ACCOUNT_ID') || ''
+const CF_MODEL_MAIN = Deno.env.get('CF_MODEL_MAIN') || '@cf/meta/llama-3.3-70b-instruct-fp8-fast'
+const CF_MODEL_REASON = Deno.env.get('CF_MODEL_REASON') || '@cf/openai/gpt-oss-120b'
+const CLOUDFLARE_DAILY_LIMIT = parseInt(Deno.env.get('CLOUDFLARE_DAILY_LIMIT') || '120', 10)
 
 export type LlmRoute = 'quality' | 'moderation' | 'bulk' | 'default'
 
@@ -162,10 +186,11 @@ async function tryGroq(call: LlmCall, model: string): Promise<Response | null> {
 }
 
 /**
- * Increment today's Gemini call counter and check the budget.
- * Fail-open: if the counter itself errors, allow the call (Groq still backs it up).
+ * Increment today's call counter for a provider and check its daily budget.
+ * Fail-open: if the counter itself errors, allow the call (the rest of the
+ * chain still backs it up).
  */
-async function geminiBudgetOk(): Promise<boolean> {
+async function budgetOk(provider: string, limit: number): Promise<boolean> {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
   if (!supabaseUrl || !serviceKey) return true
@@ -177,12 +202,12 @@ async function geminiBudgetOk(): Promise<boolean> {
         'Authorization': `Bearer ${serviceKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ p_provider: 'gemini' }),
+      body: JSON.stringify({ p_provider: provider }),
     }, 5_000)
     if (!res.ok) return true
     const count = await res.json()
-    if (typeof count === 'number' && count > GEMINI_DAILY_LIMIT) {
-      console.warn(`🛑 Gemini daily budget exhausted (${count}/${GEMINI_DAILY_LIMIT}) — skipping Gemini`)
+    if (typeof count === 'number' && count > limit) {
+      console.warn(`🛑 ${provider} daily budget exhausted (${count}/${limit}) — skipping ${provider}`)
       return false
     }
     return true
@@ -190,6 +215,8 @@ async function geminiBudgetOk(): Promise<boolean> {
     return true
   }
 }
+
+const geminiBudgetOk = () => budgetOk('gemini', GEMINI_DAILY_LIMIT)
 
 async function tryGemini(call: LlmCall): Promise<Response | null> {
   if (!GOOGLE_API_KEY) return null
@@ -292,6 +319,82 @@ async function tryGeminiFree(call: LlmCall, model: string): Promise<Response | n
   return null
 }
 
+/**
+ * Cloudflare Workers AI, OpenAI-compatible endpoint. Independent of every Groq
+ * pool, so it is the link that survives "all three Groq pools capped at once".
+ *
+ * Response shape note: gpt-oss models return a separate `reasoning` field and a
+ * clean `content` — but if max_tokens is tight the whole budget goes to
+ * reasoning and `content` comes back null. Hence the same +1500 headroom rule
+ * tryGroq uses for reasoning models.
+ */
+async function tryCloudflare(call: LlmCall, model: string): Promise<Response | null> {
+  if (!CF_AI_TOKEN || !CF_ACCOUNT_ID) return null
+  if (!(await budgetOk('cloudflare', CLOUDFLARE_DAILY_LIMIT))) return null
+
+  const isReasoner = model.includes('gpt-oss') || model.includes('qwq') || model.includes('deepseek-r1')
+  const tokenBudget = isReasoner
+    ? Math.min(Math.max(call.maxTokens + 1500, 2000), 8192)
+    : Math.min(call.maxTokens, 8192)
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const body: Record<string, unknown> = {
+        model,
+        messages: call.messages,
+        temperature: call.temperature,
+        max_tokens: tokenBudget,
+      }
+      if (call.expectsJson) body.response_format = { type: 'json_object' }
+
+      const res = await fetchWithTimeout(
+        `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/v1/chat/completions`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${CF_AI_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(body),
+        },
+      )
+
+      if (res.ok) {
+        const data = await res.json()
+        const raw = (data?.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim()
+        const text = stripFence(raw)
+        if (text) {
+          const u = data.usage || {}
+          const short = model.split('/').pop()
+          console.log(`🟠 Cloudflare AI (${short}) — ${text.length} chars | tokens: ${u.prompt_tokens || 0}+${u.completion_tokens || 0} | neurons: ${u.neurons ?? '?'}`)
+          return okResponse(text, data.usage)
+        }
+        console.warn(`⚠️ Cloudflare AI ${model} returned empty content (reasoning ate the budget?)`)
+        break
+      }
+
+      const status = res.status
+      const errText = await res.text().catch(() => '')
+      console.warn(`⚠️ Cloudflare AI ${model} failed (${status}): ${errText.substring(0, 200)}`)
+
+      if ((status === 429 || status === 503) && attempt === 0) {
+        await new Promise(r => setTimeout(r, 3000))
+        continue
+      }
+      break
+    } catch (e) {
+      const msg = (e as Error).message
+      if (msg.includes('aborted') && attempt === 0) {
+        console.warn(`⚠️ Cloudflare AI timeout, retrying...`)
+        continue
+      }
+      console.warn(`⚠️ Cloudflare AI error: ${msg}`)
+      break
+    }
+  }
+  return null
+}
+
 async function tryNvidia(call: LlmCall): Promise<Response | null> {
   if (!NVIDIA_API_KEY) return null
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -371,6 +474,11 @@ export async function azureFetch(
       () => tryGroq(call, GROQ_MODEL_REASON),
       () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryGroq(call, GROQ_MODEL),
+      // Cloudflare sits ahead of NVIDIA (2026-08-26): its llama-3.3-70b is the
+      // best bokmål writer left to us after Groq dropped every Llama model, and
+      // NVIDIA has a habit of answering "upstream server is timing out".
+      () => tryCloudflare(call, CF_MODEL_MAIN),
+      () => tryCloudflare(call, CF_MODEL_REASON),
       () => tryNvidia(call),
       // Last resort only. On 2026-07-25 all three Groq pools hit their daily caps
       // at once and 10 articles died at rewrite because the chain ended at NVIDIA
@@ -389,6 +497,7 @@ export async function azureFetch(
       () => tryGeminiFree(call, GEMINI_FREE_MODEL_LITE),
       () => tryGroq(call, GROQ_MODEL_BULK),
       () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
+      () => tryCloudflare(call, CF_MODEL_MAIN),
       () => tryNvidia(call),
     ]
   } else if (route === 'bulk') {
@@ -398,6 +507,7 @@ export async function azureFetch(
       () => tryGroq(call, GROQ_MODEL_BULK),
       () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryGeminiFree(call, GEMINI_FREE_MODEL_LITE),
+      () => tryCloudflare(call, CF_MODEL_MAIN),
       () => tryNvidia(call),
     ]
   } else {
@@ -406,6 +516,7 @@ export async function azureFetch(
       () => tryGroq(call, GROQ_MODEL_REASON_SMALL),
       () => tryGroq(call, GROQ_MODEL),
       () => tryGeminiFree(call, GEMINI_FREE_MODEL_LITE),
+      () => tryCloudflare(call, CF_MODEL_MAIN),
       () => tryNvidia(call),
     ]
   }
