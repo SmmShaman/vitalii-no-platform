@@ -46,10 +46,16 @@ that used to be optional: bright suits time-saved / clicks-removed / chaos →
 order stories, which is nearly every feature; dark only ever fit internal
 plumbing where the viewer IS a developer.
 
-**Known dark debt (2026-08-26):** j28, j29, j30, j31 already have dark clips on
-R2 and have already been posted. They are rebuild candidates on the same
-same-R2-key swap the lux wave uses — but they are NOT part of
-`feature_video_repost_queue` and need the owner's word before re-posting.
+**Dark debt cleared for j28–j31 (2026-08-26):** those four were rebuilt bright
+and swapped on the same R2 keys (`features/feature-<id>.mp4`), so the site and
+the already-published social posts now play the new clip without any DB change.
+Owner decision: **rebuild only, no repost** — they are deliberately NOT in
+`feature_video_repost_queue`, and no row was added to `feature_social_posts`.
+That leaves the old LinkedIn/Facebook posts pointing at the new video, which is
+the intended outcome.
+
+Remaining dark debt: the ~120 features still on v1 clips that the lux wave has
+not reached, tracked by the queue, not by this file.
 
 **Bright template rules (all owner rules above still apply):**
 

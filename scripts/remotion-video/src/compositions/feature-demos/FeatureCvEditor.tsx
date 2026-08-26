@@ -1,40 +1,85 @@
 /**
  * FeatureCvEditor — feature j28 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2) — rebuilt 2026-08-26 from the dark v1 clip.
  *
- * Story: the AI PDF parser mis-reads a date, fixing it means an external PDF
- * editor + re-upload + re-parse, 20 minutes wasted → ProfileEditor.tsx gives
- * 9 direct, expandable sections, drag-and-drop reordering, auto-saved to the
- * structured_content JSONB column → instantly available for form auto-fill
- * and cover letters, no re-parsing needed → 20 minutes down to 3 seconds.
+ * Story (4 beats):
+ *  1. Problem — the AI read the CV but got one date wrong; fixing it meant a
+ *     separate PDF editor, a re-upload and a full re-parse. ~20 minutes. Red.
+ *  2. Solution — the same fix inside the app: open the section, click the field,
+ *     type. 2 clicks, 3 seconds. Cursor does it on a real form mockup.
+ *  3. How it works — 9 sections → edit in place → saved the moment you stop
+ *     typing. One tech-credibility line (ProfileEditor.tsx, JSONB in Supabase).
+ *  4. Result — 20 minutes → 3 seconds, ≈400× faster. Green zone.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Badge, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  BrowserWindow,
+  StatPill,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  Cursor,
+  CheckBadge,
+  CaptionBand,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const PDF = { x: 90, y: 62, w: 230, h: 80, label: "AI PDF parser" };
-const EXTERNAL = { x: 400, y: 62, w: 230, h: 80, label: "external PDF editor" };
-const REUPLOAD = { x: 710, y: 62, w: 230, h: 80, label: "re-upload + re-parse" };
-const PDF_R: Pt = { x: PDF.x + PDF.w, y: PDF.y + PDF.h / 2 };
-const EXT_L: Pt = { x: EXTERNAL.x, y: EXTERNAL.y + EXTERNAL.h / 2 };
-const EXT_R: Pt = { x: EXTERNAL.x + EXTERNAL.w, y: EXTERNAL.y + EXTERNAL.h / 2 };
-const REUP_L: Pt = { x: REUPLOAD.x, y: REUPLOAD.y + REUPLOAD.h / 2 };
-
-const EDITOR = { x: 440, y: 220, w: 400, h: 100 };
-const EDITOR_T: Pt = { x: EDITOR.x + EDITOR.w / 2, y: EDITOR.y };
-const EDITOR_B: Pt = { x: EDITOR.x + EDITOR.w / 2, y: EDITOR.y + EDITOR.h };
-
-const SECTIONS = [
-  { x: 120, y: 380, w: 190, h: 66, label: "Work Experience" },
-  { x: 340, y: 380, w: 190, h: 66, label: "Education" },
-  { x: 560, y: 380, w: 190, h: 66, label: "Skills" },
-  { x: 780, y: 380, w: 190, h: 66, label: "+ 6 more" },
-];
-const SEC_T: Pt[] = SECTIONS.map((s) => ({ x: s.x + s.w / 2, y: s.y }));
-
-const JSONB = { x: 490, y: 500, w: 300, h: 90 };
-const JSONB_T: Pt = { x: JSONB.x + JSONB.w / 2, y: JSONB.y };
+/** One collapsible CV section row in the editor mockup. */
+const SectionRow: React.FC<{
+  y: number;
+  emoji: string;
+  label: string;
+  value: string;
+  opacity?: number;
+  highlight?: number;
+  fixed?: number;
+}> = ({ y, emoji, label, value, opacity = 1, highlight = 0, fixed = 0 }) => {
+  if (opacity <= 0.004) return null;
+  const bg = highlight > 0.02 ? `rgba(37,99,235,${0.06 + 0.06 * highlight})` : "transparent";
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 18,
+        top: y,
+        width: 664,
+        height: 44,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "0 14px",
+        borderRadius: 8,
+        background: bg,
+        border: `1px solid ${highlight > 0.02 ? B.accent : B.border}`,
+        opacity,
+        fontFamily,
+        boxSizing: "border-box",
+      }}
+    >
+      <span style={{ fontSize: 19 }}>{emoji}</span>
+      <span style={{ fontSize: 17, fontWeight: 700, color: B.ink, width: 190 }}>{label}</span>
+      <span
+        style={{
+          fontSize: 17,
+          fontWeight: 600,
+          color: fixed > 0.5 ? B.success : B.muted,
+          flex: 1,
+        }}
+      >
+        {fixed > 0.5 ? value.replace("2021", "2019") : value}
+      </span>
+      <span style={{ fontSize: 15, color: B.muted, opacity: 0.7 }}>▾</span>
+    </div>
+  );
+};
 
 export const FeatureCvEditor: React.FC = () => {
   const frame = useCurrentFrame();
@@ -43,136 +88,211 @@ export const FeatureCvEditor: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // ── Beat 1 (0–116): a bad date fix means external editor + re-upload, 20 minutes ──
-  const pdfOp = appear(6) * lf;
-  const extOp = appear(16) * lf;
-  const reupOp = appear(26) * lf;
-  const pdfLit = interpolate(frame, [6, 28, 96, 116], [0, 0.45, 0.45, 0.12], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const t1a = seg(frame, 34, 58);
-  const t1aVis = frame >= 34 && frame < 80 ? 1 : 0;
-  const t1b = seg(frame, 40, 64);
-  const t1bVis = frame >= 40 && frame < 86 ? 1 : 0;
-  const clockPillIn = seg(frame, 60, 82, Easing.out(Easing.cubic));
-  const clockPillOp = clockPillIn * interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap1In = seg(frame, 24, 46, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
+  // ── Beat windows (same rhythm as the j26 reference) ────────────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
 
-  // ── Beat 2 (128–236): ProfileEditor.tsx — 9 direct sections ──
-  const editorOp = appear(134, 18) * lf;
-  const editorLit = interpolate(frame, [134, 156, 330, 350], [0, 0.75, 0.75, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const tSec = SECTIONS.map((_, i) => seg(frame, 156 + i * 8, 178 + i * 8));
-  const tSecVis = SECTIONS.map((_, i) => (frame >= 156 + i * 8 && frame < 210 ? 1 : 0));
-  const secOp = SECTIONS.map((_, i) => appear(164 + i * 8, 14) * lf);
-  const secLit = SECTIONS.map((_, i) =>
-    interpolate(frame, [164 + i * 8, 186 + i * 8, 330, 350], [0, 0.6, 0.6, 0.16], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }) * lf,
+  // ── Beat 1: the problem ───────────────────────────────────────────
+  const noteOp = seg(frame, 26, 42, Easing.out(Easing.cubic));
+  const pill1 = pop(48);
+  const pill2 = pop(60);
+  const pill3 = pop(72);
+  // the wrong date pulses red inside the PDF mockup
+  const wrongPulse = 0.5 + 0.5 * Math.sin((frame - 14) / 5);
+
+  // ── Beat 2: the solution ──────────────────────────────────────────
+  const editorIn = seg(frame, 126, 140, Easing.out(Easing.cubic));
+  const rowIn = (i: number) => seg(frame, 134 + i * 5, 146 + i * 5, Easing.out(Easing.cubic));
+  const openRow = seg(frame, 158, 170, Easing.inOut(Easing.cubic));
+  const fixed = seg(frame, 190, 198);
+  const cx = interpolate(frame, [128, 152, 168, 186, 210], [660, 300, 470, 470, 900], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cy = interpolate(frame, [128, 152, 168, 186, 210], [420, 268, 268, 268, 420], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cursorOp = seg(frame, 128, 136) * (1 - seg(frame, 210, 222));
+  const click1 = seg(frame, 152, 164, Easing.out(Easing.quad));
+  const click2 = seg(frame, 186, 198, Easing.out(Easing.quad));
+  const savedIn = pop(200);
+  const cap2 = seg(frame, 204, 218, Easing.out(Easing.cubic));
+
+  // ── Beat 3: how it works ──────────────────────────────────────────
+  const card1 = pop(252);
+  const card2 = pop(272);
+  const card3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+
+  // ── Beat 4: the result ────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const speedX = Math.round(
+    interpolate(frame, [384, 414], [1, 400], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }),
   );
-  const dragPillIn = seg(frame, 196, 218, Easing.out(Easing.cubic));
-  const dragPillOp = dragPillIn * interpolate(frame, [222, 242], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap2In = seg(frame, 160, 182, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [222, 242], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
-
-  // ── Beat 3 (246–340): auto-saved to structured_content JSONB, instantly reused ──
-  const tJ = SECTIONS.map((_, i) => seg(frame, 252 + i * 4, 276 + i * 4));
-  const tJVis = SECTIONS.map((_, i) => (frame >= 252 + i * 4 && frame < 300 ? 1 : 0));
-  const jsonbOp = appear(266, 18) * lf;
-  const jsonbLit = interpolate(frame, [274, 296, 330, 350], [0, 0.75, 0.75, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const usePillIn = seg(frame, 280, 302, Easing.out(Easing.cubic));
-  const usePillOp = usePillIn * interpolate(frame, [316, 336], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap3In = seg(frame, 262, 284, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [316, 336], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
-
-  // ── Beat 4 (346–450): result ──
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
-  const metricOp = seg(frame, 358, 380, Easing.out(Easing.cubic)) * lf;
+  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      <Connector pts={[PDF_R, EXT_L]} color={T.danger} width={2.5} progress={t1a} opacity={0.8 * t1aVis * lf} />
-      <Connector pts={[EXT_R, REUP_L]} color={T.danger} width={2.5} progress={t1b} opacity={0.8 * t1bVis * lf} />
-      {SEC_T.map((p, i) => (
-        <Connector key={i} pts={[EDITOR_B, p]} color={T.accent} width={2} progress={tSec[i]} opacity={0.7 * tSecVis[i] * lf} />
-      ))}
-      {SECTIONS.map((s, i) => (
-        <Connector key={i} pts={[{ x: s.x + s.w / 2, y: s.y + s.h }, JSONB_T]} color={T.success} width={1.8} progress={tJ[i]} opacity={0.5 * tJVis[i] * lf} />
-      ))}
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="The AI read your CV — and got" accentText="one date wrong" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <BrowserWindow x={80} y={116} w={700} h={452} title="cv-vitalii-berbeha.pdf — read-only" opacity={Math.min(1, pop(8))}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: B.ink }}>Vitalii Berbeha</div>
+            <div style={{ fontSize: 17, fontWeight: 600, color: B.muted, marginTop: 6 }}>Full-stack developer · Gjøvik, Norway</div>
+            <div style={{ height: 1, background: B.border, margin: "20px 0" }} />
+            <div style={{ fontSize: 18, fontWeight: 800, color: B.ink, letterSpacing: 0.5 }}>WORK EXPERIENCE</div>
+            <div style={{ marginTop: 16, fontSize: 18, fontWeight: 700, color: B.ink }}>Frontend Developer · TechCorp</div>
+            <div
+              style={{
+                display: "inline-block",
+                marginTop: 8,
+                padding: "5px 12px",
+                borderRadius: 7,
+                fontSize: 18,
+                fontWeight: 800,
+                color: B.danger,
+                background: B.dangerBg,
+                border: `2px solid rgba(220,47,62,${0.35 + 0.5 * wrongPulse})`,
+              }}
+            >
+              2021 – 2023 ← wrong, it was 2019
+            </div>
+            <div style={{ marginTop: 22, fontSize: 18, fontWeight: 700, color: B.ink }}>Support Engineer · DataSolve</div>
+            <div style={{ marginTop: 8, fontSize: 18, fontWeight: 650, color: B.muted }}>2017 – 2019</div>
+            <div style={{ marginTop: 26, height: 10, width: "82%", borderRadius: 5, background: B.chipBg }} />
+            <div style={{ marginTop: 10, height: 10, width: "64%", borderRadius: 5, background: B.chipBg }} />
+          </div>
+        </BrowserWindow>
+        <StickyNote
+          x={830}
+          y={150}
+          w={350}
+          opacity={noteOp}
+          text="To fix one date: open a PDF editor, find it, retype it, re-upload, wait for the whole CV to be read again"
+        />
+        <StatPill x={846} y={356} emoji="🧾" text="A separate PDF editor" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+        <StatPill x={846} y={418} emoji="🔁" text="Re-upload + full re-parse" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+        <StatPill x={846} y={480} emoji="⏱️" text="~20 minutes gone" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
+        <CaptionBand text="A near-perfect CV you cannot touch is still a broken CV" tone="danger" opacity={seg(frame, 32, 48)} />
+      </Group>
 
-      <SchemaNode {...PDF} state="idle" lit={pdfLit} opacity={pdfOp} label={PDF.label} fontSize={18} />
-      <SchemaNode {...EXTERNAL} state="danger" lit={0.4 * extOp * lf} opacity={extOp} label={EXTERNAL.label} fontSize={17} />
-      <SchemaNode {...REUPLOAD} state="danger" lit={0.4 * reupOp * lf} opacity={reupOp} label={REUPLOAD.label} fontSize={17} />
-      <Token pts={[PDF_R, EXT_L]} t={t1a} color={T.danger} opacity={t1aVis * lf} />
-      <Token pts={[EXT_R, REUP_L]} t={t1b} color={T.danger} opacity={t1bVis * lf} />
-      <Pill x={REUPLOAD.x - 40} y={REUPLOAD.y + REUPLOAD.h + 14} dx={(1 - clockPillIn) * 40} text="a single date fix: 20 minutes" color={T.danger} opacity={clockPillOp} fontSize={17} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="Now you just" accentText="click the field and type" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <BrowserWindow x={110} y={150} w={700} h={402} title="jobbot — my profile · 9 sections" opacity={editorIn}>
+          <SectionRow y={16} emoji="👤" label="Personal info" value="Vitalii Berbeha · Gjøvik" opacity={rowIn(0)} />
+          <SectionRow
+            y={68}
+            emoji="💼"
+            label="Work experience"
+            value="TechCorp · 2021 – 2023"
+            opacity={rowIn(1)}
+            highlight={openRow}
+            fixed={fixed}
+          />
+          <SectionRow y={120} emoji="🎓" label="Education" value="NTNU · Bachelor" opacity={rowIn(2)} />
+          <SectionRow y={172} emoji="🗣️" label="Languages" value="NO · EN · UA" opacity={rowIn(3)} />
+          <SectionRow y={224} emoji="🧩" label="Skills" value="React · TypeScript · SQL" opacity={rowIn(4)} />
+          <SectionRow y={276} emoji="🏅" label="Certificates" value="3 entries" opacity={rowIn(5)} />
+          <div
+            style={{
+              position: "absolute",
+              left: 18,
+              top: 330,
+              width: 664,
+              textAlign: "center",
+              fontSize: 16,
+              fontWeight: 600,
+              color: B.muted,
+              opacity: rowIn(6) * 0.9,
+              fontFamily,
+            }}
+          >
+            …plus Projects, Courses and References — 9 sections in total
+          </div>
+        </BrowserWindow>
+        <StatPill x={866} y={214} emoji="🖱️" text="2 clicks" tone="success" scale={savedIn} opacity={Math.min(1, savedIn)} />
+        <StatPill x={866} y={276} emoji="⏱️" text="3 seconds" tone="success" scale={savedIn} opacity={Math.min(1, savedIn)} />
+        <StatPill x={866} y={338} emoji="💾" text="Saved automatically" tone="success" scale={savedIn} opacity={Math.min(1, savedIn)} />
+        <Cursor x={cx} y={cy} opacity={cursorOp} click={Math.max(click1 % 1, click2 % 1)} />
+        <CaptionBand text="No PDF editor, no re-upload, no waiting for the CV to be read again" tone="accent" opacity={cap2} />
+      </Group>
 
-      <SchemaNode {...EDITOR} state="accent" lit={editorLit} opacity={editorOp} label="ProfileEditor.tsx" fontSize={24}>
-        <div style={{ fontSize: 14, color: T.muted, fontWeight: 500, marginTop: 2 }}>9 expandable sections</div>
-      </SchemaNode>
+      {/* ════ Beat 3 — HOW IT WORKS ════ */}
+      <Group opacity={b3}>
+        <Headline text="Every part of the CV" accentText="under your control" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        <IconCard x={110} y={218} w={300} emoji="🗂️" title="9 expandable sections" sub="from contacts to references" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
+        <IconCard x={490} y={218} w={300} emoji="✏️" title="Edit right where you read" sub="add, reorder or delete a line" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
+        <IconCard x={870} y={218} w={300} emoji="💾" title="Saved the moment you stop" sub="and reused in every application" tone="success" scale={card3} opacity={Math.min(1, card3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="Under the hood: ProfileEditor.tsx, a React 19 component keeping the whole CV as JSONB in Supabase"
+          opacity={cap3}
+          fontSize={21}
+          y={580}
+        />
+      </Group>
 
-      {SECTIONS.map((s, i) => (
-        <SchemaNode key={s.label} {...s} state="accent" lit={secLit[i]} opacity={secOp[i]} label={s.label} fontSize={15} />
-      ))}
-      {SEC_T.map((p, i) => (
-        <Token key={i} pts={[EDITOR_B, p]} t={tSec[i]} opacity={tSecVis[i] * lf} size={10} />
-      ))}
-      <Pill x={SECTIONS[0].x - 20} y={SECTIONS[0].y - 46} dx={(1 - dragPillIn) * 40} text="drag & drop reordering" color={T.accent} opacity={dragPillOp} fontSize={16} />
-
-      <SchemaNode {...JSONB} state="success" lit={jsonbLit} opacity={jsonbOp} label="structured_content" fontSize={19}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>Supabase JSONB, auto-saved</div>
-      </SchemaNode>
-      <Pill x={JSONB.x - 60} y={JSONB.y + JSONB.h + 14} text="→ form auto-fill · cover letters" color={T.success} opacity={usePillOp} fontSize={16} />
-
-      <Caption x={90} y={648} w={1100} text="A wrong date means an external editor and a 20-minute re-upload cycle" color={T.danger} opacity={cap1} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="9 sections, direct edit — add, reorder, delete right inside the app" color={T.text} opacity={cap2} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Every change auto-saves — no backend re-parsing needed, ever" color={T.success} opacity={cap3} fontSize={22} weight={600} />
-
-      <div style={{ position: "absolute", left: 0, top: 598, width: 1280, textAlign: "center", opacity: metricOp }}>
-        <div style={{ fontSize: 22, fontWeight: 600, color: T.muted }}>20 minutes → 3 seconds, 2 clicks</div>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>~20 minutes</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>to fix one date</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>3 seconds</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>2 clicks, in the app</div>
+          </div>
+        </Panel>
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
+            position: "absolute",
+            left: 0,
+            top: 424,
+            width: 1280,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
+            gap: 20,
+            opacity: speedOp,
+            fontFamily,
           }}
         >
-          ✓
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>≈{speedX}× faster</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>Instant sync — no re-parsing, ever again</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            Add a language in 5 seconds. Every fix carries into the next application.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>JobBot · vitalii.no</div>
+        </div>
+      </Group>
+    </div>
   );
 };

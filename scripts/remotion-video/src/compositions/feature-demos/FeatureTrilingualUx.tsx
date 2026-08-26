@@ -1,39 +1,88 @@
 /**
  * FeatureTrilingualUx — feature j29 — 1280x720, 15s @ 30fps, silent, loop-friendly.
+ * BRIGHT INFOGRAPHIC template (v2) — rebuilt 2026-08-26 from the dark v1 clip.
  *
- * Story: Ukrainians in Norway split across NO/EN/UA — hardcoding one
- * language alienates 66% of users, and if the choice doesn't persist the
- * platform feels broken → translations.ts (~200 keys) + LanguageContext +
- * preferred_analysis_language in Supabase user_settings → the flag switcher
- * propagates into job_analyzer's AI output AND the Telegram bot → one
- * choice, consistent everywhere, 100% linguistic coverage.
+ * Story (4 beats):
+ *  1. Problem — JobBot's users are Ukrainians in Norway: some think in Norwegian,
+ *     some in English, many prefer Ukrainian. Pick one and you lose most of them.
+ *     Worse, a choice that doesn't follow you to the next device feels broken.
+ *  2. Solution — one switch. The interface, the AI's job analysis and the Telegram
+ *     alerts all change language together, on every device you sign in from.
+ *  3. How it works — ~200 phrases × 3 languages → the choice is stored on your
+ *     account → everything that talks to you reads it. Tech line: LanguageContext
+ *     + Supabase user_settings.
+ *  4. Result — before: English only, re-picked on every login. Now: 1 switch,
+ *     3 languages, everywhere. 600 translated phrases.
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Badge, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
+import { B } from "./bright-theme";
+import {
+  LightBg,
+  Group,
+  Headline,
+  Panel,
+  BrowserWindow,
+  FilterChip,
+  StatPill,
+  IconCard,
+  FlowArrow,
+  StickyNote,
+  Cursor,
+  CheckBadge,
+  CaptionBand,
+  seg,
+  loopFade,
+  fontFamily,
+} from "./bright-primitives";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const FLAGS = [
-  { x: 150, y: 62, w: 190, h: 78, label: "🇳🇴 Norsk" },
-  { x: 545, y: 62, w: 190, h: 78, label: "🇬🇧 English" },
-  { x: 940, y: 62, w: 190, h: 78, label: "🇺🇦 Українська" },
-];
-const FLAGS_B: Pt[] = FLAGS.map((f) => ({ x: f.x + f.w / 2, y: f.y + f.h }));
+/** The three phrasings of the same screen line, one per language. */
+const COPY = {
+  no: { title: "Nye jobber for deg", sub: "5 treff · sortert etter poengsum", cta: "Søk nå", bell: "Varsel sendt på Telegram" },
+  en: { title: "New jobs for you", sub: "5 matches · sorted by score", cta: "Apply now", bell: "Alert sent on Telegram" },
+  ua: { title: "Нові вакансії для вас", sub: "5 збігів · за рейтингом", cta: "Подати заявку", bell: "Сповіщення в Telegram" },
+} as const;
 
-const CTX = { x: 490, y: 200, w: 300, h: 90 };
-const CTX_T: Pt = { x: CTX.x + CTX.w / 2, y: CTX.y };
-const CTX_B: Pt = { x: CTX.x + CTX.w / 2, y: CTX.y + CTX.h };
+type Lang = keyof typeof COPY;
 
-const SETTINGS = { x: 490, y: 340, w: 300, h: 90 };
-const SETTINGS_T: Pt = { x: SETTINGS.x + SETTINGS.w / 2, y: SETTINGS.y };
-const SETTINGS_L: Pt = { x: SETTINGS.x, y: SETTINGS.y + SETTINGS.h / 2 };
-const SETTINGS_R: Pt = { x: SETTINGS.x + SETTINGS.w, y: SETTINGS.y + SETTINGS.h / 2 };
-
-const ANALYZER = { x: 140, y: 480, w: 260, h: 90 };
-const BOT = { x: 850, y: 480, w: 260, h: 90 };
-const ANALYZER_T: Pt = { x: ANALYZER.x + ANALYZER.w / 2, y: ANALYZER.y };
-const BOT_T: Pt = { x: BOT.x + BOT.w / 2, y: BOT.y };
+/** A person avatar card saying which language they think in. */
+const PersonCard: React.FC<{
+  x: number;
+  y: number;
+  emoji: string;
+  name: string;
+  line: string;
+  tone?: "danger" | "accent" | "success";
+  scale?: number;
+  opacity?: number;
+}> = ({ x, y, emoji, name, line, tone = "accent", scale = 1, opacity = 1 }) => {
+  if (opacity <= 0.004) return null;
+  const c = tone === "danger" ? B.danger : tone === "success" ? B.success : B.accent;
+  const bg = tone === "danger" ? B.dangerBg : tone === "success" ? B.successBg : B.accentBg;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        width: 300,
+        padding: "20px 22px",
+        borderRadius: 14,
+        background: bg,
+        border: `1.5px solid ${c}33`,
+        transform: `scale(${0.88 + 0.12 * Math.min(1, scale)})`,
+        transformOrigin: "center",
+        opacity,
+        fontFamily,
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ fontSize: 34 }}>{emoji}</div>
+      <div style={{ fontSize: 20, fontWeight: 800, color: B.ink, marginTop: 8 }}>{name}</div>
+      <div style={{ fontSize: 17, fontWeight: 600, color: c, marginTop: 6, lineHeight: 1.35 }}>{line}</div>
+    </div>
+  );
+};
 
 export const FeatureTrilingualUx: React.FC = () => {
   const frame = useCurrentFrame();
@@ -42,139 +91,200 @@ export const FeatureTrilingualUx: React.FC = () => {
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
-  // ── Beat 1 (0–116): 3 languages, one hardcoded choice alienates 66% ──
-  const flagOp = FLAGS.map((_, i) => appear(6 + i * 10) * lf);
-  const flagLit = FLAGS.map((_, i) =>
-    interpolate(frame, [6 + i * 10, 30 + i * 10, 96, 116], [0, 0.4, 0.4, 0.12], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }) * lf,
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
+  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
+  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
+  const b4 = seg(frame, 340, 354) * lf;
+
+  // ── Beat 1: three people, one interface ───────────────────────────
+  const p1 = pop(14);
+  const p2 = pop(28);
+  const p3 = pop(42);
+  const noteOp = seg(frame, 58, 74, Easing.out(Easing.cubic));
+
+  // ── Beat 2: one switch changes everything ─────────────────────────
+  // Which language the mockup is showing right now.
+  const lang: Lang = frame < 168 ? "en" : frame < 200 ? "no" : "ua";
+  const chipOn = (l: Lang) => (lang === l ? 1 : 0.35);
+  const winIn = seg(frame, 128, 142, Easing.out(Easing.cubic));
+  // a quick flash when the copy swaps, so the change is unmissable
+  const swapFlash = Math.max(seg(frame, 168, 176) * (1 - seg(frame, 176, 186)), seg(frame, 200, 208) * (1 - seg(frame, 208, 218)));
+  const cx = interpolate(frame, [130, 160, 172, 196, 216], [660, 452, 452, 604, 900], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cy = interpolate(frame, [130, 160, 172, 196, 216], [420, 160, 160, 160, 420], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cursorOp = seg(frame, 130, 138) * (1 - seg(frame, 216, 226));
+  const click1 = seg(frame, 162, 174, Easing.out(Easing.quad));
+  const click2 = seg(frame, 194, 206, Easing.out(Easing.quad));
+  const cap2 = seg(frame, 206, 220, Easing.out(Easing.cubic));
+
+  // ── Beat 3: how it works ──────────────────────────────────────────
+  const card1 = pop(252);
+  const card2 = pop(272);
+  const card3 = pop(292);
+  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
+  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
+  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+
+  // ── Beat 4: the result ────────────────────────────────────────────
+  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
+  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
+  const afterIn = pop(372);
+  const phrases = Math.round(
+    interpolate(frame, [384, 414], [0, 600], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }),
   );
-  const alienPillIn = seg(frame, 50, 72, Easing.out(Easing.cubic));
-  const alienPillOp = alienPillIn * interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const alienPillDx = (1 - alienPillIn) * 40;
-  const cap1In = seg(frame, 24, 46, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [96, 116], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
+  const phrasesOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
+  const check = pop(392);
+  const footOp = seg(frame, 402, 418);
 
-  // ── Beat 2 (128–232): LanguageContext + user_settings persist the pick ──
-  const tF = FLAGS_B.map((_, i) => seg(frame, 130 + i * 6, 154 + i * 6));
-  const tFVis = FLAGS_B.map((_, i) => (frame >= 130 + i * 6 && frame < 180 ? 1 : 0));
-  const ctxOp = appear(150, 18) * lf;
-  const ctxLit = interpolate(frame, [150, 172, 330, 350], [0, 0.7, 0.7, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const tCs = seg(frame, 176, 200);
-  const tCsVis = frame >= 176 && frame < 222 ? 1 : 0;
-  const settingsOp = appear(190, 18) * lf;
-  const settingsLit = interpolate(frame, [198, 220, 330, 350], [0, 0.7, 0.7, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const keysPillIn = seg(frame, 158, 180, Easing.out(Easing.cubic));
-  const keysPillOp = keysPillIn * interpolate(frame, [222, 242], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap2In = seg(frame, 158, 180, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [222, 242], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
-
-  // ── Beat 3 (246–340): propagates to AI analysis AND Telegram bot ──
-  const tSa = seg(frame, 250, 274);
-  const tSaVis = frame >= 250 && frame < 300 ? 1 : 0;
-  const tSb = seg(frame, 256, 280);
-  const tSbVis = frame >= 256 && frame < 306 ? 1 : 0;
-  const analyzerOp = appear(266, 18) * lf;
-  const botOp = appear(272, 18) * lf;
-  const analyzerLit = interpolate(frame, [274, 296, 330, 350], [0, 0.65, 0.65, 0.18], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const botLit = interpolate(frame, [280, 302, 330, 350], [0, 0.65, 0.65, 0.18], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const langParamPillIn = seg(frame, 284, 306, Easing.out(Easing.cubic));
-  const langParamPillOp = langParamPillIn * interpolate(frame, [316, 336], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const cap3In = seg(frame, 264, 286, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [316, 336], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
-
-  // ── Beat 4 (346–450): result ──
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
-  const metricOp = seg(frame, 358, 380, Easing.out(Easing.cubic)) * lf;
+  const c = COPY[lang];
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+      <LightBg />
 
-      {FLAGS_B.map((p, i) => (
-        <Connector key={i} pts={[p, CTX_T]} color={T.accent} width={2.5} progress={tF[i]} opacity={0.8 * tFVis[i] * lf} />
-      ))}
-      <Connector pts={[CTX_B, SETTINGS_T]} color={T.accent} width={2.5} progress={tCs} opacity={0.8 * tCsVis * lf} />
-      <Connector pts={[SETTINGS_L, ANALYZER_T]} color={T.success} width={2.5} progress={tSa} opacity={0.8 * tSaVis * lf} />
-      <Connector pts={[SETTINGS_R, BOT_T]} color={T.success} width={2.5} progress={tSb} opacity={0.8 * tSbVis * lf} />
+      {/* ════ Beat 1 — PROBLEM ════ */}
+      <Group opacity={b1}>
+        <Headline text="Same app, three people," accentText="three languages" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
+        <PersonCard x={90} y={166} emoji="🧭" name="Ola" line="Reads Norwegian at work — bokmål or nothing" tone="accent" scale={p1} opacity={Math.min(1, p1)} />
+        <PersonCard x={490} y={166} emoji="💻" name="Sam" line="Works in English, moved here last year" tone="accent" scale={p2} opacity={Math.min(1, p2)} />
+        <PersonCard x={890} y={166} emoji="🌻" name="Oksana" line="Thinks in Ukrainian, job-hunting in Norway" tone="accent" scale={p3} opacity={Math.min(1, p3)} />
+        <StickyNote
+          x={330}
+          y={392}
+          w={620}
+          opacity={noteOp}
+          rotate={-1}
+          text="Hardcode one language and you lose the other two. And if the choice doesn't follow you to your phone, the app feels broken every time you sign in."
+        />
+        <CaptionBand text="A job hunt is stressful enough without reading it in your third-best language" tone="danger" opacity={seg(frame, 78, 94)} />
+      </Group>
 
-      {FLAGS.map((f, i) => (
-        <SchemaNode key={f.label} {...f} state="idle" lit={flagLit[i]} opacity={flagOp[i]} label={f.label} fontSize={22} />
-      ))}
-      <Pill x={FLAGS[1].x - 30} y={FLAGS[1].y + FLAGS[1].h + 14} dx={alienPillDx} text="hardcoding one alienates 66% of users" color={T.danger} opacity={alienPillOp} fontSize={17} />
+      {/* ════ Beat 2 — SOLUTION ════ */}
+      <Group opacity={b2}>
+        <Headline text="One switch —" accentText="everything follows" accentColor={B.success} opacity={seg(frame, 116, 130)} />
+        <FilterChip x={452} y={140} text="EN" scale={1} opacity={winIn * chipOn("en")} />
+        <FilterChip x={556} y={140} text="NO" scale={1} opacity={winIn * chipOn("no")} />
+        <FilterChip x={660} y={140} text="UA" scale={1} opacity={winIn * chipOn("ua")} />
+        <BrowserWindow x={150} y={208} w={620} h={352} title="jobbot — dashboard" opacity={winIn}>
+          <div style={{ padding: "24px 28px", fontFamily, position: "relative" }}>
+            <div
+              style={{
+                position: "absolute",
+                inset: -24,
+                background: B.accent,
+                opacity: swapFlash * 0.1,
+                borderRadius: 12,
+              }}
+            />
+            <div style={{ fontSize: 30, fontWeight: 800, color: B.ink }}>{c.title}</div>
+            <div style={{ fontSize: 19, fontWeight: 600, color: B.muted, marginTop: 8 }}>{c.sub}</div>
+            <div style={{ height: 1, background: B.border, margin: "20px 0" }} />
+            <div style={{ fontSize: 20, fontWeight: 700, color: B.ink }}>Frontend Developer · TechCorp</div>
+            <div style={{ fontSize: 17, fontWeight: 600, color: B.muted, marginTop: 6 }}>Gjøvik · 92 / 100</div>
+            <div
+              style={{
+                display: "inline-block",
+                marginTop: 20,
+                padding: "10px 22px",
+                borderRadius: 10,
+                background: B.accent,
+                color: "#fff",
+                fontSize: 19,
+                fontWeight: 800,
+              }}
+            >
+              {c.cta}
+            </div>
+          </div>
+        </BrowserWindow>
+        <Panel x={812} y={228} w={340} h={132} tone="accent" opacity={winIn}>
+          <div style={{ padding: "20px 22px", fontFamily }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: B.accent, letterSpacing: 0.8 }}>TELEGRAM</div>
+            <div style={{ fontSize: 20, fontWeight: 700, color: B.ink, marginTop: 10, lineHeight: 1.3 }}>🔔 {c.bell}</div>
+          </div>
+        </Panel>
+        <Panel x={812} y={384} w={340} h={176} tone="success" opacity={winIn}>
+          <div style={{ padding: "20px 22px", fontFamily }}>
+            <div style={{ fontSize: 16, fontWeight: 700, color: B.success, letterSpacing: 0.8 }}>AI ANALYSIS</div>
+            <div style={{ fontSize: 18, fontWeight: 650, color: B.ink, marginTop: 10, lineHeight: 1.35 }}>
+              {lang === "no" ? "Fordeler og ulemper skrevet på norsk" : lang === "ua" ? "Плюси й мінуси — українською" : "Pros and cons written in English"}
+            </div>
+          </div>
+        </Panel>
+        <Cursor x={cx} y={cy} opacity={cursorOp} click={Math.max(click1 % 1, click2 % 1)} />
+        <CaptionBand text="Interface, AI verdict and Telegram alerts — all three switch together" tone="accent" opacity={cap2} />
+      </Group>
 
-      <SchemaNode {...CTX} state="accent" lit={ctxLit} opacity={ctxOp} label="LanguageContext" fontSize={20}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>React Context, ~200 keys</div>
-      </SchemaNode>
-      {FLAGS_B.map((_, i) => (
-        <Token key={i} pts={[FLAGS_B[i], CTX_T]} t={tF[i]} opacity={tFVis[i] * lf} />
-      ))}
-      <Pill x={CTX.x - 30} y={CTX.y - 46} text="translations.ts en / no / uk" color={T.accent} opacity={keysPillOp} fontSize={16} />
+      {/* ════ Beat 3 — HOW IT WORKS ════ */}
+      <Group opacity={b3}>
+        <Headline text="Chosen once," accentText="remembered everywhere" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
+        {/* 🌐 not 🗣️ — the speaking-head glyph renders as the same grey bust as 👤
+            in headless Chrome, and two identical icons side by side read as a bug. */}
+        <IconCard x={110} y={218} w={300} emoji="🌐" title="~200 phrases, 3 languages" sub="Norwegian · English · Ukrainian" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
+        <IconCard x={490} y={218} w={300} emoji="👤" title="Saved to your account" sub="not to this one browser" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
+        <IconCard x={870} y={218} w={300} emoji="📱" title="Same on laptop and phone" sub="sign in anywhere, it follows" tone="success" scale={card3} opacity={Math.min(1, card3)} />
+        <FlowArrow x={412} y={262} len={76} progress={arr1} />
+        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
+        <CaptionBand
+          text="Under the hood: a React LanguageContext reading one field in Supabase user_settings — the AI Edge Function reads it too"
+          opacity={cap3}
+          fontSize={20}
+          y={580}
+        />
+      </Group>
 
-      <SchemaNode {...SETTINGS} state="accent" lit={settingsLit} opacity={settingsOp} label="user_settings" fontSize={20}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>preferred_analysis_language</div>
-      </SchemaNode>
-      <Token pts={[CTX_B, SETTINGS_T]} t={tCs} opacity={tCsVis * lf} />
-
-      <SchemaNode {...ANALYZER} state="success" lit={analyzerLit} opacity={analyzerOp} label="job-analyzer" fontSize={20}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>Deno Edge Function</div>
-      </SchemaNode>
-      <SchemaNode {...BOT} state="success" lit={botLit} opacity={botOp} label="Telegram bot" fontSize={20}>
-        <div style={{ fontSize: 12, color: T.muted, fontWeight: 500, marginTop: 2 }}>localized notifications</div>
-      </SchemaNode>
-      <Token pts={[SETTINGS_L, ANALYZER_T]} t={tSa} color={T.success} opacity={tSaVis * lf} />
-      <Token pts={[SETTINGS_R, BOT_T]} t={tSb} color={T.success} opacity={tSbVis * lf} />
-      <Pill x={SETTINGS.x - 10} y={SETTINGS.y + SETTINGS.h + 14} text="language param passed end-to-end" color={T.success} opacity={langParamPillOp} fontSize={16} />
-
-      <Caption x={90} y={648} w={1100} text="Hardcoding one language would alienate 66% of a trilingual audience" color={T.danger} opacity={cap1} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="One flag switch, persisted cross-device via Supabase user_settings" color={T.text} opacity={cap2} fontSize={22} weight={600} />
-      <Caption x={90} y={648} w={1100} text="Same choice drives AI analysis output and Telegram notifications too" color={T.success} opacity={cap3} fontSize={22} weight={600} />
-
-      <div style={{ position: "absolute", left: 0, top: 598, width: 1280, textAlign: "center", opacity: metricOp }}>
-        <div style={{ fontSize: 22, fontWeight: 600, color: T.muted }}>UI, AI, Telegram — one setting, always in sync</div>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
-        }}
-      >
+      {/* ════ Beat 4 — RESULT ════ */}
+      <Group opacity={b4}>
+        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
+        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
+          <div style={{ padding: "26px 30px", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>1 language</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>re-picked every login</div>
+          </div>
+        </Panel>
+        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
+        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
+          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
+            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>3 languages</div>
+            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>one switch, everywhere</div>
+          </div>
+        </Panel>
         <div
           style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
+            position: "absolute",
+            left: 0,
+            top: 424,
+            width: 1280,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
+            gap: 20,
+            opacity: phrasesOp,
+            fontFamily,
           }}
         >
-          ✓
+          <div style={{ position: "relative", width: 52, height: 52 }}>
+            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          </div>
+          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>{phrases} phrases translated</span>
         </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>100% linguistic coverage, every device</div>
-      </div>
-    </AbsoluteFill>
+        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
+          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
+            Even the AI's verdict on a job comes back in the language you chose.
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>JobBot · vitalii.no</div>
+        </div>
+      </Group>
+    </div>
   );
 };
