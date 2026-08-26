@@ -9,7 +9,7 @@ no matter the topic — the FIRST message of a session must report lux-wave prog
 one question:
 
 > Зроблено **N / <total>** фіч у новому стилі, залишилось **M**.
-> Черга LinkedIn: **K** постів до **<дата>**. Продовжуємо наступний батч? (так / ні)
+> Запасу яскравих кліпів: **R** фіч ≈ **R/2** днів (по 2 пости щодня). Продовжуємо наступний батч? (так / ні)
 
 - **"ні"** → do nothing about it. No prep, no counting, no subagents. Just do what the owner
   asked. This is an explicit token-saving order.
@@ -22,12 +22,18 @@ memory) with one command:
 ```bash
 ssh -i ~/.ssh/contabo_vps root@173.249.31.179 "docker exec portfolio-db psql -U postgres -t -A -F'|' \
  -c \"SELECT coalesce(demo_style,'(no clip)'), count(*) FROM features GROUP BY 1 ORDER BY 2 DESC;\" \
- -c \"SELECT status, count(*), min(scheduled_for), max(scheduled_for) FROM feature_video_repost_queue GROUP BY status;\""
+ -c \"SELECT 'runway_features', count(*) FROM features WHERE demo_style='bright' AND bright_posted_at IS NULL AND status='published';\""
 ```
 
-Lux-done = `count(*) WHERE demo_style = 'bright'` (since 2026-08-26 the DB tracks
-the style itself; the old "count the queue rows + j26" formula is retired and was
-already off by one). Remaining = everything `dark` plus everything with no clip.
+Lux-done = `count(*) WHERE demo_style = 'bright'`. Remaining = everything `dark`
+plus everything with no clip. **Runway** = bright features not yet posted; the
+publisher ships **2 a day**, so runway/2 = days of material left. Under ~14 the
+publisher itself starts warning in Telegram — a batch is overdue at that point.
+
+Retired formulas, do not resurrect: "count the queue rows + j26" (was already off
+by one), and reading the runway out of `feature_video_repost_queue` — since
+2026-08-26 the publisher draws from the whole `features` table and the queue only
+orders what is left in it.
 
 **How to actually do the work — read these before starting a batch:**
 
@@ -43,8 +49,16 @@ already off by one). Remaining = everything `dark` plus everything with no clip.
 Batch recipe: pick N features → dump rows to `out/lux-batchN-data.json` → N/2 subagents
 (`model: sonnet`, pointed at `lux-batch-instructions.md`) → render loop with auto-retry
 (~50 s/clip, `--timeout 120000`) → contact sheets to verify → scp to VPS → PUT to R2 on the
-SAME keys → INSERT into `feature_video_repost_queue` with dates → send the owner one md with
-all texts → commit the story files.
+SAME keys → **`UPDATE features SET demo_style='bright'`** for each id → commit the story files.
+
+Two steps of the old recipe are **gone**: do NOT insert into
+`feature_video_repost_queue` (the publisher no longer needs a row — `demo_style`
+alone makes a feature eligible), and do NOT write post texts in the batch (the
+publisher writes them on the day it posts). A batch now produces clips only.
+
+Batch size follows the publish rate: 2 posts/day = **14 clips/week** ≈ 1M Sonnet
+tokens/week. Rendering far ahead of that recreates the "texts and clips sitting
+for months" problem the owner killed on 2026-08-26.
 
 Full context: `~/.claude/memory-shared/portfolio_feature_demos_pipeline.md` and the newest
 `session_handoff_*.md`.

@@ -167,25 +167,56 @@ the oldest feature with no post regardless of style) is **PAUSED**
 It would have published j32 with a dark clip on 2026-08-27. Do not resume it —
 it has no style gate.
 
-### The single daily publisher
+### The single publisher — twice a day
 
-`task-1787348379037-luxrp1` (17:00 UTC, LinkedIn only, EN only). Its pre-task
-script joins `feature_video_repost_queue` to `features`, filters
-`demo_style = 'bright'`, and hands the agent up to **2 rows** (two = the queue is
-behind and is catching up). The agent then:
+`task-1787348379037-luxrp1`, cron **`0 8,20 * * *`** = **10:00 and 22:00
+Europe/Oslo**, one feature per run, **two features a day**. LinkedIn **and**
+Facebook, EN only.
 
-- writes the post text **from scratch** out of `problem_en` / `solution_en` /
-  `result_en` — `feature_video_repost_queue.post_text` is NULL on a pending row
-  and is only filled in *after* posting, with what was actually published;
+⏰ **nanoclaw parses cron in UTC** — the host orchestrator has no `TZ` in its
+environ and containers spawn with `-e TZ=UTC`, so `data/env/env`'s
+`TZ=Europe/Oslo` does *not* reach it. Oslo is UTC+2 on CEST, hence 08:00/20:00.
+**After the DST change on 2026-10-25 Oslo is UTC+1 and this cron must become
+`0 9,21 * * *`**, or the posts silently slide an hour earlier.
+
+The pre-task script selects from the **whole `features` table**, not the queue:
+
+```sql
+WHERE demo_style = 'bright' AND bright_posted_at IS NULL AND status = 'published'
+ORDER BY <the feature's pending queue row's scheduled_for> ASC NULLS LAST,
+         created_at ASC, feature_id ASC
+LIMIT 1
+```
+
+`feature_video_repost_queue` now only supplies the preferred **order** while it
+still has rows; `queue_id` comes back NULL for most features and that is normal,
+not an error. A second query returns `runway` — how many bright features are
+still owed a post — and the agent shouts in Telegram when that drops under 14
+(≈7 days at two a day).
+
+The agent then:
+
+- writes **two different texts**, on the spot, out of `problem_en` /
+  `solution_en` / `result_en`: 900–1400 chars for LinkedIn, 500–800 warmer chars
+  for Facebook. It is explicitly forbidden from reading
+  `feature_video_repost_queue.post_text`, which is NULL on a pending row and is
+  filled in *after* posting with what actually went out;
 - always links `https://vitalii.no/features/<slug_en>`, and additionally
   `https://www.youtube.com/watch?v=<youtube_video_id>` when that column is set;
 - posts native video through `nano-social-publish` and treats
   `ok:true, videoUsed:false` as a partial failure worth shouting about;
+- **stamps `features.bright_posted_at`** — that, not the queue, is what stops a
+  feature being picked twice. One platform failing still counts as published;
+  both failing leaves the column NULL so the next run retries;
 - never fails silently: a broken query wakes the agent with `data.debug` set and
   the instruction to send a Telegram warning instead of posting.
 
 The August texts that used to sit in the queue are backed up on the VPS at
 `/root/feature-demos/queue-post_text-backup-20260826.json`.
+
+**Render cadence must match:** two posts a day burns **14 clips/week**
+(≈1M Sonnet tokens/week at the measured ~70k per feature, ~50 s render each).
+A batch that lags behind that empties the runway.
 
 ### Closing the three-way loop
 
