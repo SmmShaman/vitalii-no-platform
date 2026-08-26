@@ -21,11 +21,13 @@ memory) with one command:
 
 ```bash
 ssh -i ~/.ssh/contabo_vps root@173.249.31.179 "docker exec portfolio-db psql -U postgres -t -A -F'|' \
- -c \"SELECT count(*), count(demo_media_url) FROM features;\" \
+ -c \"SELECT coalesce(demo_style,'(no clip)'), count(*) FROM features GROUP BY 1 ORDER BY 2 DESC;\" \
  -c \"SELECT status, count(*), min(scheduled_for), max(scheduled_for) FROM feature_video_repost_queue GROUP BY status;\""
 ```
 
-Lux-done = number of rows in `feature_video_repost_queue` (one row per reworked feature) + j26.
+Lux-done = `count(*) WHERE demo_style = 'bright'` (since 2026-08-26 the DB tracks
+the style itself; the old "count the queue rows + j26" formula is retired and was
+already off by one). Remaining = everything `dark` plus everything with no clip.
 
 **How to actually do the work — read these before starting a batch:**
 
