@@ -10,13 +10,15 @@
  */
 import React from "react";
 import { AbsoluteFill } from "remotion";
-import { B, Tone, toneBg, toneEdge, cardShadow } from "./bright-theme";
+import { Tone, toneBg, toneEdge, cardShadow, usePalette } from "./bright-theme";
 import { seg, loopFade, fontFamily } from "./primitives";
 
 export { seg, loopFade, fontFamily };
 
 /** Soft light gradient + faint dot grid. */
-export const LightBg: React.FC = () => (
+export const LightBg: React.FC = () => {
+  const B = usePalette();
+  return (
   <AbsoluteFill
     style={{
       background: `linear-gradient(165deg, ${B.bgTop} 0%, ${B.bgBottom} 100%)`,
@@ -31,7 +33,8 @@ export const LightBg: React.FC = () => (
       }}
     />
   </AbsoluteFill>
-);
+  );
+};
 
 /** Full-frame group for one story beat (fade/slide as a unit). */
 export const Group: React.FC<{ opacity?: number; dy?: number; children?: React.ReactNode }> = ({
@@ -39,6 +42,7 @@ export const Group: React.FC<{ opacity?: number; dy?: number; children?: React.R
   dy = 0,
   children,
 }) => {
+  const B = usePalette();
   if (opacity <= 0.004) return null;
   return (
     <AbsoluteFill style={{ opacity, transform: dy ? `translateY(${dy}px)` : undefined, fontFamily }}>
@@ -55,7 +59,10 @@ export const Headline: React.FC<{
   accentColor?: string;
   opacity?: number;
   fontSize?: number;
-}> = ({ y = 42, text, accentText, accentColor = B.accent, opacity = 1, fontSize = 36 }) => (
+}> = ({ y = 42, text, accentText, accentColor, opacity = 1, fontSize = 36 }) => {
+  const B = usePalette();
+  const ac = accentColor ?? B.accent;
+  return (
   <div
     style={{
       position: "absolute",
@@ -72,9 +79,10 @@ export const Headline: React.FC<{
     }}
   >
     {text}
-    {accentText ? <span style={{ color: accentColor }}> {accentText}</span> : null}
+    {accentText ? <span style={{ color: ac }}> {accentText}</span> : null}
   </div>
-);
+  );
+};
 
 /** Rounded tinted panel (problem = danger, solution = success, etc). */
 export const Panel: React.FC<{
@@ -87,6 +95,7 @@ export const Panel: React.FC<{
   radius?: number;
   children?: React.ReactNode;
 }> = ({ x, y, w, h, tone = "card", opacity = 1, radius = 20, children }) => {
+  const B = usePalette();
   if (opacity <= 0.004) return null;
   return (
     <div
@@ -97,8 +106,8 @@ export const Panel: React.FC<{
         width: w,
         height: h,
         borderRadius: radius,
-        background: toneBg(tone),
-        border: `1.5px solid ${toneEdge(tone)}`,
+        background: toneBg(tone, B),
+        border: `1.5px solid ${toneEdge(tone, B)}`,
         boxShadow: cardShadow,
         opacity,
         fontFamily,
@@ -120,6 +129,7 @@ export const BrowserWindow: React.FC<{
   scale?: number;
   children?: React.ReactNode;
 }> = ({ x, y, w, h, title = "", opacity = 1, scale = 1, children }) => {
+  const B = usePalette();
   if (opacity <= 0.004) return null;
   const bar = 42;
   return (
@@ -189,6 +199,7 @@ export const SkeletonScroll: React.FC<{ w: number; h: number; offset: number; ro
   offset,
   rowH = 44,
 }) => {
+  const B = usePalette();
   const count = Math.ceil(h / rowH) + 2;
   const shift = offset % rowH;
   return (
@@ -241,6 +252,7 @@ export const JobsTable: React.FC<{
   appearStart: number;
   stagger?: number;
 }> = ({ w, rows, frame, appearStart, stagger = 9 }) => {
+  const B = usePalette();
   const cols = [0.27, 0.17, 0.11, 0.11, 0.13, 0.21];
   const heads = ["Position", "Company", "City", "Score", "Source", "Status"];
   const cell = (f: number): React.CSSProperties => ({
@@ -339,7 +351,9 @@ export const FilterChip: React.FC<{
   scale?: number;
   opacity?: number;
   color?: string;
-}> = ({ x, y, text, icon = "✕", scale = 1, opacity = 1, color = B.accent }) => {
+}> = ({ x, y, text, icon = "✕", scale = 1, opacity = 1, color }) => {
+  const B = usePalette();
+  const c0 = color ?? B.accent;
   if (opacity <= 0.004 || scale <= 0.004) return null;
   return (
     <div
@@ -352,8 +366,8 @@ export const FilterChip: React.FC<{
         padding: "7px 16px",
         borderRadius: 999,
         background: B.card,
-        border: `1.5px solid ${color}`,
-        color,
+        border: `1.5px solid ${c0}`,
+        color: c0,
         fontSize: 18,
         fontWeight: 700,
         display: "flex",
@@ -379,6 +393,7 @@ export const ToggleSwitch: React.FC<{
   on: number;
   opacity?: number;
 }> = ({ x, y, label, on, opacity = 1 }) => {
+  const B = usePalette();
   if (opacity <= 0.004) return null;
   const w = 52;
   const knob = 22;
@@ -435,6 +450,7 @@ export const StatPill: React.FC<{
   scale?: number;
   fontSize?: number;
 }> = ({ x, y, emoji, text, tone = "danger", opacity = 1, scale = 1, fontSize = 19 }) => {
+  const B = usePalette();
   if (opacity <= 0.004 || scale <= 0.004) return null;
   const c = tone === "danger" ? B.danger : tone === "success" ? B.success : B.accent;
   return (
@@ -450,8 +466,8 @@ export const StatPill: React.FC<{
         gap: 10,
         padding: `${fontSize * 0.4}px ${fontSize * 0.85}px`,
         borderRadius: 999,
-        background: toneBg(tone),
-        border: `1.5px solid ${toneEdge(tone)}`,
+        background: toneBg(tone, B),
+        border: `1.5px solid ${toneEdge(tone, B)}`,
         color: c,
         fontSize,
         fontWeight: 700,
@@ -479,6 +495,7 @@ export const IconCard: React.FC<{
   opacity?: number;
   scale?: number;
 }> = ({ x, y, w, emoji, title, sub, tone = "accent", opacity = 1, scale = 1 }) => {
+  const B = usePalette();
   if (opacity <= 0.004 || scale <= 0.004) return null;
   const c = tone === "danger" ? B.danger : tone === "success" ? B.success : B.accent;
   return (
@@ -503,8 +520,8 @@ export const IconCard: React.FC<{
           width: 110,
           height: 110,
           borderRadius: 30,
-          background: toneBg(tone),
-          border: `2px solid ${toneEdge(tone)}`,
+          background: toneBg(tone, B),
+          border: `2px solid ${toneEdge(tone, B)}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -530,19 +547,21 @@ export const FlowArrow: React.FC<{
   progress?: number;
   color?: string;
   opacity?: number;
-}> = ({ x, y, len, progress = 1, color = B.accent, opacity = 1 }) => {
+}> = ({ x, y, len, progress = 1, color, opacity = 1 }) => {
+  const B = usePalette();
+  const c0 = color ?? B.accent;
   if (opacity <= 0.004 || progress <= 0.004) return null;
   const shaft = Math.max(2, (len - 18) * progress);
   return (
     <div style={{ position: "absolute", left: x, top: y, opacity, display: "flex", alignItems: "center" }}>
-      <div style={{ width: shaft, height: 7, borderRadius: 4, background: color }} />
+      <div style={{ width: shaft, height: 7, borderRadius: 4, background: c0 }} />
       <div
         style={{
           width: 0,
           height: 0,
           borderTop: "12px solid transparent",
           borderBottom: "12px solid transparent",
-          borderLeft: `18px solid ${color}`,
+          borderLeft: `18px solid ${c0}`,
           opacity: progress > 0.85 ? 1 : 0,
         }}
       />
@@ -559,6 +578,7 @@ export const StickyNote: React.FC<{
   opacity?: number;
   rotate?: number;
 }> = ({ x, y, w, text, opacity = 1, rotate = -2 }) => {
+  const B = usePalette();
   if (opacity <= 0.004) return null;
   return (
     <div
@@ -594,6 +614,7 @@ export const Cursor: React.FC<{ x: number; y: number; opacity?: number; click?: 
   opacity = 1,
   click = 0,
 }) => {
+  const B = usePalette();
   if (opacity <= 0.004) return null;
   return (
     <div style={{ position: "absolute", left: x, top: y, opacity, pointerEvents: "none" }}>
@@ -626,6 +647,7 @@ export const CheckBadge: React.FC<{ x: number; y: number; scale?: number; opacit
   opacity = 1,
   size = 46,
 }) => {
+  const B = usePalette();
   if (opacity <= 0.004 || scale <= 0.004) return null;
   return (
     <div
@@ -662,6 +684,7 @@ export const CaptionBand: React.FC<{
   opacity?: number;
   fontSize?: number;
 }> = ({ y = 646, text, tone = "card", opacity = 1, fontSize = 23 }) => {
+  const B = usePalette();
   if (opacity <= 0.004) return null;
   const c = tone === "danger" ? B.danger : tone === "success" ? B.success : tone === "accent" ? B.accent : B.ink;
   return (

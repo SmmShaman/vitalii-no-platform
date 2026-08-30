@@ -34,6 +34,7 @@ import { FeatureCommentReplies } from "./compositions/feature-demos/FeatureComme
 import { FeatureDupeDetection } from "./compositions/feature-demos/FeatureDupeDetection";
 import { FeatureMultiLlm } from "./compositions/feature-demos/FeatureMultiLlm";
 import { FeatureVideoFactory } from "./compositions/feature-demos/FeatureVideoFactory";
+import { FeatureVideoFactoryV3 } from "./compositions/feature-demos/FeatureVideoFactoryV3";
 import { FeatureSkyvernRecovery } from "./compositions/feature-demos/FeatureSkyvernRecovery";
 import { FeatureFormMemory } from "./compositions/feature-demos/FeatureFormMemory";
 import { FeatureNavigationGoals } from "./compositions/feature-demos/FeatureNavigationGoals";
@@ -481,6 +482,14 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureVideoFactory"
         component={FeatureVideoFactory}
+        durationInFrames={450}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+      <Composition
+        id="FeatureVideoFactoryV3"
+        component={FeatureVideoFactoryV3}
         durationInFrames={450}
         fps={30}
         width={1280}
