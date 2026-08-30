@@ -17,7 +17,9 @@ Work dir: C:\Users\stuar\Projects\vitalii_claude-code-in-browser\scripts\remotio
    the same batch must never share an archetype.
 3. Palette: `const P = moodFor("<feature id>")` from `./bright-theme` — same rule, if the
    drawn mood matches either of the last 2 logged clips, take the next name in `MOOD_NAMES`.
-4. Append your two rows to `out/lux-archetypes.md` (`feature id | file | archetype | mood`).
+4. If the orchestrating session already handed you an archetype and a mood, use those and skip
+   steps 1–3. **Never edit `out/lux-archetypes.md` yourself** — concurrent agents would clobber
+   each other; report your draw and the session logs it.
 
 ### The eight archetypes
 
@@ -72,16 +74,14 @@ retired as a default. It is allowed only as archetype 6's right-hand stage, once
   bright-primitives.tsx, bright-theme.ts, primitives.tsx, theme.ts, Root.tsx, or any file
   outside your two Feature files.
 
-## STEP 3 — LinkedIn post text per feature
-Write to `out/lux-pilot/<feature_id>-post.txt` (create dir if needed):
-120–180 words, English, humanized: everyday-life hook (a moment, a feeling) → the problem as a
-story in plain words → what changed → ONE concrete number → ONE everyday analogy → link
-`https://vitalii.no/features/<slug_en>` → 3–5 hashtags. NO tech jargon except one short stack mention.
-
-## STEP 4 — Typecheck
+## STEP 3 — Typecheck
 From scripts/remotion-video run: `node node_modules/typescript/bin/tsc --noEmit`. Other agents edit
 OTHER Feature files concurrently — IGNORE errors in files that are not yours; fix only your two
 files, re-run until yours are clean.
 
-DO NOT render video. DO NOT commit. Report: files rewritten, archetype + mood drawn for each,
-1-line beat summary each, text files written, typecheck status for your files.
+**No post texts.** Since 2026-08-26 the publisher writes the LinkedIn/Facebook text on the day it
+posts, so a batch produces clips only — do not write `-post.txt` files and do not touch
+`feature_video_repost_queue`.
+
+DO NOT render video. DO NOT commit. Report: files rewritten, archetype + mood used for each,
+1-line beat summary each, typecheck status for your files.

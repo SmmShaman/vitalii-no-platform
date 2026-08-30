@@ -1,34 +1,34 @@
 /**
  * FeatureAiThumbnails — feature p11 — 1280x720, 15s @ 30fps, silent, loop-friendly.
- * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
- * viewer: an endless wall of manual thumbnail drafts, then Gemini generating
- * 4 psychology-driven concepts in one pass and a moderator tapping the
- * winner straight from Telegram.
  *
- * Story (4 beats):
- *  1. Problem — 15-20 minutes of manual mockups per video, mediocre
- *     click-through, a bottleneck on every single upload. Red zone.
- *  2. Solution — generate-ai-thumbnail.js hands Gemini the article; it
- *     returns 4 concepts, each built around a different psychological hook.
- *  3. How it ships — all 4 land in a Telegram moderation channel; one tap
- *     picks the winner and sends it straight to the pipeline.
- *  4. Result — 15-20 min → 5 seconds, ≈180× faster, 4 A/B options for free.
- *     Green zone, check badge.
+ * ART-DIRECTION REWRITE (2026-08-30), drawn from `out/lux-batch-instructions.md`:
+ *   archetype = 3 "card deck"   mood = sand   (const P = MOODS.sand)
+ *   rhythm    = 4 beats (~136 / ~126 / ~114 / ~90 frames)
+ *   transition = the 4 concept cards SLIDE in from off-screen right (not a
+ *   crossfade) once the draft pile has fully faded — the deck itself carries
+ *   the story forward physically across beats 2→3→4 (fan out, tap, shrink to
+ *   corner) instead of being re-drawn per beat.
+ *
+ * Story (kept from the old version, staging rebuilt):
+ *  1. Problem — a messy pile of manual thumbnail drafts, 15-20 minutes and
+ *     still not right. Red statpills.
+ *  2. Solution — 4 concept cards fly in from Gemini and land as a stack,
+ *     then fan into a 2×2 grid, one per psychological hook.
+ *  3. How it ships — a Telegram window frames the grid; a cursor taps the
+ *     winner, which glows green while the other three shrink away.
+ *  4. Result — the winning card shrinks into the corner as proof while a
+ *     hero number lands: 15-20 min → 5 sec, ≈180× faster.
  */
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { B } from "./bright-theme";
+import { MOODS, PaletteProvider, cardShadow } from "./bright-theme";
 import {
   LightBg,
   Group,
   Headline,
-  Panel,
   BrowserWindow,
-  SkeletonScroll,
-  FilterChip,
   StatPill,
   FlowArrow,
-  StickyNote,
   Cursor,
   CheckBadge,
   CaptionBand,
@@ -36,6 +36,10 @@ import {
   loopFade,
   fontFamily,
 } from "./bright-primitives";
+
+const P = MOODS.sand;
+
+const CLAMP = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
 type Concept = { emoji: string; hook: string; caption: string };
 
@@ -46,6 +50,22 @@ const CONCEPTS: Concept[] = [
   { emoji: "❓", hook: "Bold question", caption: "Is this the end of Moore's Law?" },
 ];
 
+const SLOTS = [
+  { x: 355, y: 150 },
+  { x: 655, y: 150 },
+  { x: 355, y: 340 },
+  { x: 655, y: 340 },
+] as const;
+
+const DRAFTS: { title: string; dx: number; dy: number; rot: number; at: number }[] = [
+  { title: "Draft #1", dx: 0, dy: 0, rot: -7, at: 18 },
+  { title: "Draft #2", dx: 22, dy: -14, rot: 5, at: 30 },
+  { title: "Draft #3", dx: -16, dy: -30, rot: -4, at: 42 },
+  { title: "Draft #4", dx: 34, dy: -46, rot: 8, at: 54 },
+  { title: "Draft #5", dx: -28, dy: -62, rot: -9, at: 66 },
+  { title: "Draft #6", dx: 12, dy: -78, rot: 3, at: 78 },
+];
+
 export const FeatureAiThumbnails: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
@@ -54,229 +74,172 @@ export const FeatureAiThumbnails: React.FC = () => {
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
 
-  // ── Beat windows ──────────────────────────────────────────────────
-  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
-  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
-  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
-  const b4 = seg(frame, 340, 354) * lf;
+  // ── Beat windows (headline/statpill/caption groups only) ───────────
+  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 120, 136)) * lf;
+  const b2 = seg(frame, 136, 152) * (1 - seg(frame, 246, 262)) * lf;
+  const b3 = seg(frame, 254, 270) * (1 - seg(frame, 352, 368)) * lf;
+  const b4 = seg(frame, 360, 376) * lf;
 
-  // ── Beat 1: the problem ───────────────────────────────────────────
-  const scroll = frame * 2.2;
-  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
-  const pill1 = pop(46);
-  const pill2 = pop(58);
-  const pill3 = pop(70);
+  // ── The deck: 4 concept cards, alive from beat 2 through beat 4 ────
+  const cardState = (i: number) => {
+    const winner = i === 0;
+    const eS = 138 + i * 10;
+    const eE = eS + 18;
+    const fS = 192 + i * 10;
+    const fE = fS + 26;
+    const slot = SLOTS[i];
+    const stX = 505 + i * 4;
+    const stY = 225 - i * 4;
+    const stR = -8 + i * 5;
+    let x: number, y: number, rot: number, scale: number, opacity: number;
+    if (winner) {
+      x = interpolate(frame, [eS, eE, fS, fE, 356, 376], [1400, stX, stX, slot.x, slot.x, 90], { ...CLAMP, easing: Easing.inOut(Easing.cubic) });
+      y = interpolate(frame, [eS, eE, fS, fE, 356, 376], [260, stY, stY, slot.y, slot.y, 250], { ...CLAMP, easing: Easing.inOut(Easing.cubic) });
+      rot = interpolate(frame, [eS, eE, fS, fE], [14, stR, stR, 0], CLAMP);
+      scale = interpolate(frame, [eS, eE, 300, 316, 356, 376], [0.85, 1, 1, 1.14, 1.14, 0.85], { ...CLAMP, easing: Easing.inOut(Easing.cubic) });
+      opacity = interpolate(frame, [eS, eS + 8], [0, 1], CLAMP);
+    } else {
+      const xS = 316 + (i - 1) * 10;
+      const xE = xS + 22;
+      x = interpolate(frame, [eS, eE, fS, fE], [1400, stX, stX, slot.x], { ...CLAMP, easing: Easing.inOut(Easing.cubic) });
+      y = interpolate(frame, [eS, eE, fS, fE], [260, stY, stY, slot.y], { ...CLAMP, easing: Easing.inOut(Easing.cubic) });
+      rot = interpolate(frame, [eS, eE, fS, fE], [14, stR, stR, 0], CLAMP);
+      scale = interpolate(frame, [eS, eE, xS, xE], [0.85, 1, 1, 0], { ...CLAMP, easing: Easing.inOut(Easing.cubic) });
+      opacity = interpolate(frame, [eS, eS + 8, xS, xE], [0, 1, 1, 0], CLAMP);
+    }
+    return { x, y, rot, scale, opacity: opacity * lf };
+  };
 
-  // ── Beat 2: the solution ──────────────────────────────────────────
-  const chip1 = pop(132);
-  const chip2 = pop(142);
-  const chip3 = pop(152);
-  const chip4 = pop(164);
-  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
-
-  // ── Beat 3: one tap picks the winner ───────────────────────────────
-  const cx = interpolate(frame, [248, 262, 300, 316], [950, 300, 300, 950], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.inOut(Easing.quad),
-  });
-  const cy = interpolate(frame, [248, 262, 300, 316], [500, 254, 254, 500], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.inOut(Easing.quad),
-  });
-  const cursorOp = seg(frame, 248, 258) * (1 - seg(frame, 310, 320));
-  const click1 = seg(frame, 266, 282, Easing.out(Easing.quad));
-  const picked = seg(frame, 282, 298);
-  const check3 = pop(288);
-  const cap3 = seg(frame, 260, 282, Easing.out(Easing.cubic));
-
-  // ── Beat 4: the result ────────────────────────────────────────────
-  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
-  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
-  const afterIn = pop(372);
-  const speedX = Math.round(interpolate(frame, [384, 414], [1, 180], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }));
-  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
-  const check = pop(392);
-  const footOp = seg(frame, 402, 418);
+  // ── Beat 3: cursor taps the winner ──────────────────────────────────
+  const cursorX = interpolate(frame, [288, 300, 312, 326], [1050, 490, 490, 1050], { ...CLAMP, easing: Easing.inOut(Easing.quad) });
+  const cursorY = interpolate(frame, [288, 300, 312, 326], [560, 235, 235, 560], { ...CLAMP, easing: Easing.inOut(Easing.quad) });
+  const cursorOpacity = seg(frame, 286, 296) * (1 - seg(frame, 320, 330));
+  const clickAmt = seg(frame, 300, 316, Easing.out(Easing.quad));
+  const winnerGlow = seg(frame, 300, 316);
 
   return (
-    <div style={{ position: "absolute", inset: 0, fontFamily }}>
-      <LightBg />
+    <PaletteProvider value={P}>
+      <div style={{ position: "absolute", inset: 0, fontFamily }}>
+        <LightBg />
 
-      {/* ════ Beat 1 — PROBLEM ════ */}
-      <Group opacity={b1}>
-        <Headline text="Designing one YouTube thumbnail takes" accentText="15-20 minutes" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
-        <BrowserWindow x={80} y={116} w={700} h={452} title="thumbnail editor — draft #12" opacity={Math.min(1, pop(8))}>
-          <SkeletonScroll w={700} h={410} offset={scroll} />
-        </BrowserWindow>
-        <StickyNote
-          x={830}
-          y={150}
-          w={350}
-          opacity={noteOp}
-          text="Need: a thumbnail that stops the scroll and earns the click"
-        />
-        <StatPill x={846} y={340} emoji="🎨" text="15-20 min of manual design" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
-        <StatPill x={846} y={402} emoji="📉" text="Mediocre click-through" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
-        <StatPill x={846} y={464} emoji="😩" text="A bottleneck every video" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
-        <CaptionBand text="Endless drafts and mockups — one thumbnail eats 15-20 minutes" tone="danger" opacity={seg(frame, 30, 46)} />
-      </Group>
-
-      {/* ════ Beat 2 — SOLUTION ════ */}
-      <Group opacity={b2}>
-        <Headline text="Gemini designs 4 options in" accentText="one pass" accentColor={B.success} opacity={seg(frame, 116, 130)} />
-        <FilterChip x={90} y={132} text="📊 Data point" icon="✓" scale={chip1} opacity={Math.min(1, chip1)} />
-        <FilterChip x={360} y={132} text="😲 Emotional face" icon="✓" scale={chip2} opacity={Math.min(1, chip2)} />
-        <FilterChip x={650} y={132} text="⚡ High contrast" icon="✓" scale={chip3} opacity={Math.min(1, chip3)} />
-        <FilterChip x={930} y={132} text="❓ Bold question" icon="✓" scale={chip4} opacity={Math.min(1, chip4)} />
-        <BrowserWindow x={110} y={196} w={1060} h={396} title="generate-ai-thumbnail.js — Gemini output" opacity={seg(frame, 168, 182)}>
-          <div style={{ position: "relative", width: 1060, height: 354, padding: 20, boxSizing: "border-box", fontFamily }}>
-            {CONCEPTS.map((c, i) => {
-              const col = i % 2;
-              const row = Math.floor(i / 2);
-              const t = seg(frame, 184 + i * 12, 184 + i * 12 + 14);
-              return (
-                <div
-                  key={c.hook}
-                  style={{
-                    position: "absolute",
-                    left: col === 0 ? 0 : 520,
-                    top: row === 0 ? 0 : 170,
-                    width: 500,
-                    height: 140,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 18,
-                    padding: "0 22px",
-                    borderRadius: 16,
-                    background: B.accentBg,
-                    border: `1.5px solid #C4D7FB`,
-                    opacity: t,
-                    transform: `scale(${0.94 + t * 0.06})`,
-                  }}
-                >
-                  <div style={{ fontSize: 46 }}>{c.emoji}</div>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 700, color: B.accent, letterSpacing: 0.3, textTransform: "uppercase" }}>{c.hook}</div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: B.ink, marginTop: 4, lineHeight: 1.25 }}>{c.caption}</div>
-                  </div>
+        {/* ════ Beat 1 — PROBLEM: the messy draft pile ════ */}
+        <Group opacity={b1}>
+          <Headline text="Every thumbnail starts as" accentText="another blind draft" accentColor={P.danger} opacity={seg(frame, 4, 18)} />
+          {DRAFTS.map((d) => {
+            const s = pop(d.at);
+            if (s <= 0.004) return null;
+            return (
+              <div
+                key={d.title}
+                style={{
+                  position: "absolute",
+                  left: 150 + d.dx,
+                  top: 330 + d.dy,
+                  width: 250,
+                  height: 150,
+                  borderRadius: 14,
+                  background: P.card,
+                  border: `1.5px solid ${P.dangerEdge}`,
+                  boxShadow: cardShadow,
+                  transform: `rotate(${d.rot}deg) scale(${s})`,
+                  transformOrigin: "center",
+                  opacity: Math.min(1, s),
+                  padding: "16px 18px",
+                  boxSizing: "border-box",
+                  fontFamily,
+                }}
+              >
+                <div style={{ fontSize: 14, fontWeight: 700, color: P.danger, letterSpacing: 0.3 }}>{d.title}</div>
+                <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                  {[0.85, 0.65, 0.5].map((f, k) => (
+                    <div key={k} style={{ width: `${f * 100}%`, height: 9, borderRadius: 5, background: P.chipBg }} />
+                  ))}
                 </div>
-              );
-            })}
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              left: 0,
-              top: 328,
-              width: 1060,
-              textAlign: "center",
-              fontSize: 15.5,
-              fontWeight: 600,
-              color: B.muted,
-              opacity: seg(frame, 214, 228) * 0.9,
-            }}
-          >
-            …all 4 ready for review, in the same pass
-          </div>
-        </BrowserWindow>
-        <CaptionBand text="One prompt, four distinct hooks — each engineered to earn a different kind of click" tone="accent" opacity={cap2} />
-      </Group>
+              </div>
+            );
+          })}
+          <StatPill x={760} y={200} emoji="🎨" text="15-20 minutes of manual design" tone="danger" scale={pop(58)} opacity={Math.min(1, pop(58))} />
+          <StatPill x={760} y={262} emoji="📉" text="Mediocre click-through" tone="danger" scale={pop(70)} opacity={Math.min(1, pop(70))} />
+          <StatPill x={760} y={324} emoji="😩" text="A bottleneck every video" tone="danger" scale={pop(82)} opacity={Math.min(1, pop(82))} />
+          <CaptionBand text="Endless drafts, never quite right — 15-20 minutes gone every time" tone="danger" opacity={seg(frame, 90, 106)} />
+        </Group>
 
-      {/* ════ Beat 3 — ONE TAP PICKS THE WINNER ════ */}
-      <Group opacity={b3}>
-        <Headline text="One tap in Telegram" accentText="picks the winner" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
-        <BrowserWindow x={190} y={208} w={900} h={340} title="Telegram — moderation channel" opacity={seg(frame, 244, 258)}>
-          <div style={{ padding: "6px 0" }}>
-            {CONCEPTS.map((c, i) => {
-              const isWinner = i === 0;
-              const win = isWinner ? picked : 0;
-              return (
-                <div
-                  key={c.hook}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 16,
-                    padding: "14px 24px",
-                    borderBottom: `1px solid ${B.border}`,
-                    background: isWinner ? `rgba(230,247,236,${win})` : "transparent",
-                  }}
-                >
-                  <div style={{ fontSize: 30 }}>{c.emoji}</div>
-                  <div style={{ flex: 1, fontSize: 17, fontWeight: 650, color: B.ink }}>{c.caption}</div>
-                  <div
-                    style={{
-                      padding: "4px 14px",
-                      borderRadius: 999,
-                      fontSize: 13.5,
-                      fontWeight: 700,
-                      background: isWinner ? B.successBg : B.chipBg,
-                      color: isWinner ? B.success : B.muted,
-                      border: `1px solid ${isWinner ? "#BFE7CD" : B.border}`,
-                    }}
-                  >
-                    {isWinner ? "Approved" : "Ready"}
-                  </div>
-                  {isWinner ? (
-                    <div style={{ position: "relative", width: 26, height: 26, transform: `scale(${check3})`, opacity: check3 }}>
-                      <CheckBadge x={0} y={0} size={26} scale={1} opacity={1} />
-                    </div>
-                  ) : null}
+        {/* ════ Beat 2 — SOLUTION: Gemini's 4 concepts land ════ */}
+        <Group opacity={b2}>
+          <Headline text="Gemini designs 4 options in" accentText="one pass" accentColor={P.accent} opacity={seg(frame, 140, 156)} />
+          <CaptionBand text="One prompt, four distinct hooks — each engineered to earn a different kind of click" tone="accent" opacity={seg(frame, 230, 246)} />
+          <div style={{ position: "absolute", left: 0, top: 600, width: 1280, textAlign: "center", fontSize: 14.5, fontWeight: 600, color: P.muted, opacity: seg(frame, 236, 252), fontFamily }}>
+            via Google Gemini API — generate-ai-thumbnail.js
+          </div>
+        </Group>
+
+        {/* ════ Beat 3 — HOW: a tap in Telegram picks the winner ════ */}
+        <BrowserWindow x={300} y={104} w={680} h={470} title="Telegram — moderation channel" opacity={seg(frame, 254, 270)} />
+        <Group opacity={b3}>
+          <Headline text="One tap in Telegram" accentText="picks the winner" accentColor={P.accent} opacity={seg(frame, 258, 274)} />
+          <CaptionBand text="All four land in Telegram — a single tap sends the winner straight to the pipeline" tone="accent" opacity={seg(frame, 278, 294)} />
+        </Group>
+        <Cursor x={cursorX} y={cursorY} opacity={cursorOpacity} click={clickAmt} />
+
+        {/* ════ The deck itself — persists across beats 2, 3, 4 ════ */}
+        {CONCEPTS.map((c, i) => {
+          const st = cardState(i);
+          if (st.opacity <= 0.004) return null;
+          const winner = i === 0;
+          const hl = winner ? winnerGlow : 0;
+          return (
+            <div
+              key={c.hook}
+              style={{
+                position: "absolute",
+                left: st.x,
+                top: st.y,
+                width: 270,
+                height: 170,
+                transform: `rotate(${st.rot}deg) scale(${st.scale})`,
+                transformOrigin: "top left",
+                opacity: st.opacity,
+                borderRadius: 18,
+                background: P.card,
+                border: `2px solid ${hl > 0.5 ? P.successEdge : P.accentEdge}`,
+                boxShadow: hl > 0.4 ? `0 0 0 ${hl * 6}px ${P.successBg}, ${cardShadow}` : cardShadow,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily,
+              }}
+            >
+              <div style={{ fontSize: 40 }}>{c.emoji}</div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: P.accent, textTransform: "uppercase", letterSpacing: 0.4, marginTop: 8 }}>{c.hook}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: P.ink, marginTop: 6, lineHeight: 1.25, padding: "0 16px", textAlign: "center" }}>{c.caption}</div>
+              {winner && hl > 0.3 ? (
+                <div style={{ position: "absolute", right: 12, top: 12 }}>
+                  <CheckBadge x={0} y={0} size={26} scale={Math.min(1, hl * 1.4)} opacity={Math.min(1, hl * 1.4)} />
                 </div>
-              );
-            })}
-          </div>
-        </BrowserWindow>
-        <Cursor x={cx} y={cy} opacity={cursorOp} click={click1 % 1} />
-        <CaptionBand text="All 4 land in Telegram — a single tap sends the winner straight to the pipeline" tone="accent" opacity={cap3} />
-      </Group>
+              ) : null}
+            </div>
+          );
+        })}
 
-      {/* ════ Beat 4 — RESULT ════ */}
-      <Group opacity={b4}>
-        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
-        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
-          <div style={{ padding: "26px 30px", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>15-20 min</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>manual mockups, weak CTR</div>
+        {/* ════ Beat 4 — RESULT ════ */}
+        <Group opacity={b4}>
+          <div style={{ position: "absolute", left: 90, top: 220, fontSize: 15, fontWeight: 700, color: P.accent, letterSpacing: 1, opacity: seg(frame, 362, 378), fontFamily }}>
+            SELECTED CONCEPT
           </div>
-        </Panel>
-        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
-        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
-          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>5 sec</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>one tap, 4 options ready</div>
+          <FlowArrow x={400} y={330} len={140} progress={seg(frame, 372, 392, Easing.inOut(Easing.cubic))} color={P.success} />
+          <div style={{ position: "absolute", left: 580, top: 140, width: 640, fontFamily }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: P.muted, textDecoration: "line-through", opacity: seg(frame, 376, 392) }}>was 15-20 min</div>
+            <div style={{ fontSize: 118, fontWeight: 800, color: P.success, letterSpacing: -4, opacity: Math.min(1, pop(388)) }}>5 sec</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: P.accent, marginTop: 8, opacity: seg(frame, 402, 418) }}>≈180× faster · 4 options, free</div>
           </div>
-        </Panel>
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 424,
-            width: 1280,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-            opacity: speedOp,
-            fontFamily,
-          }}
-        >
-          <div style={{ position: "relative", width: 52, height: 52 }}>
-            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          <CheckBadge x={300} y={365} size={44} scale={pop(392)} opacity={Math.min(1, pop(392))} />
+          <div style={{ position: "absolute", left: 0, top: 560, width: 1280, textAlign: "center", opacity: seg(frame, 412, 428), fontFamily }}>
+            <div style={{ fontSize: 21, fontWeight: 650, color: P.muted }}>Every video ships with 4 built-in A/B options — no extra work.</div>
+            <div style={{ fontSize: 17, fontWeight: 600, color: P.accent, marginTop: 10 }}>AI Thumbnails · vitalii.no</div>
           </div>
-          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>≈{speedX}× faster</span>
-        </div>
-        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
-          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
-            Every video ships with 4 built-in A/B options — no extra work.
-          </div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>AI Thumbnails · vitalii.no</div>
-        </div>
-      </Group>
-    </div>
+        </Group>
+      </div>
+    </PaletteProvider>
   );
 };

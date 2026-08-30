@@ -1,45 +1,110 @@
 /**
  * FeatureCrossPlatformDistribution — feature p13 — 1280x720, 15s @ 30fps,
- * silent, loop-friendly. BRIGHT INFOGRAPHIC template (v2, 2026-08-22) —
- * written for a NON-TECHNICAL viewer: problem/solution color zones, a
- * platform-icon row, a size-limit comparison, and a before→after time metric.
+ * silent, loop-friendly. ART-DIRECTION REWORK (2026-08-30): archetype 5
+ * "ledger", mood mint. The whole frame is one receipt/invoice column — the
+ * old centered-headline + zone-panels + 3-icon-strip + 2-result-cards layout
+ * is retired.
  *
- * Story (4 beats):
- *  1. Problem — one video, four platforms (YouTube, Reels, LinkedIn,
- *     Facebook), each with its own format/size rules — 30-45 minutes of
- *     manual re-encoding and uploading, one at a time. Red zone.
- *  2. Solution — Remotion renders both formats once (vertical + horizontal),
- *     then four GitHub Actions workflows push straight to each platform's API.
- *  3. How it handles big files — the Bot API caps out at 20MB; MTKruto pulls
- *     the source video straight from Telegram up to 2GB, with a Telegram-embed
- *     fallback if any single upload fails.
- *  4. Result — before/after cards: 30-45 min → 2-3 min of monitoring, one
- *     trigger reaching all four platforms. Green zone, check badge.
+ * Kept from the old story: problem → solution → how → number.
+ *
+ * Story (continuous ledger, 4 beats, ~110-150 frames each):
+ *  1. (0-134)   Problem — 4 manual line items (encode/resize/compress/upload
+ *     per platform) add up in red under a "BY HAND" total, 30-45 min.
+ *  2. (128-264) Solution — the title flips to "AUTOMATIC" and each row is
+ *     struck through in place, then replaced with its GitHub Actions
+ *     workflow — a wipe/kill-and-show swap, never a crossfade — closing on a
+ *     green 2-3 min total.
+ *  3. (264-374) How — a capacity note wipes open under the total: the Bot
+ *     API's 20MB ceiling vs MTKruto pulling up to 2GB straight from
+ *     Telegram, plus the Telegram-embed fallback. One small tech caption.
+ *  4. (374-450) Result — before/after minute chips, the derived ≈15× speed,
+ *     check badge, footer.
  */
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { B } from "./bright-theme";
-import {
-  LightBg,
-  Group,
-  Headline,
-  Panel,
-  IconCard,
-  FlowArrow,
-  StatPill,
-  CheckBadge,
-  CaptionBand,
-  seg,
-  loopFade,
-  fontFamily,
-} from "./bright-primitives";
+import { MOODS, PaletteProvider } from "./bright-theme";
+import { LightBg, StatPill, CheckBadge, seg, loopFade, fontFamily } from "./bright-primitives";
 
-const PLATFORMS = [
-  { emoji: "📺", title: "YouTube", sub: "16:9 horizontal" },
-  { emoji: "🔁", title: "Instagram Reels", sub: "9:16 vertical" },
-  { emoji: "💼", title: "LinkedIn", sub: "MP4 under 200MB" },
-  { emoji: "👍", title: "Facebook", sub: "its own upload flow" },
+const P = MOODS.mint;
+
+const CARD_X = 380;
+const CARD_Y = 42;
+const CARD_W = 520;
+const CARD_H = 462;
+const PAD = 30;
+
+const ROWS_OLD = [
+  { label: "YouTube — encode 16:9, upload", value: "10 min" },
+  { label: "Instagram Reels — resize 9:16, upload", value: "10 min" },
+  { label: "LinkedIn — compress under 200MB", value: "8 min" },
+  { label: "Facebook — re-export, upload", value: "8 min" },
 ];
+const ROWS_NEW = [
+  { label: "process-video.yml runs", value: "done" },
+  { label: "instagram-video.yml runs", value: "done" },
+  { label: "linkedin-video.yml runs", value: "done" },
+  { label: "facebook-video.yml runs", value: "done" },
+];
+const ROW_Y = [114, 152, 190, 228];
+
+/** One receipt line: label, dotted leader, value — with an optional strike-through wipe. */
+const LedgerRow: React.FC<{
+  y: number;
+  label: string;
+  value: string;
+  tone: "danger" | "success";
+  opacity?: number;
+  strike?: number;
+  fontSize?: number;
+}> = ({ y, label, value, tone, opacity = 1, strike = 0, fontSize = 17 }) => {
+  if (opacity <= 0.004) return null;
+  const c = tone === "danger" ? P.danger : P.success;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: CARD_X + PAD,
+        top: y,
+        width: CARD_W - PAD * 2,
+        display: "flex",
+        alignItems: "baseline",
+        gap: 8,
+        opacity,
+        fontFamily,
+      }}
+    >
+      <span style={{ position: "relative", fontSize, fontWeight: 600, color: P.ink, whiteSpace: "nowrap" }}>
+        {label}
+        {strike > 0.004 ? (
+          <span
+            style={{
+              position: "absolute",
+              left: 0,
+              top: "54%",
+              height: 2,
+              width: `${Math.min(1, strike) * 100}%`,
+              background: P.danger,
+            }}
+          />
+        ) : null}
+      </span>
+      <span style={{ flex: 1, borderBottom: `2px dotted ${P.border}`, marginBottom: 5 }} />
+      <span style={{ fontSize, fontWeight: 800, color: c, whiteSpace: "nowrap" }}>{value}</span>
+    </div>
+  );
+};
+
+const Dash: React.FC<{ y: number }> = ({ y }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: CARD_X + PAD,
+      top: y,
+      width: CARD_W - PAD * 2,
+      borderBottom: `1.5px dashed ${P.border}`,
+    }}
+  />
+);
 
 export const FeatureCrossPlatformDistribution: React.FC = () => {
   const frame = useCurrentFrame();
@@ -49,153 +114,190 @@ export const FeatureCrossPlatformDistribution: React.FC = () => {
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
 
-  // ── Beat windows ──────────────────────────────────────────────────
-  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
-  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
-  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
-  const b4 = seg(frame, 340, 354) * lf;
+  const cardPop = pop(4);
 
-  // ── Beat 1: the problem ───────────────────────────────────────────
-  const platCards = [0, 1, 2, 3].map((i) => pop(20 + i * 12));
-  const pill1 = pop(78);
-  const cap1 = seg(frame, 86, 102);
+  // ── Title swap: "BY HAND" → "AUTOMATIC" ───────────────────────────
+  const titleOldOp = 1 - seg(frame, 116, 130);
+  const titleNewOp = seg(frame, 130, 146);
 
-  // ── Beat 2: the solution ──────────────────────────────────────────
-  const cardRem = pop(132);
-  const wfCards = [0, 1, 2, 3].map((i) => pop(160 + i * 10));
-  const arrDown = seg(frame, 148, 162, Easing.inOut(Easing.cubic));
-  const pill2 = pop(190);
-  const cap2 = seg(frame, 202, 218);
+  // ── Beat 1 caption ─────────────────────────────────────────────────
+  const cap1Op = seg(frame, 34, 50) * (1 - seg(frame, 116, 132));
 
-  // ── Beat 3: handling big files ────────────────────────────────────
-  const cardCap = pop(252);
-  const cardMtk = pop(268);
-  const arrMtk = seg(frame, 272, 288, Easing.inOut(Easing.cubic));
-  const pill3 = pop(300);
-  const cap3 = seg(frame, 308, 324);
-  const techCap = seg(frame, 312, 328);
+  // ── Row swap (strike old → gone → new), staggered per row ─────────
+  const rowStrikeStart = (i: number) => 134 + i * 12;
+  const rowStrikeEnd = (i: number) => rowStrikeStart(i) + 10;
+  const rowOldGone = (i: number) => rowStrikeEnd(i) + 8;
+  const rowNewIn = (i: number) => rowOldGone(i) + 12;
 
-  // ── Beat 4: the result ────────────────────────────────────────────
-  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
-  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
-  const afterIn = pop(372);
-  const speedX = Math.round(
-    interpolate(frame, [384, 414], [1, 15], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) })
+  // ── Total swap ──────────────────────────────────────────────────────
+  const TOTAL_STRIKE_START = 204;
+  const TOTAL_STRIKE_END = 214;
+  const TOTAL_OLD_GONE = 222;
+  const TOTAL_NEW_IN = 234;
+  const totalStrike = seg(frame, TOTAL_STRIKE_START, TOTAL_STRIKE_END);
+  const totalOldOp = 1 - seg(frame, TOTAL_STRIKE_END, TOTAL_OLD_GONE);
+  const totalNewOp = seg(frame, TOTAL_OLD_GONE, TOTAL_NEW_IN);
+
+  // ── Beat 2 caption ─────────────────────────────────────────────────
+  const cap2Op = seg(frame, 240, 256) * (1 - seg(frame, 276, 292));
+
+  // ── Beat 3: capacity note wipes open ───────────────────────────────
+  const WIPE_START = 292;
+  const WIPE_END = 320;
+  const wipeH = interpolate(frame, [WIPE_START, WIPE_END], [0, 128], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+  const rowAOp = Math.min(1, pop(300));
+  const rowBOp = Math.min(1, pop(314));
+  const fallbackOp = seg(frame, 324, 338);
+  const techCapOp = seg(frame, 338, 352) * (1 - seg(frame, 364, 378));
+
+  // ── Beat 4: result ──────────────────────────────────────────────────
+  const chipOp = seg(frame, 374, 390, Easing.out(Easing.cubic));
+  const ratio = Math.round(
+    interpolate(frame, [386, 408], [1, 15], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: Easing.out(Easing.cubic),
+    }),
   );
-  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
-  const check = pop(392);
-  const footOp = seg(frame, 402, 418);
+  const heroOp = seg(frame, 386, 402);
+  const checkScale = pop(398);
+  const footerOp = seg(frame, 404, 420);
 
   return (
-    <div style={{ position: "absolute", inset: 0, fontFamily }}>
-      <LightBg />
+    <PaletteProvider value={P}>
+      <div style={{ position: "absolute", inset: 0, fontFamily, opacity: lf }}>
+        <LightBg />
 
-      {/* ════ Beat 1 — PROBLEM ════ */}
-      <Group opacity={b1}>
-        <Headline text="One video, four platforms," accentText="one at a time?" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
-        {PLATFORMS.map((p, i) => (
-          <IconCard
-            key={p.title}
-            x={90 + i * 280}
-            y={150}
-            w={250}
-            emoji={p.emoji}
-            title={p.title}
-            sub={p.sub}
-            tone="danger"
-            scale={platCards[i]}
-            opacity={Math.min(1, platCards[i])}
-          />
-        ))}
-        <StatPill x={430} y={400} emoji="⏱️" text="30–45 minutes of re-encoding and uploading" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
-        <CaptionBand text="Each platform means its own format, size limit and upload flow" tone="danger" opacity={cap1} />
-      </Group>
-
-      {/* ════ Beat 2 — SOLUTION ════ */}
-      <Group opacity={b2}>
-        <Headline text="Render once," accentText="ship to four" accentColor={B.success} opacity={seg(frame, 116, 130)} />
-        <IconCard x={490} y={130} w={300} emoji="🎬" title="Remotion renders both formats" sub="1080×1920 + 1920×1080, once" tone="accent" scale={cardRem} opacity={Math.min(1, cardRem)} />
-        <FlowArrow x={624} y={228} len={64} progress={arrDown} color={B.accent} />
-        {[
-          { label: "process-video.yml", sub: "YouTube" },
-          { label: "linkedin-video.yml", sub: "LinkedIn" },
-          { label: "instagram-video.yml", sub: "Reels" },
-          { label: "facebook-video.yml", sub: "Facebook" },
-        ].map((wf, i) => (
-          <IconCard
-            key={wf.label}
-            x={90 + i * 280}
-            y={300}
-            w={250}
-            emoji="⚙️"
-            title={wf.label}
-            sub={wf.sub}
-            tone="accent"
-            scale={wfCards[i]}
-            opacity={Math.min(1, wfCards[i])}
-          />
-        ))}
-        <StatPill x={454} y={478} emoji="🎯" text="one trigger, four platforms" tone="accent" scale={pill2} opacity={Math.min(1, pill2)} />
-        <CaptionBand text="GitHub Actions pushes the right format to each platform's own API" tone="accent" opacity={cap2} y={600} />
-      </Group>
-
-      {/* ════ Beat 3 — HANDLING BIG FILES ════ */}
-      <Group opacity={b3}>
-        <Headline text="No file too large —" accentText="up to 2GB" accentColor={B.success} opacity={seg(frame, 240, 254)} />
-        <IconCard x={180} y={190} w={340} emoji="🚫" title="Bot API caps at 20MB" sub="most videos don't fit" tone="danger" scale={cardCap} opacity={Math.min(1, cardCap)} />
-        <FlowArrow x={540} y={244} len={140} progress={arrMtk} color={B.success} />
-        <IconCard x={760} y={190} w={340} emoji="📥" title="MTKruto pulls up to 2GB" sub="straight from Telegram" tone="success" scale={cardMtk} opacity={Math.min(1, cardMtk)} />
-        <StatPill x={410} y={422} emoji="🛟" text="Telegram-embed fallback if any upload fails" tone="success" scale={pill3} opacity={Math.min(1, pill3)} />
-        <CaptionBand text="Large source video streams straight from Telegram — no size ceiling" tone="success" opacity={cap3} y={614} />
-        <div style={{ position: "absolute", left: 0, top: 590, width: 1280, textAlign: "center", fontSize: 15, fontWeight: 600, color: B.muted, opacity: techCap, fontFamily }}>
-          via MTKruto, a full MTProto client
-        </div>
-      </Group>
-
-      {/* ════ Beat 4 — RESULT ════ */}
-      <Group opacity={b4}>
-        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
-        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
-          <div style={{ padding: "26px 30px", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>30–45 min</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>per video, one platform at a time</div>
-          </div>
-        </Panel>
-        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
-        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
-          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>2–3 min</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>of monitoring, all four platforms</div>
-          </div>
-        </Panel>
+        {/* ════ THE LEDGER — alive for the whole clip ════ */}
         <div
           style={{
             position: "absolute",
-            left: 0,
-            top: 424,
-            width: 1280,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-            opacity: speedOp,
-            fontFamily,
+            left: CARD_X,
+            top: CARD_Y,
+            width: CARD_W,
+            height: CARD_H,
+            borderRadius: 18,
+            background: P.card,
+            border: `1.5px solid ${P.border}`,
+            boxShadow: "0 16px 40px rgba(16,40,29,0.16)",
+            opacity: Math.min(1, cardPop),
+            transform: `scale(${0.94 + Math.min(1, cardPop) * 0.06})`,
+            transformOrigin: "center",
           }}
         >
-          <div style={{ position: "relative", width: 52, height: 52 }}>
-            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          <div style={{ position: "absolute", left: PAD, top: 24, fontSize: 15, fontWeight: 700, letterSpacing: 2, color: P.muted }}>
+            🧾 VIDEO DISTRIBUTION
           </div>
-          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>≈{speedX}× faster</span>
-        </div>
-        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
-          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
-            One click uploads to YouTube, Reels, LinkedIn and Facebook.
+          <div style={{ position: "absolute", left: PAD, top: 44, fontSize: 15, fontWeight: 800, letterSpacing: 1, opacity: titleOldOp, color: P.danger }}>
+            — BY HAND
           </div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>Remotion + GitHub Actions · vitalii.no</div>
+          <div style={{ position: "absolute", left: PAD, top: 44, fontSize: 15, fontWeight: 800, letterSpacing: 1, opacity: titleNewOp, color: P.success }}>
+            — AUTOMATIC
+          </div>
         </div>
-      </Group>
-    </div>
+        <Dash y={CARD_Y + 58} />
+
+        {ROWS_OLD.map((r, i) => (
+          <LedgerRow
+            key={r.label}
+            y={ROW_Y[i]}
+            label={r.label}
+            value={r.value}
+            tone="danger"
+            strike={seg(frame, rowStrikeStart(i), rowStrikeEnd(i))}
+            opacity={1 - seg(frame, rowStrikeEnd(i), rowOldGone(i))}
+          />
+        ))}
+        {ROWS_NEW.map((r, i) => (
+          <LedgerRow key={r.label} y={ROW_Y[i]} label={r.label} value={r.value} tone="success" opacity={seg(frame, rowOldGone(i), rowNewIn(i))} />
+        ))}
+
+        <Dash y={CARD_Y + 228} />
+
+        {/* Total */}
+        <div style={{ position: "absolute", left: CARD_X + PAD, top: 284, fontSize: 14, fontWeight: 700, letterSpacing: 2, color: P.muted }}>
+          TOTAL PER VIDEO
+        </div>
+        <div style={{ position: "absolute", left: CARD_X + PAD, top: 305, width: CARD_W - PAD * 2 }}>
+          <span
+            style={{
+              position: "relative",
+              fontSize: 30,
+              fontWeight: 800,
+              color: P.danger,
+              opacity: totalOldOp,
+              fontFamily,
+            }}
+          >
+            30–45 MIN
+            {totalStrike > 0.004 ? (
+              <span
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: "50%",
+                  height: 3,
+                  width: `${Math.min(1, totalStrike) * 100}%`,
+                  background: P.ink,
+                }}
+              />
+            ) : null}
+          </span>
+          <span style={{ position: "absolute", left: 0, top: 0, fontSize: 30, fontWeight: 800, color: P.success, opacity: totalNewOp, fontFamily }}>
+            2–3 MIN
+          </span>
+        </div>
+
+        <Dash y={336} />
+
+        {/* Beat 1 / Beat 2 captions */}
+        <div style={{ position: "absolute", left: 90, top: 520, width: 1100, textAlign: "center", fontSize: 20, fontWeight: 650, color: P.danger, opacity: cap1Op, fontFamily }}>
+          Every platform means its own format, size limit and upload flow
+        </div>
+        <div style={{ position: "absolute", left: 90, top: 520, width: 1100, textAlign: "center", fontSize: 20, fontWeight: 650, color: P.accent, opacity: cap2Op, fontFamily }}>
+          One trigger — GitHub Actions ships the right format to each API
+        </div>
+
+        {/* ════ Beat 3 — capacity note, wiped open ════ */}
+        <div style={{ position: "absolute", left: CARD_X + PAD, top: 350, width: CARD_W - PAD * 2, height: wipeH, overflow: "hidden" }}>
+          <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 2, color: P.muted, marginBottom: 8 }}>BIG FILES</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, opacity: rowAOp, fontSize: 15, fontWeight: 650, color: P.danger }}>
+            <span>🚫</span>
+            <span style={{ flex: 1 }}>Bot API caps uploads at</span>
+            <span style={{ fontWeight: 800 }}>20 MB</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, opacity: rowBOp, marginTop: 8, fontSize: 15, fontWeight: 650, color: P.success }}>
+            <span>✅</span>
+            <span style={{ flex: 1 }}>MTKruto pulls from Telegram</span>
+            <span style={{ fontWeight: 800 }}>up to 2GB</span>
+          </div>
+          <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 8, opacity: fallbackOp, fontSize: 13.5, fontWeight: 600, color: P.muted }}>
+            <span>🛟</span>
+            <span>Falls back to a Telegram embed if any upload fails</span>
+          </div>
+        </div>
+        <div style={{ position: "absolute", left: 90, top: 520, width: 1100, textAlign: "center", fontSize: 16, fontWeight: 600, color: P.muted, opacity: techCapOp, fontFamily }}>
+          via MTKruto, a full MTProto client
+        </div>
+
+        {/* ════ Beat 4 — the payoff ════ */}
+        <StatPill x={310} y={576} emoji="⏱" text="30–45 min by hand" tone="danger" fontSize={17} opacity={chipOp} />
+        <div style={{ position: "absolute", left: 634, top: 584, fontSize: 26, color: P.muted, fontWeight: 700, opacity: chipOp, fontFamily }}>→</div>
+        <StatPill x={690} y={576} emoji="✅" text="2–3 min automatic" tone="success" fontSize={17} opacity={chipOp} />
+        <div style={{ position: "absolute", left: 0, top: 626, width: 1280, display: "flex", alignItems: "center", justifyContent: "center", gap: 16, opacity: heroOp, fontFamily }}>
+          <div style={{ position: "relative", width: 44, height: 44 }}>
+            <CheckBadge x={0} y={0} size={44} scale={checkScale} opacity={Math.min(1, checkScale)} />
+          </div>
+          <span style={{ fontSize: 44, fontWeight: 800, color: P.success }}>≈{ratio}× faster</span>
+        </div>
+        <div style={{ position: "absolute", left: 0, top: 692, width: 1280, textAlign: "center", fontSize: 14, fontWeight: 600, color: P.accent, opacity: footerOp, fontFamily }}>
+          Remotion renders both formats · GitHub Actions ships them · vitalii.no
+        </div>
+      </div>
+    </PaletteProvider>
   );
 };
