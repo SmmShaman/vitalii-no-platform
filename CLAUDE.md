@@ -41,14 +41,23 @@ orders what is left in it.
 |---|---|
 | Canonical rules (styles, Story cut, SEO, budgets) | `docs/feature-demos-pipeline.md` |
 | Ready-made subagent prompt for a batch | `scripts/remotion-video/out/lux-batch-instructions.md` |
-| Bright clip reference (4-beat structure) | `scripts/remotion-video/src/compositions/feature-demos/FeatureJobTable.tsx` |
+| Art-direction log (which staging is already used) | `scripts/remotion-video/out/lux-archetypes.md` |
+| New-rules clip reference (archetype + mood + free rhythm) | `.../feature-demos/FeatureVideoFactoryV3.tsx` |
+| Older bright reference (real-data mockups; its fixed 4-beat rhythm is retired) | `.../feature-demos/FeatureJobTable.tsx` |
 | Story cut reference (54 s, voice-first) | `.../feature-demos/FeatureJobTableStory.tsx` |
 | v2 primitives + colors | `.../feature-demos/bright-primitives.tsx`, `bright-theme.ts` |
 | Per-beat voiceover generator | `scripts/remotion-video/vo-scripts/j26-story.py` |
 
+**Staging is drawn, not copied (2026-08-30).** Each clip gets an archetype (8 of them) and a
+palette mood (`dawn`/`sand`/`slate`/`mint`/`violet`) from its feature id, may not repeat the
+previous two clips, and picks its own 3–5 beat rhythm — see STEP 0 of the instruction sheet.
+Draw them in the MAIN session and hand each subagent its pair; agents must not edit the log.
+
 Batch recipe: pick N features → dump rows to `out/lux-batchN-data.json` → N/2 subagents
 (`model: sonnet`, pointed at `lux-batch-instructions.md`) → render loop with auto-retry
-(~50 s/clip, `--timeout 120000`) → contact sheets to verify → scp to VPS → PUT to R2 on the
+(~50 s/clip, `--timeout 120000`, and `--concurrency=2` — the default times out connecting to
+the browser; from WSL run the render through `cmd.exe /c`) → contact sheets to verify →
+back up the old mp4s from R2 first → scp to VPS → PUT to R2 on the
 SAME keys → **`UPDATE features SET demo_style='bright'`** for each id → commit the story files.
 
 Two steps of the old recipe are **gone**: do NOT insert into
