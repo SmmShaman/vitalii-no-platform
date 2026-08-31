@@ -1,33 +1,46 @@
 /**
- * FeatureInstagramPublishing — feature p15 — 1280x720, 15s @ 30fps, silent, loop-friendly.
- * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
- * viewer: problem/solution color zones, a realistic Instagram post mockup,
- * an automated validate→publish checklist, and a big before→after failure-rate metric.
+ * FeatureInstagramPublishing — feature p15 — 1280x720, 907 frames @30fps.
  *
- * Story (4 beats):
- *  1. Problem — cryptic error codes (#10, #24, #100, #190) and strict aspect
- *     ratio rules silently reject 40% of posts. Red zone.
- *  2. Solution — validate the image locally first, then create a Reels
- *     container, poll until it's ready, and publish — all automatic.
- *  3. How it works — aspect-ratio pre-check, patient polling (every 10s, up
- *     to 30 tries), and an error → fix map for every failure code.
- *  4. Result — before/after cards: 40% failure rate → under 5%, cryptic
- *     codes → self-diagnosable fixes. Green zone, check badge.
+ * FIRST VOICE-SYNCED CLIP (owner rule, 2026-08-31). Everything before this was
+ * a 15 s silent loop with a voiceover laid over it afterwards, so the picture
+ * repeated twice while the narration said something new — the viewer heard one
+ * thing and watched another. From here the ORDER IS REVERSED: the voiceover is
+ * written and measured FIRST, and the frame windows below are the measured beat
+ * boundaries, not a designer's guess. Rebuild the audio and you must rebuild
+ * these numbers with it (`scripts/remotion-video/vo-scripts/p15-beats.py`).
+ *
+ * Art direction drawn from the feature id (STEP 0 of lux-batch-instructions.md):
+ *   archetype 7 "hero number" — (sum of char codes of "p15") % 8 = 6 "sidebar",
+ *   already used by the previous logged clip (p14), so the next one down: 7.
+ *   mood — moodFor("p15") = violet, used by p14, so the next in MOOD_NAMES: dawn.
+ *
+ * Beat windows, measured from the edge-tts build (fps 30, 0.5 s lead, 0.3 s gaps):
+ *   b1  15-150  "Two out of every five Instagram posts simply vanished. Rejected."
+ *   b2 159-340  "Not with a reason — with a number. Error ten. Error twenty-four.
+ *                Nothing about what to fix."
+ *   b3 349-500  "So the picture is measured before it ever leaves. Wrong shape,
+ *                and it never gets sent."
+ *   b4 509-691  "For Reels, the function waits, checking every ten seconds until
+ *                Instagram says it is ready."
+ *   b5 700-862  "Forty percent failing, down to under five. And every error now
+ *                arrives with its fix."
+ *   tail 862-907
+ *
+ * The hero figure owns the frame for the whole clip and is the only element that
+ * survives every beat: it reads 40% while the problem is described and counts
+ * down to <5% exactly while beat 5 says so. Evidence is built AROUND it in the
+ * right-hand zone, which is why each beat there must fade out fully before the
+ * next fades in — they share the same area.
  */
 import React from "react";
-import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { B } from "./bright-theme";
+import { useCurrentFrame, useVideoConfig, interpolate, Easing } from "remotion";
+import { moodFor } from "./bright-theme";
 import {
   LightBg,
   Group,
-  Headline,
   Panel,
-  BrowserWindow,
-  FilterChip,
   StatPill,
   IconCard,
-  FlowArrow,
-  StickyNote,
   CheckBadge,
   CaptionBand,
   seg,
@@ -35,213 +48,365 @@ import {
   fontFamily,
 } from "./bright-primitives";
 
-/** Small Instagram-feed post mockup: square media block, caption, either an error banner or a like row. */
-const InstaCard: React.FC<{ w: number; ok: boolean }> = ({ w, ok }) => (
-  <div style={{ width: w, padding: "18px 20px", fontFamily }}>
-    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-      <div
-        style={{
-          width: 36,
-          height: 36,
-          borderRadius: "50%",
-          background: `linear-gradient(135deg, ${B.danger}, ${B.accent})`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 14,
-          color: "#fff",
-          fontWeight: 800,
-        }}
-      >
-        VB
-      </div>
-      <div style={{ fontSize: 14.5, fontWeight: 700, color: B.ink }}>vitalii.no</div>
-    </div>
+const P = moodFor("p15");
+
+/** Measured beat windows — see the header. Do not hand-tune without rebuilding the audio. */
+const BEATS = {
+  b1: [15, 150],
+  b2: [159, 340],
+  b3: [349, 500],
+  b4: [509, 691],
+  b5: [700, 862],
+} as const;
+
+/** A square Instagram post tile; `state` drives whether it is accepted or silently rejected. */
+const PostTile: React.FC<{
+  x: number;
+  y: number;
+  size: number;
+  rejected: number;
+  opacity?: number;
+}> = ({ x, y, size, rejected, opacity = 1 }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: x,
+      top: y,
+      width: size,
+      height: size,
+      borderRadius: 10,
+      background: P.card,
+      border: `2px solid ${rejected > 0.5 ? P.dangerEdge : P.border}`,
+      boxShadow: "0 4px 14px rgba(20,35,70,0.08)",
+      opacity,
+      overflow: "hidden",
+      fontFamily,
+    }}
+  >
     <div
       style={{
-        marginTop: 12,
-        width: "100%",
-        aspectRatio: ok ? "4 / 5" : "1 / 1",
-        borderRadius: 10,
-        border: `2px solid ${ok ? "#BFE7CD" : B.danger}`,
-        background: ok ? `linear-gradient(135deg, ${B.success} 0%, #43C97F 100%)` : "#F0D8DA",
+        position: "absolute",
+        inset: 0,
+        background: `linear-gradient(135deg, ${P.chipBg} 0%, ${P.accentBg} 100%)`,
+        opacity: 1 - rejected * 0.75,
+      }}
+    />
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontSize: 42,
-        position: "relative",
+        fontSize: size * 0.42,
+        color: P.danger,
+        opacity: rejected,
       }}
     >
-      {ok ? "🎬" : "🖼️"}
-      {!ok && (
-        <div
-          style={{
-            position: "absolute",
-            left: 10,
-            right: 10,
-            bottom: 10,
-            padding: "6px 10px",
-            borderRadius: 8,
-            background: B.danger,
-            color: "#fff",
-            fontSize: 12.5,
-            fontWeight: 700,
-            textAlign: "center",
-          }}
-        >
-          Error #100 — media not published
-        </div>
-      )}
-    </div>
-    <div style={{ marginTop: 12, display: "flex", gap: 22, fontSize: 13, color: B.muted, fontWeight: 600 }}>
-      <span>{ok ? "❤️ Liked" : "❤️"}</span>
-      <span>💬 Comment</span>
-      <span>📤 Share</span>
+      ✕
     </div>
   </div>
 );
 
+/** A raw API error code as Instagram actually returns it: a number and nothing else. */
+const ErrorChip: React.FC<{
+  x: number;
+  y: number;
+  code: string;
+  scale?: number;
+  opacity?: number;
+}> = ({ x, y, code, scale = 1, opacity = 1 }) => {
+  if (opacity <= 0.004 || scale <= 0.004) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        transform: `scale(${scale})`,
+        transformOrigin: "left top",
+        padding: "14px 22px",
+        borderRadius: 12,
+        background: P.dangerBg,
+        border: `1.5px solid ${P.dangerEdge}`,
+        color: P.danger,
+        fontSize: 30,
+        fontWeight: 800,
+        letterSpacing: 0.5,
+        opacity,
+        fontFamily,
+      }}
+    >
+      {code}
+    </div>
+  );
+};
+
 export const FeatureInstagramPublishing: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, durationInFrames } = useVideoConfig();
-  const lf = loopFade(frame, durationInFrames);
+  const { durationInFrames } = useVideoConfig();
 
-  const pop = (start: number, damping = 11) =>
-    frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
+  /**
+   * Visibility for a beat that lives in the shared right-hand zone: it fades in
+   * after its window opens and is fully gone before the window closes, so two
+   * beats never crossfade on top of each other.
+   */
+  const zone = (name: keyof typeof BEATS) => {
+    const [s, e] = BEATS[name];
+    return Math.min(seg(frame, s + 2, s + 16), 1 - seg(frame, e - 10, e - 2));
+  };
 
-  // ── Beat windows ──────────────────────────────────────────────────
-  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
-  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
-  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
-  const b4 = seg(frame, 340, 354) * lf;
+  const b1 = zone("b1");
+  const b2 = zone("b2");
+  const b3 = zone("b3");
+  const b4 = zone("b4");
+  // The last beat has nothing to hand over to, so it holds through the 1.5 s
+  // tail instead of fading out into an empty right-hand zone.
+  const b5 = seg(frame, BEATS.b5[0] + 2, BEATS.b5[0] + 16);
 
-  // ── Beat 1: the problem ───────────────────────────────────────────
-  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
-  const pill1 = pop(46);
-  const pill2 = pop(58);
-  const pill3 = pop(70);
+  // ---- Hero figure: 40% for the whole problem, counting down only while beat 5 says it.
+  const countStart = BEATS.b5[0] + 26;
+  const countEnd = BEATS.b5[0] + 104;
+  const counted = interpolate(frame, [countStart, countEnd], [40, 4.8], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+  const heroText = frame >= countEnd ? "<5%" : `${Math.round(counted)}%`;
+  // The same glyphs are painted twice; the green layer fades in over the red one
+  // so the figure changes colour without ever showing two different numbers.
+  const heroGreen = seg(frame, countStart, countEnd);
+  const heroLabel =
+    frame >= countEnd ? "of Instagram posts rejected, today" : "of Instagram posts rejected";
 
-  // ── Beat 2: the solution ──────────────────────────────────────────
-  const chip1 = pop(132);
-  const chip2 = pop(142);
-  const chip3 = pop(152);
-  const chip4 = pop(164);
-  const postWinOp = seg(frame, 168, 184);
-  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
+  const heroIn = seg(frame, 6, 26);
 
-  // ── Beat 3: how it works ──────────────────────────────────────────
-  const card1 = pop(252);
-  const card2 = pop(272);
-  const card3 = pop(292);
-  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
-  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
-  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
-
-  // ── Beat 4: the result ────────────────────────────────────────────
-  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
-  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
-  const afterIn = pop(372);
-  const drop = Math.round(interpolate(frame, [384, 414], [0, 88], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }));
-  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
-  const check = pop(392);
-  const footOp = seg(frame, 402, 418);
+  const HeroFigure: React.FC<{ color: string; opacity: number }> = ({ color, opacity }) => (
+    <div
+      style={{
+        position: "absolute",
+        left: 78,
+        top: 196,
+        width: 520,
+        fontSize: 208,
+        lineHeight: 1,
+        fontWeight: 800,
+        letterSpacing: -6,
+        color,
+        opacity,
+        fontFamily,
+      }}
+    >
+      {heroText}
+    </div>
+  );
 
   return (
-    <div style={{ position: "absolute", inset: 0, fontFamily }}>
+    <>
       <LightBg />
 
-      {/* ════ Beat 1 — PROBLEM ════ */}
-      <Group opacity={b1}>
-        <Headline text="Instagram rejects your post with" accentText="cryptic errors?" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
-        <BrowserWindow x={80} y={116} w={520} h={452} title="Instagram — publish failed" opacity={Math.min(1, pop(8))}>
-          <InstaCard w={520} ok={false} />
-        </BrowserWindow>
-        <StickyNote
-          x={650}
-          y={150}
-          w={510}
-          opacity={noteOp}
-          text="Need: this photo published as a Reel, without babysitting the upload every time"
-        />
-        <StatPill x={666} y={340} emoji="🚫" text="Error #10 · #24 · #100 · #190" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
-        <StatPill x={666} y={402} emoji="📐" text="Strict aspect ratio, 4:5 to 1.91:1" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
-        <StatPill x={666} y={464} emoji="📉" text="40% of posts silently rejected" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
-        <CaptionBand text="Cryptic codes and strict rules — a coin-flip on whether the post even goes live" tone="danger" opacity={seg(frame, 30, 46)} />
-      </Group>
+      <Group opacity={loopFade(frame, durationInFrames)}>
+        {/* ---------- Hero figure: present in every beat, changes only in beat 5 ---------- */}
+        <HeroFigure color={P.danger} opacity={heroIn} />
+        <HeroFigure color={P.success} opacity={heroIn * heroGreen} />
 
-      {/* ════ Beat 2 — SOLUTION ════ */}
-      <Group opacity={b2}>
-        <Headline text="Check first," accentText="publish with confidence" accentColor={B.success} opacity={seg(frame, 116, 130)} />
-        <FilterChip x={150} y={132} text="Validate ratio" icon="✓" color={B.success} scale={chip1} opacity={Math.min(1, chip1)} />
-        <FilterChip x={390} y={132} text="Create container" icon="✓" color={B.success} scale={chip2} opacity={Math.min(1, chip2)} />
-        <FilterChip x={650} y={132} text="Poll status" icon="✓" color={B.success} scale={chip3} opacity={Math.min(1, chip3)} />
-        <FilterChip x={870} y={132} text="Publish" icon="✓" color={B.success} scale={chip4} opacity={Math.min(1, chip4)} />
-        <BrowserWindow x={390} y={196} w={500} h={420} title="Instagram — published" opacity={postWinOp}>
-          <InstaCard w={500} ok />
-        </BrowserWindow>
-        <CaptionBand text="Bad media never even reaches Instagram — it's caught before the upload starts" tone="accent" opacity={cap2} />
-      </Group>
-
-      {/* ════ Beat 3 — HOW IT WORKS ════ */}
-      <Group opacity={b3}>
-        <Headline text="What happens" accentText="behind the scenes" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
-        <IconCard x={110} y={218} w={300} emoji="📐" title="Aspect-ratio check" sub="parses headers locally, rejects upfront" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
-        <IconCard x={490} y={218} w={300} emoji="⏱️" title="Patient polling" sub="every 10s, up to 30 tries" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
-        <IconCard x={870} y={218} w={300} emoji="🗺️" title="Error → fix map" sub="every code becomes a clear next step" tone="success" scale={card3} opacity={Math.min(1, card3)} />
-        <FlowArrow x={412} y={262} len={76} progress={arr1} />
-        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
-        <CaptionBand
-          text="Under the hood: one post-to-instagram Deno Edge Function talking to the Graph API"
-          opacity={cap3}
-          fontSize={21}
-          y={580}
-        />
-      </Group>
-
-      {/* ════ Beat 4 — RESULT ════ */}
-      <Group opacity={b4}>
-        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
-        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
-          <div style={{ padding: "26px 30px", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>40% fail</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>Cryptic, unfixable errors</div>
-          </div>
-        </Panel>
-        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
-        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
-          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>Under 5% fail</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>Every error, self-diagnosable</div>
-          </div>
-        </Panel>
         <div
           style={{
             position: "absolute",
-            left: 0,
-            top: 424,
-            width: 1280,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-            opacity: speedOp,
+            left: 84,
+            top: 418,
+            width: 500,
+            fontSize: 27,
+            fontWeight: 650,
+            color: P.muted,
+            opacity: heroIn,
             fontFamily,
           }}
         >
-          <div style={{ position: "relative", width: 52, height: 52 }}>
-            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
-          </div>
-          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>-{drop}% failures</span>
+          {heroLabel}
         </div>
-        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
-          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
-            No more sifting through obtuse documentation for every failed post.
-          </div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>Instagram Publishing · vitalii.no</div>
+
+        <div
+          style={{
+            position: "absolute",
+            left: 84,
+            top: 128,
+            fontSize: 22,
+            fontWeight: 700,
+            letterSpacing: 2.4,
+            textTransform: "uppercase",
+            color: P.muted,
+            opacity: heroIn,
+            fontFamily,
+          }}
+        >
+          Instagram publishing
         </div>
+
+        {/* ---------- Beat 1 — two out of five tiles silently rejected ---------- */}
+        <Group opacity={b1}>
+          {[0, 1, 2, 3, 4].map((i) => {
+            const rejected = i >= 3 ? seg(frame, 52 + (i - 3) * 20, 84 + (i - 3) * 20) : 0;
+            return (
+              <PostTile
+                key={i}
+                x={672 + (i % 3) * 178}
+                y={214 + Math.floor(i / 3) * 178}
+                size={152}
+                rejected={rejected}
+                opacity={seg(frame, 24 + i * 9, 48 + i * 9)}
+              />
+            );
+          })}
+          <div
+            style={{
+              position: "absolute",
+              left: 674,
+              top: 574,
+              width: 520,
+              fontSize: 25,
+              fontWeight: 650,
+              color: P.danger,
+              opacity: seg(frame, 96, 118),
+              fontFamily,
+            }}
+          >
+            Two of every five never appeared.
+          </div>
+        </Group>
+
+        {/* ---------- Beat 2 — the API answers with numbers, not reasons ---------- */}
+        <Group opacity={b2}>
+          {[
+            { code: "#10", x: 672, y: 208 },
+            { code: "#24", x: 872, y: 208 },
+            { code: "#100", x: 672, y: 300 },
+            { code: "#190", x: 872, y: 300 },
+          ].map((e, i) => (
+            <ErrorChip
+              key={e.code}
+              x={e.x}
+              y={e.y}
+              code={e.code}
+              scale={interpolate(seg(frame, 176 + i * 22, 206 + i * 22), [0, 1], [0.82, 1])}
+              opacity={seg(frame, 176 + i * 22, 206 + i * 22)}
+            />
+          ))}
+          <Panel x={664} y={402} w={520} h={132} tone="danger" opacity={seg(frame, 268, 296)}>
+            <div
+              style={{
+                padding: "26px 28px",
+                fontSize: 26,
+                fontWeight: 650,
+                color: P.danger,
+                lineHeight: 1.35,
+                fontFamily,
+              }}
+            >
+              No field, no dimension, no hint.
+              <br />
+              Just the number.
+            </div>
+          </Panel>
+        </Group>
+
+        {/* ---------- Beat 3 — the picture is measured locally, before it is sent ---------- */}
+        <Group opacity={b3}>
+          <Panel x={664} y={186} w={524} h={168} tone="success" opacity={seg(frame, 360, 386)}>
+            <div style={{ padding: "22px 26px", fontFamily }}>
+              <div style={{ fontSize: 21, fontWeight: 700, color: P.muted, letterSpacing: 1.4 }}>
+                1080 × 1350
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: P.success, marginTop: 10 }}>
+                4:5 — allowed
+              </div>
+              <div style={{ fontSize: 20, color: P.muted, marginTop: 8 }}>
+                measured here, sent onward
+              </div>
+            </div>
+          </Panel>
+          <CheckBadge x={1120} y={206} scale={seg(frame, 388, 412)} opacity={seg(frame, 388, 412)} />
+
+          <Panel x={664} y={372} w={524} h={168} tone="danger" opacity={seg(frame, 414, 440)}>
+            <div style={{ padding: "22px 26px", fontFamily }}>
+              <div style={{ fontSize: 21, fontWeight: 700, color: P.muted, letterSpacing: 1.4 }}>
+                1080 × 500
+              </div>
+              <div style={{ fontSize: 32, fontWeight: 800, color: P.danger, marginTop: 10 }}>
+                2.16:1 — refused
+              </div>
+              <div style={{ fontSize: 20, color: P.muted, marginTop: 8 }}>
+                stopped before the upload
+              </div>
+            </div>
+          </Panel>
+        </Group>
+
+        {/* ---------- Beat 4 — Reels: create the container, then wait patiently ---------- */}
+        <Group opacity={b4}>
+          {[
+            { t: "10s", label: "in progress", i: 0 },
+            { t: "20s", label: "in progress", i: 1 },
+            { t: "30s", label: "finished", i: 2 },
+          ].map((row) => {
+            const app = seg(frame, 528 + row.i * 34, 558 + row.i * 34);
+            const done = row.i === 2;
+            return (
+              <StatPill
+                key={row.t}
+                x={676}
+                y={212 + row.i * 78}
+                emoji={done ? "✅" : "🕒"}
+                text={`${row.t} — ${row.label}`}
+                tone={done ? "success" : "accent"}
+                opacity={app}
+                scale={interpolate(app, [0, 1], [0.9, 1])}
+                fontSize={24}
+              />
+            );
+          })}
+          <IconCard
+            x={676}
+            y={452}
+            w={508}
+            emoji="📤"
+            title="Then, and only then, publish"
+            sub="up to 30 checks, 10 seconds apart"
+            tone="success"
+            opacity={seg(frame, 636, 664)}
+            scale={interpolate(seg(frame, 636, 664), [0, 1], [0.94, 1])}
+          />
+        </Group>
+
+        {/* ---------- Beat 5 — the number falls, and errors arrive with their fix ---------- */}
+        <Group opacity={b5}>
+          <Panel x={664} y={216} w={524} h={150} tone="card" opacity={seg(frame, 782, 812)}>
+            <div style={{ padding: "24px 26px", fontFamily }}>
+              <div style={{ fontSize: 26, fontWeight: 800, color: P.danger }}>#24</div>
+              <div style={{ fontSize: 25, fontWeight: 650, color: P.ink, marginTop: 10 }}>
+                → resize to 4:5, then retry
+              </div>
+            </div>
+          </Panel>
+          <Panel x={664} y={384} w={524} h={150} tone="success" opacity={seg(frame, 816, 846)}>
+            <div style={{ padding: "24px 26px", fontFamily }}>
+              <div style={{ fontSize: 26, fontWeight: 800, color: P.success }}>#190</div>
+              <div style={{ fontSize: 25, fontWeight: 650, color: P.ink, marginTop: 10 }}>
+                → refresh the page token
+              </div>
+            </div>
+          </Panel>
+        </Group>
+
+        {/* One tech-credibility line for the whole clip. */}
+        <CaptionBand
+          y={648}
+          text="post-to-instagram — a Deno edge function on Supabase"
+          tone="card"
+          fontSize={21}
+          opacity={seg(frame, 40, 70) * 0.72}
+        />
       </Group>
-    </div>
+    </>
   );
 };

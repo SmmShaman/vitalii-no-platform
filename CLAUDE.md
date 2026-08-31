@@ -66,31 +66,44 @@ Two steps of the old recipe are **gone**: do NOT insert into
 alone makes a feature eligible), and do NOT write post texts in the batch (the
 publisher writes them on the day it posts).
 
-**Voicing is NOT optional (owner rule, 2026-08-31).** Between 26.08 and 31.08 the
-batch produced clips only, and every post went out mute — the owner found it by
-watching his own LinkedIn feed. The silent 15 s loop stays the site-hub product;
-the voiced cut is what LinkedIn, Facebook and YouTube get. Per clip, on the VPS
-in `/root/feature-demos/yt/`:
+**Clips are VOICE-SYNCED — voice first, picture second (owner rule, 2026-08-31).**
+Two rules landed the same day. First: voicing is not optional — between 26.08 and
+31.08 the batch produced clips only and every post went out mute. Second, after
+the first three were voiced by looping a 15 s clip under a 25 s narration: **no
+loops.** The owner watched the picture repeat while the voice said something new
+and called it what it is — the viewer hears one thing and watches another.
 
-1. `curl` the clip **from R2** into `/root/feature-demos/feature-<id>.mp4` first.
-   The local copies on the VPS *and* on the PC are stale (12.08 dark renders);
-   R2 is the only source of truth. Muxing without this step silently ships the
-   old dark clip with a new voiceover.
-2. Write `vo-<id>.txt`: **65–75 words**, benefit-led, human problem first, one
-   plain analogy, exactly one tech name, ends on the number. Short sentences —
-   it is heard, not read. At ~155 wpm that lands on 22–27 s.
-3. `edge-tts --voice en-US-AndrewNeural --file vo-<id>.txt --write-media vo-<id>.mp3`
-4. `bash mux_v2.sh <id>` — loops the 15 s clip under the voice (`-stream_loop`,
-   never tpad) and outputs `yt-feature-<id>.mp4` at vo+2 s.
-5. Verify: `volumedetect` mean ≈ −20 dB (a −91 dB track is digital silence), and
-   three frames from the last 3 s must differ (a frozen tail is the 13.08 defect).
-6. PUT to R2 as `features/feature-<id>-voiced.mp4`, then
-   `UPDATE features SET story_media_url = '<public url>'`. The publisher reads
-   `coalesce(story_media_url, demo_media_url)` — that column is the whole switch.
-7. Write `meta-<id>.json` (full SEO template), `echo <id> >> queue.txt`, and run
+So the order is reversed. Reference: `FeatureInstagramPublishing.tsx` (p15, the
+first synced clip) + `vo-scripts/p15-beats.py`.
+
+1. **Write the VO as 4–6 beats**, one sentence-group each, ~70 words total.
+   Human problem first, one plain analogy, exactly one tech name, ends on the
+   number. Short sentences — it is heard, not read.
+2. **Generate and measure each beat separately** (`p15-beats.py`): one mp3 per
+   beat, `ffprobe` each, then assemble the full track with 0.5 s lead, 0.3 s
+   gaps, 1.5 s tail. ⚠️ Assemble with **adelay + amix**, never `concat -c copy`:
+   mp3 frames are 26 ms, and the concat build measured **1.2 s short** over five
+   beats — enough to walk the picture off the words by the last beat.
+3. The script prints the **frame windows**. They go into the composition header
+   AND into `Root.tsx` as `durationInFrames` (p15 = 907). The clip is no longer
+   450 frames and no longer loop-friendly.
+4. Subagents get the beat table in their prompt (STEP 0b of the instruction
+   sheet) and must land each visual event inside its own window.
+5. Render (`--concurrency=2 --timeout 120000`, retry on the browser-connect
+   timeout), then mux: `-i silent.mp4 -i vo.mp3 -filter_complex '[1:a]apad[a]'
+   -map 0:v -map '[a]' -c:v copy -c:a aac -shortest`. `mux_v2.sh` is for the
+   OLD loop recipe only — do not use it on a synced clip.
+6. Verify: `volumedetect` mean ≈ −20 dB (−91 dB is digital silence), and a
+   contact sheet across the beats — each frame must show what that beat says.
+7. **Back up the R2 object first**, then PUT the voiced file to the SAME key
+   `features/feature-<id>.mp4`. One file serves everything: the site plays it
+   muted, the sound button unmutes it, LinkedIn and Facebook get the same URL.
+   `demo_media_url` already points there, so no DB write is needed.
+   (`story_media_url` exists only for p12–p14, voiced the old way.)
+8. Write `meta-<id>.json` (full SEO template), `echo <id> >> queue.txt`, run
    `bash upload_queue.sh` in-session rather than waiting for the 07:30 UTC timer.
-   It writes `youtube_video_id` back to the DB itself; that column makes the site
-   show the play-with-sound overlay and the publisher add the YouTube link.
+   It writes `youtube_video_id` back to the DB itself; that column is what makes
+   the site show the sound button and the publisher add the YouTube link.
 
 Batch size follows the publish rate: 2 posts/day = **14 clips/week** ≈ 1M Sonnet
 tokens/week. Rendering far ahead of that recreates the "texts and clips sitting

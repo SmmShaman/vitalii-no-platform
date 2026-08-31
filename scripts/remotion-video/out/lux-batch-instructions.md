@@ -38,6 +38,26 @@ Hard rule: the archetype decides **where things sit and how they move**. Do NOT 
 to "headline centered on top + panel row + 3 icon cards + 2 result cards" — that layout is
 retired as a default. It is allowed only as archetype 6's right-hand stage, once.
 
+## STEP 0b — Your clip is VOICE-SYNCED (owner rule, 2026-08-31)
+
+The orchestrating session hands you, per feature, a **beat table** it measured from the
+real voiceover: the start and end frame of every beat plus the sentence spoken in it.
+Those numbers are not a suggestion and not a starting point — they are the audio.
+
+- `durationInFrames` is given to you (p15 = 907). It is NOT 450 any more, and the clip is
+  **not loop-friendly**: it ends, it does not seam back to frame 0.
+- Each beat's content must appear inside its own window and be **fully gone before the next
+  window opens** when the two share screen area — the gaps between beats are only ~9 frames.
+- The visual event must land on the words that name it. If beat 3 says "measured before it
+  ever leaves", the measurement appears in beat 3, not beat 2 as foreshadowing.
+- The LAST beat holds through the tail instead of fading out — there is nothing to hand over
+  to, and an empty frame under the closing line reads as a truncated video.
+- One element should survive every beat (in p15 the hero figure), so the clip reads as one
+  argument rather than five slides.
+
+Reference: `src/compositions/feature-demos/FeatureInstagramPublishing.tsx` (p15) — its header
+carries the measured table and explains how each window was used.
+
 ## STEP 1 — Learn the style (read each ONCE, never re-read)
 - `src/compositions/feature-demos/FeatureVideoFactoryV3.tsx` — the reference for the NEW
   art direction (archetype 7 "hero number", mood `violet`, 5 beats). Read it for HOW a clip wires a
@@ -56,8 +76,9 @@ retired as a default. It is allowed only as archetype 6's right-hand stage, once
   proven story beats. Keep the STORY, rebuild the STAGING.
 
 ## STEP 2 — Rewrite each of your two files COMPLETELY in bright v2 style
-- Keep the SAME export/component name (Root.tsx must not change). 1280x720, 450 frames @30fps,
-  silent, loop-friendly (loopFade at tail).
+- Keep the SAME export/component name. 1280x720, 30fps. **`durationInFrames` comes from your
+  beat table (STEP 0b)** — the session updates Root.tsx with it; do not assume 450 and do not
+  build a loop seam.
 - **Wrap the whole tree** in `<PaletteProvider value={P}>` so every primitive picks up your mood.
 - **Rhythm is yours:** 3 to 5 beats, each ≥90 frames (3 s), filling 450 frames. Do not reuse the
   `b1=seg(0,10)…b4=seg(340,354)` windows — pick your own split (e.g. 4 beats of 150/120/90/90,

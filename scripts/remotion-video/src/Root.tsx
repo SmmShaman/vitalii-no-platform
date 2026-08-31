@@ -611,7 +611,9 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureInstagramPublishing"
         component={FeatureInstagramPublishing}
-        durationInFrames={450}
+        // Voice-synced clip: length comes from the measured voiceover, not the
+        // 15 s loop default. Changing the VO means recomputing this.
+        durationInFrames={907}
         fps={30}
         width={1280}
         height={720}

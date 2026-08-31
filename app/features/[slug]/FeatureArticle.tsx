@@ -19,9 +19,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 }
 
 const labels = {
-  en: { features: 'Features', problem: 'Problem', solution: 'How it works', result: 'Result', techStack: 'Tech Stack', notFound: 'Feature Not Found', backHome: 'Back to Home', watchNarrated: 'Watch the narrated version on YouTube', playWithSound: 'Play with sound' },
-  no: { features: 'Funksjoner', problem: 'Problem', solution: 'Hvordan det fungerer', result: 'Resultat', techStack: 'Teknologier', notFound: 'Funksjon ikke funnet', backHome: 'Tilbake til hjem', watchNarrated: 'Se den fortalte versjonen på YouTube', playWithSound: 'Spill av med lyd' },
-  ua: { features: 'Функції', problem: 'Проблема', solution: 'Як це працює', result: 'Результат', techStack: 'Технології', notFound: 'Функцію не знайдено', backHome: 'На головну', watchNarrated: 'Дивитись озвучену версію на YouTube', playWithSound: 'Увімкнути звук' },
+  en: { features: 'Features', problem: 'Problem', solution: 'How it works', result: 'Result', techStack: 'Tech Stack', notFound: 'Feature Not Found', backHome: 'Back to Home', watchNarrated: 'Watch the narrated version on YouTube', playWithSound: 'Play with sound', muteSound: 'Mute' },
+  no: { features: 'Funksjoner', problem: 'Problem', solution: 'Hvordan det fungerer', result: 'Resultat', techStack: 'Teknologier', notFound: 'Funksjon ikke funnet', backHome: 'Tilbake til hjem', watchNarrated: 'Se den fortalte versjonen på YouTube', playWithSound: 'Spill av med lyd', muteSound: 'Demp lyden' },
+  ua: { features: 'Функції', problem: 'Проблема', solution: 'Як це працює', result: 'Результат', techStack: 'Технології', notFound: 'Функцію не знайдено', backHome: 'На головну', watchNarrated: 'Дивитись озвучену версію на YouTube', playWithSound: 'Увімкнути звук', muteSound: 'Вимкнути звук' },
 }
 
 interface FeatureArticleProps {
@@ -184,15 +184,19 @@ export function FeatureArticle({ slug, initialLanguage, initialData }: FeatureAr
             </div>
           </ScrollReveal>
 
-          {/* Demo clip */}
-          {feature.demo_media_url && (
+          {/* Demo clip. Prefer the voiced cut — it is the same file LinkedIn and
+              Facebook get, so the page and the feed never show different videos.
+              `story_media_url` is only set on clips whose voiceover was muxed
+              separately; voice-synced clips carry the audio in demo_media_url. */}
+          {(feature.story_media_url || feature.demo_media_url) && (
             <ScrollReveal delay={0.18}>
               <FeatureDemoClip
-                src={feature.demo_media_url}
+                src={feature.story_media_url || feature.demo_media_url}
                 type={feature.demo_media_type}
                 title={title}
-                youtubeId={feature.youtube_video_id}
-                soundLabel={t.playWithSound}
+                hasSound={!!feature.youtube_video_id}
+                soundOnLabel={t.playWithSound}
+                soundOffLabel={t.muteSound}
                 className={feature.youtube_video_id ? 'mb-3' : 'mb-6'}
               />
             </ScrollReveal>

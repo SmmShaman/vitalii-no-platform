@@ -14,6 +14,14 @@ read the last rows here; after writing, append yours. Rules live in `lux-batch-i
 | 2026-08-30 | p12 | FeatureNeuralTts.tsx | 4 flow-map | slate |
 | 2026-08-30 | p13 | FeatureCrossPlatformDistribution.tsx | 5 ledger | mint |
 | 2026-08-30 | p14 | FeatureLinkedinNativeUpload.tsx | 6 sidebar | violet |
+| 2026-08-31 | p15 | FeatureInstagramPublishing.tsx | 7 hero-number | dawn |
+
+**From p15 on, clips are VOICE-SYNCED (owner rule, 2026-08-31).** The 15 s silent loop is
+retired for new clips: the voiceover is written and measured first, and `durationInFrames`
+plus every beat window comes from those measurements (p15 = 907 frames, 5 beats). A clip
+that ends before the narration does, and is looped to cover the gap, shows the viewer one
+thing while telling them another — that is now a defect. See STEP 0b in
+`lux-batch-instructions.md` and `vo-scripts/p15-beats.py`.
 
 **Legacy note:** the 35 bright clips written between 2026-08-21 and 2026-08-29 all used the
 same staging (centered headline + zone panels + 3 icon cards + 2 result cards) and the dawn
