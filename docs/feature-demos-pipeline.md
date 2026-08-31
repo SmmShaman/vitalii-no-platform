@@ -76,6 +76,24 @@ not reached, tracked by the queue, not by this file.
 5. EN-only (owner decision 2026-08-20), silent 15 s loop, `loopFade` at the
    tail, same render/mux/queue steps as v1 — nothing downstream changes.
 
+**"Silent" describes the RENDER, not the deliverable (clarified 2026-08-31).**
+The rendered 15 s loop is and stays mute: it autoplays in the hub grid, where
+several clips run at once and sound would be chaos. But every clip must then be
+voiced through step 8 below, uploaded to R2 as
+`features/feature-<id>-voiced.mp4`, and written into `features.story_media_url`.
+That column is what LinkedIn and Facebook actually receive — the publisher's
+query selects `coalesce(story_media_url, demo_media_url)`. Skipping it does not
+produce a silent-by-design post; it produces a post carrying a **digital-silence
+audio track** (−91 dB), which reads as broken to anyone who unmutes.
+
+Between 2026-08-26 and 2026-08-31 the batch recipe dropped voicing entirely and
+every post went out that way. Restored as a hard step in the project CLAUDE.md.
+
+**On the site the loop is a poster, not the whole product (2026-08-31).** When
+`youtube_video_id` is set, `FeatureDemoClip` overlays a "Play with sound" button
+that swaps the muted `<video>` for the YouTube embed with `autoplay=1`. The hub
+grid keeps plain silent loops.
+
 ### Story cut (long-form, owner-approved 2026-08-21)
 
 For ~20–30 flagship features with a strong human story, a **Story cut** exists
