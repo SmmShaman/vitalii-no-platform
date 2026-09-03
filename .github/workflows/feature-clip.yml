@@ -24,9 +24,20 @@ on:
         required: true
         type: string
       composition:
-        description: 'Remotion composition id, e.g. FeatureTelegramModeration'
-        required: true
+        description: 'Remotion composition id, e.g. FeatureTelegramModeration (render mode only)'
+        required: false
+        default: ''
         type: string
+      mode:
+        # measure: build the voice from committed beats and commit the measurement
+        #   back to main. ~90 s, no Remotion. This is what a clip needs BEFORE its
+        #   composition can be written, because the beat windows are the audio.
+        # render: the full cell — voice, render, mux, verify, publish.
+        description: 'measure (voice only, commits the timing) or render (the whole clip)'
+        required: false
+        default: 'render'
+        type: choice
+        options: ['render', 'measure']
       upload:
         # A string, not a boolean: in a GitHub expression `false || 'true'`
         # evaluates to 'true', so a boolean false input would silently publish.
@@ -44,7 +55,74 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ── measure ──────────────────────────────────────────────────────────────
+  # A clip cannot be drawn until its narration has been timed, so this runs
+  # first and writes the timing into the repo. No Remotion, no npm install:
+  # about ninety seconds. The nightly factory calls this, waits, pulls, and
+  # only then writes the composition against the frame windows it produced.
+  measure:
+    if: (github.event.inputs.mode || github.event.client_payload.mode || 'render') == 'measure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    env:
+      FEATURE_ID: ${{ github.event.inputs.feature_id || github.event.client_payload.feature_id }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install edge-tts
+        run: |
+          sudo apt-get update && sudo apt-get install -y ffmpeg || true
+          python3 -m pip install --quiet edge-tts
+
+      - name: Measure the voiceover
+        working-directory: ./scripts/remotion-video
+        env:
+          VO_OUT_ROOT: ${{ github.workspace }}/vo
+        run: |
+          set -euo pipefail
+          BEATS="vo-scripts/feature-vo/beats-${FEATURE_ID}.json"
+          test -f "$BEATS" || { echo "::error::missing $BEATS — commit the beat texts first"; exit 1; }
+          python3 vo-scripts/vo-beats.py "$BEATS" > "vo-scripts/feature-vo/vo-${FEATURE_ID}.json"
+          python3 - "$FEATURE_ID" <<'PY'
+          import json, sys, os
+          fid = sys.argv[1]
+          d = json.load(open(f"vo-scripts/feature-vo/vo-{fid}.json"))
+          lines = [f"### {fid} — durationInFrames = **{d['durationInFrames']}** ({d['measured_track_s']} s)", "",
+                   "| beat | frames | words |", "|---|---|---|"]
+          for b in d["timeline"]:
+              lines.append(f"| {b['beat']} | {b['start_f']}–{b['end_f']} | {b['text']} |")
+          out = "\n".join(lines)
+          print(out)
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as f:
+              f.write(out + "\n")
+          PY
+
+      - name: Commit the measurement
+        run: |
+          set -euo pipefail
+          cd "${{ github.workspace }}"
+          F="scripts/remotion-video/vo-scripts/feature-vo/vo-${FEATURE_ID}.json"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$F"
+          if git diff --cached --quiet; then
+            echo "measurement unchanged — nothing to commit"
+          else
+            git commit -m "chore(feature-vo): measured voiceover timing for ${FEATURE_ID}"
+            # Another clip may have landed while the voice was being built.
+            git pull --rebase --autostash origin main
+            git push origin HEAD:main
+            echo "committed $F"
+          fi
+
+  # ── render ───────────────────────────────────────────────────────────────
   render:
+    if: (github.event.inputs.mode || github.event.client_payload.mode || 'render') == 'render'
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
