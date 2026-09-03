@@ -1,0 +1,56 @@
+{
+ "id": "p20",
+ "beat_durations": {
+  "b1": 5.4,
+  "b2": 6.096,
+  "b3": 5.784,
+  "b4": 6.72,
+  "b5": 4.104
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Forty taps a day. Sometimes sixty. Just to move articles from one step to the next.",
+   "start_s": 0.5,
+   "end_s": 5.9,
+   "start_f": 15,
+   "end_f": 177
+  },
+  {
+   "beat": "b2",
+   "text": "Generate the picture. Rewrite it in three languages. Put it on the site. Post it. Repeat.",
+   "start_s": 6.2,
+   "end_s": 12.296,
+   "start_f": 186,
+   "end_f": 369
+  },
+  {
+   "beat": "b3",
+   "text": "None of it was thinking. It was the same buttons in the same order, a factory line with no conveyor.",
+   "start_s": 12.596,
+   "end_s": 18.38,
+   "start_f": 378,
+   "end_f": 551
+  },
+  {
+   "beat": "b4",
+   "text": "So one Supabase function became the conveyor. It runs the chain and stops only to ask when something looks wrong.",
+   "start_s": 18.68,
+   "end_s": 25.4,
+   "start_f": 560,
+   "end_f": 762
+  },
+  {
+   "beat": "b5",
+   "text": "Fifteen minutes per article became two. And the taps went to zero.",
+   "start_s": 25.7,
+   "end_s": 29.804,
+   "start_f": 771,
+   "end_f": 894
+  }
+ ],
+ "total_s": 31.304,
+ "durationInFrames": 939,
+ "measured_track_s": 29.856,
+ "track": "/root/feature-demos/vo-p20/vo-p20.mp3"
+}

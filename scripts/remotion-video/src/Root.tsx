@@ -717,7 +717,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureAutonomousPublishing"
         component={FeatureAutonomousPublishing}
-        durationInFrames={450}
+        durationInFrames={939}
         fps={30}
         width={1280}
         height={720}
