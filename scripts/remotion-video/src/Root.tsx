@@ -725,7 +725,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureMtkrutoVideo"
         component={FeatureMtkrutoVideo}
-        durationInFrames={450}
+        durationInFrames={874}
         fps={30}
         width={1280}
         height={720}
@@ -733,7 +733,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureSourceConsolidation"
         component={FeatureSourceConsolidation}
-        durationInFrames={450}
+        durationInFrames={889}
         fps={30}
         width={1280}
         height={720}
@@ -741,7 +741,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureEdgeFunctionsCost"
         component={FeatureEdgeFunctionsCost}
-        durationInFrames={450}
+        durationInFrames={815}
         fps={30}
         width={1280}
         height={720}
