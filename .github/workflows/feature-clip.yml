@@ -173,24 +173,40 @@ jobs:
         run: |
           set -euo pipefail
           cd "${{ github.workspace }}"
+          # One frame per beat, plus one late in the tail — the tail cell is what
+          # catches a clip that fades to dark instead of holding its last beat.
+          DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "feature-${FEATURE_ID}.mp4")
           mapfile -t MIDS < <(python3 -c "
-          import json
+          import json, sys
           t = json.load(open('vo-measured.json'))['timeline']
           for b in t: print(round((b['start_s'] + b['end_s']) / 2, 2))
+          print(round(float('${DUR}') - 0.2, 2))
           ")
           i=0; SHOTS=()
           for s in "${MIDS[@]}"; do
-            ffmpeg -y -v error -ss "$s" -i "feature-${FEATURE_ID}.mp4" -vframes 1 -vf scale=640:-1 "shot$i.jpg"
+            ffmpeg -y -v error -ss "$s" -i "feature-${FEATURE_ID}.mp4" -vframes 1 -vf scale=560:-1 "shot$i.jpg"
             SHOTS+=("shot$i.jpg"); i=$((i+1))
           done
           # hstack/vstack, never tile= on separate inputs: tile silently emits one frame.
-          if [ ${#SHOTS[@]} -ge 4 ]; then
-            ffmpeg -y -v error -i "${SHOTS[0]}" -i "${SHOTS[1]}" -filter_complex hstack row0.jpg
-            ffmpeg -y -v error -i "${SHOTS[2]}" -i "${SHOTS[3]}" -filter_complex hstack row1.jpg
-            ffmpeg -y -v error -i row0.jpg -i row1.jpg -filter_complex vstack "contact-${FEATURE_ID}.jpg"
+          # Rows of 3, padded to a full row so hstack always gets equal-sized inputs.
+          PER=3
+          while [ $(( ${#SHOTS[@]} % PER )) -ne 0 ]; do
+            ffmpeg -y -v error -f lavfi -i "color=c=white:s=560x315:d=1" -vframes 1 pad.jpg
+            SHOTS+=("pad.jpg")
+          done
+          ROWS=(); r=0
+          for ((k=0; k<${#SHOTS[@]}; k+=PER)); do
+            ARGS=(); for ((m=0; m<PER; m++)); do ARGS+=(-i "${SHOTS[$((k+m))]}"); done
+            ffmpeg -y -v error "${ARGS[@]}" -filter_complex "hstack=inputs=${PER}" "row$r.jpg"
+            ROWS+=("row$r.jpg"); r=$((r+1))
+          done
+          if [ ${#ROWS[@]} -eq 1 ]; then
+            cp "${ROWS[0]}" "contact-${FEATURE_ID}.jpg"
           else
-            cp "${SHOTS[0]}" "contact-${FEATURE_ID}.jpg"
+            ARGS=(); for f in "${ROWS[@]}"; do ARGS+=(-i "$f"); done
+            ffmpeg -y -v error "${ARGS[@]}" -filter_complex "vstack=inputs=${#ROWS[@]}" "contact-${FEATURE_ID}.jpg"
           fi
+          echo "contact sheet: ${#MIDS[@]} cells (beats + tail)"
           ls -la "contact-${FEATURE_ID}.jpg"
 
       - name: Upload artifacts
