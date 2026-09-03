@@ -1,0 +1,56 @@
+{
+ "id": "p18",
+ "beat_durations": {
+  "b1": 6.696,
+  "b2": 5.448,
+  "b3": 6.192,
+  "b4": 7.104,
+  "b5": 4.752
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Fifty articles a day. Every one of them needed a decision, and every decision meant opening something else.",
+   "start_s": 0.5,
+   "end_s": 7.196,
+   "start_f": 15,
+   "end_f": 216
+  },
+  {
+   "beat": "b2",
+   "text": "Pick the picture. Pick the language. Pick where it goes. Hours of it, every single day.",
+   "start_s": 7.496,
+   "end_s": 12.944,
+   "start_f": 225,
+   "end_f": 388
+  },
+  {
+   "beat": "b3",
+   "text": "Now it all happens inside one Telegram message, the way a form fills itself in as you tap.",
+   "start_s": 13.244,
+   "end_s": 19.436,
+   "start_f": 397,
+   "end_f": 583
+  },
+  {
+   "beat": "b4",
+   "text": "The message rewrites itself after every tap. Same bubble, next question. Nothing to open, nothing to type.",
+   "start_s": 19.736,
+   "end_s": 26.84,
+   "start_f": 592,
+   "end_f": 805
+  },
+  {
+   "beat": "b5",
+   "text": "Hours per article became eight seconds. Four taps, and it is published.",
+   "start_s": 27.14,
+   "end_s": 31.892,
+   "start_f": 814,
+   "end_f": 957
+  }
+ ],
+ "total_s": 33.392,
+ "durationInFrames": 1002,
+ "measured_track_s": 31.944,
+ "track": "/root/feature-demos/vo-p18/vo-p18.mp3"
+}

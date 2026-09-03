@@ -15,6 +15,8 @@ read the last rows here; after writing, append yours. Rules live in `lux-batch-i
 | 2026-08-30 | p13 | FeatureCrossPlatformDistribution.tsx | 5 ledger | mint |
 | 2026-08-30 | p14 | FeatureLinkedinNativeUpload.tsx | 6 sidebar | violet |
 | 2026-08-31 | p15 | FeatureInstagramPublishing.tsx | 7 hero-number | dawn |
+| 2026-09-03 | p18 | FeatureTelegramModeration.tsx | 1 timeline | mint |
+| 2026-09-03 | p19 | FeatureCreativeBuilder.tsx | 2 zoom-in | sand |
 
 **From p15 on, clips are VOICE-SYNCED (owner rule, 2026-08-31).** The 15 s silent loop is
 retired for new clips: the voiceover is written and measured first, and `durationInFrames`

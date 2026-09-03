@@ -1,0 +1,56 @@
+{
+ "id": "p19",
+ "beat_durations": {
+  "b1": 5.736,
+  "b2": 5.448,
+  "b3": 6.36,
+  "b4": 6.84,
+  "b5": 5.136
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Make it warmer. Make it more corporate. Everyone knows what they want, nobody can write it down.",
+   "start_s": 0.5,
+   "end_s": 6.236,
+   "start_f": 15,
+   "end_f": 187
+  },
+  {
+   "beat": "b2",
+   "text": "So the picture came back wrong again, and someone tried again. Two hours of guessing per article.",
+   "start_s": 6.536,
+   "end_s": 11.984,
+   "start_f": 196,
+   "end_f": 360
+  },
+  {
+   "beat": "b3",
+   "text": "Now nobody writes anything. You tap. Colour, mood, lighting, like ordering from a menu.",
+   "start_s": 12.284,
+   "end_s": 18.644,
+   "start_f": 369,
+   "end_f": 559
+  },
+  {
+   "beat": "b4",
+   "text": "Forty-two options, and every tap is assembled into one instruction that Azure OpenAI can actually read.",
+   "start_s": 18.944,
+   "end_s": 25.784,
+   "start_f": 568,
+   "end_f": 774
+  },
+  {
+   "beat": "b5",
+   "text": "Two hours of trial and error became fifteen minutes. Eighty-seven percent gone.",
+   "start_s": 26.084,
+   "end_s": 31.22,
+   "start_f": 783,
+   "end_f": 937
+  }
+ ],
+ "total_s": 32.72,
+ "durationInFrames": 982,
+ "measured_track_s": 31.272,
+ "track": "/root/feature-demos/vo-p19/vo-p19.mp3"
+}

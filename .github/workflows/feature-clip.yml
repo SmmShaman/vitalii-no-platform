@@ -1,0 +1,274 @@
+name: Feature Clip Render
+
+# Renders ONE voice-synced feature demo clip and replaces its object in R2.
+#
+# Why this exists (2026-09-03): every other Remotion output in this repo already
+# renders on GitHub runners (daily-news-video.yml, custom-video.yml). Feature
+# clips were the only ones still rendered by hand on the owner's PC, which made
+# the clip supply depend on that PC being awake. This is the same cell, for
+# feature clips.
+#
+# What still happens elsewhere: writing the composition (needs Claude, costs
+# tokens) and the YouTube upload (token lives on the VPS). This workflow does
+# the free half — voice, render, mux, verify, publish to R2.
+#
+# The voiceover is REGENERATED here from the committed beat texts and checked
+# against the committed measurement. If edge-tts drifts, the run fails instead
+# of shipping a clip whose picture no longer matches its words.
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_id:
+        description: 'Feature id, e.g. p18'
+        required: true
+        type: string
+      composition:
+        description: 'Remotion composition id, e.g. FeatureTelegramModeration'
+        required: true
+        type: string
+      upload:
+        # A string, not a boolean: in a GitHub expression `false || 'true'`
+        # evaluates to 'true', so a boolean false input would silently publish.
+        description: 'Replace the clip in R2 (false = render and inspect artifacts only)'
+        required: false
+        default: 'true'
+        type: choice
+        options: ['true', 'false']
+  repository_dispatch:
+    types: [feature-clip-render]
+
+concurrency:
+  # Two runs rendering the same feature would race on the same R2 key.
+  group: feature-clip-${{ github.event.inputs.feature_id || github.event.client_payload.feature_id }}
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    env:
+      FEATURE_ID: ${{ github.event.inputs.feature_id || github.event.client_payload.feature_id }}
+      COMPOSITION: ${{ github.event.inputs.composition || github.event.client_payload.composition }}
+      DO_UPLOAD: ${{ github.event.inputs.upload || github.event.client_payload.upload || 'true' }}
+      R2_BUCKET: news-images
+      R2_PUBLIC_BASE: https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Chrome dependencies (for Remotion)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+            libxcomposite1 libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2t64 || true
+
+      - name: Install Remotion project dependencies
+        working-directory: ./scripts/remotion-video
+        run: npm ci
+
+      - name: Ensure Remotion's own Chrome
+        working-directory: ./scripts/remotion-video
+        run: npx remotion browser ensure
+
+      - name: Install edge-tts
+        run: python3 -m pip install --quiet edge-tts
+
+      # ── Voice ──────────────────────────────────────────────────────────────
+      # Beats are the committed source of truth. The track is rebuilt here so a
+      # clip is reproducible from git alone, with no audio files to shuttle.
+      - name: Build the voiceover from committed beats
+        working-directory: ./scripts/remotion-video
+        env:
+          VO_OUT_ROOT: ${{ github.workspace }}/vo
+        run: |
+          set -euo pipefail
+          BEATS="vo-scripts/feature-vo/beats-${FEATURE_ID}.json"
+          test -f "$BEATS" || { echo "::error::missing $BEATS — commit the beat texts first"; exit 1; }
+          python3 vo-scripts/vo-beats.py "$BEATS" > "${{ github.workspace }}/vo-measured.json"
+          cat "${{ github.workspace }}/vo-measured.json"
+
+      # The composition's beat windows were written against a specific
+      # measurement. edge-tts is not bit-identical run to run, so verify the
+      # rebuild lands on the same timeline before trusting the sync.
+      - name: Verify the rebuilt track matches the committed measurement
+        working-directory: ./scripts/remotion-video
+        run: |
+          set -euo pipefail
+          python3 - "$FEATURE_ID" <<'PY'
+          import json, sys
+          fid = sys.argv[1]
+          want = json.load(open(f"vo-scripts/feature-vo/vo-{fid}.json"))
+          got = json.load(open(f"{__import__('os').environ['GITHUB_WORKSPACE']}/vo-measured.json"))
+          TOL_F = 6  # 0.2 s at 30fps
+          bad = []
+          if abs(want["durationInFrames"] - got["durationInFrames"]) > TOL_F:
+              bad.append(f"total {want['durationInFrames']} -> {got['durationInFrames']} frames")
+          for w, g in zip(want["timeline"], got["timeline"]):
+              for k in ("start_f", "end_f"):
+                  if abs(w[k] - g[k]) > TOL_F:
+                      bad.append(f"{w['beat']}.{k} {w[k]} -> {g[k]}")
+          if bad:
+              print("::error::voiceover drifted from the measurement the picture was built against:")
+              for b in bad:
+                  print(f"::error::  {b}")
+              print("::error::re-measure with vo-beats.py, rebuild the beat windows in the composition and Root.tsx, then re-run")
+              sys.exit(1)
+          print(f"voice ok: {got['durationInFrames']} frames, {len(got['timeline'])} beats, within {TOL_F} frames of the committed measurement")
+          PY
+
+      # ── Picture ────────────────────────────────────────────────────────────
+      # The first render regularly dies with "connect to the browser (25000 ms)"
+      # even on a warm runner; the second attempt goes through. --timeout is
+      # about frame rendering and does not affect that connect step.
+      - name: Render the silent clip
+        working-directory: ./scripts/remotion-video
+        run: |
+          set -uo pipefail
+          OUT="${{ github.workspace }}/feature-${FEATURE_ID}-silent.mp4"
+          for attempt in 1 2 3; do
+            echo "── render attempt $attempt"
+            if npx remotion render "$COMPOSITION" "$OUT" --concurrency=2 --timeout 120000; then
+              echo "rendered on attempt $attempt"; exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::render failed three times"; exit 1
+
+      - name: Mux voice onto picture
+        run: |
+          set -euo pipefail
+          cd "${{ github.workspace }}"
+          # apad, not -stream_loop: a voice-synced clip is cut to the narration
+          # and must never repeat its picture under new words.
+          ffmpeg -y -v error \
+            -i "feature-${FEATURE_ID}-silent.mp4" \
+            -i "vo/vo-${FEATURE_ID}/vo-${FEATURE_ID}.mp3" \
+            -filter_complex '[1:a]apad[a]' \
+            -map 0:v -map '[a]' -c:v copy -c:a aac -shortest \
+            "feature-${FEATURE_ID}.mp4"
+          ls -la "feature-${FEATURE_ID}.mp4"
+
+      - name: Verify the clip carries real audio
+        run: |
+          set -euo pipefail
+          cd "${{ github.workspace }}"
+          MEAN=$(ffmpeg -i "feature-${FEATURE_ID}.mp4" -af volumedetect -f null - 2>&1 \
+                 | grep -oP 'mean_volume: \K-?[0-9.]+')
+          DUR=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "feature-${FEATURE_ID}.mp4")
+          echo "mean volume: ${MEAN} dB   duration: ${DUR} s"
+          # -91 dB is a digital-silence track, which is what shipped mute for a week.
+          python3 -c "import sys; sys.exit(0 if float('${MEAN}') > -60 else 1)" \
+            || { echo "::error::clip is silent (${MEAN} dB) — the mux did not take"; exit 1; }
+
+      # One frame per beat, so a human can see that each beat shows what it says.
+      - name: Build a contact sheet across the beats
+        run: |
+          set -euo pipefail
+          cd "${{ github.workspace }}"
+          mapfile -t MIDS < <(python3 -c "
+          import json
+          t = json.load(open('vo-measured.json'))['timeline']
+          for b in t: print(round((b['start_s'] + b['end_s']) / 2, 2))
+          ")
+          i=0; SHOTS=()
+          for s in "${MIDS[@]}"; do
+            ffmpeg -y -v error -ss "$s" -i "feature-${FEATURE_ID}.mp4" -vframes 1 -vf scale=640:-1 "shot$i.jpg"
+            SHOTS+=("shot$i.jpg"); i=$((i+1))
+          done
+          # hstack/vstack, never tile= on separate inputs: tile silently emits one frame.
+          if [ ${#SHOTS[@]} -ge 4 ]; then
+            ffmpeg -y -v error -i "${SHOTS[0]}" -i "${SHOTS[1]}" -filter_complex hstack row0.jpg
+            ffmpeg -y -v error -i "${SHOTS[2]}" -i "${SHOTS[3]}" -filter_complex hstack row1.jpg
+            ffmpeg -y -v error -i row0.jpg -i row1.jpg -filter_complex vstack "contact-${FEATURE_ID}.jpg"
+          else
+            cp "${SHOTS[0]}" "contact-${FEATURE_ID}.jpg"
+          fi
+          ls -la "contact-${FEATURE_ID}.jpg"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: feature-${{ env.FEATURE_ID }}
+          path: |
+            ${{ github.workspace }}/feature-${{ env.FEATURE_ID }}.mp4
+            ${{ github.workspace }}/contact-${{ env.FEATURE_ID }}.jpg
+            ${{ github.workspace }}/vo-measured.json
+          retention-days: 14
+
+      # ── Publish ────────────────────────────────────────────────────────────
+      # The live key is what the site, LinkedIn and Facebook all read, so the
+      # object it is about to overwrite is copied aside first.
+      - name: Back up the current R2 object
+        if: env.DO_UPLOAD == 'true'
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          cd "${{ github.workspace }}"
+          KEY="features/feature-${FEATURE_ID}.mp4"
+          STAMP=$(date -u +%Y%m%d)
+          BAK="features/_backup/feature-${FEATURE_ID}-${STAMP}.mp4"
+          API="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects"
+          if curl -sfL "${R2_PUBLIC_BASE}/${KEY}" -o old.mp4; then
+            echo "current object: $(stat -c%s old.mp4) bytes -> ${BAK}"
+            curl -sf -X PUT "${API}/$(python3 -c "import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1],safe=''))" "$BAK")" \
+              -H "Authorization: Bearer ${CF_API_TOKEN}" -H 'Content-Type: video/mp4' \
+              --data-binary @old.mp4 >/dev/null
+            echo "backed up"
+          else
+            echo "no existing object at ${KEY} — nothing to back up"
+          fi
+
+      - name: Publish the clip to R2 on the live key
+        if: env.DO_UPLOAD == 'true'
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          cd "${{ github.workspace }}"
+          KEY="features/feature-${FEATURE_ID}.mp4"
+          API="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects"
+          curl -sf -X PUT "${API}/$(python3 -c "import urllib.parse,sys;print(urllib.parse.quote(sys.argv[1],safe=''))" "$KEY")" \
+            -H "Authorization: Bearer ${CF_API_TOKEN}" -H 'Content-Type: video/mp4' \
+            --data-binary @"feature-${FEATURE_ID}.mp4" >/dev/null
+          sleep 3
+          SIZE=$(curl -sfI "${R2_PUBLIC_BASE}/${KEY}" | grep -i '^content-length' | tr -dc '0-9')
+          LOCAL=$(stat -c%s "feature-${FEATURE_ID}.mp4")
+          echo "R2 now serves ${SIZE} bytes, local file is ${LOCAL}"
+          test "$SIZE" = "$LOCAL" || { echo "::error::R2 object does not match what we uploaded"; exit 1; }
+          echo "live: ${R2_PUBLIC_BASE}/${KEY}"
+
+      - name: Tell Telegram
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          cd "${{ github.workspace }}"
+          RUN="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          if [ "${{ job.status }}" = "success" ]; then
+            CAPTION="🎬 Feature clip <b>${FEATURE_ID}</b> rendered with voice.%0AUploaded to R2: ${DO_UPLOAD}%0A<a href=\"${RUN}\">run</a>"
+            if [ -f "contact-${FEATURE_ID}.jpg" ]; then
+              curl -s -F chat_id="${TELEGRAM_CHAT_ID}" -F parse_mode=HTML \
+                -F caption="🎬 Feature clip ${FEATURE_ID} rendered with voice. Uploaded: ${DO_UPLOAD}" \
+                -F photo=@"contact-${FEATURE_ID}.jpg" \
+                "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto" >/dev/null
+            else
+              curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+                -d chat_id="${TELEGRAM_CHAT_ID}" -d parse_mode=HTML -d text="${CAPTION}" >/dev/null
+            fi
+          else
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -d chat_id="${TELEGRAM_CHAT_ID}" -d parse_mode=HTML -d disable_web_page_preview=true \
+              -d text="❌ Feature clip <b>${FEATURE_ID}</b> failed.%0A<a href=\"${RUN}\">logs</a>" >/dev/null
+          fi

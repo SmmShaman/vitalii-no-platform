@@ -1,240 +1,370 @@
 /**
- * FeatureCreativeBuilder — feature p19 — 1280x720, 15s @ 30fps, silent, loop-friendly.
- * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
- * viewer: problem/solution color zones, a real "tap-based menu" mockup, an
- * icon strip for how the taps become a real prompt, and a big before→after
- * metric.
+ * FeatureCreativeBuilder — feature p19 — 1280x720, 982 frames @30fps.
  *
- * Story (4 beats):
- *  1. Problem — vague feedback like "more corporate" or "warmer colors" isn't
- *     a prompt a model can use; moderators regenerate again and again, 2+
- *     hours of trial and error every day. Red zone.
- *  2. Solution — a 7-category, 6-option tap menu: pick "Color", then pick
- *     "Warm" — no typing, ever. A cursor taps through both steps.
- *  3. How it works — 42 no-code elements, cb_gen compiles every tap into one
- *     real prompt, Azure OpenAI draws the image.
- *  4. Result — before/after cards: 2 hours of trial and error → 15 minutes,
- *     an 87% drop. Green zone, check badge.
+ * VOICE-SYNCED (owner rule, 2026-08-31): the beat windows below are measured
+ * from the real voiceover, not a designer's guess — rebuild the audio and you
+ * must rebuild these numbers with it.
+ *
+ * Art direction drawn by the orchestrating session (STEP 0 of
+ * lux-batch-instructions.md):
+ *   archetype 2 "zoom-in" — beat 1 is a wide, small-scale view of the whole
+ *   Telegram bot screen; every following beat is a camera push into ONE part
+ *   of that same screen until it fills the frame. Beat 5 reverses the move —
+ *   a pull-BACK that reveals a result card beside the (now small) phone. The
+ *   phone is the one element that survives every beat.
+ *   mood — sand (warm paper / terracotta), via MOODS.sand.
+ *
+ * Beat windows, measured (fps 30):
+ *   b1  15-187  "Make it warmer. Make it more corporate. Everyone knows what
+ *                they want, nobody can write it down."
+ *   b2 196-360  "So the picture came back wrong again, and someone tried
+ *                again. Two hours of guessing per article."
+ *   b3 369-559  "Now nobody writes anything. You tap. Colour, mood, lighting,
+ *                like ordering from a menu."
+ *   b4 568-774  "Forty-two options, and every tap is assembled into one
+ *                instruction that Azure OpenAI can actually read."
+ *   b5 783-937  "Two hours of trial and error became fifteen minutes.
+ *                Eighty-seven percent gone."
+ *   tail 937-982 — beat 5 HOLDS here at full opacity through the very last
+ *   frame; there is nothing to hand over to, so no fade-out of any kind.
+ *
+ * The camera is one transform (`translate(tx,ty) scale(s)`) applied to a
+ * single "world" div that holds the whole phone screen laid out once, at
+ * fixed coordinates. Each beat just moves/scales that one camera — nothing
+ * ever crossfades with anything that shares its screen area, because each
+ * beat's content lives at a different, non-overlapping y-band inside the
+ * phone and the camera has physically moved on by the time the next band's
+ * content appears.
  */
 import React from "react";
-import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { B } from "./bright-theme";
+import { useCurrentFrame, interpolate, Easing } from "remotion";
+import { MOODS, PaletteProvider } from "./bright-theme";
 import {
   LightBg,
-  Group,
-  Headline,
   Panel,
-  BrowserWindow,
-  FilterChip,
   StatPill,
-  IconCard,
-  FlowArrow,
-  StickyNote,
+  FilterChip,
   Cursor,
   CheckBadge,
   CaptionBand,
   seg,
-  loopFade,
   fontFamily,
 } from "./bright-primitives";
 
+const P = MOODS.sand;
+
+/** Measured beat windows — see the header. Do not hand-tune without rebuilding the audio. */
+const BEATS = {
+  b1: [15, 187],
+  b2: [196, 360],
+  b3: [369, 559],
+  b4: [568, 774],
+  b5: [783, 937],
+} as const;
+
+// ── The phone screen — one fixed layout in "world" coordinates ───────────
+const PHONE_X = 360;
+const PHONE_Y = 26;
+const PHONE_W = 460;
+const PHONE_H = 668;
+const PHONE_CX = PHONE_X + PHONE_W / 2; // 590
+
+// Non-overlapping y-bands inside the phone, one per beat.
+const HEADER_Y = 26;
+const F_Y = 100; // beat 1 — vague feedback
+const R_Y = 220; // beat 2 — rejected image, tried again
+const K_Y = 366; // beat 3 — tap the menu
+const PR_Y = 536; // beat 4 — compiled prompt
+
+// Camera targets: [center-x, center-y, scale]. A wide establishing shot,
+// three progressively tighter pushes into the phone, then a pull-back that
+// reveals the result card beside it.
+const CAM_F = [0, 178, 204, 352, 378, 551, 577, 766, 792, 982];
+const CAM_CX = [590, 590, 590, 590, 590, 590, 590, 590, 830, 830];
+const CAM_CY = [360, 360, 285, 285, 443, 443, 600, 600, 360, 360];
+const CAM_S = [0.95, 0.95, 1.9, 1.9, 2.5, 2.5, 3.15, 3.15, 0.75, 0.75];
+
 export const FeatureCreativeBuilder: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, durationInFrames } = useVideoConfig();
-  const lf = loopFade(frame, durationInFrames);
 
-  const pop = (start: number, damping = 11) =>
-    frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
+  const camAt = (values: readonly number[]) =>
+    interpolate(frame, CAM_F, values, {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: Easing.inOut(Easing.cubic),
+    });
+  const camCx = camAt(CAM_CX);
+  const camCy = camAt(CAM_CY);
+  const camS = camAt(CAM_S);
+  const tx = 640 - camCx * camS;
+  const ty = 360 - camCy * camS;
 
-  // ── Beat windows ──────────────────────────────────────────────────
-  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
-  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
-  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
-  const b4 = seg(frame, 340, 354) * lf;
+  // ── Beat 1 — the moderator can't write down what they want ─────────────
+  // Fully gone by 184, well clear of the 9-frame gap before b2 opens at 196.
+  const b1Out = 1 - seg(frame, 166, 184);
+  const fF = seg(frame, 22, 42) * b1Out;
+  const fTag = seg(frame, 60, 80) * b1Out;
 
-  // ── Beat 1: the problem ───────────────────────────────────────────
-  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
-  const pill1 = pop(46);
-  const pill2 = pop(58);
-  const pill3 = pop(70);
+  // ── Beat 2 — wrong again, tried again, two hours gone ───────────────────
+  // Fully gone by 360 (b2's own end), clear of the gap before b3 opens at 369.
+  const b2Out = 1 - seg(frame, 344, 360);
+  const rIn = seg(frame, 204, 224) * b2Out;
   const regenPulse = 0.85 + 0.15 * Math.sin(frame / 6);
+  const rTag = seg(frame, 250, 270) * b2Out;
+  const rStat = seg(frame, 286, 306) * b2Out;
 
-  // ── Beat 2: the solution — tap a category, then an option ─────────
-  const bubbleOp = seg(frame, 120, 134, Easing.out(Easing.cubic));
-  const stepHubOp = seg(frame, 132, 148) * (1 - seg(frame, 172, 188));
-  const stepOptOp = seg(frame, 172, 188) * (1 - seg(frame, 214, 226));
-  const cx = interpolate(frame, [124, 150, 190, 214], [700, 460, 190, 900], {
+  // ── Beat 3 — tap a category, then an option ──────────────────────────────
+  // Fully gone by 562, clear of the gap before b4 opens at 568 (this is what
+  // was leaking the green "Saved to session" chip into b4 before the fix).
+  const b3Out = 1 - seg(frame, 546, 562);
+  const catLabel = seg(frame, 380, 398) * (1 - seg(frame, 452, 466));
+  const optLabel = seg(frame, 452, 466) * b3Out;
+  const catChips = catLabel;
+  const optChips = optLabel;
+  const cx = interpolate(frame, [398, 428, 466, 496], [860, 770, 770, 450], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.quad),
   });
-  const cy = interpolate(frame, [124, 150, 190, 214], [500, 324, 324, 420], {
+  const cy = interpolate(frame, [398, 428, 466, 496], [520, 424, 424, 424], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.quad),
   });
-  const cursorOp = seg(frame, 124, 132) * (1 - seg(frame, 214, 224));
-  const click1 = seg(frame, 150, 162, Easing.out(Easing.quad));
-  const click2 = seg(frame, 190, 202, Easing.out(Easing.quad));
-  const cap2 = seg(frame, 204, 220, Easing.out(Easing.cubic)) * (1 - seg(frame, 228, 240));
+  const cursorOp = seg(frame, 398, 410) * (1 - seg(frame, 508, 520));
+  const click1 = seg(frame, 428, 440, Easing.out(Easing.quad));
+  const click2 = seg(frame, 496, 508, Easing.out(Easing.quad));
+  const colorHighlight = seg(frame, 434, 448);
+  const warmHighlight = seg(frame, 502, 516);
+  const savedTag = seg(frame, 520, 538) * b3Out;
 
-  // ── Beat 3: how it works ───────────────────────────────────────────
-  const card1 = pop(252);
-  const card2 = pop(272);
-  const card3 = pop(292);
-  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
-  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
-  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+  // ── Beat 4 — every tap assembled into one prompt ─────────────────────────
+  // Fully gone by 774 (b4's own end), clear of the gap before b5 opens at 783.
+  const b4Out = 1 - seg(frame, 758, 774);
+  const promptIn = seg(frame, 578, 600) * b4Out;
+  const techTag = seg(frame, 630, 650) * b4Out;
+  const promptStat = seg(frame, 660, 680) * b4Out;
 
-  // ── Beat 4: the result ────────────────────────────────────────────
-  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
-  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
-  const afterIn = pop(372);
-  const check = pop(392);
-  const resultOp = seg(frame, 388, 404, Easing.out(Easing.cubic));
-  const footOp = seg(frame, 402, 418);
+  // ── Beat 5 — the number, and the payoff ───────────────────────────────────
+  const cardIn = seg(frame, 792, 814);
+  const beforeAfter = seg(frame, 816, 838);
+  const heroPct = seg(frame, 846, 872);
+  const check = seg(frame, 872, 890);
+  const resultSub = seg(frame, 892, 912);
 
+  // No tail fade: this clip does not loop and has nothing to hand over to,
+  // so beat 5 holds at full opacity through the very last rendered frame.
   return (
-    <div style={{ position: "absolute", inset: 0, fontFamily }}>
-      <LightBg />
+    <PaletteProvider value={P}>
+      <div style={{ position: "absolute", inset: 0, fontFamily }}>
+        <LightBg />
 
-      {/* ════ Beat 1 — PROBLEM ════ */}
-      <Group opacity={b1}>
-        <Headline text="Turn " accentText='"warmer colors" into a real prompt?' accentColor={B.danger} opacity={seg(frame, 4, 18)} />
-        <BrowserWindow x={80} y={116} w={700} h={452} title="Image review — needs work" opacity={Math.min(1, pop(8))}>
-          <div
-            style={{
-              position: "absolute",
-              left: 150,
-              top: 40,
-              width: 400,
-              height: 250,
-              borderRadius: 18,
-              background: "linear-gradient(135deg, #E3E9F2, #F4F7FC)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 68,
-              opacity: regenPulse,
-            }}
-          >
-            🖼️
-          </div>
-          <div style={{ position: "absolute", left: 0, top: 306, width: 700, textAlign: "center", fontSize: 16, fontWeight: 600, color: B.muted, fontFamily }}>
-            AI-generated image — attempt after attempt
-          </div>
-          <FilterChip x={270} y={344} text="🔄 Regenerate again" icon="" opacity={0.95} />
-        </BrowserWindow>
-        <StickyNote
-          x={830}
-          y={150}
-          w={350}
-          opacity={noteOp}
-          text={'Feedback so far: "more corporate", "needs to feel warmer", "just... try again"'}
-        />
-        <StatPill x={846} y={340} emoji="🔄" text="Regenerate, again and again" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
-        <StatPill x={846} y={402} emoji="🗣️" text="Vague feedback, no real prompt" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
-        <StatPill x={846} y={464} emoji="⏱️" text="2+ hours of trial and error, daily" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
-        <CaptionBand text="Moderators know what looks right — but can't write a prompt for it" tone="danger" opacity={seg(frame, 30, 46)} />
-      </Group>
+        {/* Small persistent eyebrow — screen-fixed, never moves with the camera */}
+        <div
+          style={{
+            position: "absolute",
+            left: 60,
+            top: 40,
+            fontSize: 20,
+            fontWeight: 700,
+            letterSpacing: 2.2,
+            textTransform: "uppercase",
+            color: P.muted,
+            opacity: seg(frame, 10, 26),
+            fontFamily,
+          }}
+        >
+          AI Creative Builder
+        </div>
 
-      {/* ════ Beat 2 — SOLUTION ════ */}
-      <Group opacity={b2}>
-        <Headline text="Tap it into" accentText="a real prompt" accentColor={B.success} opacity={seg(frame, 116, 130)} />
-        <Panel x={110} y={196} w={1060} h={280} tone="accent" opacity={bubbleOp}>
-          <div style={{ position: "absolute", left: 30, top: 22, fontSize: 20, fontWeight: 700, color: B.ink, fontFamily }}>
-            🎨 Creative Builder — cb_hub
-          </div>
-          <div style={{ position: "absolute", left: 30, top: 54, fontSize: 15, fontWeight: 600, color: B.muted, fontFamily }}>
-            7 categories, 6 options each — no typing, ever
-          </div>
-          <div style={{ position: "absolute", left: 30, top: 100, fontSize: 16.5, fontWeight: 700, color: B.accent, opacity: stepHubOp, fontFamily }}>
-            Step 1 — pick a category
-          </div>
-          <div style={{ position: "absolute", left: 30, top: 100, fontSize: 16.5, fontWeight: 700, color: B.accent, opacity: stepOptOp, fontFamily }}>
-            Step 2 — pick an option for "Color"
-          </div>
-          <FilterChip x={30} y={140} text="Mood" icon="" opacity={stepHubOp} />
-          <FilterChip x={165} y={140} text="Style" icon="" opacity={stepHubOp} />
-          <FilterChip x={300} y={140} text="Color" icon="" opacity={stepHubOp} color={B.success} />
-          <FilterChip x={435} y={140} text="Lighting" icon="" opacity={stepHubOp} />
-          <FilterChip x={570} y={140} text="Composition" icon="" opacity={stepHubOp} />
-          <FilterChip x={730} y={140} text="Subject" icon="" opacity={stepHubOp} />
-          <FilterChip x={880} y={140} text="Background" icon="" opacity={stepHubOp} />
-          <FilterChip x={30} y={140} text="Warm" icon="" opacity={stepOptOp} color={B.success} />
-          <FilterChip x={190} y={140} text="Cool" icon="" opacity={stepOptOp} />
-          <FilterChip x={330} y={140} text="Pastel" icon="" opacity={stepOptOp} />
-          <FilterChip x={480} y={140} text="Bold" icon="" opacity={stepOptOp} />
-          <FilterChip x={630} y={140} text="Monochrome" icon="" opacity={stepOptOp} />
-          <FilterChip x={820} y={140} text="Vivid" icon="" opacity={stepOptOp} />
-          <div style={{ position: "absolute", left: 30, top: 220, fontSize: 14.5, fontWeight: 600, color: B.muted, opacity: Math.max(stepHubOp, stepOptOp) * 0.85, fontFamily }}>
-            Every tap saves straight to session state — nothing to type, nothing to lose
-          </div>
-        </Panel>
-        <Cursor x={cx} y={cy} opacity={cursorOp} click={Math.max(click1 % 1, click2 % 1)} />
-        <CaptionBand text='Category, then option — "Color" → "Warm" — no prompt engineering needed' tone="accent" opacity={cap2} />
-      </Group>
-
-      {/* ════ Beat 3 — HOW IT WORKS ════ */}
-      <Group opacity={b3}>
-        <Headline text="Every tap becomes" accentText="part of the image" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
-        <IconCard x={110} y={218} w={300} emoji="🗂️" title="42 elements, no-code" sub="editable anytime in creative_elements" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
-        <IconCard x={490} y={218} w={300} emoji="🧩" title="cb_gen compiles it all" sub="taps + article details → one prompt" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
-        <IconCard x={870} y={218} w={300} emoji="🎨" title="Azure OpenAI draws it" sub="on-brand, every single time" tone="success" scale={card3} opacity={Math.min(1, card3)} />
-        <FlowArrow x={412} y={262} len={76} progress={arr1} />
-        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
-        <CaptionBand
-          text="Taste, translated automatically into a prompt a model can actually use"
-          opacity={cap3}
-          fontSize={21}
-          y={580}
-        />
-      </Group>
-
-      {/* ════ Beat 4 — RESULT ════ */}
-      <Group opacity={b4}>
-        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
-        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
-          <div style={{ padding: "26px 30px", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>2 hours</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>of trial and error, per article</div>
-          </div>
-        </Panel>
-        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
-        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
-          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>15 minutes</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>42 taps, one clear prompt</div>
-          </div>
-        </Panel>
+        {/* ════ The world — one camera transform over the whole phone ════ */}
         <div
           style={{
             position: "absolute",
             left: 0,
-            top: 424,
+            top: 0,
             width: 1280,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-            opacity: resultOp,
-            fontFamily,
+            height: 720,
+            transform: `translate(${tx}px, ${ty}px) scale(${camS})`,
+            transformOrigin: "0 0",
           }}
         >
-          <div style={{ position: "relative", width: 52, height: 52 }}>
-            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+          {/* Phone shell — the one element that survives every beat */}
+          <Panel x={PHONE_X} y={PHONE_Y} w={PHONE_W} h={PHONE_H} tone="card" radius={40} opacity={1} />
+
+          {/* Header — persistent chrome */}
+          <div style={{ position: "absolute", left: PHONE_X, top: HEADER_Y, width: PHONE_W, height: 64, opacity: seg(frame, 8, 24), fontFamily }}>
+            <div
+              style={{
+                position: "absolute",
+                left: 20,
+                top: 12,
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                background: P.accentBg,
+                border: `2px solid ${P.accentEdge}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 21,
+              }}
+            >
+              🎨
+            </div>
+            <div style={{ position: "absolute", left: 72, top: 14, fontSize: 18, fontWeight: 700, color: P.ink }}>
+              Creative Builder Bot
+            </div>
+            <div style={{ position: "absolute", left: 72, top: 38, fontSize: 13, fontWeight: 600, color: P.muted }}>
+              online — tap to direct the image
+            </div>
           </div>
-          <span style={{ fontSize: 48, fontWeight: 800, color: B.success }}>87% less iteration time</span>
-        </div>
-        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
-          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
-            Non-technical moderators, real creative control.
+
+          {/* ════ Beat 1 — vague feedback ════ */}
+          <Panel x={PHONE_X + 20} y={F_Y} w={PHONE_W - 40} h={92} tone="danger" opacity={fF}>
+            <div style={{ padding: "16px 20px", fontFamily }}>
+              <div style={{ fontSize: 15.5, fontWeight: 700, color: P.danger, lineHeight: 1.5 }}>
+                💬 "more corporate, please"
+              </div>
+              <div style={{ fontSize: 15.5, fontWeight: 700, color: P.danger, lineHeight: 1.5, marginTop: 4 }}>
+                💬 "needs to feel warmer..."
+              </div>
+            </div>
+          </Panel>
+          <StatPill
+            x={PHONE_X + 20}
+            y={F_Y + 100}
+            emoji="🗣️"
+            text="Vague feedback, no real prompt"
+            tone="danger"
+            opacity={fTag}
+            fontSize={15}
+          />
+
+          {/* ════ Beat 2 — wrong again, tried again ════ */}
+          <div
+            style={{
+              position: "absolute",
+              left: PHONE_X + 20,
+              top: R_Y,
+              width: 84,
+              height: 84,
+              borderRadius: 16,
+              background: `linear-gradient(135deg, ${P.chipBg}, ${P.card})`,
+              border: `1.5px solid ${P.border}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 38,
+              opacity: rIn * regenPulse,
+              fontFamily,
+            }}
+          >
+            🖼️
           </div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>Creative Builder · vitalii.no</div>
+          <div style={{ position: "absolute", left: PHONE_X + 120, top: R_Y + 14 }}>
+            <FilterChip x={0} y={0} text="Regenerate, again" icon="🔄" opacity={rIn} />
+          </div>
+          <div style={{ position: "absolute", left: PHONE_X + 120, top: R_Y + 56, opacity: rTag, fontFamily }}>
+            <FilterChip x={0} y={0} text="Still not right..." icon="" opacity={1} color={P.danger} />
+          </div>
+          <StatPill
+            x={PHONE_X + 20}
+            y={R_Y + 100}
+            emoji="⏱️"
+            text="2 hours of guessing, per article"
+            tone="danger"
+            opacity={rStat}
+            fontSize={15}
+          />
+
+          {/* ════ Beat 3 — tap the menu ════ */}
+          <div style={{ position: "absolute", left: PHONE_X + 20, top: K_Y, fontSize: 16, fontWeight: 700, color: P.accent, opacity: catLabel, fontFamily }}>
+            Step 1 — tap a category
+          </div>
+          <div style={{ position: "absolute", left: PHONE_X + 20, top: K_Y, fontSize: 16, fontWeight: 700, color: P.accent, opacity: optLabel, fontFamily }}>
+            Step 2 — tap an option for "Color"
+          </div>
+          <FilterChip x={PHONE_X + 20} y={K_Y + 34} text="Mood" icon="" opacity={catChips} />
+          <FilterChip x={PHONE_X + 150} y={K_Y + 34} text="Style" icon="" opacity={catChips} />
+          <FilterChip x={PHONE_X + 280} y={K_Y + 34} text="Color" icon="" opacity={catChips} scale={1 + colorHighlight * 0.12} color={colorHighlight > 0.4 ? P.success : undefined} />
+          <FilterChip x={PHONE_X + 20} y={K_Y + 34} text="Warm" icon="" opacity={optChips} scale={1 + warmHighlight * 0.12} color={warmHighlight > 0.4 ? P.success : undefined} />
+          <FilterChip x={PHONE_X + 140} y={K_Y + 34} text="Cool" icon="" opacity={optChips} />
+          <FilterChip x={PHONE_X + 250} y={K_Y + 34} text="Pastel" icon="" opacity={optChips} />
+          <Cursor x={cx} y={cy} opacity={cursorOp} click={Math.max(click1 % 1, click2 % 1)} />
+          <StatPill x={PHONE_X + 20} y={K_Y + 100} emoji="✅" text="Saved to session — no typing" tone="success" opacity={savedTag} fontSize={15} />
+
+          {/* ════ Beat 4 — one prompt, assembled ════ */}
+          <Panel x={PHONE_X + 20} y={PR_Y} w={PHONE_W - 40} h={78} tone="accent" opacity={promptIn}>
+            <div style={{ padding: "14px 20px", fontFamily }}>
+              <div style={{ fontSize: 14.5, fontWeight: 650, color: P.ink, lineHeight: 1.45 }}>
+                "Warm palette, soft studio light, confident corporate mood, centered subject"
+              </div>
+            </div>
+          </Panel>
+          {/* Shifted in from PHONE_X+20 to PHONE_X+40: at beat 4's 3.15x push the
+              visible world-x window starts at ~386.8px, and flush left text at
+              PHONE_X+20 (=380) got its leading glyph sliced off the frame. */}
+          <div
+            style={{
+              position: "absolute",
+              left: PHONE_X + 40,
+              top: PR_Y + 86,
+              fontSize: 13,
+              fontWeight: 700,
+              letterSpacing: 0.4,
+              color: P.muted,
+              opacity: techTag,
+              fontFamily,
+            }}
+          >
+            cb_gen_7f3a → Azure OpenAI
+          </div>
+          <StatPill x={PHONE_X + 40} y={PR_Y + 108} emoji="🧩" text="42 taps → 1 real prompt" tone="accent" opacity={promptStat} fontSize={15} />
+
+          {/* ════ Beat 5 — the payoff, revealed beside the phone ════ */}
+          <Panel x={900} y={170} w={330} h={370} tone="success" opacity={cardIn}>
+            <div style={{ padding: "26px 28px", fontFamily }}>
+              <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1.4, color: P.muted, opacity: beforeAfter }}>
+                THE RESULT
+              </div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: P.ink, marginTop: 10, opacity: beforeAfter }}>
+                2 hours <span style={{ color: P.muted }}>→</span> 15 minutes
+              </div>
+              <div
+                style={{
+                  fontSize: 108,
+                  fontWeight: 800,
+                  color: P.success,
+                  marginTop: 12,
+                  lineHeight: 1,
+                  opacity: Math.min(1, heroPct),
+                  transform: `scale(${0.85 + 0.15 * Math.min(1, heroPct)})`,
+                  transformOrigin: "left center",
+                }}
+              >
+                87%
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 10, opacity: Math.min(1, check) }}>
+                <div style={{ position: "relative", width: 34, height: 34 }}>
+                  <CheckBadge x={0} y={0} size={34} scale={check} opacity={Math.min(1, check)} />
+                </div>
+                <span style={{ fontSize: 20, fontWeight: 700, color: P.success }}>less iteration time</span>
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: P.muted, marginTop: 18, lineHeight: 1.4, opacity: resultSub }}>
+                Non-technical moderators, real creative control.
+              </div>
+            </div>
+          </Panel>
         </div>
-      </Group>
-    </div>
+
+        {/* ════ Bottom caption band — screen-fixed, one line per beat ════ */}
+        <CaptionBand text='Nobody could turn "warmer" or "more corporate" into a real prompt' tone="danger" opacity={Math.min(seg(frame, 30, 50), 1 - seg(frame, 176, 190))} />
+        <CaptionBand text="Every wrong guess cost another try — two hours of guessing, per article" tone="danger" opacity={Math.min(seg(frame, 210, 228), 1 - seg(frame, 348, 362))} />
+        <CaptionBand text='Now nobody writes anything — you just tap: colour, mood, lighting' tone="accent" opacity={Math.min(seg(frame, 384, 402), 1 - seg(frame, 546, 560))} />
+        <CaptionBand text="42 options, assembled into one instruction Azure OpenAI can read" opacity={Math.min(seg(frame, 588, 606), 1 - seg(frame, 760, 776))} />
+        <CaptionBand text="2 hours of trial and error became 15 minutes — 87% gone" tone="success" opacity={seg(frame, 800, 818)} />
+      </div>
+    </PaletteProvider>
   );
 };

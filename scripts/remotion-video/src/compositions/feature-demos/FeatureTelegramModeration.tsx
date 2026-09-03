@@ -1,28 +1,44 @@
 /**
- * FeatureTelegramModeration — feature p18 — 1280x720, 15s @ 30fps, silent, loop-friendly.
- * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
- * viewer: problem/solution color zones, a real "chat message" mockup that
- * edits itself in place, an icon strip for the smart shortcuts, and a big
- * before→after metric.
+ * FeatureTelegramModeration — feature p18 — 1280x720, 1002 frames @30fps.
+ * VOICE-SYNCED (owner rule, 2026-08-31) — the beat windows below are measured
+ * from the real voiceover, not a designer's guess. Rebuild the audio and you
+ * must rebuild these numbers with it.
  *
- * Story (4 beats):
- *  1. Problem — 50+ articles a day from 6 Telegram channels + RSS, each one
- *     needing 3 picks by hand: an image, a language, a platform. Red zone.
- *  2. Solution — one chat message that edits itself three times: photo →
- *     language → platform — a cursor taps through all three, same bubble.
- *  3. How it stays fast — action_prefix_${newsId} fits Telegram's 64-byte
- *     limit, the smartest photo is always picked automatically, video posts
- *     skip straight to publish.
- *  4. Result — before/after cards: hours per article → 8 seconds, 4 taps.
- *     Green zone, check badge.
+ * Art direction handed down by the orchestrating session (STEP 0 of
+ * lux-batch-instructions.md), NOT drawn locally:
+ *   archetype 1 "timeline ribbon" — a horizontal band spans the frame at
+ *     y=555; a stamp lands on it, left→right, the moment each beat's event
+ *     happens. It is the one element that survives every beat, so the clip
+ *     reads as one line of progress instead of five slides.
+ *   mood "mint" — `<PaletteProvider value={MOODS.mint}>` wraps the whole tree.
+ *
+ * Beat windows (measured, edge-tts build, fps 30):
+ *   b1  15-216  "Fifty articles a day. Every one of them needed a decision,
+ *                and every decision meant opening something else."
+ *   b2 225-388  "Pick the picture. Pick the language. Pick where it goes.
+ *                Hours of it, every single day."
+ *   b3 397-583  "Now it all happens inside one Telegram message, the way a
+ *                form fills itself in as you tap."
+ *   b4 592-805  "The message rewrites itself after every tap. Same bubble,
+ *                next question. Nothing to open, nothing to type."
+ *   b5 814-957  "Hours per article became eight seconds. Four taps, and it
+ *                is published."
+ *   tail 957-1002 — b5 HOLDS, it does not fade to an empty frame.
+ *
+ * Sync notes: b3 talks about "one message" only conceptually (two icon
+ * cards, chat→form) — the actual Telegram bubble mockup does not appear
+ * until b4, because b4 is the beat that says it rewrites itself; showing the
+ * bubble earlier would foreshadow the payoff before the words land. The
+ * b3→b4 change is a slide+scale push along the ribbon, not a plain
+ * crossfade: b3's cards slide left as they leave, b4's bubble pushes in
+ * from the right and scales up to full size.
  */
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { B } from "./bright-theme";
+import { MOODS, PaletteProvider, cardShadow } from "./bright-theme";
 import {
   LightBg,
   Group,
-  Headline,
   Panel,
   BrowserWindow,
   SkeletonScroll,
@@ -30,7 +46,6 @@ import {
   StatPill,
   IconCard,
   FlowArrow,
-  StickyNote,
   Cursor,
   CheckBadge,
   CaptionBand,
@@ -39,182 +54,440 @@ import {
   fontFamily,
 } from "./bright-primitives";
 
+const P = MOODS.mint;
+
+/** Measured beat windows — see the header. Do not hand-tune without rebuilding the audio. */
+const BEATS = {
+  b1: [15, 216],
+  b2: [225, 388],
+  b3: [397, 583],
+  b4: [592, 805],
+  b5: [814, 957],
+} as const;
+
+/** Ribbon stamp: a small circle that lands on the timeline and never leaves. */
+const Stamp: React.FC<{ x: number; emoji: string; label: string; color: string; scale: number; opacity: number }> = ({
+  x,
+  emoji,
+  label,
+  color,
+  scale,
+  opacity,
+}) => {
+  if (opacity <= 0.004) return null;
+  return (
+    <>
+      <div
+        style={{
+          position: "absolute",
+          left: x - 20,
+          top: 535,
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          background: P.card,
+          border: `2.5px solid ${color}`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 19,
+          transform: `scale(${scale})`,
+          transformOrigin: "center",
+          boxShadow: cardShadow,
+          opacity,
+          fontFamily,
+        }}
+      >
+        {emoji}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: x - 74,
+          top: 584,
+          width: 148,
+          textAlign: "center",
+          fontSize: 14.5,
+          fontWeight: 700,
+          color,
+          opacity,
+          fontFamily,
+        }}
+      >
+        {label}
+      </div>
+    </>
+  );
+};
+
 export const FeatureTelegramModeration: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
-  const lf = loopFade(frame, durationInFrames);
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
 
-  // ── Beat windows ──────────────────────────────────────────────────
-  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
-  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
-  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
-  const b4 = seg(frame, 340, 354) * lf;
+  /** Zone visibility: fades in after the beat opens, fully gone before it closes. */
+  const zone = (name: keyof typeof BEATS) => {
+    const [s, e] = BEATS[name];
+    return Math.min(seg(frame, s + 2, s + 16), 1 - seg(frame, e - 10, e - 2));
+  };
 
-  // ── Beat 1: the problem ───────────────────────────────────────────
+  const b1 = zone("b1");
+  const b2 = zone("b2");
+  const b3 = zone("b3");
+  const b4 = zone("b4");
+  // b5 has nothing to hand over to — it holds through the tail instead of fading out.
+  const b5 = seg(frame, BEATS.b5[0] + 2, BEATS.b5[0] + 16);
+
+  // ── Ribbon spine — present from the first frame, grows as the story moves ──
+  const ribbonX0 = 110;
+  const ribbonW = 1060;
+  const ribbonIn = seg(frame, 8, 24);
+  const ribbonProgress = interpolate(frame, [15, 957], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+
+  const stamps = [
+    { x: ribbonX0, start: BEATS.b1[0] + 6, emoji: "📥", label: "50+ / day", color: P.danger },
+    { x: ribbonX0 + 265, start: BEATS.b2[0] + 6, emoji: "🖼️", label: "manual picks", color: P.danger },
+    { x: ribbonX0 + 530, start: BEATS.b3[0] + 6, emoji: "💬", label: "one message", color: P.accent },
+    { x: ribbonX0 + 795, start: BEATS.b4[0] + 6, emoji: "🔁", label: "rewrites itself", color: P.accent },
+    { x: ribbonX0 + 1060, start: BEATS.b5[0] + 6, emoji: "✅", label: "8 seconds", color: P.success },
+  ];
+
+  // ── Beat 1: the problem — 50+/day, every one a decision ──
   const scroll = frame * 2.2;
-  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
-  const pill1 = pop(46);
-  const pill2 = pop(58);
-  const pill3 = pop(70);
+  const pill1 = pop(BEATS.b1[0] + 32);
+  const pill2 = pop(BEATS.b1[0] + 44);
+  const pill3 = pop(BEATS.b1[0] + 56);
+  const numberPop = pop(BEATS.b1[0] + 14);
 
-  // ── Beat 2: the solution — one bubble, edited 3 times ─────────────
-  const bubbleOp = seg(frame, 120, 134, Easing.out(Easing.cubic));
-  const stepImgOp = seg(frame, 132, 144) * (1 - seg(frame, 160, 172));
-  const stepLangOp = seg(frame, 160, 172) * (1 - seg(frame, 188, 200));
-  const stepPlatOp = seg(frame, 188, 200) * (1 - seg(frame, 214, 226));
-  const cx = interpolate(frame, [124, 140, 168, 196, 214], [700, 230, 475, 710, 880], {
+  // ── Beat 2: the manual ledger — pick, pick, pick, hours of it ──
+  const tap2 = [252, 292, 332];
+  const rows2 = [
+    { emoji: "🖼️", text: "Pick the picture" },
+    { emoji: "🌍", text: "Pick the language" },
+    { emoji: "📲", text: "Pick where it goes" },
+  ];
+  const rowOp2 = tap2.map((t) => seg(frame, t - 8, t + 6));
+  const cx2 = interpolate(frame, [231, tap2[0], tap2[1], tap2[2], 372], [820, 380, 380, 380, 820], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.quad),
   });
-  const cy = interpolate(frame, [124, 140, 168, 196, 214], [500, 364, 364, 364, 420], {
+  const cy2 = interpolate(frame, [231, tap2[0], tap2[1], tap2[2], 372], [420, 156, 250, 344, 420], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.quad),
   });
-  const cursorOp = seg(frame, 124, 132) * (1 - seg(frame, 214, 224));
-  const click1 = seg(frame, 140, 152, Easing.out(Easing.quad));
-  const click2 = seg(frame, 168, 180, Easing.out(Easing.quad));
-  const click3 = seg(frame, 196, 208, Easing.out(Easing.quad));
-  const cap2 = seg(frame, 204, 220, Easing.out(Easing.cubic)) * (1 - seg(frame, 228, 240));
+  const cursorOp2 = seg(frame, 231, 240) * (1 - seg(frame, 366, 378));
+  const click2a = seg(frame, tap2[0], tap2[0] + 12, Easing.out(Easing.quad));
+  const click2b = seg(frame, tap2[1], tap2[1] + 12, Easing.out(Easing.quad));
+  const click2c = seg(frame, tap2[2], tap2[2] + 12, Easing.out(Easing.quad));
+  const totalOp2 = seg(frame, 348, 364, Easing.out(Easing.cubic));
 
-  // ── Beat 3: how it stays fast ─────────────────────────────────────
-  const card1 = pop(252);
-  const card2 = pop(272);
-  const card3 = pop(292);
-  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
-  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
-  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
+  // ── Beat 3 → 4 push transition (not a plain crossfade) ──
+  const b3ExitT = seg(frame, BEATS.b3[1] - 10, BEATS.b3[1] - 2);
+  const b3TranslateX = -50 * b3ExitT;
+  const b4EnterT = seg(frame, BEATS.b4[0] + 2, BEATS.b4[0] + 16);
+  const b4TranslateX = 60 * (1 - b4EnterT);
+  const b4Scale = 0.94 + 0.06 * b4EnterT;
 
-  // ── Beat 4: the result ────────────────────────────────────────────
-  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
-  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
-  const afterIn = pop(372);
-  const check = pop(392);
-  const resultOp = seg(frame, 388, 404, Easing.out(Easing.cubic));
-  const footOp = seg(frame, 402, 418);
+  // ── Beat 3: the concept — one message, fills itself in ──
+  const card3a = pop(BEATS.b3[0] + 10);
+  const card3b = pop(BEATS.b3[0] + 26);
+  const arr3 = seg(frame, BEATS.b3[0] + 20, BEATS.b3[0] + 40, Easing.inOut(Easing.cubic));
+
+  // ── Beat 4: the actual bubble, rewriting itself three times ──
+  const stepImgOp = seg(frame, 610, 622) * (1 - seg(frame, 672, 684));
+  const stepLangOp = seg(frame, 672, 684) * (1 - seg(frame, 738, 750));
+  const stepPlatOp = seg(frame, 738, 750) * (1 - seg(frame, 793, 803));
+  const cx4 = interpolate(frame, [602, 618, 684, 750, 793], [700, 230, 475, 710, 880], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cy4 = interpolate(frame, [602, 618, 684, 750, 793], [400, 300, 300, 300, 350], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.inOut(Easing.quad),
+  });
+  const cursorOp4 = seg(frame, 602, 610) * (1 - seg(frame, 793, 803));
+  const click4a = seg(frame, 618, 630, Easing.out(Easing.quad));
+  const click4b = seg(frame, 684, 696, Easing.out(Easing.quad));
+  const click4c = seg(frame, 750, 762, Easing.out(Easing.quad));
+  const creditOp = seg(frame, 700, 716) * (1 - seg(frame, 795, 803));
+
+  // ── Beat 5: the payoff — hours → 8 seconds, 4 taps, published ──
+  const beforeIn = seg(frame, BEATS.b5[0] + 6, BEATS.b5[0] + 20);
+  const arrRes = seg(frame, BEATS.b5[0] + 18, BEATS.b5[0] + 34, Easing.inOut(Easing.cubic));
+  const afterIn = pop(BEATS.b5[0] + 28);
+  const check = pop(BEATS.b5[0] + 46);
+  const resultOp = seg(frame, BEATS.b5[0] + 44, BEATS.b5[0] + 60, Easing.out(Easing.cubic));
 
   return (
     <div style={{ position: "absolute", inset: 0, fontFamily }}>
       <LightBg />
+      <PaletteProvider value={P}>
+        <Group opacity={loopFade(frame, durationInFrames)}>
+          {/* ════ Persistent headline — small, bottom-left, never centered ════ */}
+          <div
+            style={{
+              position: "absolute",
+              left: 70,
+              top: 626,
+              fontSize: 16,
+              fontWeight: 700,
+              letterSpacing: 2.4,
+              textTransform: "uppercase",
+              color: P.accent,
+              opacity: seg(frame, 18, 34),
+              fontFamily,
+            }}
+          >
+            Telegram moderation
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: 70,
+              top: 652,
+              fontSize: 20,
+              fontWeight: 700,
+              color: P.ink,
+              opacity: seg(frame, 18, 34),
+              fontFamily,
+            }}
+          >
+            One message, edited in place
+          </div>
 
-      {/* ════ Beat 1 — PROBLEM ════ */}
-      <Group opacity={b1}>
-        <Headline text="Moderate" accentText="50+ articles a day, by hand?" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
-        <BrowserWindow x={80} y={116} w={700} h={452} title="Telegram — moderation queue (50+ waiting)" opacity={Math.min(1, pop(8))}>
-          <SkeletonScroll w={700} h={410} offset={scroll} />
-        </BrowserWindow>
-        <StickyNote
-          x={830}
-          y={150}
-          w={350}
-          opacity={noteOp}
-          text="Every article needs 3 picks: an image, a language (EN/NO/UA), and a platform — LinkedIn, Instagram, or Facebook"
-        />
-        <StatPill x={846} y={340} emoji="🖼️" text="Pick an image — every article" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
-        <StatPill x={846} y={402} emoji="🌍" text="Pick a language — every article" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
-        <StatPill x={846} y={464} emoji="📲" text="Pick a platform — every article" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
-        <CaptionBand text="6 Telegram channels plus RSS, all needing the same 3 picks by hand" tone="danger" opacity={seg(frame, 30, 46)} />
-      </Group>
+          {/* ════ Ribbon spine — the one element that survives every beat ════ */}
+          <div
+            style={{
+              position: "absolute",
+              left: ribbonX0,
+              top: 552,
+              width: ribbonW,
+              height: 6,
+              borderRadius: 3,
+              background: P.border,
+              opacity: ribbonIn,
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: ribbonX0,
+              top: 552,
+              width: ribbonW * ribbonProgress,
+              height: 6,
+              borderRadius: 3,
+              background: P.accent,
+              opacity: ribbonIn,
+            }}
+          />
+          {stamps.map((s) => (
+            <Stamp
+              key={s.label}
+              x={s.x}
+              emoji={s.emoji}
+              label={s.label}
+              color={s.color}
+              scale={Math.min(1, pop(s.start))}
+              opacity={Math.min(1, pop(s.start))}
+            />
+          ))}
 
-      {/* ════ Beat 2 — SOLUTION ════ */}
-      <Group opacity={b2}>
-        <Headline text="One message that" accentText="edits itself" accentColor={B.success} opacity={seg(frame, 116, 130)} />
-        <Panel x={110} y={196} w={1060} h={280} tone="accent" opacity={bubbleOp}>
-          <div style={{ position: "absolute", left: 30, top: 22, fontSize: 20, fontWeight: 700, color: B.ink, fontFamily }}>
-            📰 TechCorp raises $10M — ready for review
-          </div>
-          <div style={{ position: "absolute", left: 30, top: 54, fontSize: 15, fontWeight: 600, color: B.muted, fontFamily }}>
-            Same chat bubble, updated at every step
-          </div>
-          <div style={{ position: "absolute", left: 30, top: 108, fontSize: 16.5, fontWeight: 700, color: B.accent, opacity: stepImgOp, fontFamily }}>
-            Step 1 of 3 — choose the photo
-          </div>
-          <div style={{ position: "absolute", left: 30, top: 108, fontSize: 16.5, fontWeight: 700, color: B.accent, opacity: stepLangOp, fontFamily }}>
-            Step 2 of 3 — choose the language
-          </div>
-          <div style={{ position: "absolute", left: 30, top: 108, fontSize: 16.5, fontWeight: 700, color: B.accent, opacity: stepPlatOp, fontFamily }}>
-            Step 3 of 3 — choose the platform
-          </div>
-          <FilterChip x={30} y={150} text="🖼️ Keep photo" icon="" opacity={stepImgOp} />
-          <FilterChip x={280} y={150} text="✨ Generate new" icon="" opacity={stepImgOp} />
-          <FilterChip x={30} y={150} text="🇬🇧 English" icon="" opacity={stepLangOp} />
-          <FilterChip x={280} y={150} text="🇳🇴 Norwegian" icon="" opacity={stepLangOp} />
-          <FilterChip x={530} y={150} text="🇺🇦 Ukrainian" icon="" opacity={stepLangOp} />
-          <FilterChip x={30} y={150} text="LinkedIn" icon="" opacity={stepPlatOp} />
-          <FilterChip x={280} y={150} text="Instagram" icon="" opacity={stepPlatOp} />
-          <FilterChip x={530} y={150} text="Facebook" icon="" opacity={stepPlatOp} />
-          <div style={{ position: "absolute", left: 30, top: 220, fontSize: 14.5, fontWeight: 600, color: B.muted, opacity: Math.max(stepImgOp, stepLangOp, stepPlatOp) * 0.85, fontFamily }}>
-            No new message is sent — Telegram just edits this one
-          </div>
-        </Panel>
-        <Cursor x={cx} y={cy} opacity={cursorOp} click={Math.max(click1 % 1, click2 % 1, click3 % 1)} />
-        <CaptionBand text="Same message, edited three times — photo, then language, then platform" tone="accent" opacity={cap2} />
-      </Group>
+          {/* ════ Beat 1 — PROBLEM ════ */}
+          <Group opacity={b1}>
+            <BrowserWindow x={80} y={90} w={620} h={330} title="Telegram — moderation queue (50+ waiting)" opacity={1}>
+              <SkeletonScroll w={620} h={288} offset={scroll} />
+            </BrowserWindow>
+            <div
+              style={{
+                position: "absolute",
+                left: 740,
+                top: 78,
+                fontSize: 132,
+                fontWeight: 800,
+                letterSpacing: -4,
+                color: P.danger,
+                opacity: Math.min(1, numberPop),
+                fontFamily,
+              }}
+            >
+              50+
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                left: 744,
+                top: 222,
+                fontSize: 23,
+                fontWeight: 650,
+                color: P.muted,
+                opacity: Math.min(1, numberPop),
+                fontFamily,
+              }}
+            >
+              articles / day, 6 channels + RSS
+            </div>
+            <StatPill x={744} y={282} emoji="🖼️" text="Pick an image — every article" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
+            <StatPill x={744} y={336} emoji="🌍" text="Pick a language — every article" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
+            <StatPill x={744} y={390} emoji="📲" text="Pick a platform — every article" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
+          </Group>
 
-      {/* ════ Beat 3 — HOW IT STAYS FAST ════ */}
-      <Group opacity={b3}>
-        <Headline text="Smart shortcuts" accentText="skip extra taps" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
-        <IconCard x={110} y={218} w={300} emoji="🔑" title="One tap, one code" sub="fits Telegram's 64-byte limit" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
-        <IconCard x={490} y={218} w={300} emoji="🖼️" title="Smartest photo wins" sub="AI photo, then original, then none" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
-        <IconCard x={870} y={218} w={300} emoji="🎥" title="Video posts skip ahead" sub="straight to publish, no extra step" tone="success" scale={card3} opacity={Math.min(1, card3)} />
-        <FlowArrow x={412} y={262} len={76} progress={arr1} />
-        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
-        <CaptionBand
-          text="A single telegram-webhook handler decides what to skip and what to ask"
-          opacity={cap3}
-          fontSize={21}
-          y={580}
-        />
-      </Group>
+          {/* ════ Beat 2 — MANUAL LEDGER ════ */}
+          <Group opacity={b2}>
+            <Panel x={340} y={110} w={600} h={300} tone="danger" opacity={1}>
+              {rows2.map((r, i) => (
+                <div
+                  key={r.text}
+                  style={{
+                    position: "absolute",
+                    left: 40,
+                    top: 46 + i * 84,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 16,
+                    fontSize: 25,
+                    fontWeight: 700,
+                    color: P.ink,
+                    opacity: rowOp2[i],
+                    transform: `translateX(${(1 - rowOp2[i]) * 20}px)`,
+                    fontFamily,
+                  }}
+                >
+                  <span style={{ fontSize: 32 }}>{r.emoji}</span>
+                  {r.text}
+                  <span style={{ fontSize: 20, color: P.danger, fontWeight: 700 }}>— by hand</span>
+                </div>
+              ))}
+              <div
+                style={{
+                  position: "absolute",
+                  left: 40,
+                  top: 234,
+                  fontSize: 34,
+                  fontWeight: 800,
+                  color: P.danger,
+                  opacity: totalOp2,
+                  fontFamily,
+                }}
+              >
+                = Hours, every single day
+              </div>
+            </Panel>
+            <Cursor x={cx2} y={cy2} opacity={cursorOp2} click={Math.max(click2a % 1, click2b % 1, click2c % 1)} />
+          </Group>
 
-      {/* ════ Beat 4 — RESULT ════ */}
-      <Group opacity={b4}>
-        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
-        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
-          <div style={{ padding: "26px 30px", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>Hours</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>per article, 8+ chat messages</div>
+          {/* ════ Beat 3 — CONCEPT: one message, fills itself in ════ */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              opacity: b3,
+              transform: `translateX(${b3TranslateX}px)`,
+              fontFamily,
+            }}
+          >
+            <IconCard x={330} y={150} w={280} emoji="💬" title="One chat message" sub="no new one is ever sent" tone="accent" scale={Math.min(1, card3a)} opacity={Math.min(1, card3a)} />
+            <FlowArrow x={636} y={200} len={100} progress={arr3} color={P.accent} />
+            <IconCard x={670} y={150} w={280} emoji="📝" title="Fills itself in" sub="as you tap, right there" tone="accent" scale={Math.min(1, card3b)} opacity={Math.min(1, card3b)} />
           </div>
-        </Panel>
-        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
-        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
-          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>8 seconds</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>one message, 4 taps</div>
+
+          {/* ════ Beat 4 — THE BUBBLE, rewriting itself ════ */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              opacity: b4,
+              transform: `translateX(${b4TranslateX}px) scale(${b4Scale})`,
+              transformOrigin: "center",
+              fontFamily,
+            }}
+          >
+            <Panel x={110} y={150} w={1060} h={270} tone="accent" opacity={1}>
+              <div style={{ position: "absolute", left: 30, top: 22, fontSize: 20, fontWeight: 700, color: P.ink, fontFamily }}>
+                📰 TechCorp raises $10M — ready for review
+              </div>
+              <div style={{ position: "absolute", left: 30, top: 54, fontSize: 15, fontWeight: 600, color: P.muted, fontFamily }}>
+                Same chat bubble, updated at every step
+              </div>
+              <div style={{ position: "absolute", left: 30, top: 108, fontSize: 16.5, fontWeight: 700, color: P.accent, opacity: stepImgOp, fontFamily }}>
+                Step 1 of 3 — choose the photo
+              </div>
+              <div style={{ position: "absolute", left: 30, top: 108, fontSize: 16.5, fontWeight: 700, color: P.accent, opacity: stepLangOp, fontFamily }}>
+                Step 2 of 3 — choose the language
+              </div>
+              <div style={{ position: "absolute", left: 30, top: 108, fontSize: 16.5, fontWeight: 700, color: P.accent, opacity: stepPlatOp, fontFamily }}>
+                Step 3 of 3 — choose the platform
+              </div>
+              <FilterChip x={30} y={150} text="🖼️ Keep photo" icon="" opacity={stepImgOp} />
+              <FilterChip x={280} y={150} text="✨ Generate new" icon="" opacity={stepImgOp} />
+              <FilterChip x={30} y={150} text="🇬🇧 English" icon="" opacity={stepLangOp} />
+              <FilterChip x={280} y={150} text="🇳🇴 Norwegian" icon="" opacity={stepLangOp} />
+              <FilterChip x={530} y={150} text="🇺🇦 Ukrainian" icon="" opacity={stepLangOp} />
+              <FilterChip x={30} y={150} text="LinkedIn" icon="" opacity={stepPlatOp} />
+              <FilterChip x={280} y={150} text="Instagram" icon="" opacity={stepPlatOp} />
+              <FilterChip x={530} y={150} text="Facebook" icon="" opacity={stepPlatOp} />
+              <div style={{ position: "absolute", left: 30, top: 220, fontSize: 14.5, fontWeight: 600, color: P.muted, opacity: Math.max(stepImgOp, stepLangOp, stepPlatOp) * 0.85, fontFamily }}>
+                No new message is sent — Telegram just edits this one
+              </div>
+            </Panel>
+            <Cursor x={cx4} y={cy4} opacity={cursorOp4} click={Math.max(click4a % 1, click4b % 1, click4c % 1)} />
+            <CaptionBand
+              y={478}
+              text="action_prefix_${newsId} — one code, fits Telegram's 64-byte callback limit"
+              tone="card"
+              fontSize={18}
+              opacity={creditOp * 0.85}
+            />
           </div>
-        </Panel>
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 424,
-            width: 1280,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-            opacity: resultOp,
-            fontFamily,
-          }}
-        >
-          <div style={{ position: "relative", width: 52, height: 52 }}>
-            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
-          </div>
-          <span style={{ fontSize: 44, fontWeight: 800, color: B.success }}>4 taps — done, no scrolling</span>
-        </div>
-        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
-          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
-            50+ articles a day, every one moderated the same simple way.
-          </div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>telegram-webhook · vitalii.no</div>
-        </div>
-      </Group>
+
+          {/* ════ Beat 5 — RESULT, holds through the tail ════ */}
+          <Group opacity={b5}>
+            <Panel x={150} y={150} w={400} h={190} tone="danger" opacity={beforeIn}>
+              <div style={{ padding: "24px 28px", fontFamily }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: P.danger, letterSpacing: 1 }}>BEFORE</div>
+                <div style={{ fontSize: 36, fontWeight: 800, color: P.ink, marginTop: 12 }}>Hours</div>
+                <div style={{ fontSize: 22, fontWeight: 650, color: P.muted, marginTop: 6 }}>per article, by hand</div>
+              </div>
+            </Panel>
+            <FlowArrow x={568} y={238} len={150} progress={arrRes} color={P.success} />
+            <Panel x={730} y={150} w={400} h={190} tone="success" opacity={Math.min(1, afterIn)}>
+              <div style={{ padding: "24px 28px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
+                <div style={{ fontSize: 18, fontWeight: 700, color: P.success, letterSpacing: 1 }}>NOW</div>
+                <div style={{ fontSize: 36, fontWeight: 800, color: P.ink, marginTop: 12 }}>8 seconds</div>
+                <div style={{ fontSize: 22, fontWeight: 650, color: P.muted, marginTop: 6 }}>one message, 4 taps</div>
+              </div>
+            </Panel>
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 384,
+                width: 1280,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 20,
+                opacity: resultOp,
+                fontFamily,
+              }}
+            >
+              <div style={{ position: "relative", width: 48, height: 48 }}>
+                <CheckBadge x={0} y={0} size={48} scale={check} opacity={Math.min(1, check)} />
+              </div>
+              <span style={{ fontSize: 38, fontWeight: 800, color: P.success }}>4 taps — and it is published</span>
+            </div>
+          </Group>
+        </Group>
+      </PaletteProvider>
     </div>
   );
 };

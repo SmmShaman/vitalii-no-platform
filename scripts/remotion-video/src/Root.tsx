@@ -701,7 +701,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureTelegramModeration"
         component={FeatureTelegramModeration}
-        durationInFrames={450}
+        durationInFrames={1002}
         fps={30}
         width={1280}
         height={720}
@@ -709,7 +709,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureCreativeBuilder"
         component={FeatureCreativeBuilder}
-        durationInFrames={450}
+        durationInFrames={982}
         fps={30}
         width={1280}
         height={720}
