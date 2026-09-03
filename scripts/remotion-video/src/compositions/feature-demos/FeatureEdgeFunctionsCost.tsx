@@ -138,6 +138,75 @@ export const FeatureEdgeFunctionsCost: React.FC = () => {
     <div style={{ position: "absolute", inset: 0, fontFamily }}>
       <LightBg />
       <PaletteProvider value={P}>
+        {/* ════ Ambient fill — faint receipt echoes in the side margins, so the frame ════
+             reads as a wide ledger desk (a stack of receipts) rather than one card
+             floating in empty space. Rendered first (behind everything), translucent
+             and blurred, so the real receipt stays the unambiguous hero. Chrome-style:
+             fades in once with the shell and holds — never fades out, same precedent
+             as the shell/header/footer below. */}
+        <div
+          style={{
+            position: "absolute",
+            left: 54,
+            top: 92,
+            width: 168,
+            height: 492,
+            borderRadius: 22,
+            background: P.card,
+            border: `2px solid ${P.border}`,
+            opacity: chromeIn * 0.38,
+            filter: "blur(3px)",
+            transform: "rotate(-6deg)",
+          }}
+        />
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={`ghost-l-${i}`}
+            style={{
+              position: "absolute",
+              left: 78,
+              top: 148 + i * 62,
+              width: 118,
+              height: 3,
+              borderRadius: 2,
+              background: P.border,
+              opacity: chromeIn * 0.32,
+              transform: "rotate(-6deg)",
+            }}
+          />
+        ))}
+        <div
+          style={{
+            position: "absolute",
+            left: 1058,
+            top: 92,
+            width: 168,
+            height: 492,
+            borderRadius: 22,
+            background: P.card,
+            border: `2px solid ${P.border}`,
+            opacity: chromeIn * 0.38,
+            filter: "blur(3px)",
+            transform: "rotate(6deg)",
+          }}
+        />
+        {[0, 1, 2, 3, 4, 5].map((i) => (
+          <div
+            key={`ghost-r-${i}`}
+            style={{
+              position: "absolute",
+              left: 1084,
+              top: 148 + i * 62,
+              width: 118,
+              height: 3,
+              borderRadius: 2,
+              background: P.border,
+              opacity: chromeIn * 0.32,
+              transform: "rotate(6deg)",
+            }}
+          />
+        ))}
+
         {/* ════ Persistent receipt shell — the ledger itself, the archetype's object ════ */}
         <div
           style={{

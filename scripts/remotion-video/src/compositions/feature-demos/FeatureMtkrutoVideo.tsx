@@ -8,12 +8,17 @@
  * lux-batch-instructions.md), NOT drawn locally:
  *   archetype 3 "card deck" — a single persistent object, a WALL WITH A SLOT
  *     (a literal "mail slot" a video file must pass through) spans the middle
- *     of the frame from frame ~10 to the end. Video-file cards fly in from
- *     above it: in beats 1-2 they are too wide for the narrow slot and get
- *     stamped and stuck; in beat 3 the slot swings open; in beats 4-5 cards
- *     of every size fall clean through it and fan into a 2x2 grid below. The
- *     wall+slot is the thing that survives every beat — its width is the
- *     whole story, told without a single centered headline+icon-row layout.
+ *     of the frame from frame ~10 to the end. It is a floor-to-ceiling
+ *     doorway (175-545 of the 720px canvas), not a thin bar — the dominant,
+ *     longest-lived shape in every beat (review pass 2026-09-03 enlarged it
+ *     from an 8%-tall strip to this). Video-file cards fly in from above it:
+ *     in beats 1-2 they are too wide for the narrow slot and get stamped and
+ *     stuck deep inside its mouth; in beat 3 the slot swings open; in beat 4
+ *     five cards of escalating size drop through and fan out into an
+ *     overlapping deck inside the open doorway; beat 5's payoff number is
+ *     delivered inside that same doorway. The wall+slot is the thing that
+ *     survives every beat — its width is the whole story, told without a
+ *     single centered headline+icon-row layout.
  *   mood "sand" — `<PaletteProvider value={MOODS.sand}>` wraps the whole tree.
  *
  * Beat windows (measured, fps 30):
@@ -65,10 +70,13 @@ const BEATS = {
 } as const;
 
 // ── Wall geometry (the one object that survives every beat) ──
-const WALL_X0 = 190;
-const WALL_TOTAL_W = 900;
-const WALL_Y = 330;
-const WALL_H = 60;
+// Floor-to-ceiling doorway, not a thin bar: the wall now owns the vertical
+// middle of the frame (175-545 of 720) so the deck reads as the dominant
+// object, not a diagram floating in whitespace (review fix #1/#2).
+const WALL_X0 = 130;
+const WALL_TOTAL_W = 1020;
+const WALL_Y = 175;
+const WALL_H = 370;
 const WALL_CX = WALL_X0 + WALL_TOTAL_W / 2; // 640
 
 /** A video-file card — the deck's unit of currency. */
@@ -85,7 +93,8 @@ const FileCard: React.FC<{
   stampOpacity?: number;
   opacity?: number;
   scaleY?: number;
-}> = ({ x, y, w = 220, h = 88, emoji, size, label, tone = "neutral", stamp, stampOpacity = 0, opacity = 1, scaleY = 1 }) => {
+  rotate?: number;
+}> = ({ x, y, w = 220, h = 88, emoji, size, label, tone = "neutral", stamp, stampOpacity = 0, opacity = 1, scaleY = 1, rotate = 0 }) => {
   const B = usePalette();
   if (opacity <= 0.004) return null;
   const edge = tone === "danger" ? B.danger : tone === "success" ? B.success : B.border;
@@ -98,7 +107,7 @@ const FileCard: React.FC<{
         top: y - h / 2,
         width: w,
         height: h,
-        transform: `scaleY(${scaleY})`,
+        transform: `scaleY(${scaleY}) rotate(${rotate}deg)`,
         transformOrigin: "center",
         borderRadius: 14,
         background: bg,
@@ -208,18 +217,22 @@ export const FeatureMtkrutoVideo: React.FC = () => {
   const tagGreenOp = interpolate(gateOpen, [0.5, 1], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   // ── Beat 1: the problem — three videos fall, all too wide, all rejected ──
+  // Columns spread across the full doorway width; cards land deep inside the
+  // tall wall's mouth (not hovering above a thin bar) — review fix #1/#2.
   const cardsB1 = [
-    { col: 300, size: "187 MB", label: "news clip", emoji: "🎬", start: 25 },
+    { col: 260, size: "187 MB", label: "news clip", emoji: "🎬", start: 25 },
     { col: 640, size: "412 MB", label: "interview", emoji: "🎤", start: 70 },
-    { col: 980, size: "96 MB", label: "explainer", emoji: "📹", start: 115 },
+    { col: 1020, size: "96 MB", label: "explainer", emoji: "📹", start: 115 },
   ];
   const cornerScale = Math.min(1, pop(60));
 
   // ── Beat 2: the letter-slot squeeze — one package, pressed and bounced ──
+  // Pushes deep into the tall doorway before bouncing back, so the struggle
+  // reads against the full height of the wall, not a thin bar (review fix #1).
   const packageY = interpolate(
     frame,
     [210, 240, 270, 300, 320, 374],
-    [150, 230, 308, 250, 270, 270],
+    [160, 260, 380, 290, 310, 310],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) },
   );
   const packageSquish = interpolate(frame, [255, 270, 285], [1, 0.82, 1], {
@@ -244,12 +257,19 @@ export const FeatureMtkrutoVideo: React.FC = () => {
   const arrow3 = seg(frame, 410, 460, Easing.inOut(Easing.cubic));
   const techCaption = seg(frame, 460, 476);
 
-  // ── Beat 4: everything gets through — four sizes, one open door ──
+  // ── Beat 4: everything gets through — five sizes fan out inside the wide-
+  // open doorway, escalating small-to-large left to right (review fix #3:
+  // the sampled frame must read as a real deck, not two lonely cards). All
+  // five values are real facts already used elsewhere in this file (45 MB /
+  // 96 MB / 340 MB / 890 MB / 1.9 GB) — none invented. Tight staggering
+  // means most of the beat shows the full fanned deck at once.
+  const FAN_CY = 345; // vertical center of the fan, inside the tall doorway
   const cardsB4 = [
-    { size: "45 MB", label: "short clip", entryX: 580, gridX: 360, gridY: 410, start: 549 },
-    { size: "340 MB", label: "weekly recap", entryX: 620, gridX: 680, gridY: 410, start: 594 },
-    { size: "890 MB", label: "long interview", entryX: 660, gridX: 360, gridY: 530, start: 639 },
-    { size: "1.9 GB", label: "full documentary", entryX: 700, gridX: 680, gridY: 530, start: 664 },
+    { size: "45 MB", label: "short clip", gridX: WALL_CX - 220, gridY: FAN_CY + 30, rot: -14, start: 545 },
+    { size: "96 MB", label: "explainer", gridX: WALL_CX - 110, gridY: FAN_CY + 10, rot: -7, start: 565 },
+    { size: "340 MB", label: "weekly recap", gridX: WALL_CX, gridY: FAN_CY, rot: 0, start: 585 },
+    { size: "890 MB", label: "long interview", gridX: WALL_CX + 110, gridY: FAN_CY + 10, rot: 7, start: 605 },
+    { size: "1.9 GB", label: "full documentary", gridX: WALL_CX + 220, gridY: FAN_CY + 30, rot: 14, start: 625 },
   ];
   const caption4 = seg(frame, 610, 626);
 
@@ -305,13 +325,13 @@ export const FeatureMtkrutoVideo: React.FC = () => {
             style={{
               position: "absolute",
               left: WALL_CX - 130,
-              top: 182,
+              top: WALL_Y - 35,
               width: 260,
               textAlign: "center",
               fontSize: 20,
               fontWeight: 800,
               color: P.danger,
-              opacity: tagRedOp,
+              opacity: tagRedOp * wallIn,
               fontFamily,
             }}
           >
@@ -321,13 +341,13 @@ export const FeatureMtkrutoVideo: React.FC = () => {
             style={{
               position: "absolute",
               left: WALL_CX - 130,
-              top: 182,
+              top: WALL_Y - 35,
               width: 260,
               textAlign: "center",
               fontSize: 20,
               fontWeight: 800,
               color: P.success,
-              opacity: tagGreenOp,
+              opacity: tagGreenOp * wallIn,
               fontFamily,
             }}
           >
@@ -337,7 +357,7 @@ export const FeatureMtkrutoVideo: React.FC = () => {
           {/* ════ Beat 1 — PROBLEM: three videos, three rejections ════ */}
           <Group opacity={b1}>
             <CaptionBand
-              y={100}
+              y={84}
               text="Every video over 20 MB just vanished — dropped, not delivered."
               tone="danger"
               opacity={seg(frame, 40, 56)}
@@ -353,7 +373,7 @@ export const FeatureMtkrutoVideo: React.FC = () => {
             />
             {cardsB1.map((c) => {
               const land = c.start + 34;
-              const y = interpolate(frame, [c.start, land], [150, 300], {
+              const y = interpolate(frame, [c.start, land], [140, WALL_Y + 90], {
                 extrapolateLeft: "clamp",
                 extrapolateRight: "clamp",
                 easing: Easing.out(Easing.cubic),
@@ -369,6 +389,8 @@ export const FeatureMtkrutoVideo: React.FC = () => {
                   key={c.label}
                   x={c.col + shake}
                   y={y}
+                  w={240}
+                  h={100}
                   size={c.size}
                   label={c.label}
                   emoji={c.emoji}
@@ -384,7 +406,7 @@ export const FeatureMtkrutoVideo: React.FC = () => {
           {/* ════ Beat 2 — LETTER SLOT: a package too big for the opening ════ */}
           <Group opacity={b2}>
             <CaptionBand
-              y={100}
+              y={84}
               text="Telegram's own limit acts like a narrow letter slot, not a doorway."
               tone="danger"
               opacity={seg(frame, 222, 238)}
@@ -392,8 +414,8 @@ export const FeatureMtkrutoVideo: React.FC = () => {
             <FileCard
               x={WALL_CX}
               y={packageY}
-              w={300}
-              h={140}
+              w={320}
+              h={150}
               size="340 MB"
               label="weekly recap video"
               emoji="🎥"
@@ -407,7 +429,7 @@ export const FeatureMtkrutoVideo: React.FC = () => {
               style={{
                 position: "absolute",
                 left: WALL_CX - 200,
-                top: 400,
+                top: WALL_Y + WALL_H + 20,
                 width: 400,
                 textAlign: "center",
                 fontSize: 17,
@@ -432,12 +454,12 @@ export const FeatureMtkrutoVideo: React.FC = () => {
             }}
           >
             <CaptionBand
-              y={100}
+              y={84}
               text="MTKruto: a full MTProto client, not the Bot API"
               tone="accent"
               opacity={techCaption}
             />
-            <div style={{ position: "absolute", left: 250, top: 190, width: 260, height: 120 }}>
+            <div style={{ position: "absolute", left: 240, top: 230, width: 280, height: 130 }}>
               {frontVisible ? (
                 <div
                   style={{
@@ -488,10 +510,10 @@ export const FeatureMtkrutoVideo: React.FC = () => {
                 </div>
               )}
             </div>
-            <FlowArrow x={520} y={250} len={110} progress={arrow3} color={P.accent} />
+            <FlowArrow x={530} y={284} len={110} progress={arrow3} color={P.accent} />
           </div>
 
-          {/* ════ Beat 4 — EVERYTHING GETS THROUGH: four sizes, one open door ════ */}
+          {/* ════ Beat 4 — EVERYTHING GETS THROUGH: five sizes fan into a deck ════ */}
           <div
             style={{
               position: "absolute",
@@ -503,19 +525,27 @@ export const FeatureMtkrutoVideo: React.FC = () => {
             }}
           >
             <CaptionBand
-              y={100}
+              y={84}
               text="From a 45 MB clip to a 1.9 GB documentary — everything gets through now."
               tone="success"
               opacity={caption4}
             />
             {cardsB4.map((c) => {
-              const land = c.start + 55;
-              const x = interpolate(frame, [c.start, c.start + 30, land], [c.entryX, c.entryX, c.gridX], {
+              const land = c.start + 50;
+              // Drop straight down through the open slot, then fan out sideways
+              // into a stacked, overlapping deck (not a thin 2x2 grid) — the
+              // escalating sizes read left-to-right across the fan.
+              const x = interpolate(frame, [c.start, c.start + 28, land], [WALL_CX, WALL_CX, c.gridX], {
                 extrapolateLeft: "clamp",
                 extrapolateRight: "clamp",
                 easing: Easing.inOut(Easing.cubic),
               });
-              const y = interpolate(frame, [c.start, c.start + 30, land], [150, 400, c.gridY], {
+              const y = interpolate(frame, [c.start, c.start + 28, land], [10, 220, c.gridY], {
+                extrapolateLeft: "clamp",
+                extrapolateRight: "clamp",
+                easing: Easing.inOut(Easing.cubic),
+              });
+              const rotate = interpolate(frame, [c.start, c.start + 28, land], [0, 0, c.rot], {
                 extrapolateLeft: "clamp",
                 extrapolateRight: "clamp",
                 easing: Easing.inOut(Easing.cubic),
@@ -527,7 +557,9 @@ export const FeatureMtkrutoVideo: React.FC = () => {
                   key={c.label}
                   x={x}
                   y={y}
-                  w={200}
+                  w={180}
+                  h={84}
+                  rotate={rotate}
                   size={c.size}
                   label={c.label}
                   emoji="🎬"
@@ -540,10 +572,12 @@ export const FeatureMtkrutoVideo: React.FC = () => {
             })}
           </div>
 
-          {/* ════ Beat 5 — RESULT, holds through the tail ════ */}
+          {/* ════ Beat 5 — RESULT, delivered inside the now wide-open doorway,
+               holds through the tail (review fix #2: the wall stays the frame's
+               dominant element right through the payoff, not just beats 1-4) ════ */}
           <Group opacity={b5}>
             <StatPill
-              x={440}
+              x={90}
               y={104}
               emoji="📦"
               text="20 MB → 2 GB per file"
@@ -555,7 +589,7 @@ export const FeatureMtkrutoVideo: React.FC = () => {
               style={{
                 position: "absolute",
                 left: 0,
-                top: 380,
+                top: WALL_Y + 20,
                 width: 1280,
                 textAlign: "center",
                 fontSize: 18,
@@ -573,7 +607,7 @@ export const FeatureMtkrutoVideo: React.FC = () => {
               style={{
                 position: "absolute",
                 left: 0,
-                top: 410,
+                top: 260,
                 width: 1280,
                 textAlign: "center",
                 fontSize: 140,
@@ -592,7 +626,7 @@ export const FeatureMtkrutoVideo: React.FC = () => {
               style={{
                 position: "absolute",
                 left: 0,
-                top: 596,
+                top: WALL_Y + WALL_H - 70,
                 width: 1280,
                 display: "flex",
                 alignItems: "center",
