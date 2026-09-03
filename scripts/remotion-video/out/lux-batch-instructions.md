@@ -38,6 +38,20 @@ Hard rule: the archetype decides **where things sit and how they move**. Do NOT 
 to "headline centered on top + panel row + 3 icon cards + 2 result cards" — that layout is
 retired as a default. It is allowed only as archetype 6's right-hand stage, once.
 
+**The archetype must DOMINATE the frame, not decorate a corner (2026-09-03).** The p20 clip
+passed every sync check and still failed review: its drawn archetype was the card deck, and
+the deck rendered as a 180px pile in the lower-left while a centered headline and a big red
+number owned the screen. That is the retired default layout wearing an archetype as a badge.
+Test your own clip with one question: **if the archetype's object were deleted, would the
+clip still read?** If yes, the archetype is decoration and the staging is wrong. The drawn
+object is the largest, most central, longest-lived thing on screen; the headline goes small
+and to one side, the way p18 puts its title bottom-left.
+
+Second lesson from the same clip: **a beat that lists four things needs four things on
+screen.** Its narration said "Generate the picture. Rewrite it in three languages. Put it on
+the site. Post it." and the frame showed one small card. Count the nouns in your beat's
+sentence and make sure the picture pays each one, spaced across that beat's window.
+
 ## STEP 0b — Your clip is VOICE-SYNCED (owner rule, 2026-08-31)
 
 The orchestrating session hands you, per feature, a **beat table** it measured from the
