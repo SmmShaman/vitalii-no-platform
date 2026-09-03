@@ -52,6 +52,13 @@ screen.** Its narration said "Generate the picture. Rewrite it in three language
 the site. Post it." and the frame showed one small card. Count the nouns in your beat's
 sentence and make sure the picture pays each one, spaced across that beat's window.
 
+Third lesson, from p20's second pass: **an archetype that owns the frame still has to FILL
+it.** Moving the deck to the centre fixed the hierarchy and left the top-right third of
+every frame empty, with the beat-4 conveyor tucked into a lower corner. 1280x720 is the
+whole canvas. Nothing should sit in a corner with a third of the screen white beside it, and
+a card with no label on it is a shape, not information — every card the viewer can see
+should say what it is.
+
 ## STEP 0b — Your clip is VOICE-SYNCED (owner rule, 2026-08-31)
 
 The orchestrating session hands you, per feature, a **beat table** it measured from the
