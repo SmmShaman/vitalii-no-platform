@@ -285,25 +285,22 @@ jobs:
             ffmpeg -y -v error -ss "$s" -i "feature-${FEATURE_ID}.mp4" -vframes 1 -vf scale=560:-1 "shot$i.jpg"
             SHOTS+=("shot$i.jpg"); i=$((i+1))
           done
-          # hstack/vstack, never tile= on separate inputs: tile silently emits one frame.
-          # Rows of 3, padded to a full row so hstack always gets equal-sized inputs.
+          # tile= works on ONE input read as an image SEQUENCE; it is passing
+          # several separate -i images that makes it emit a single frame. The
+          # earlier hstack-then-vstack build did produce the right sheet and
+          # then segfaulted ffmpeg on the vstack, so: one input, one filter.
+          # Every frame in an image sequence must be the same size, so the
+          # padding cells are generated at the exact size of the real ones.
           PER=3
+          SZ=$(ffprobe -v error -select_streams v -show_entries stream=width,height \
+                 -of csv=p=0:s=x shot0.jpg)
           while [ $(( ${#SHOTS[@]} % PER )) -ne 0 ]; do
-            ffmpeg -y -v error -f lavfi -i "color=c=white:s=560x315:d=1" -vframes 1 pad.jpg
-            SHOTS+=("pad.jpg")
+            ffmpeg -y -v error -f lavfi -i "color=c=white:s=${SZ}:d=1" -vframes 1 "shot$i.jpg"
+            SHOTS+=("shot$i.jpg"); i=$((i+1))
           done
-          ROWS=(); r=0
-          for ((k=0; k<${#SHOTS[@]}; k+=PER)); do
-            ARGS=(); for ((m=0; m<PER; m++)); do ARGS+=(-i "${SHOTS[$((k+m))]}"); done
-            ffmpeg -y -v error "${ARGS[@]}" -filter_complex "hstack=inputs=${PER}" "row$r.jpg"
-            ROWS+=("row$r.jpg"); r=$((r+1))
-          done
-          if [ ${#ROWS[@]} -eq 1 ]; then
-            cp "${ROWS[0]}" "contact-${FEATURE_ID}.jpg"
-          else
-            ARGS=(); for f in "${ROWS[@]}"; do ARGS+=(-i "$f"); done
-            ffmpeg -y -v error "${ARGS[@]}" -filter_complex "vstack=inputs=${#ROWS[@]}" "contact-${FEATURE_ID}.jpg"
-          fi
+          ROWS_N=$(( ${#SHOTS[@]} / PER ))
+          ffmpeg -y -v error -framerate 1 -i "shot%d.jpg" \
+            -vf "tile=${PER}x${ROWS_N}" -frames:v 1 "contact-${FEATURE_ID}.jpg"
           echo "contact sheet: ${#MIDS[@]} cells (beats + tail)"
           ls -la "contact-${FEATURE_ID}.jpg"
 
