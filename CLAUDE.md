@@ -46,20 +46,45 @@ orders what is left in it.
 | Older bright reference (real-data mockups; its fixed 4-beat rhythm is retired) | `.../feature-demos/FeatureJobTable.tsx` |
 | Story cut reference (54 s, voice-first) | `.../feature-demos/FeatureJobTableStory.tsx` |
 | v2 primitives + colors | `.../feature-demos/bright-primitives.tsx`, `bright-theme.ts` |
-| Per-beat voiceover generator | `scripts/remotion-video/vo-scripts/j26-story.py` |
+| Per-beat voiceover generator (any feature) | `scripts/remotion-video/vo-scripts/vo-beats.py` |
+| Render cell — no PC needed | `.github/workflows/feature-clip.yml` |
+| Beat texts + measurements + YouTube SEO, per feature | `scripts/remotion-video/vo-scripts/feature-vo/` |
 
 **Staging is drawn, not copied (2026-08-30).** Each clip gets an archetype (8 of them) and a
 palette mood (`dawn`/`sand`/`slate`/`mint`/`violet`) from its feature id, may not repeat the
 previous two clips, and picks its own 3–5 beat rhythm — see STEP 0 of the instruction sheet.
 Draw them in the MAIN session and hand each subagent its pair; agents must not edit the log.
 
-Batch recipe: pick N features → dump rows to `out/lux-batchN-data.json` → N/2 subagents
-(`model: sonnet`, pointed at `lux-batch-instructions.md`) → render loop with auto-retry
-(~50 s/clip, `--timeout 120000`, and `--concurrency=2` — the default times out connecting to
-the browser; from WSL run the render through `cmd.exe /c`) → contact sheets to verify →
-back up the old mp4s from R2 first → scp to VPS → PUT to R2 on the
-SAME keys → **`UPDATE features SET demo_style='bright'`** for each id → **voice every
-clip (below)** → commit the story files.
+Batch recipe: pick N features → dump rows to `out/lux-batchN-data.json` → write and
+measure the voiceover FIRST (below) → N subagents (`model: sonnet`, pointed at
+`lux-batch-instructions.md`, one feature each, each handed its archetype + mood + beat
+table) → set `durationInFrames` in `Root.tsx` yourself → commit → **render on GitHub**
+→ verify the contact sheet → re-run with `upload=true`.
+
+**RENDERING MOVED OFF THE PC (2026-09-03).** `.github/workflows/feature-clip.yml` does
+the whole free half on a GitHub runner, the way `daily-news-video.yml` already did for
+the news digest:
+
+```bash
+gh workflow run "Feature Clip Render" -f feature_id=p20 -f composition=FeatureX -f upload=false   # inspect
+gh workflow run "Feature Clip Render" -f feature_id=p20 -f composition=FeatureX -f upload=true    # publish
+gh run download <run-id> -n feature-p20 -D /tmp/x     # mp4 + contact sheet + measurement
+```
+
+It rebuilds the voice from the committed beats, **fails if it drifts >6 frames from the
+committed measurement**, renders with retry, muxes without looping, refuses a silent
+track, posts a per-beat contact sheet to Telegram, backs up the R2 object and writes the
+new one to the same key. Run it with `upload=false` first, look at the sheet, then again
+with `upload=true`. Nothing needs the PC awake.
+
+Committed per feature, and required by the workflow:
+`vo-scripts/feature-vo/beats-<id>.json` (the spoken text) and `vo-<id>.json` (the
+measurement the picture was drawn against). `meta-<id>.json` is the YouTube SEO.
+
+The PC path still works and is the fallback: `cmd.exe /c` from WSL, `--concurrency=2
+--timeout 120000`, retry once on the browser-connect timeout, then `mux_synced.sh <id>`
+on the VPS. Only the composition writing must happen in a session — it costs tokens and
+needs the subscription.
 
 Two steps of the old recipe are **gone**: do NOT insert into
 `feature_video_repost_queue` (the publisher no longer needs a row — `demo_style`
@@ -89,10 +114,10 @@ first synced clip) + `vo-scripts/p15-beats.py`.
    450 frames and no longer loop-friendly.
 4. Subagents get the beat table in their prompt (STEP 0b of the instruction
    sheet) and must land each visual event inside its own window.
-5. Render (`--concurrency=2 --timeout 120000`, retry on the browser-connect
-   timeout), then mux: `-i silent.mp4 -i vo.mp3 -filter_complex '[1:a]apad[a]'
-   -map 0:v -map '[a]' -c:v copy -c:a aac -shortest`. `mux_v2.sh` is for the
-   OLD loop recipe only — do not use it on a synced clip.
+5. Render and mux via `gh workflow run "Feature Clip Render"` (above). By hand
+   the mux is `-i silent.mp4 -i vo.mp3 -filter_complex '[1:a]apad[a]' -map 0:v
+   -map '[a]' -c:v copy -c:a aac -shortest`, wrapped as `mux_synced.sh <id>` on
+   the VPS. `mux_v2.sh` is for the OLD loop recipe only — never on a synced clip.
 6. Verify: `volumedetect` mean ≈ −20 dB (−91 dB is digital silence), and a
    contact sheet across the beats — each frame must show what that beat says.
 7. **Back up the R2 object first**, then PUT the voiced file to the SAME key
