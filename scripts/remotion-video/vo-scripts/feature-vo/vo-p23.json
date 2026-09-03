@@ -1,0 +1,56 @@
+{
+ "id": "p23",
+ "beat_durations": {
+  "b1": 6.6,
+  "b2": 3.864,
+  "b3": 6.576,
+  "b4": 4.464,
+  "b5": 2.472
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My site sits quiet almost all day, then spikes without warning \u2014 and I was paying for a server to just wait around.",
+   "start_s": 0.5,
+   "end_s": 7.1,
+   "start_f": 15,
+   "end_f": 213
+  },
+  {
+   "beat": "b2",
+   "text": "That's like renting a whole office for a meeting that happens twice a week.",
+   "start_s": 7.4,
+   "end_s": 11.264,
+   "start_f": 222,
+   "end_f": 338
+  },
+  {
+   "beat": "b3",
+   "text": "I replaced it with 43 small Edge Functions that only run, and only get billed, the instant they're needed.",
+   "start_s": 11.564,
+   "end_s": 18.14,
+   "start_f": 347,
+   "end_f": 544
+  },
+  {
+   "beat": "b4",
+   "text": "Each one wakes up in under half a second and redeploys in about ten.",
+   "start_s": 18.44,
+   "end_s": 22.904,
+   "start_f": 553,
+   "end_f": 687
+  },
+  {
+   "beat": "b5",
+   "text": "The bill: $0 a month.",
+   "start_s": 23.204,
+   "end_s": 25.676,
+   "start_f": 696,
+   "end_f": 770
+  }
+ ],
+ "total_s": 27.176,
+ "durationInFrames": 815,
+ "measured_track_s": 25.728,
+ "track": "/root/feature-demos/vo-p23/vo-p23.mp3"
+}

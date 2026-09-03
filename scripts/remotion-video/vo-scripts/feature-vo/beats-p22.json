@@ -1,0 +1,7 @@
+{"id": "p22", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "I used to check six Telegram channels and 26 RSS feeds every single day, by hand, just hunting for one good story."],
+  ["b2", "That's 32 different clocks, all ticking on their own schedule."],
+  ["b3", "So I automated the entire intake with GitHub Actions, funneling everything into one queue."],
+  ["b4", "It rotates through sources so none of them throttles me, and batches the rest to keep it fast and cheap."],
+  ["b5", "32 sources, one queue."]
+]}

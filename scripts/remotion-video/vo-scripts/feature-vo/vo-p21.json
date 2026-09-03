@@ -1,0 +1,56 @@
+{
+ "id": "p21",
+ "beat_durations": {
+  "b1": 5.856,
+  "b2": 5.808,
+  "b3": 4.896,
+  "b4": 6.456,
+  "b5": 2.928
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every time a news video passed 20 megabytes, my pipeline choked and just dropped it \u2014 gone.",
+   "start_s": 0.5,
+   "end_s": 6.356,
+   "start_f": 15,
+   "end_f": 191
+  },
+  {
+   "beat": "b2",
+   "text": "Telegram's own rules capped downloads that small, like trying to mail a package through a letter slot.",
+   "start_s": 6.656,
+   "end_s": 12.464,
+   "start_f": 200,
+   "end_f": 374
+  },
+  {
+   "beat": "b3",
+   "text": "So I built a client with MTKruto that logs in like a real user, not a bot.",
+   "start_s": 12.764,
+   "end_s": 17.66,
+   "start_f": 383,
+   "end_f": 530
+  },
+  {
+   "beat": "b4",
+   "text": "Now it pulls anything up to two gigabytes, from short clips to full documentaries, straight into the feed.",
+   "start_s": 17.96,
+   "end_s": 24.416,
+   "start_f": 539,
+   "end_f": 732
+  },
+  {
+   "beat": "b5",
+   "text": "Video failures: down 100 percent.",
+   "start_s": 24.716,
+   "end_s": 27.644,
+   "start_f": 741,
+   "end_f": 829
+  }
+ ],
+ "total_s": 29.144,
+ "durationInFrames": 874,
+ "measured_track_s": 27.696,
+ "track": "/root/feature-demos/vo-p21/vo-p21.mp3"
+}

@@ -1,0 +1,56 @@
+{
+ "id": "p22",
+ "beat_durations": {
+  "b1": 7.992,
+  "b2": 3.984,
+  "b3": 5.952,
+  "b4": 6.24,
+  "b5": 2.256
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I used to check six Telegram channels and 26 RSS feeds every single day, by hand, just hunting for one good story.",
+   "start_s": 0.5,
+   "end_s": 8.492,
+   "start_f": 15,
+   "end_f": 255
+  },
+  {
+   "beat": "b2",
+   "text": "That's 32 different clocks, all ticking on their own schedule.",
+   "start_s": 8.792,
+   "end_s": 12.776,
+   "start_f": 264,
+   "end_f": 383
+  },
+  {
+   "beat": "b3",
+   "text": "So I automated the entire intake with GitHub Actions, funneling everything into one queue.",
+   "start_s": 13.076,
+   "end_s": 19.028,
+   "start_f": 392,
+   "end_f": 571
+  },
+  {
+   "beat": "b4",
+   "text": "It rotates through sources so none of them throttles me, and batches the rest to keep it fast and cheap.",
+   "start_s": 19.328,
+   "end_s": 25.568,
+   "start_f": 580,
+   "end_f": 767
+  },
+  {
+   "beat": "b5",
+   "text": "32 sources, one queue.",
+   "start_s": 25.868,
+   "end_s": 28.124,
+   "start_f": 776,
+   "end_f": 844
+  }
+ ],
+ "total_s": 29.624,
+ "durationInFrames": 889,
+ "measured_track_s": 28.176,
+ "track": "/root/feature-demos/vo-p22/vo-p22.mp3"
+}

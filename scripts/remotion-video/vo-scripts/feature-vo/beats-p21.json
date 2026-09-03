@@ -1,0 +1,7 @@
+{"id": "p21", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every time a news video passed 20 megabytes, my pipeline choked and just dropped it — gone."],
+  ["b2", "Telegram's own rules capped downloads that small, like trying to mail a package through a letter slot."],
+  ["b3", "So I built a client with MTKruto that logs in like a real user, not a bot."],
+  ["b4", "Now it pulls anything up to two gigabytes, from short clips to full documentaries, straight into the feed."],
+  ["b5", "Video failures: down 100 percent."]
+]}

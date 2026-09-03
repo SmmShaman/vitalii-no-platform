@@ -1,0 +1,7 @@
+{"id": "p23", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "My site sits quiet almost all day, then spikes without warning — and I was paying for a server to just wait around."],
+  ["b2", "That's like renting a whole office for a meeting that happens twice a week."],
+  ["b3", "I replaced it with 43 small Edge Functions that only run, and only get billed, the instant they're needed."],
+  ["b4", "Each one wakes up in under half a second and redeploys in about ten."],
+  ["b5", "The bill: $0 a month."]
+]}
