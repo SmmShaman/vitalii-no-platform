@@ -102,23 +102,43 @@ jobs:
               f.write(out + "\n")
           PY
 
+      # Written through the contents API rather than git. Three measure runs can
+      # be in flight at once on a factory night, and a local commit-then-rebase
+      # trips over the audio the voice build leaves in the tree; the API takes
+      # the file's current sha and is done.
       - name: Commit the measurement
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           cd "${{ github.workspace }}"
           F="scripts/remotion-video/vo-scripts/feature-vo/vo-${FEATURE_ID}.json"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$F"
-          if git diff --cached --quiet; then
-            echo "measurement unchanged — nothing to commit"
-          else
-            git commit -m "chore(feature-vo): measured voiceover timing for ${FEATURE_ID}"
-            # Another clip may have landed while the voice was being built.
-            git pull --rebase --autostash origin main
-            git push origin HEAD:main
-            echo "committed $F"
+          API="https://api.github.com/repos/${{ github.repository }}/contents/${F}"
+          SHA=$(curl -s -H "Authorization: Bearer ${GH_TOKEN}" "${API}?ref=main" \
+                | python3 -c "import json,sys; print(json.load(sys.stdin).get('sha',''))")
+          NEW=$(base64 -w0 "$F")
+          OLD=$(curl -s -H "Authorization: Bearer ${GH_TOKEN}" \
+                  -H "Accept: application/vnd.github.raw" "${API}?ref=main" | base64 -w0)
+          if [ "$NEW" = "$OLD" ]; then
+            echo "measurement unchanged — nothing to write"
+            exit 0
           fi
+          python3 - "$SHA" "$NEW" > payload.json <<'PY'
+          import json, sys
+          sha, content = sys.argv[1], sys.argv[2]
+          body = {"message": f"chore(feature-vo): measured voiceover timing",
+                  "content": content, "branch": "main"}
+          if sha:
+              body["sha"] = sha
+          print(json.dumps(body))
+          PY
+          CODE=$(curl -s -o resp.json -w '%{http_code}' -X PUT "$API" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            --data-binary @payload.json)
+          echo "contents API -> HTTP ${CODE}"
+          test "$CODE" = "200" -o "$CODE" = "201" || { head -c 400 resp.json; exit 1; }
+          echo "wrote $F to main"
 
   # ── render ───────────────────────────────────────────────────────────────
   render:
