@@ -749,7 +749,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureCascadingImageProviders"
         component={FeatureCascadingImageProviders}
-        durationInFrames={450}
+        durationInFrames={954}
         fps={30}
         width={1280}
         height={720}
@@ -893,7 +893,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureScheduledPublishing"
         component={FeatureScheduledPublishing}
-        durationInFrames={450}
+        durationInFrames={917}
         fps={30}
         width={1280}
         height={720}
@@ -901,7 +901,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureSpamProtection"
         component={FeatureSpamProtection}
-        durationInFrames={450}
+        durationInFrames={955}
         fps={30}
         width={1280}
         height={720}

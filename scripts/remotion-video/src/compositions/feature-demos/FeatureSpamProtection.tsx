@@ -1,42 +1,37 @@
 /**
- * FeatureSpamProtection — feature p26 — 1280x720, 15s @ 30fps, silent, loop-friendly.
- * BRIGHT INFOGRAPHIC template (v2, 2026-08-22) — written for a NON-TECHNICAL
- * viewer: problem/solution color zones, a real browser+form mockup, a
- * server-side checklist ticking off in real time, and a big before→after
- * metric.
+ * FeatureSpamProtection — feature p26 — 1280x720 @ 30fps, VOICE-SYNCED (955
+ * frames), mood "sand".
  *
- * Story (4 beats):
- *  1. Problem — the contact form inbox scrolls with junk: casino bonuses,
- *     crypto scams, fake SEO deals. 50+ a day, real messages buried inside.
- *  2. Solution — the same contact form, but a hidden honeypot field and a
- *     server-side checklist quietly verify every submission before it's
- *     treated as real: honeypot empty, filled in over 3s, first request
- *     from this IP in the last 10 minutes.
- *  3. How it works — three tiers as icon cards (honeypot / timer / rate
- *     limit), one small tech-credibility line (Deno Edge Function).
- *  4. Result — before/after cards: 50+/day → 0-1/day, a 98% reduction badge,
- *     zero false positives, no CAPTCHA needed.
+ * ARCHETYPE 0 — "split duel". The whole canvas is halved by a divider whose
+ * x-position slides over the course of the clip: chaos (spam) lives on the
+ * left, order (the 3-tier defense) lives on the right, BOTH alive at once for
+ * the entire clip. Early on the chaos side is wide (spam is the problem being
+ * described); as the defense gets built and the result lands, the divider
+ * slides left and the order side swallows most of the frame — spam visually
+ * squeezed into a thin trickle by the end.
+ *
+ * Beats (voice-synced, do not change without re-measuring the VO):
+ *  b1  15–304  "...50 spam messages a day — SEO offers, casino links, crypto junk."
+ *  b2  313–459 "I didn't want a CAPTCHA... make every real visitor feel like a suspect."
+ *  b3  468–669 "...a three-layer trap inside one Edge Function: hidden field, timing, rate limit."
+ *  b4  678–823 "Bots trip one of the three instantly; real people never notice."
+ *  b5  832–910 "Spam: down 98 percent." (holds full opacity through frame 955)
  */
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { B } from "./bright-theme";
+import { MOODS, PaletteProvider, Tone } from "./bright-theme";
 import {
   LightBg,
   Group,
-  Headline,
   Panel,
-  BrowserWindow,
   IconCard,
-  FlowArrow,
-  StickyNote,
-  Cursor,
-  CheckBadge,
-  CaptionBand,
   StatPill,
+  CaptionBand,
   seg,
-  loopFade,
   fontFamily,
 } from "./bright-primitives";
+
+const P = MOODS.sand;
 
 const SPAM_LINES: { icon: string; text: string }[] = [
   { icon: "🎰", text: "CASINO BONUS — claim $500 free spins now!!!" },
@@ -44,13 +39,13 @@ const SPAM_LINES: { icon: string; text: string }[] = [
   { icon: "🔗", text: "SEO backlinks package — rank #1 fast, cheap" },
   { icon: "💊", text: "Cheap meds, no prescription needed" },
   { icon: "🎰", text: "You won a prize! Click to claim instantly" },
-  { icon: "🔗", text: "Guest post opportunity — link exchange offer" },
+  { icon: "🔗", text: "Guest post offer — link exchange, one time only" },
   { icon: "💰", text: "Double your investment in 24 hours, guaranteed" },
 ];
 
-/** Scrolling wall of junk subject lines — "an inbox drowning in spam". */
-const SpamScroll: React.FC<{ w: number; h: number; offset: number }> = ({ w, h, offset }) => {
-  const rowH = 58;
+/** Scrolling wall of junk subject lines, clipped to whatever width it's given. */
+const SpamFeed: React.FC<{ w: number; h: number; offset: number }> = ({ w, h, offset }) => {
+  const rowH = 54;
   const count = Math.ceil(h / rowH) + 2;
   const shift = offset % rowH;
   return (
@@ -64,13 +59,23 @@ const SpamScroll: React.FC<{ w: number; h: number; offset: number }> = ({ w, h, 
               height: rowH,
               display: "flex",
               alignItems: "center",
-              gap: 14,
-              padding: "0 18px",
-              borderBottom: `1px solid ${B.border}`,
+              gap: 12,
+              padding: "0 16px",
+              borderBottom: `1px solid ${P.dangerEdge}`,
             }}
           >
-            <span style={{ fontSize: 22 }}>{item.icon}</span>
-            <span style={{ fontSize: 16, fontWeight: 600, color: B.danger, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+            <span style={{ fontSize: 20 }}>{item.icon}</span>
+            <span
+              style={{
+                fontSize: 15,
+                fontWeight: 600,
+                color: P.danger,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                fontFamily,
+              }}
+            >
               {item.text}
             </span>
           </div>
@@ -80,297 +85,364 @@ const SpamScroll: React.FC<{ w: number; h: number; offset: number }> = ({ w, h, 
   );
 };
 
-/** One row of a mock contact form field. */
-const FormField: React.FC<{ label: string; value: string; dashed?: boolean; badge?: string }> = ({
-  label,
-  value,
-  dashed = false,
-  badge,
-}) => (
-  <div style={{ marginBottom: 14 }}>
-    <div style={{ fontSize: 13, fontWeight: 700, color: B.muted, marginBottom: 5, display: "flex", alignItems: "center", gap: 8 }}>
-      {label}
-      {badge ? (
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            color: B.accent,
-            background: B.accentBg,
-            border: `1px solid ${B.border}`,
-            borderRadius: 999,
-            padding: "1px 8px",
-          }}
-        >
-          {badge}
-        </span>
-      ) : null}
-    </div>
-    <div
-      style={{
-        height: 34,
-        borderRadius: 9,
-        background: dashed ? "transparent" : "#F4F7FC",
-        border: dashed ? `1.5px dashed ${B.border}` : `1.5px solid ${B.border}`,
-        display: "flex",
-        alignItems: "center",
-        padding: "0 12px",
-        fontSize: 14,
-        fontWeight: 500,
-        color: dashed ? B.muted : B.ink,
-      }}
-    >
-      {value}
-    </div>
-  </div>
-);
-
-/** Checklist row that pops in and turns into a green check. */
-const CheckRow: React.FC<{ text: string; sub: string; t: number }> = ({ text, sub, t }) => {
+/** A clean-inbox row that pops in with a green check — the messages that get through. */
+const ArrivalRow: React.FC<{ text: string; t: number }> = ({ text, t }) => {
   if (t <= 0.004) return null;
   return (
     <div
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 12,
-        padding: "10px 14px",
-        marginBottom: 10,
-        borderRadius: 12,
-        background: B.successBg,
-        border: `1.5px solid #BFE7CD`,
+        gap: 10,
+        padding: "8px 12px",
+        marginBottom: 8,
+        borderRadius: 10,
+        background: P.successBg,
+        border: `1.5px solid ${P.successEdge}`,
         opacity: Math.min(1, t * 1.6),
-        transform: `translateX(${(1 - Math.min(1, t * 1.6)) * 24}px)`,
+        transform: `translateX(${(1 - Math.min(1, t * 1.6)) * 20}px)`,
       }}
     >
       <div
         style={{
-          width: 26,
-          height: 26,
-          minWidth: 26,
+          width: 22,
+          height: 22,
+          minWidth: 22,
           borderRadius: "50%",
-          background: B.success,
+          background: P.success,
           color: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontSize: 15,
+          fontSize: 13,
           fontWeight: 800,
-          transform: `scale(${Math.min(1, t * 1.4)})`,
         }}
       >
         ✓
       </div>
-      <div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: B.ink }}>{text}</div>
-        <div style={{ fontSize: 12.5, fontWeight: 500, color: B.muted, marginTop: 1 }}>{sub}</div>
-      </div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: P.ink, fontFamily }}>{text}</div>
     </div>
   );
 };
 
+type Check = { emoji: string; title: string; sub: string; tone: Tone; x: number; activateAt: number };
+
+const CHECKS: Check[] = [
+  { emoji: "🍯", title: "Honeypot field", sub: "a bot fills it in", tone: "accent", x: 40, activateAt: 484 },
+  { emoji: "⏱", title: "3-second timer", sub: "too fast is a bot", tone: "accent", x: 214, activateAt: 540 },
+  { emoji: "🚦", title: "Rate limit", sub: "5 per 10 minutes", tone: "success", x: 388, activateAt: 600 },
+];
+
 export const FeatureSpamProtection: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, durationInFrames } = useVideoConfig();
-  const lf = loopFade(frame, durationInFrames);
+  const { fps } = useVideoConfig();
 
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
 
-  // ── Beat windows (matches reference clip exactly) ──────────────────
-  const b1 = seg(frame, 0, 10) * (1 - seg(frame, 104, 118)) * lf;
-  const b2 = seg(frame, 112, 126) * (1 - seg(frame, 228, 242)) * lf;
-  const b3 = seg(frame, 236, 250) * (1 - seg(frame, 332, 346)) * lf;
-  const b4 = seg(frame, 340, 354) * lf;
-
-  // ── Beat 1: the problem ───────────────────────────────────────────
-  const scroll = frame * 2.0;
-  const noteOp = seg(frame, 24, 40, Easing.out(Easing.cubic));
-  const pill1 = pop(46);
-  const pill2 = pop(58);
-  const pill3 = pop(70);
-
-  // ── Beat 2: the solution ──────────────────────────────────────────
-  const formOp = seg(frame, 116, 130);
-  const cx = interpolate(frame, [124, 150, 168], [700, 335, 335], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.inOut(Easing.quad),
-  });
-  const cy = interpolate(frame, [124, 150, 168], [420, 552, 552], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.inOut(Easing.quad),
-  });
-  const cursorOp = seg(frame, 124, 132) * (1 - seg(frame, 176, 190));
-  const click1 = seg(frame, 150, 164, Easing.out(Easing.quad));
-  const check1 = seg(frame, 170, 190, Easing.out(Easing.cubic));
-  const check2 = seg(frame, 182, 202, Easing.out(Easing.cubic));
-  const check3 = seg(frame, 194, 214, Easing.out(Easing.cubic));
-  const verifiedOp = seg(frame, 210, 224, Easing.out(Easing.cubic));
-  const cap2 = seg(frame, 196, 212, Easing.out(Easing.cubic));
-
-  // ── Beat 3: how it works ──────────────────────────────────────────
-  const card1 = pop(252);
-  const card2 = pop(272);
-  const card3 = pop(292);
-  const arr1 = seg(frame, 262, 278, Easing.inOut(Easing.cubic));
-  const arr2 = seg(frame, 282, 298, Easing.inOut(Easing.cubic));
-  const cap3 = seg(frame, 300, 316, Easing.out(Easing.cubic));
-
-  // ── Beat 4: the result ─────────────────────────────────────────────
-  const beforeIn = seg(frame, 350, 364, Easing.out(Easing.cubic));
-  const arrRes = seg(frame, 362, 378, Easing.inOut(Easing.cubic));
-  const afterIn = pop(372);
-  const pct = Math.round(
-    interpolate(frame, [384, 410], [0, 98], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) })
+  // ── The moving divider — chaos wide early, order swallows the frame late ──
+  const dividerX = interpolate(
+    frame,
+    [0, 304, 459, 669, 823, 910, 955],
+    [860, 830, 760, 480, 260, 130, 130],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.inOut(Easing.cubic) },
   );
-  const speedOp = seg(frame, 384, 398, Easing.out(Easing.cubic));
-  const check = pop(392);
-  const footOp = seg(frame, 402, 418);
+  const leftW = dividerX;
+  const rightW = 1280 - dividerX;
+
+  const structureOp = seg(frame, 0, 14);
+
+  // ── Beat windows (fade-in + fade-out per beat; b5 holds to the end) ──────
+  const b1 = seg(frame, 15, 31) * (1 - seg(frame, 288, 304));
+  const b2 = seg(frame, 313, 329) * (1 - seg(frame, 443, 459));
+  const b3 = seg(frame, 468, 484) * (1 - seg(frame, 653, 669));
+  const b4 = seg(frame, 678, 694) * (1 - seg(frame, 807, 823));
+  const b5 = seg(frame, 832, 848);
+
+  // ── Chaos side (left) ─────────────────────────────────────────────
+  const scroll = frame * 1.8;
+  const headerFade = structureOp * (1 - seg(frame, 600, 650));
+  const pillPop = pop(40);
+  const pillOp = Math.min(1, pillPop) * (1 - seg(frame, 600, 650));
+  const spamCount = Math.round(
+    interpolate(frame, [20, 140], [0, 50], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }),
+  );
+
+  // ── Beat 2: the CAPTCHA idea, sliding down onto the divider ────────
+  const capScale = pop(322, 9);
+  const capY = interpolate(frame, [313, 345], [130, 258], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+
+  // ── Beat 4: blocked-bot flashes at each checkpoint ─────────────────
+  const blockPop = [pop(690), pop(715), pop(740)];
+
+  // ── Beat 4/5: real messages arriving in the clean inbox ────────────
+  const arrival = [
+    seg(frame, 700, 716, Easing.out(Easing.cubic)),
+    seg(frame, 724, 740, Easing.out(Easing.cubic)),
+    seg(frame, 748, 764, Easing.out(Easing.cubic)),
+  ];
+
+  // ── Beat 5: the payoff number ───────────────────────────────────────
+  const pct = Math.round(
+    interpolate(frame, [840, 900], [0, 98], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }),
+  );
 
   return (
-    <div style={{ position: "absolute", inset: 0, fontFamily }}>
-      <LightBg />
+    <PaletteProvider value={P}>
+      <div style={{ position: "absolute", inset: 0, fontFamily, opacity: structureOp }}>
+        <LightBg />
 
-      {/* ════ Beat 1 — PROBLEM ════ */}
-      <Group opacity={b1}>
-        <Headline text="Your contact form gets" accentText="50+ spam messages a day" accentColor={B.danger} opacity={seg(frame, 4, 18)} />
-        <BrowserWindow x={80} y={116} w={700} h={452} title="vitalii.no — inbox (unfiltered)" opacity={Math.min(1, pop(8))}>
-          <SpamScroll w={700} h={410} offset={scroll} />
-        </BrowserWindow>
-        <StickyNote
-          x={830}
-          y={150}
-          w={350}
-          opacity={noteOp}
-          text="Casino bonuses, crypto scams, fake SEO deals — real messages get buried inside"
-        />
-        <StatPill x={846} y={340} emoji="📧" text="50+ spam / day" tone="danger" scale={pill1} opacity={Math.min(1, pill1)} />
-        <StatPill x={846} y={402} emoji="🎰" text="Casino, crypto, SEO junk" tone="danger" scale={pill2} opacity={Math.min(1, pill2)} />
-        <StatPill x={846} y={464} emoji="😤" text="Drowning within the first week" tone="danger" scale={pill3} opacity={Math.min(1, pill3)} />
-        <CaptionBand text="Every single day, spam drowns out the messages that actually matter" tone="danger" opacity={seg(frame, 30, 46)} />
-      </Group>
-
-      {/* ════ Beat 2 — SOLUTION ════ */}
-      <Group opacity={b2}>
-        <Headline text="3 invisible checks run" accentText="before any email is sent" accentColor={B.success} opacity={seg(frame, 116, 130)} />
-        <BrowserWindow x={90} y={196} w={560} h={396} title="vitalii.no — contact form" opacity={formOp}>
-          <div style={{ padding: "22px 24px", fontFamily }}>
-            <FormField label="NAME" value="Kari Nordmann" />
-            <FormField label="EMAIL" value="kari@example.com" />
-            <FormField label="EMAIL_CONFIRM" value="(left empty)" dashed badge="🍯 hidden field" />
-            <FormField label="MESSAGE" value="Hi, I'd like to ask about..." />
-            <div
-              style={{
-                marginTop: 16,
-                width: 140,
-                height: 38,
-                borderRadius: 10,
-                background: B.accent,
-                color: "#fff",
-                fontSize: 14,
-                fontWeight: 700,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              Send message
-            </div>
+        {/* ════ CHAOS SIDE — spam flooding in ════ */}
+        <div style={{ position: "absolute", left: 0, top: 0, width: leftW, height: 720, overflow: "hidden" }}>
+          <Panel x={0} y={0} w={leftW} h={720} tone="danger" radius={0} />
+          <div
+            style={{
+              position: "absolute",
+              left: 18,
+              top: 16,
+              fontSize: 15,
+              fontWeight: 800,
+              letterSpacing: 0.6,
+              color: P.danger,
+              opacity: headerFade,
+              whiteSpace: "nowrap",
+              fontFamily,
+            }}
+          >
+            📥 UNFILTERED INBOX
           </div>
-        </BrowserWindow>
-        <Panel x={680} y={196} w={490} h={396} tone="card" opacity={formOp}>
-          <div style={{ padding: "20px 20px 0", fontFamily }}>
-            <div style={{ fontSize: 15, fontWeight: 700, color: B.muted, letterSpacing: 0.4, marginBottom: 12 }}>
-              SERVER-SIDE CHECKS
+          <div style={{ position: "absolute", left: 0, top: 54, width: leftW, height: 666, overflow: "hidden" }}>
+            <SpamFeed w={leftW} h={666} offset={scroll} />
+          </div>
+          <div style={{ position: "absolute", left: 16, bottom: 30, opacity: pillOp }}>
+            <StatPill x={0} y={0} emoji="📧" text={`${spamCount}/day`} tone="danger" scale={1} opacity={1} />
+          </div>
+        </div>
+
+        {/* ════ ORDER SIDE — the 3-tier defense ════ */}
+        <div style={{ position: "absolute", left: dividerX, top: 0, width: rightW, height: 720, overflow: "hidden" }}>
+          <Panel x={0} y={0} w={rightW} h={720} tone="success" radius={0} />
+          <div
+            style={{
+              position: "absolute",
+              left: 40,
+              top: 16,
+              fontSize: 15,
+              fontWeight: 800,
+              letterSpacing: 0.6,
+              color: P.success,
+              opacity: structureOp,
+              whiteSpace: "nowrap",
+              fontFamily,
+            }}
+          >
+            🛡 YOUR DEFENSE
+          </div>
+
+          {/* Ghost slots — foreshadow the 3 checkpoints before they activate */}
+          {CHECKS.map((c) => {
+            const ghostOp = structureOp * (1 - seg(frame, c.activateAt - 10, c.activateAt + 6));
+            if (ghostOp <= 0.004) return null;
+            return (
+              <div
+                key={`ghost-${c.title}`}
+                style={{
+                  position: "absolute",
+                  left: c.x + 25,
+                  top: 100,
+                  width: 110,
+                  height: 110,
+                  borderRadius: 30,
+                  border: `2px dashed ${P.border}`,
+                  opacity: ghostOp * 0.7,
+                }}
+              />
+            );
+          })}
+
+          {/* The 3 checkpoints, activating in sequence during beat 3 */}
+          {CHECKS.map((c) => {
+            const s = pop(c.activateAt);
+            return (
+              <IconCard
+                key={c.title}
+                x={c.x}
+                y={100}
+                w={160}
+                emoji={c.emoji}
+                title={c.title}
+                sub={c.sub}
+                tone={c.tone}
+                scale={s}
+                opacity={Math.min(1, s)}
+              />
+            );
+          })}
+
+          {/* Beat 4 — blocked-bot flashes right under each checkpoint */}
+          <Group opacity={b4}>
+            {CHECKS.map((c, i) => (
+              <div
+                key={`block-${c.title}`}
+                style={{
+                  position: "absolute",
+                  left: c.x + 55,
+                  top: 232,
+                  width: 46,
+                  height: 46,
+                  borderRadius: "50%",
+                  background: P.dangerBg,
+                  border: `2px solid ${P.danger}`,
+                  color: P.danger,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 22,
+                  fontWeight: 800,
+                  transform: `scale(${Math.min(1, blockPop[i])})`,
+                  opacity: Math.min(1, blockPop[i]),
+                }}
+              >
+                ✕
+              </div>
+            ))}
+          </Group>
+
+          {/* Beat 4/5 — the clean inbox: real messages get through */}
+          <Group opacity={Math.max(b4, b5)}>
+            <div style={{ position: "absolute", left: 430, top: 100, width: 340 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  letterSpacing: 0.6,
+                  color: P.success,
+                  marginBottom: 12,
+                  fontFamily,
+                }}
+              >
+                REAL MESSAGES GET THROUGH
+              </div>
+              <ArrivalRow text="Kari N. — pricing question" t={arrival[0]} />
+              <ArrivalRow text="Ola H. — project inquiry" t={arrival[1]} />
+              <ArrivalRow text="Team @ Acme — collab request" t={arrival[2]} />
             </div>
-            <CheckRow text="Honeypot field is empty" sub="a bot would have filled it in" t={check1} />
-            <CheckRow text="Took 4.2 seconds to fill in" sub="over the 3-second minimum" t={check2} />
-            <CheckRow text="1st request from this IP in 10 min" sub="under the 5-request limit" t={check3} />
+          </Group>
+
+          {/* Beat 5 — the payoff number, dominating the now-huge order side */}
+          <Group opacity={b5}>
             <div
               style={{
-                marginTop: 6,
-                padding: "12px 14px",
-                borderRadius: 12,
-                background: B.accentBg,
-                border: `1.5px solid #C4D7FB`,
+                position: "absolute",
+                left: 0,
+                top: 430,
+                width: rightW,
                 textAlign: "center",
-                fontSize: 16,
-                fontWeight: 800,
-                color: B.accent,
-                opacity: verifiedOp,
-                transform: `scale(${0.94 + 0.06 * verifiedOp})`,
+                fontFamily,
               }}
             >
-              ✅ Verified — sending now
+              <div
+                style={{
+                  fontSize: 118,
+                  lineHeight: 1,
+                  fontWeight: 800,
+                  letterSpacing: -3,
+                  color: P.success,
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {pct}%
+              </div>
+              <div
+                style={{
+                  marginTop: 10,
+                  fontSize: 22,
+                  fontWeight: 700,
+                  letterSpacing: 1.4,
+                  color: P.muted,
+                }}
+              >
+                FEWER SPAM MESSAGES
+              </div>
             </div>
-          </div>
-        </Panel>
-        <Cursor x={cx} y={cy} opacity={cursorOp} click={click1 % 1} />
-        <CaptionBand text="Real visitors pass without ever noticing a thing" tone="accent" opacity={cap2} />
-      </Group>
+          </Group>
+        </div>
 
-      {/* ════ Beat 3 — HOW IT WORKS ════ */}
-      <Group opacity={b3}>
-        <Headline text="Three quiet tiers," accentText="one Edge Function" accentColor={B.accent} opacity={seg(frame, 240, 254)} />
-        <IconCard x={110} y={218} w={300} emoji="🍯" title="Hidden honeypot field" sub="bots fill it in, humans never see it" tone="accent" scale={card1} opacity={Math.min(1, card1)} />
-        <IconCard x={490} y={218} w={300} emoji="⏱️" title="3-second minimum" sub="blocks instant auto-submits" tone="accent" scale={card2} opacity={Math.min(1, card2)} />
-        <IconCard x={870} y={218} w={300} emoji="🚦" title="IP rate limit" sub="5 requests per 10 minutes" tone="success" scale={card3} opacity={Math.min(1, card3)} />
-        <FlowArrow x={412} y={262} len={76} progress={arr1} />
-        <FlowArrow x={792} y={262} len={76} progress={arr2} color={B.success} />
-        <CaptionBand
-          text="All three checks run inside one Deno Edge Function — before Resend ever sends an email"
-          opacity={cap3}
-          fontSize={21}
-          y={580}
-        />
-      </Group>
-
-      {/* ════ Beat 4 — RESULT ════ */}
-      <Group opacity={b4}>
-        <Headline text="The payoff" opacity={seg(frame, 344, 358)} />
-        <Panel x={140} y={170} w={400} h={210} tone="danger" opacity={beforeIn}>
-          <div style={{ padding: "26px 30px", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.danger, letterSpacing: 1 }}>BEFORE</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>50+ / day</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>spam submissions</div>
-          </div>
-        </Panel>
-        <FlowArrow x={560} y={264} len={150} progress={arrRes} color={B.success} />
-        <Panel x={740} y={170} w={400} h={210} tone="success" opacity={Math.min(1, afterIn)}>
-          <div style={{ padding: "26px 30px", transform: `scale(${0.9 + 0.1 * Math.min(1, afterIn)})`, transformOrigin: "center", fontFamily }}>
-            <div style={{ fontSize: 19, fontWeight: 700, color: B.success, letterSpacing: 1 }}>NOW</div>
-            <div style={{ fontSize: 40, fontWeight: 800, color: B.ink, marginTop: 14 }}>0-1 / day</div>
-            <div style={{ fontSize: 26, fontWeight: 650, color: B.muted, marginTop: 6 }}>zero false positives</div>
-          </div>
-        </Panel>
+        {/* ════ Divider — slides left as order takes over ════ */}
         <div
           style={{
             position: "absolute",
-            left: 0,
-            top: 424,
-            width: 1280,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 20,
-            opacity: speedOp,
-            fontFamily,
+            left: dividerX - 3,
+            top: 0,
+            width: 6,
+            height: 720,
+            background: P.ink,
+            opacity: 0.85 * structureOp,
+            boxShadow: "0 0 18px rgba(0,0,0,0.25)",
           }}
-        >
-          <div style={{ position: "relative", width: 52, height: 52 }}>
-            <CheckBadge x={0} y={0} size={52} scale={check} opacity={Math.min(1, check)} />
+        />
+
+        {/* ════ Beat 1 caption — the problem, hero count on the chaos side ════ */}
+        <Group opacity={b1}>
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 130,
+              width: Math.max(leftW, 300),
+              textAlign: "center",
+              fontFamily,
+            }}
+          >
+            <div style={{ fontSize: 132, lineHeight: 1, fontWeight: 800, color: P.danger }}>{spamCount}</div>
+            <div style={{ marginTop: 8, fontSize: 20, fontWeight: 700, letterSpacing: 1.2, color: P.muted }}>
+              SPAM MESSAGES / DAY
+            </div>
           </div>
-          <span style={{ fontSize: 52, fontWeight: 800, color: B.success }}>{pct}% fewer spam messages</span>
-        </div>
-        <div style={{ position: "absolute", left: 0, top: 540, width: 1280, textAlign: "center", opacity: footOp, fontFamily }}>
-          <div style={{ fontSize: 22, fontWeight: 650, color: B.muted }}>
-            No CAPTCHA, no friction — just three quiet checks running in the background.
-          </div>
-          <div style={{ fontSize: 18, fontWeight: 600, color: B.accent, marginTop: 12 }}>vitalii.no · Contact form</div>
-        </div>
-      </Group>
-    </div>
+          <CaptionBand
+            text="Within days of launching, my contact form was buried under spam — SEO offers, casino links, crypto junk."
+            tone="danger"
+          />
+        </Group>
+
+        {/* ════ Beat 2 caption — no CAPTCHA, sliding onto the divider ════ */}
+        <Group opacity={b2}>
+          <IconCard
+            x={dividerX - 90}
+            y={capY}
+            w={180}
+            emoji="🧩"
+            title="No CAPTCHA"
+            sub="real visitors never feel like suspects"
+            tone="danger"
+            scale={Math.min(1.05, capScale)}
+            opacity={Math.min(1, capScale)}
+          />
+          <CaptionBand text="I didn't want a CAPTCHA — that treats every real visitor like a suspect." tone="accent" />
+        </Group>
+
+        {/* ════ Beat 3 caption — the trap, the one tech mention ════ */}
+        <Group opacity={b3}>
+          <CaptionBand
+            text="A three-layer trap inside one Edge Function: a hidden field, a timing check, and a rate limit."
+            tone="accent"
+          />
+        </Group>
+
+        {/* ════ Beat 4 caption ════ */}
+        <Group opacity={b4}>
+          <CaptionBand text="Bots trip one of the three instantly — real people never even notice it's there." />
+        </Group>
+
+        {/* ════ Beat 5 caption — holds to the end ════ */}
+        <Group opacity={b5}>
+          <CaptionBand text="Spam: down 98 percent." tone="success" fontSize={26} />
+        </Group>
+      </div>
+    </PaletteProvider>
   );
 };
