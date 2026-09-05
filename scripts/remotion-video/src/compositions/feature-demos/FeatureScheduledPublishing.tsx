@@ -147,14 +147,20 @@ export const FeatureScheduledPublishing: React.FC = () => {
   const heroPop2 = pop(295);
   const cap2 = seg(frame, 392, 408);
   const ghostLabelOp = seg(frame, 378, 394);
+  const stat2L = pop(300);
+  const stat2R = pop(312);
 
   // ── Beat 3: the fix — 5-minute automatic cadence ───────────────────
   const heroPop3 = pop(444);
   const techBadge = pop(596);
   const cap3 = seg(frame, 598, 614);
+  const stat3L = pop(450);
+  const stat3R = pop(462);
 
   // ── Beat 4: priority jump ───────────────────────────────────────────
   const heroPop4 = pop(648);
+  const stat4L = pop(654);
+  const stat4R = pop(666);
   const urgentX = interpolate(frame, [672, 744], [QUEUE_SLOT_X[5], QUEUE_SLOT_X[0]], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -229,6 +235,8 @@ export const FeatureScheduledPublishing: React.FC = () => {
         {/* ════ Beat 2 — the analogy: 12 gifts in one breath ════ */}
         <Group opacity={b2} dy={b2Dy}>
           {hero("12", undefined, "GIFTS IN ONE BREATH", P.danger, heroPop2)}
+          <StatPill x={64} y={150} emoji="😮‍💨" text="All at once" tone="danger" scale={stat2L} opacity={Math.min(1, stat2L)} />
+          <StatPill x={882} y={150} emoji="🙈" text="None of it lands" tone="danger" scale={stat2R} opacity={Math.min(1, stat2R)} />
           {GIFTS.map((g, i) => {
             const t = seg(frame, 300 + i * 7, 300 + i * 7 + 12);
             return (
@@ -289,6 +297,8 @@ export const FeatureScheduledPublishing: React.FC = () => {
         {/* ════ Beat 3 — the fix: checked every 5 minutes ════ */}
         <Group opacity={b3}>
           {hero("5", "MIN", "BETWEEN AUTOMATIC CHECKS", P.accent, heroPop3)}
+          <StatPill x={64} y={150} emoji="🔁" text="Runs around the clock" tone="accent" scale={stat3L} opacity={Math.min(1, stat3L)} />
+          <StatPill x={882} y={150} emoji="🤖" text="Fully automatic" tone="accent" scale={stat3R} opacity={Math.min(1, stat3R)} />
           <div style={{ position: "absolute", left: 90, top: 520, width: 1100, height: 3, background: P.border }} />
           {TICKS.map((x, i) => {
             const t = seg(frame, 462 + i * 16, 462 + i * 16 + 14, Easing.out(Easing.cubic));
@@ -348,6 +358,8 @@ export const FeatureScheduledPublishing: React.FC = () => {
         {/* ════ Beat 4 — priority jumps the queue ════ */}
         <Group opacity={b4} dy={b4Dy}>
           {hero("92", undefined, "PRIORITY SCORE", P.amber, heroPop4)}
+          <StatPill x={64} y={150} emoji="🚦" text="Breaking jumps ahead" tone="accent" scale={stat4L} opacity={Math.min(1, stat4L)} />
+          <StatPill x={882} y={150} emoji="😌" text="Routine waits calmly" tone="success" scale={stat4R} opacity={Math.min(1, stat4R)} />
           {[1, 2, 3, 4, 5].map((slot) => {
             const t = pop(648 + slot * 6);
             return (

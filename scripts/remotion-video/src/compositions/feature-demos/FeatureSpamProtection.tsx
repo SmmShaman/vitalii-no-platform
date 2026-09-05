@@ -386,8 +386,33 @@ export const FeatureSpamProtection: React.FC = () => {
           }}
         />
 
+        {/* ════ Caption backdrop — keeps every CaptionBand legible over the
+             full-bleed spam feed / checklist behind it ════ */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 606,
+            width: 1280,
+            height: 114,
+            background: "linear-gradient(180deg, rgba(253,250,244,0) 0%, rgba(253,250,244,0.92) 28%, rgba(253,250,244,0.92) 100%)",
+          }}
+        />
+
         {/* ════ Beat 1 caption — the problem, hero count on the chaos side ════ */}
         <Group opacity={b1}>
+          <div
+            style={{
+              position: "absolute",
+              left: Math.max(0, leftW / 2 - 260),
+              top: 96,
+              width: 520,
+              height: 216,
+              borderRadius: 26,
+              background: "rgba(253,250,244,0.9)",
+              boxShadow: "0 16px 36px rgba(0,0,0,0.22)",
+            }}
+          />
           <div
             style={{
               position: "absolute",

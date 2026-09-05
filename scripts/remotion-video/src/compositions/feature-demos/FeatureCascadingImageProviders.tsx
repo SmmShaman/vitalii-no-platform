@@ -241,7 +241,7 @@ export const FeatureCascadingImageProviders: React.FC = () => {
                 style={{
                   position: "absolute",
                   left: 396,
-                  top: 176 + i * 78,
+                  top: 140 + i * 92,
                   width: 176,
                   height: 56,
                   borderRadius: 12,
@@ -262,15 +262,15 @@ export const FeatureCascadingImageProviders: React.FC = () => {
               </div>
             );
           })}
-          <FlowArrow x={588} y={330} len={78} progress={seg(frame, 350, 368)} color={P.muted} />
+          <FlowArrow x={588} y={306} len={78} progress={seg(frame, 350, 368)} color={P.muted} />
 
           <div
             style={{
               position: "absolute",
               left: 690,
-              top: 176,
+              top: 150,
               width: 300,
-              height: 300,
+              height: 360,
               borderRadius: 32,
               background: P.card,
               border: `2.5px solid ${flickerColor}`,
@@ -413,9 +413,9 @@ export const FeatureCascadingImageProviders: React.FC = () => {
             style={{
               position: "absolute",
               left: STAGE_L + 6,
-              top: 214,
+              top: 190,
               width: 240,
-              height: 300,
+              height: 340,
               borderRadius: 20,
               background: timeoutHit ? P.dangerBg : P.card,
               border: `2px solid ${timeoutHit ? P.dangerEdge : P.border}`,
@@ -449,9 +449,9 @@ export const FeatureCascadingImageProviders: React.FC = () => {
             style={{
               position: "absolute",
               left: STAGE_L + 300,
-              top: 214,
+              top: 190,
               width: 240,
-              height: 300,
+              height: 340,
               borderRadius: 20,
               background: cardB_fail ? P.dangerBg : P.card,
               border: `2px solid ${cardB_fail ? P.dangerEdge : P.border}`,
@@ -482,9 +482,9 @@ export const FeatureCascadingImageProviders: React.FC = () => {
             style={{
               position: "absolute",
               left: STAGE_L + 594,
-              top: 214,
+              top: 190,
               width: 240,
-              height: 300,
+              height: 340,
               borderRadius: 20,
               background: successPop > 0.1 ? P.successBg : P.card,
               border: `2px solid ${successPop > 0.1 ? P.successEdge : P.border}`,
