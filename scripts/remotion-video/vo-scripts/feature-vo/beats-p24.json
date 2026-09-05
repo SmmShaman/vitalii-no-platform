@@ -1,0 +1,7 @@
+{"id": "p24", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Some days, one in four AI images just failed — blank, broken, or so wrong I had to catch it and redo by hand."],
+  ["b2", "Trusting one image provider was like trusting one waiter to remember your whole order — perfect, until it wasn't."],
+  ["b3", "So I built an Edge Function that races five different providers and takes whichever one actually finishes."],
+  ["b4", "If the first one fails or stalls, it falls automatically to the next in line."],
+  ["b5", "Image success rate: 98 percent."]
+]}

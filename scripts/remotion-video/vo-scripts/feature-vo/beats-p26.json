@@ -1,0 +1,7 @@
+{"id": "p26", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Within days of launching my site, my contact form was getting buried under 50 spam messages a day — SEO offers, casino links, crypto junk."],
+  ["b2", "I didn't want to slap a CAPTCHA on it and make every real visitor feel like a suspect."],
+  ["b3", "So I built a three-layer trap inside one Edge Function: a hidden field, a timing check, and a rate limit."],
+  ["b4", "Bots trip one of the three instantly; real people never even notice it's there."],
+  ["b5", "Spam: down 98 percent."]
+]}

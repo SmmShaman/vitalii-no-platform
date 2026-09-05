@@ -1,0 +1,7 @@
+{
+  "id": "p26",
+  "file": "yt-feature-p26.mp4",
+  "title": "50 Spam Messages a Day to Zero, No CAPTCHA | vitalii.no",
+  "description": "Within the first week of launching vitalii.no, my contact form was drowning in spam — 50 or more submissions a day. SEO offers, casino links, crypto scams, a constant stream of junk. I wanted it stopped without a CAPTCHA, which ruins the experience and makes a site look unprofessional.\n\nI built a three-tier defense inside a single Edge Function. A hidden honeypot field catches bots that fill in everything. A timing check rejects submissions completed in under three seconds — faster than any human types. And IP-based rate limiting blocks anything over five submissions in a ten-minute window. All three checks run before the email is ever sent.\n\nSpam submissions dropped from 50+ a day to virtually zero — a 98% reduction — with zero false positives, so every real inquiry still gets through.\n\n🔗 Full write-up: https://vitalii.no/features/3-tier-spam-protection-killing-bots-before-they-hit-my-inbox-p26\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#websecurity #supabase #deno #antispam #edgefunctions",
+  "tags": ["spam protection", "honeypot", "rate limiting", "supabase edge functions", "contact form security", "bot detection", "deno", "no captcha", "web security", "form validation", "vitalii berbeha"]
+}

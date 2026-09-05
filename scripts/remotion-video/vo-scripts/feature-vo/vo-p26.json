@@ -1,0 +1,56 @@
+{
+ "id": "p26",
+ "beat_durations": {
+  "b1": 9.624,
+  "b2": 4.872,
+  "b3": 6.72,
+  "b4": 4.824,
+  "b5": 2.592
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Within days of launching my site, my contact form was getting buried under 50 spam messages a day \u2014 SEO offers, casino links, crypto junk.",
+   "start_s": 0.5,
+   "end_s": 10.124,
+   "start_f": 15,
+   "end_f": 304
+  },
+  {
+   "beat": "b2",
+   "text": "I didn't want to slap a CAPTCHA on it and make every real visitor feel like a suspect.",
+   "start_s": 10.424,
+   "end_s": 15.296,
+   "start_f": 313,
+   "end_f": 459
+  },
+  {
+   "beat": "b3",
+   "text": "So I built a three-layer trap inside one Edge Function: a hidden field, a timing check, and a rate limit.",
+   "start_s": 15.596,
+   "end_s": 22.316,
+   "start_f": 468,
+   "end_f": 669
+  },
+  {
+   "beat": "b4",
+   "text": "Bots trip one of the three instantly; real people never even notice it's there.",
+   "start_s": 22.616,
+   "end_s": 27.44,
+   "start_f": 678,
+   "end_f": 823
+  },
+  {
+   "beat": "b5",
+   "text": "Spam: down 98 percent.",
+   "start_s": 27.74,
+   "end_s": 30.332,
+   "start_f": 832,
+   "end_f": 910
+  }
+ ],
+ "total_s": 31.832,
+ "durationInFrames": 955,
+ "measured_track_s": 30.384,
+ "track": "/root/feature-demos/vo-p26/vo-p26.mp3"
+}

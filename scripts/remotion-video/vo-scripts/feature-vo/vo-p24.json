@@ -1,0 +1,56 @@
+{
+ "id": "p24",
+ "beat_durations": {
+  "b1": 7.968,
+  "b2": 6.912,
+  "b3": 5.976,
+  "b4": 4.92,
+  "b5": 2.832
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Some days, one in four AI images just failed \u2014 blank, broken, or so wrong I had to catch it and redo by hand.",
+   "start_s": 0.5,
+   "end_s": 8.468,
+   "start_f": 15,
+   "end_f": 254
+  },
+  {
+   "beat": "b2",
+   "text": "Trusting one image provider was like trusting one waiter to remember your whole order \u2014 perfect, until it wasn't.",
+   "start_s": 8.768,
+   "end_s": 15.68,
+   "start_f": 263,
+   "end_f": 470
+  },
+  {
+   "beat": "b3",
+   "text": "So I built an Edge Function that races five different providers and takes whichever one actually finishes.",
+   "start_s": 15.98,
+   "end_s": 21.956,
+   "start_f": 479,
+   "end_f": 659
+  },
+  {
+   "beat": "b4",
+   "text": "If the first one fails or stalls, it falls automatically to the next in line.",
+   "start_s": 22.256,
+   "end_s": 27.176,
+   "start_f": 668,
+   "end_f": 815
+  },
+  {
+   "beat": "b5",
+   "text": "Image success rate: 98 percent.",
+   "start_s": 27.476,
+   "end_s": 30.308,
+   "start_f": 824,
+   "end_f": 909
+  }
+ ],
+ "total_s": 31.808,
+ "durationInFrames": 954,
+ "measured_track_s": 30.36,
+ "track": "/root/feature-demos/vo-p24/vo-p24.mp3"
+}

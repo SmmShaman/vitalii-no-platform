@@ -1,0 +1,7 @@
+{
+  "id": "p25",
+  "file": "yt-feature-p25.mp4",
+  "title": "10-15 Posts a Day, Zero Content Dumps | vitalii.no",
+  "description": "I was publishing 10 to 15 articles a day, often all within minutes of each other. On social feeds that read as a content dump — an instant way to alienate followers, trigger unfollows, and get penalized by the algorithm. Manually staggering posts across LinkedIn, Instagram and Facebook ate up real time every day.\n\nA scheduler now runs every five minutes via GitHub Actions, pulling from a queue and enforcing a minimum gap between publications. Every post carries an AI-derived priority score, so breaking news jumps straight to the front while routine posts wait their turn. Configurable publish windows keep everything inside sensible hours.\n\nManual scheduling is gone — about 30 minutes saved every day — and engagement is up 15 to 20% now that posts land at a steady, algorithm-friendly pace.\n\n🔗 Full write-up: https://vitalii.no/features/scheduled-publishing-taming-the-content-firehose-with-smart-delays-p25\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#automation #githubactions #supabase #contentpipeline #socialmedia",
+  "tags": ["content scheduling", "github actions", "supabase edge functions", "priority queue", "social media automation", "publishing pipeline", "rate limiting", "deno", "engagement optimization", "workflow automation", "vitalii berbeha"]
+}

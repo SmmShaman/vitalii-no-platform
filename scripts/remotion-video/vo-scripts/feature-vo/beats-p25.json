@@ -1,0 +1,7 @@
+{"id": "p25", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "I was posting 10 to 15 articles a day, sometimes all at once, and it looked like a content dump — followers would just tune out or unfollow."],
+  ["b2", "That's like trying to hand someone twelve gifts in one breath instead of spacing them out."],
+  ["b3", "So a scheduler now spaces every post automatically, running every five minutes with GitHub Actions."],
+  ["b4", "Urgent stories jump the queue instantly, while routine posts wait their turn in the background."],
+  ["b5", "Engagement up 20 percent."]
+]}

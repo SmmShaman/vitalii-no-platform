@@ -1,0 +1,56 @@
+{
+ "id": "p25",
+ "beat_durations": {
+  "b1": 8.76,
+  "b2": 4.68,
+  "b3": 6.48,
+  "b4": 5.496,
+  "b5": 1.944
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I was posting 10 to 15 articles a day, sometimes all at once, and it looked like a content dump \u2014 followers would just tune out or unfollow.",
+   "start_s": 0.5,
+   "end_s": 9.26,
+   "start_f": 15,
+   "end_f": 278
+  },
+  {
+   "beat": "b2",
+   "text": "That's like trying to hand someone twelve gifts in one breath instead of spacing them out.",
+   "start_s": 9.56,
+   "end_s": 14.24,
+   "start_f": 287,
+   "end_f": 427
+  },
+  {
+   "beat": "b3",
+   "text": "So a scheduler now spaces every post automatically, running every five minutes with GitHub Actions.",
+   "start_s": 14.54,
+   "end_s": 21.02,
+   "start_f": 436,
+   "end_f": 631
+  },
+  {
+   "beat": "b4",
+   "text": "Urgent stories jump the queue instantly, while routine posts wait their turn in the background.",
+   "start_s": 21.32,
+   "end_s": 26.816,
+   "start_f": 640,
+   "end_f": 804
+  },
+  {
+   "beat": "b5",
+   "text": "Engagement up 20 percent.",
+   "start_s": 27.116,
+   "end_s": 29.06,
+   "start_f": 813,
+   "end_f": 872
+  }
+ ],
+ "total_s": 30.56,
+ "durationInFrames": 917,
+ "measured_track_s": 29.112,
+ "track": "/root/feature-demos/vo-p25/vo-p25.mp3"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "p24",
+  "file": "yt-feature-p24.mp4",
+  "title": "Five AI Image Providers, One Job: Never Fail | vitalii.no",
+  "description": "Relying on a single AI image provider was a constant headache. One service would hit rate limits, another would occasionally return content I couldn't use, and a third was a coin toss on quality. That added up to roughly a 25% failure rate — broken content, manual retries, and wasted time every single day.\n\nI built a cascading image generation service that starts with one provider and automatically falls back through four more if it stalls or fails. Each call runs inside a Supabase Edge Function with a strict 40-second timeout so nothing gets stuck waiting. Every attempt is logged to an image_provider_usage table, and the admin panel lets me reorder the fallback chain in real time based on which providers are actually performing.\n\nImage generation success climbed from about 75% with a single provider to a consistent 98%+, with zero manual retries needed.\n\n🔗 Full write-up: https://vitalii.no/features/cascading-image-providers-when-plan-a-fails-theres-always-plan-e-p24\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#automation #supabase #deno #imagegeneration #edgefunctions",
+  "tags": ["image generation", "cascading fallback", "supabase edge functions", "ai reliability", "provider redundancy", "deno", "admin dashboard", "automation", "content pipeline", "error handling", "vitalii berbeha"]
+}
