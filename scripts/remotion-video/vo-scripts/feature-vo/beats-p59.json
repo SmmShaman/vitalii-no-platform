@@ -1,0 +1,7 @@
+{"id": "p59", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Seven repos. One feature. And I could never remember which repo touched it last."],
+ ["b2", "I'd search my way through all seven, chasing a commit that could be anywhere."],
+ ["b3", "It was like searching seven filing cabinets for one receipt, one drawer at a time."],
+ ["b4", "Now GitHub Actions scans every repo on each push and builds one map straight to the exact commit."],
+ ["b5", "One click now finds it. Debugging time dropped seventy to eighty percent."]
+]}

@@ -1,0 +1,56 @@
+{
+ "id": "p59",
+ "beat_durations": {
+  "b1": 5.232,
+  "b2": 4.704,
+  "b3": 4.92,
+  "b4": 6.768,
+  "b5": 4.608
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Seven repos. One feature. And I could never remember which repo touched it last.",
+   "start_s": 0.5,
+   "end_s": 5.732,
+   "start_f": 15,
+   "end_f": 172
+  },
+  {
+   "beat": "b2",
+   "text": "I'd search my way through all seven, chasing a commit that could be anywhere.",
+   "start_s": 6.032,
+   "end_s": 10.736,
+   "start_f": 181,
+   "end_f": 322
+  },
+  {
+   "beat": "b3",
+   "text": "It was like searching seven filing cabinets for one receipt, one drawer at a time.",
+   "start_s": 11.036,
+   "end_s": 15.956,
+   "start_f": 331,
+   "end_f": 479
+  },
+  {
+   "beat": "b4",
+   "text": "Now GitHub Actions scans every repo on each push and builds one map straight to the exact commit.",
+   "start_s": 16.256,
+   "end_s": 23.024,
+   "start_f": 488,
+   "end_f": 691
+  },
+  {
+   "beat": "b5",
+   "text": "One click now finds it. Debugging time dropped seventy to eighty percent.",
+   "start_s": 23.324,
+   "end_s": 27.932,
+   "start_f": 700,
+   "end_f": 838
+  }
+ ],
+ "total_s": 29.432,
+ "durationInFrames": 883,
+ "measured_track_s": 27.984,
+ "track": "/root/feature-demos/vo-p59/vo-p59.mp3"
+}

@@ -1,0 +1,7 @@
+{"id": "p61", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A hundred features. Five repos. And I couldn't remember where any of them came from."],
+ ["b2", "Verifying one feature meant fifteen to thirty minutes of digging through commit histories by hand."],
+ ["b3", "It was like reading a stranger's diary hoping to find the one page that mattered."],
+ ["b4", "A GitHub Action now scans every repo and links each feature straight to its commit."],
+ ["b5", "What took thirty minutes now takes seconds — investigation time down ninety-five percent."]
+]}

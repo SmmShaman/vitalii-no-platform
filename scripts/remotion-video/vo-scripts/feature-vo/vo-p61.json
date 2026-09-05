@@ -1,0 +1,56 @@
+{
+ "id": "p61",
+ "beat_durations": {
+  "b1": 5.016,
+  "b2": 5.688,
+  "b3": 4.536,
+  "b4": 5.424,
+  "b5": 5.832
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A hundred features. Five repos. And I couldn't remember where any of them came from.",
+   "start_s": 0.5,
+   "end_s": 5.516,
+   "start_f": 15,
+   "end_f": 165
+  },
+  {
+   "beat": "b2",
+   "text": "Verifying one feature meant fifteen to thirty minutes of digging through commit histories by hand.",
+   "start_s": 5.816,
+   "end_s": 11.504,
+   "start_f": 174,
+   "end_f": 345
+  },
+  {
+   "beat": "b3",
+   "text": "It was like reading a stranger's diary hoping to find the one page that mattered.",
+   "start_s": 11.804,
+   "end_s": 16.34,
+   "start_f": 354,
+   "end_f": 490
+  },
+  {
+   "beat": "b4",
+   "text": "A GitHub Action now scans every repo and links each feature straight to its commit.",
+   "start_s": 16.64,
+   "end_s": 22.064,
+   "start_f": 499,
+   "end_f": 662
+  },
+  {
+   "beat": "b5",
+   "text": "What took thirty minutes now takes seconds \u2014 investigation time down ninety-five percent.",
+   "start_s": 22.364,
+   "end_s": 28.196,
+   "start_f": 671,
+   "end_f": 846
+  }
+ ],
+ "total_s": 29.696,
+ "durationInFrames": 891,
+ "measured_track_s": 28.248,
+ "track": "/root/feature-demos/vo-p61/vo-p61.mp3"
+}

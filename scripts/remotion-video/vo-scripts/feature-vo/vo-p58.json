@@ -1,0 +1,56 @@
+{
+ "id": "p58",
+ "beat_durations": {
+  "b1": 4.824,
+  "b2": 6.408,
+  "b3": 6.576,
+  "b4": 6.648,
+  "b5": 5.736
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I post one time for two cities. New York and Oslo don't wake up together.",
+   "start_s": 0.5,
+   "end_s": 5.324,
+   "start_f": 15,
+   "end_f": 160
+  },
+  {
+   "beat": "b2",
+   "text": "Ten AM UTC meant six AM in New York, noon in Oslo \u2014 someone always got the worst hour.",
+   "start_s": 5.624,
+   "end_s": 12.032,
+   "start_f": 169,
+   "end_f": 361
+  },
+  {
+   "beat": "b3",
+   "text": "Now a scheduler checks each city's own ten AM, like a mail carrier who knows every house's hours.",
+   "start_s": 12.332,
+   "end_s": 18.908,
+   "start_f": 370,
+   "end_f": 567
+  },
+  {
+   "beat": "b4",
+   "text": "An hourly job checks Supabase, then fires the post the instant it's ten AM, locally, anywhere.",
+   "start_s": 19.208,
+   "end_s": 25.856,
+   "start_f": 576,
+   "end_f": 776
+  },
+  {
+   "beat": "b5",
+   "text": "Posting at the right local hour lifted first-hour clicks and shares by up to thirty percent.",
+   "start_s": 26.156,
+   "end_s": 31.892,
+   "start_f": 785,
+   "end_f": 957
+  }
+ ],
+ "total_s": 33.392,
+ "durationInFrames": 1002,
+ "measured_track_s": 31.944,
+ "track": "/root/feature-demos/vo-p58/vo-p58.mp3"
+}

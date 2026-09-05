@@ -1,0 +1,7 @@
+{
+  "id": "p61",
+  "file": "yt-feature-p61.mp4",
+  "title": "Every Feature, Every Commit, Instantly Linked | vitalii.no",
+  "description": "Managing 5+ portfolio projects across multiple GitHub repos, verifying any of my 100+ features was a constant headache. I'd routinely burn 15 to 30 minutes per feature manually digging through commit histories just to answer 'where did this come from?' or 'what changed here?'.\n\nI rebuilt the feature-scanner GitHub Action to iterate a repo list, hit the GitHub API for commit messages and file changes, and extract feature details plus the precise commit URL through a custom parseFeatureData function. The structured output is persisted to public/features.json, and the React frontend renders every feature with its direct commit link. A FeatureAdminPanel handles edge cases with manual overrides, keeping the data 100% accurate.\n\nTracing any feature now takes seconds instead of 15 to 30 minutes — a 95% cut in investigation time across 100+ features and 5+ repositories, with full auditability built in.\n\n🔗 Full write-up: https://vitalii.no/features/feature-traceability-every-feature-every-commit-instantly-linked-p61\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#githubactions #typescript #react #devtools #traceability",
+  "tags": ["github actions", "typescript", "react", "feature tracking", "commit history", "developer tools", "portfolio engineering", "data auditing", "traceability", "admin panel", "vitalii berbeha"]
+}

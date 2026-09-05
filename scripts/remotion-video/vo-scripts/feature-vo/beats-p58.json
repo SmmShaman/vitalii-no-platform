@@ -1,0 +1,7 @@
+{"id": "p58", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "I post one time for two cities. New York and Oslo don't wake up together."],
+ ["b2", "Ten AM UTC meant six AM in New York, noon in Oslo — someone always got the worst hour."],
+ ["b3", "Now a scheduler checks each city's own ten AM, like a mail carrier who knows every house's hours."],
+ ["b4", "An hourly job checks Supabase, then fires the post the instant it's ten AM, locally, anywhere."],
+ ["b5", "Posting at the right local hour lifted first-hour clicks and shares by up to thirty percent."]
+]}
