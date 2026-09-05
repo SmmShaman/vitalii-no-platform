@@ -1418,7 +1418,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureTimeZoneTamer"
         component={FeatureTimeZoneTamer}
-        durationInFrames={450}
+        durationInFrames={1002}
         fps={30}
         width={1280}
         height={720}
@@ -1427,7 +1427,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureMultiRepoScanner"
         component={FeatureMultiRepoScanner}
-        durationInFrames={450}
+        durationInFrames={883}
         fps={30}
         width={1280}
         height={720}
@@ -1445,7 +1445,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureTraceabilityScanner"
         component={FeatureTraceabilityScanner}
-        durationInFrames={450}
+        durationInFrames={891}
         fps={30}
         width={1280}
         height={720}
