@@ -1,13 +1,20 @@
 /**
  * TTS Voiceover Generator
  *
- * Uses Zvukogram neural TTS API to generate voiceover audio.
- * Zvukogram's /subs endpoint (real word-level timestamps) is unavailable
- * on this account, so word timestamps for Remotion's animated subtitles
- * are instead derived from real silence gaps detected in the generated
- * audio via ffmpeg — see buildSubtitleTimestamps().
+ * Default provider is Microsoft's free Edge TTS endpoint (see
+ * edge-tts-voice.py). Zvukogram, the paid reseller this used to call, is kept
+ * behind TTS_PROVIDER=zvukogram as a fallback.
  *
- * API docs: https://zvukogram.com/node/api/
+ * Why the switch (2026-09-05): Zvukogram's balance ran out on 02.09 and every
+ * digest render died at this step for four days. Its Norwegian voices "Финн"
+ * and "Пернилла" ARE nb-NO-FinnNeural and nb-NO-PernilleNeural — the same
+ * Microsoft voices, resold. Nothing about how the digest sounds changes.
+ *
+ * It also fixes the timings. Zvukogram's /subs endpoint was unavailable on
+ * that account, so caption timings were inferred from ffmpeg silence gaps;
+ * Edge emits a WordBoundary per spoken word, so they are now measured.
+ *
+ * API docs (fallback): https://zvukogram.com/node/api/
  *
  * This runs inside the GitHub Actions video-processor pipeline.
  */
@@ -57,6 +64,56 @@ export const VOICE_PRESETS = {
 };
 
 /**
+ * The same voices, addressed directly instead of through a reseller.
+ * Norwegian is the pair the digest actually uses; the rest match the intent
+ * of the Zvukogram presets above.
+ */
+export const EDGE_VOICE_PRESETS = {
+  no: { male: 'nb-NO-FinnNeural', female: 'nb-NO-PernilleNeural' },
+  en: { male: 'en-US-BrianNeural', female: 'en-US-AvaNeural' },
+  ua: { male: 'uk-UA-OstapNeural', female: 'uk-UA-PolinaNeural' },
+  ru: { male: 'ru-RU-DmitryNeural', female: 'ru-RU-SvetlanaNeural' },
+};
+
+/**
+ * Speak a script with Edge TTS, returning audio plus per-word timings taken
+ * from the WordBoundary events rather than estimated after the fact.
+ *
+ * @returns {Promise<VoiceoverResult>}
+ */
+async function generateWithEdgeTts(scriptText, language, gender) {
+  const preset = EDGE_VOICE_PRESETS[language] || EDGE_VOICE_PRESETS.no;
+  const voice = preset[gender] || preset.male;
+  console.log(`🔊 Edge TTS voice: ${voice}`);
+
+  const stamp = Date.now();
+  const audioPath = path.join(os.tmpdir(), `voiceover_${stamp}.mp3`);
+  const wordsPath = path.join(os.tmpdir(), `voiceover_${stamp}.words.json`);
+  const scriptPath = path.join(os.tmpdir(), `voiceover_${stamp}.txt`);
+  await fs.writeFile(scriptPath, scriptText, 'utf8');
+
+  const helper = path.join(path.dirname(new URL(import.meta.url).pathname), 'edge-tts-voice.py');
+  await execAsync(`python3 ${JSON.stringify(helper)} ${JSON.stringify(voice)} ` +
+    `${JSON.stringify(audioPath)} ${JSON.stringify(wordsPath)} < ${JSON.stringify(scriptPath)}`,
+    { maxBuffer: 10 * 1024 * 1024 });
+
+  const parsed = JSON.parse(await fs.readFile(wordsPath, 'utf8'));
+  const subtitles = parsed.words;
+  const durationSeconds = parsed.durationSeconds;
+
+  if (!subtitles || subtitles.length === 0) {
+    throw new Error('Edge TTS returned no word boundaries');
+  }
+
+  const size = (await fs.stat(audioPath)).size;
+  console.log(`✅ Audio: ${(size / 1024 / 1024).toFixed(2)} MB, ${durationSeconds}s → ${audioPath}`);
+  console.log(`📝 ${subtitles.length} word timings (measured, not estimated)`);
+  console.log('💰 Cost: 0 — Microsoft Edge endpoint');
+
+  return { audioPath, subtitles, durationSeconds };
+}
+
+/**
  * Generate voiceover audio and word timestamps from a script.
  *
  * @param {string} scriptText - The voiceover script text
@@ -65,15 +122,22 @@ export const VOICE_PRESETS = {
  * @returns {Promise<VoiceoverResult>}
  */
 export async function generateVoiceover(scriptText, language = 'en', options = {}) {
+  console.log(`🎙️ Generating voiceover (${language})...`);
+  console.log(`   Script length: ${scriptText.length} chars, ${scriptText.split(/\s+/).length} words`);
+
+  // Edge unless explicitly told otherwise. An explicit options.voice is a
+  // Zvukogram voice name, so that path still goes to Zvukogram.
+  const provider = process.env.TTS_PROVIDER || (options.voice ? 'zvukogram' : 'edge');
+  if (provider === 'edge') {
+    return generateWithEdgeTts(scriptText, language, options.gender || 'male');
+  }
+
   const ZVUKOGRAM_TOKEN = process.env.ZVUKOGRAM_TOKEN;
   const ZVUKOGRAM_EMAIL = process.env.ZVUKOGRAM_EMAIL;
 
   if (!ZVUKOGRAM_TOKEN || !ZVUKOGRAM_EMAIL) {
     throw new Error('Missing ZVUKOGRAM_TOKEN or ZVUKOGRAM_EMAIL');
   }
-
-  console.log(`🎙️ Generating voiceover (${language})...`);
-  console.log(`   Script length: ${scriptText.length} chars, ${scriptText.split(/\s+/).length} words`);
 
   // Pick voice: explicit override > gender preset > default male
   let voice;
