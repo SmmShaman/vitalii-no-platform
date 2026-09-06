@@ -52,6 +52,12 @@
   /* Particle color (hex for THREE.js) */
   --particle-color: 212 212 220;
 
+  /* Design tokens — neumorphic (embossed) buttons. Dark mode defaults; light overrides below */
+  --neo-shadow-dark: rgba(0, 0, 0, 0.55);
+  --neo-shadow-light: rgba(255, 255, 255, 0.07);
+  --neo-glyph-dark: rgba(0, 0, 0, 0.6);
+  --neo-glyph-light: rgba(255, 255, 255, 0.08);
+
   /* Design tokens — typography scale */
   --text-display: clamp(1.5rem, 3vw, 2.5rem);
   --text-heading: clamp(1rem, 1.7vw, 1.5rem);
@@ -68,6 +74,12 @@
    ═══════════════════════════════════════════════════ */
 html[data-mode="light"] {
   color-scheme: light;
+}
+html[data-mode="light"] {
+  --neo-shadow-dark: rgba(133, 145, 165, 0.42);
+  --neo-shadow-light: rgba(255, 255, 255, 0.95);
+  --neo-glyph-dark: rgba(133, 145, 165, 0.5);
+  --neo-glyph-light: rgba(255, 255, 255, 0.9);
 }
 
 html[data-mode="light"] .text-white {
@@ -169,6 +181,172 @@ html[data-mode="light"] .shadow-lg,
 html[data-mode="light"] .shadow-xl,
 html[data-mode="light"] .shadow-2xl {
   --tw-shadow-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════
+   NEUMORPHIC (EMBOSSED) CIRCLE BUTTONS — .neo-btn
+   The button is cut from the same tone as the surface it sits on, so set
+   --neo-base to the parent's surface token (defaults to --surface-dark).
+   Effects: --press (default), --lift, --ring, --shine, --3d. State: .is-pressed.
+   Used via components/ui/NeoIconButton.tsx.
+   ═══════════════════════════════════════════════════ */
+/* Plain CSS on purpose (not @layer): the effect classes are built at runtime
+   (`neo-btn--${effect}`) and Tailwind would purge them from a layer. */
+.neo-btn {
+  --neo-base: var(--surface-dark);
+  --neo-d: 6px;
+  --neo-b: 14px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 9999px;
+  background-color: rgb(var(--neo-base));
+  color: rgb(var(--text-secondary));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    var(--neo-d) var(--neo-d) var(--neo-b) var(--neo-shadow-dark),
+    calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+.neo-btn > * {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.3s ease;
+}
+.neo-btn > svg {
+  filter:
+    drop-shadow(1px 1px 1px var(--neo-glyph-dark))
+    drop-shadow(-1px -1px 1px var(--neo-glyph-light));
+}
+.neo-btn:hover {
+  color: rgb(var(--text-primary));
+}
+.neo-btn:focus-visible {
+  outline: 2px solid rgb(var(--focus-ring));
+  outline-offset: 3px;
+}
+
+/* Sizes: shadow scales with the puck */
+.neo-btn--sm { --neo-d: 3px; --neo-b: 7px; }
+.neo-btn--lg { --neo-d: 10px; --neo-b: 22px; }
+
+/* Pressed-in state (toggle "on", active nav item, held press) */
+.neo-btn.is-pressed,
+.neo-btn--press:active {
+  box-shadow:
+    inset var(--neo-d) var(--neo-d) calc(var(--neo-b) * 0.8) var(--neo-shadow-dark),
+    inset calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) calc(var(--neo-b) * 0.8) var(--neo-shadow-light);
+}
+.neo-btn--press:active {
+  transform: scale(0.9);
+}
+.neo-btn--press:active > * {
+  transform: scale(0.88);
+}
+
+/* Lift: floats up on hover, settles on click */
+.neo-btn--lift:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    calc(var(--neo-d) * 1.4) calc(var(--neo-d) * 1.8) calc(var(--neo-b) * 1.5) var(--neo-shadow-dark),
+    calc(var(--neo-d) * -1.4) calc(var(--neo-d) * -1.4) calc(var(--neo-b) * 1.5) var(--neo-shadow-light);
+}
+.neo-btn--lift:hover > * {
+  transform: scale(1.12);
+}
+.neo-btn--lift:active {
+  transform: translateY(-1px);
+  transition-duration: 0.1s;
+}
+
+/* Ring: a two-tone arc orbits the puck on hover */
+.neo-btn--ring::before {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  border-top-color: rgb(var(--accent-brand-light));
+  border-right-color: rgb(var(--accent-brand-light));
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.neo-btn--ring:hover::before {
+  opacity: 1;
+  animation: neo-ring-rotate 1s linear infinite;
+}
+.neo-btn--ring:hover {
+  transform: scale(1.05);
+}
+.neo-btn--ring:active {
+  transform: scale(0.96);
+}
+
+/* Shine: a light streak sweeps across on hover */
+.neo-btn--shine {
+  overflow: hidden;
+}
+.neo-btn--shine::before {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: 0;
+  width: 30%;
+  height: 220%;
+  background: var(--neo-shadow-light);
+  transform: rotate(35deg) translateX(-250%);
+  transition: transform 0.7s ease;
+}
+.neo-btn--shine:hover::before {
+  transform: rotate(35deg) translateX(450%);
+}
+.neo-btn--shine:hover {
+  transform: scale(1.06);
+}
+.neo-btn--shine:active {
+  transform: scale(0.97);
+}
+
+/* 3D: a hard ledge underneath, sinks on click */
+.neo-btn--3d {
+  box-shadow:
+    0 calc(var(--neo-d) * 1.5) 0 var(--neo-shadow-dark),
+    calc(var(--neo-d) * 1.5) calc(var(--neo-d) * 3) calc(var(--neo-b) * 1.6) rgba(0, 0, 0, 0.15),
+    calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+}
+.neo-btn--3d:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 calc(var(--neo-d) * 2.2) 0 var(--neo-shadow-dark),
+    calc(var(--neo-d) * 2) calc(var(--neo-d) * 4) calc(var(--neo-b) * 2) rgba(0, 0, 0, 0.15),
+    calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+}
+.neo-btn--3d:active {
+  transform: translateY(calc(var(--neo-d) * 1));
+  box-shadow:
+    0 calc(var(--neo-d) * 0.4) 0 var(--neo-shadow-dark),
+    calc(var(--neo-d) * 0.6) calc(var(--neo-d) * 1.2) calc(var(--neo-b) * 0.8) rgba(0, 0, 0, 0.15),
+    calc(var(--neo-d) * -0.5) calc(var(--neo-d) * -0.5) calc(var(--neo-b) * 0.5) var(--neo-shadow-light);
+}
+
+/* Inset "well" a raised button can sit in (the demo's button-stage) */
+.neo-well {
+  border-radius: 9999px;
+  box-shadow:
+    inset var(--neo-d, 8px) var(--neo-d, 8px) calc(var(--neo-b, 18px)) var(--neo-shadow-dark),
+    inset calc(var(--neo-d, 8px) * -1) calc(var(--neo-d, 8px) * -1) calc(var(--neo-b, 18px)) var(--neo-shadow-light);
+}
+
+@keyframes neo-ring-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* ═══════════════════════════════════════════════════

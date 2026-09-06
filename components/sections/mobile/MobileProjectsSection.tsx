@@ -8,6 +8,7 @@ import { translations } from '@/utils/translations'
 import { sectionColors, projectColors } from './types'
 import { VerticalLabel } from './VerticalLabel'
 import type { TranslateFn } from './types'
+import NeoIconButton from '@/components/ui/NeoIconButton'
 
 // Projects Explosion Overlay Component with Detail View
 const ProjectsExplosionOverlay = ({
@@ -43,26 +44,25 @@ const ProjectsExplosionOverlay = ({
         transition={{ duration: 0.2 }}
       >
         {/* Back button */}
-        <button
+        <NeoIconButton
           onClick={handleBack}
-          className="absolute top-4 left-4 w-11 h-11 flex items-center justify-center rounded-full z-10 transition-colors"
-          style={{ backgroundColor: `${colorSet.to}20` }}
+          effect="lift"
+          className="absolute top-4 left-4 z-10"
           aria-label="Back"
         >
           <ArrowLeft className="w-5 h-5" style={{ color: colorSet.to }} />
-        </button>
+        </NeoIconButton>
 
         {/* Close button */}
-        <button
+        <NeoIconButton
           onClick={onClose}
-          className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full z-10 transition-colors"
-          style={{ backgroundColor: `${color}20` }}
+          className="absolute top-4 right-4 z-10"
           aria-label="Close"
         >
           <svg className="w-6 h-6" style={{ color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
-        </button>
+        </NeoIconButton>
 
         {/* Scrollable content */}
         <div className="h-full overflow-y-auto">
@@ -149,16 +149,15 @@ const ProjectsExplosionOverlay = ({
       transition={{ duration: 0.2 }}
     >
       {/* Close button */}
-      <button
+      <NeoIconButton
         onClick={onClose}
-        className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full z-10 transition-colors"
-        style={{ backgroundColor: `${color}20` }}
+        className="absolute top-4 right-4 z-10"
         aria-label="Close"
       >
         <svg className="w-6 h-6" style={{ color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
-      </button>
+      </NeoIconButton>
 
       {/* Scrollable content - Grid of projects */}
       <div className="h-full overflow-y-auto pt-16 pb-8 px-4">
