@@ -148,6 +148,7 @@ import { FeatureTimeZoneTamer } from "./compositions/feature-demos/FeatureTimeZo
 import { FeatureMultiRepoScanner } from "./compositions/feature-demos/FeatureMultiRepoScanner";
 import { FeatureLocalClockScheduling } from "./compositions/feature-demos/FeatureLocalClockScheduling";
 import { FeatureTraceabilityScanner } from "./compositions/feature-demos/FeatureTraceabilityScanner";
+import { FeatureTraceabilityScannerLive } from "./compositions/feature-demos/FeatureTraceabilityScannerLive";
 import { FeatureAiFeaturePosts } from "./compositions/feature-demos/FeatureAiFeaturePosts";
 import { FeatureMultiRepoSync } from "./compositions/feature-demos/FeatureMultiRepoSync";
 import { FeatureTelegramVideoStealth } from "./compositions/feature-demos/FeatureTelegramVideoStealth";
@@ -1445,6 +1446,16 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureTraceabilityScanner"
         component={FeatureTraceabilityScanner}
+        durationInFrames={891}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      {/* p61 PILOT (2026-09-06): same voice and beat windows, real UI recordings inside. */}
+      <Composition
+        id="FeatureTraceabilityScannerLive"
+        component={FeatureTraceabilityScannerLive}
         durationInFrames={891}
         fps={30}
         width={1280}

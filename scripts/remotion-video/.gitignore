@@ -1,2 +1,5 @@
 out/
 node_modules/
+
+# record-ui.cjs frame dumps (encode with tools/encode-rec.sh; only the .mp4 + .json are committed)
+public/rec/*/
