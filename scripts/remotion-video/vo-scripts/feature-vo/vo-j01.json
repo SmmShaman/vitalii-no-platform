@@ -1,0 +1,56 @@
+{
+ "id": "j01",
+ "beat_durations": {
+  "b1": 6.672,
+  "b2": 6.696,
+  "b3": 5.448,
+  "b4": 4.176,
+  "b5": 5.256
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every morning, hundreds of job listings piled into my feeds. Sorting them by hand ate four hours a day.",
+   "start_s": 0.5,
+   "end_s": 7.172,
+   "start_f": 15,
+   "end_f": 215
+  },
+  {
+   "beat": "b2",
+   "text": "It was exhausting, biased, and slow \u2014 good matches got buried under the pile, and burnout crept in.",
+   "start_s": 7.472,
+   "end_s": 14.168,
+   "start_f": 224,
+   "end_f": 425
+  },
+  {
+   "beat": "b3",
+   "text": "So I built an Edge Function that reads each listing against my own CV and scores the fit.",
+   "start_s": 14.468,
+   "end_s": 19.916,
+   "start_f": 434,
+   "end_f": 597
+  },
+  {
+   "beat": "b4",
+   "text": "The hot ones get flagged and delivered straight to my phone within seconds.",
+   "start_s": 20.216,
+   "end_s": 24.392,
+   "start_f": 606,
+   "end_f": 732
+  },
+  {
+   "beat": "b5",
+   "text": "Four hours became under thirty minutes \u2014 a ninety percent drop in wasted time.",
+   "start_s": 24.692,
+   "end_s": 29.948,
+   "start_f": 741,
+   "end_f": 898
+  }
+ ],
+ "total_s": 31.448,
+ "durationInFrames": 943,
+ "measured_track_s": 30.0,
+ "track": "/root/feature-demos/vo-j01/vo-j01.mp3"
+}

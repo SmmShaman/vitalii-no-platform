@@ -1,0 +1,56 @@
+{
+ "id": "j26",
+ "beat_durations": {
+  "b1": 7.848,
+  "b2": 4.608,
+  "b3": 5.592,
+  "b4": 6.264,
+  "b5": 5.256
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A week in, my job board already had two hundred listings. Finding the right ones took ten clicks and five minutes of scrolling.",
+   "start_s": 0.5,
+   "end_s": 8.348,
+   "start_f": 15,
+   "end_f": 250
+  },
+  {
+   "beat": "b2",
+   "text": "Every filter click meant waiting on hundreds of rows redrawing on screen.",
+   "start_s": 8.648,
+   "end_s": 13.256,
+   "start_f": 259,
+   "end_f": 398
+  },
+  {
+   "beat": "b3",
+   "text": "So I rebuilt the table with virtual scrolling \u2014 it renders only the rows you can actually see.",
+   "start_s": 13.556,
+   "end_s": 19.148,
+   "start_f": 407,
+   "end_f": 574
+  },
+  {
+   "beat": "b4",
+   "text": "Now filtering by city, score, and company takes three clicks. One click excludes a recruiter.",
+   "start_s": 19.448,
+   "end_s": 25.712,
+   "start_f": 583,
+   "end_f": 771
+  },
+  {
+   "beat": "b5",
+   "text": "Five minutes of scrolling became two seconds, lag-free past five hundred rows.",
+   "start_s": 26.012,
+   "end_s": 31.268,
+   "start_f": 780,
+   "end_f": 938
+  }
+ ],
+ "total_s": 32.768,
+ "durationInFrames": 983,
+ "measured_track_s": 31.32,
+ "track": "/root/feature-demos/vo-j26/vo-j26.mp3"
+}

@@ -1,0 +1,7 @@
+{"id": "j01", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every morning, hundreds of job listings piled into my feeds. Sorting them by hand ate four hours a day."],
+ ["b2", "It was exhausting, biased, and slow — good matches got buried under the pile, and burnout crept in."],
+ ["b3", "So I built an Edge Function that reads each listing against my own CV and scores the fit."],
+ ["b4", "The hot ones get flagged and delivered straight to my phone within seconds."],
+ ["b5", "Four hours became under thirty minutes — a ninety percent drop in wasted time."]
+]}

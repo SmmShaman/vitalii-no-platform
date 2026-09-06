@@ -1,0 +1,7 @@
+{"id": "j26", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A week in, my job board already had two hundred listings. Finding the right ones took ten clicks and five minutes of scrolling."],
+ ["b2", "Every filter click meant waiting on hundreds of rows redrawing on screen."],
+ ["b3", "So I rebuilt the table with virtual scrolling — it renders only the rows you can actually see."],
+ ["b4", "Now filtering by city, score, and company takes three clicks. One click excludes a recruiter."],
+ ["b5", "Five minutes of scrolling became two seconds, lag-free past five hundred rows."]
+]}
