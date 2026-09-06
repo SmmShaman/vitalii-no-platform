@@ -2,22 +2,27 @@
 
 ---
 
-## 🔴 START OF EVERY SESSION — ASK THIS FIRST (owner rule, 2026-08-23)
+## 🟢 START OF EVERY SESSION — REPORT, DO NOT ASK (owner rule, 2026-09-06)
 
-**Applies to this project folder only.** Before answering whatever the owner actually asked —
-no matter the topic — the FIRST message of a session must report lux-wave progress and ask
-one question:
+**Applies to this project folder only.** Supersedes the 2026-08-23 rule "ask
+«продовжуємо батч?» first". Since 2026-09-05 the clips are made WITHOUT a session:
+`feature-factory.timer` on the VPS runs `/root/feature-demos/factory.py` every night at
+01:00 CEST, picks 3 features, writes and measures the voice, renders on the GitHub
+runner, uploads to R2 and queues YouTube (log: `/root/feature-demos/factory.log`).
+Asking the owner to start a manual batch is therefore noise — the owner said so on
+2026-09-06.
 
-> Зроблено **N / <total>** фіч у новому стилі, залишилось **M**.
-> Запасу яскравих кліпів: **R** фіч ≈ **R/2** днів (по 2 пости щодня). Продовжуємо наступний батч? (так / ні)
+What the FIRST message of a session does instead — one line, no question:
 
-- **"ні"** → do nothing about it. No prep, no counting, no subagents. Just do what the owner
-  asked. This is an explicit token-saving order.
-- **"так"** → launch the next batch **in parallel** with the owner's actual task (Sonnet
-  subagents in the background while the main work proceeds).
+> Завод уночі: p58, p59, p61 ✅ (або: ❌ впав на хвилі B). Запас яскравих кліпів: **R** фіч ≈ **R/2** днів.
 
-Ask it every session, regardless of the owner's question. Pull the numbers live (never from
-memory) with one command:
+- Read last night's result from the tail of `factory.log` over SSH; the counts come from
+  the command below.
+- Start a manual batch ONLY if the factory failed two nights in a row or the runway is
+  under 4 AND the owner explicitly says "так, роби батч". Otherwise do nothing about it —
+  no prep, no counting beyond that one line, no subagents. This is a token-saving order.
+
+Pull the numbers live (never from memory) with one command:
 
 ```bash
 ssh -i ~/.ssh/contabo_vps root@173.249.31.179 "docker exec portfolio-db psql -U postgres -t -A -F'|' \
@@ -27,15 +32,16 @@ ssh -i ~/.ssh/contabo_vps root@173.249.31.179 "docker exec portfolio-db psql -U 
 
 Lux-done = `count(*) WHERE demo_style = 'bright'`. Remaining = everything `dark`
 plus everything with no clip. **Runway** = bright features not yet posted; the
-publisher ships **2 a day**, so runway/2 = days of material left. Under ~14 the
-publisher itself starts warning in Telegram — a batch is overdue at that point.
+publisher ships **2 a day**, so runway/2 = days of material left. The factory adds 3 a
+night, so the runway grows by ~1/day on its own; `publish-watchdog.timer` alarms in
+Telegram when it drops under 6.
 
 Retired formulas, do not resurrect: "count the queue rows + j26" (was already off
 by one), and reading the runway out of `feature_video_repost_queue` — since
 2026-08-26 the publisher draws from the whole `features` table and the queue only
 orders what is left in it.
 
-**How to actually do the work — read these before starting a batch:**
+**How to actually do the work by hand (fallback when the factory is down) — read these first:**
 
 | Need | File |
 |---|---|
