@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * record-ui.cjs — deterministic, frame-exact capture of a LIVE web page for a
- * feature clip (pilot 2026-09-06, feature p61).
+ * record-ui.cjs — deterministic, frame-exact capture of LIVE web pages for a
+ * feature clip (owner rule 2026-09-06: the centre of a UI beat is the real
+ * product, not a drawn mockup).
  *
  * Why not Playwright's recordVideo: its webm timeline stretches ~1.1x against
  * wall-clock (measured on the Elvarika demo), so narration placed by time
@@ -10,74 +11,72 @@
  * result is as deterministic as a Remotion render and lands exactly inside
  * the voice-synced beat windows.
  *
- * Output per shot:  public/rec/<id>-<shot>/fNNNN.jpg  (one JPEG per frame, 30 fps)
- *                   public/rec/<id>-<shot>.json      (viewport, dsf, per-frame cursor)
- * Then encode + publish with tools/encode-rec.sh on a host that has ffmpeg.
+ * Input:   src/compositions/feature-demos/shots/<id>.json   (the shot spec — see
+ *          live-primitives.tsx for the type; the composition imports the same file)
+ * Output:  public/rec/<id>-<shot>/fNNNN.jpg   one JPEG per frame, 30 fps (git-ignored)
+ *          public/rec/<id>-<shot>.json        per-frame cursor, for debugging
+ * Then:    bash tools/encode-rec.sh <id>      → public/rec/<id>-<shot>.mp4 (H.264)
  *
- * Usage:  PW_PATH=<path to a playwright package> node tools/record-ui.cjs p61 [shot ...]
- *         CHROME=<executable> to override the browser build.
+ * Usage:   node tools/record-ui.cjs <id> [shot ...]
+ *          PW_PATH=<playwright package dir>   when playwright is not in node_modules
+ *          CHROME=<chromium executable>       to override the browser build
+ *
+ * A page that answers with HTTP >= 400 FAILS the run on purpose: a 404 recorded
+ * into a clip is worse than no clip, and the factory reads the failure.
  */
 const fs = require("fs");
 const path = require("path");
-const os = require("os");
 
 const { chromium } = require(process.env.PW_PATH || "playwright");
 
 const FPS = 30;
-const OUT_DIR = path.resolve(__dirname, "..", "public", "rec");
+const RVID = path.resolve(__dirname, "..");
+const OUT_DIR = path.join(RVID, "public", "rec");
+const SPEC_DIR = path.join(RVID, "src", "compositions", "feature-demos", "shots");
 
+// ── keyframe interpolation — MUST stay identical to live-primitives.tsx ──
 const easeInOut = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
-const easeOut = (t) => 1 - Math.pow(1 - t, 3);
-const lerp = (a, b, t) => a + (b - a) * t;
-const clamp01 = (t) => Math.max(0, Math.min(1, t));
+/** kfs: [[frame, v1, v2, ...], ...] sorted by frame → values at frame f, eased between keys. */
+function track(kfs, f) {
+  if (!kfs.length) return [];
+  if (f <= kfs[0][0]) return kfs[0].slice(1);
+  const last = kfs[kfs.length - 1];
+  if (f >= last[0]) return last.slice(1);
+  for (let i = 1; i < kfs.length; i++) {
+    const a = kfs[i - 1], b = kfs[i];
+    if (f <= b[0]) {
+      const t = easeInOut((f - a[0]) / (b[0] - a[0]));
+      return a.slice(1).map((v, k) => v + (b[k + 1] - v) * t);
+    }
+  }
+  return last.slice(1);
+}
 
-/** A shot: one page, N frames, scroll/mouse as functions of frame. */
-const SHOTS = {
-  p61: {
-    viewport: { width: 1120, height: 466 },
-    dsf: 1.25,
-    shots: [
-      {
-        name: "hub",
-        url: "https://vitalii.no/features",
-        frames: 150,
-        // Beat 1: the wall of features. Slow drift down the grid, cursor
-        // wandering across cards like someone looking for one.
-        scrollY: (f, n) => Math.round(lerp(0, 2200, easeInOut(f / (n - 1)))),
-        mouse: (f, n) => {
-          const t = f / (n - 1);
-          return { x: Math.round(lerp(220, 900, t) + 120 * Math.sin(t * 9)), y: Math.round(180 + 120 * Math.sin(t * 5.2)) };
-        },
-      },
-      {
-        name: "commits",
-        url: "https://github.com/SmmShaman/vitalii-no-platform/commits/main",
-        frames: 171,
-        // Beat 2: digging through the commit history by hand.
-        scrollY: (f, n) => Math.round(lerp(0, 2600, easeInOut(f / (n - 1)))),
-        mouse: (f, n) => ({ x: 420, y: Math.round(150 + 200 * clamp01(Math.sin((f / n) * 6) * 0.5 + 0.5)) }),
-      },
-      {
-        name: "actions",
-        url: "https://github.com/SmmShaman/vitalii-no-platform/actions/workflows/discover-features.yml",
-        frames: 100,
-        // Beat 4: the Action that does the digging now. Gentle settle.
-        scrollY: (f, n) => Math.round(lerp(0, 260, easeOut(f / (n - 1)))),
-        mouse: (f, n) => ({ x: Math.round(lerp(300, 520, easeOut(f / (n - 1)))), y: 250 }),
-      },
-      {
-        name: "page",
-        url: "https://vitalii.no/features/feature-traceability-every-feature-every-commit-instantly-linked-p61",
-        frames: 220,
-        // Beat 5: the feature's own page, drifting down to the result.
-        scrollY: (f, n) => Math.round(lerp(0, 760, easeInOut(f / (n - 1)))),
-        mouse: (f, n) => ({ x: 560, y: Math.round(lerp(220, 300, f / (n - 1))) }),
-      },
-    ],
-  },
-};
+function loadSpec(id) {
+  const p = path.join(SPEC_DIR, `${id}.json`);
+  if (!fs.existsSync(p)) throw new Error(`no shot spec at ${path.relative(RVID, p)}`);
+  const spec = JSON.parse(fs.readFileSync(p, "utf8"));
+  const problems = [];
+  if (!spec.viewport || !spec.viewport.width || !spec.viewport.height) problems.push("viewport {width,height} missing");
+  if (!spec.dsf) problems.push("dsf missing");
+  if (!Array.isArray(spec.shots) || !spec.shots.length) problems.push("shots[] empty");
+  for (const s of spec.shots || []) {
+    if (!/^[a-z0-9-]+$/.test(s.name || "")) problems.push(`shot name "${s.name}" must be [a-z0-9-]`);
+    if (!/^https?:\/\//.test(s.url || "")) problems.push(`${s.name}: url must be http(s)`);
+    if (!(s.frames >= 30)) problems.push(`${s.name}: frames must be >= 30`);
+    for (const key of ["scroll", "mouse"]) {
+      const k = s[key];
+      if (!Array.isArray(k) || !k.length) { problems.push(`${s.name}: ${key} keyframes missing`); continue; }
+      for (let i = 1; i < k.length; i++) if (!(k[i][0] > k[i - 1][0])) problems.push(`${s.name}: ${key} keyframes must be strictly increasing in frame`);
+      if (k[k.length - 1][0] > s.frames - 1) problems.push(`${s.name}: ${key} keyframe beyond the last frame ${s.frames - 1}`);
+    }
+    for (const c of s.clicks || []) if (!(c >= 0 && c < s.frames)) problems.push(`${s.name}: click at ${c} outside 0..${s.frames - 1}`);
+  }
+  if (problems.length) throw new Error(`shot spec ${id}.json is invalid:\n  - ` + problems.join("\n  - "));
+  return spec;
+}
 
-async function dismissBanners(page) {
+async function dismissBanners(page, hide) {
   // Cookie banners on vitalii.no ("Accept all") and github.com ("Accept").
   for (const label of [/^Accept all$/i, /^Accept$/i, /^Accept all cookies$/i]) {
     try {
@@ -90,16 +89,14 @@ async function dismissBanners(page) {
       /* not there */
     }
   }
-  // Belt and braces: anything still fixed at the bottom-right that looks like a consent box.
-  await page.addStyleTag({
-    content: `[class*="cookie" i], [id*="cookie" i], [aria-label*="cookie" i] { display: none !important; }`,
-  });
+  const sel = [`[class*="cookie" i]`, `[id*="cookie" i]`, `[aria-label*="cookie" i]`, ...hide];
+  await page.addStyleTag({ content: `${sel.join(", ")} { display: none !important; }` }).catch(() => {});
 }
 
-async function recordShot(browser, cfg, shot, id) {
+async function recordShot(browser, spec, shot, id) {
   const ctx = await browser.newContext({
-    viewport: cfg.viewport,
-    deviceScaleFactor: cfg.dsf,
+    viewport: spec.viewport,
+    deviceScaleFactor: spec.dsf,
     locale: "en-US",
     colorScheme: "light",
     userAgent:
@@ -107,39 +104,49 @@ async function recordShot(browser, cfg, shot, id) {
   });
   const page = await ctx.newPage();
   console.log(`[${shot.name}] goto ${shot.url}`);
-  await page.goto(shot.url, { waitUntil: "networkidle", timeout: 90000 }).catch(async (e) => {
-    console.log(`[${shot.name}] networkidle timed out (${e.message.split("\n")[0]}) — continuing with what loaded`);
-  });
+  let resp = null;
+  try {
+    resp = await page.goto(shot.url, { waitUntil: "networkidle", timeout: 90000 });
+  } catch (e) {
+    console.log(`[${shot.name}] networkidle not reached (${e.message.split("\n")[0]}) — continuing with what loaded`);
+  }
+  if (resp && resp.status() >= 400) throw new Error(`[${shot.name}] ${shot.url} answered HTTP ${resp.status()}`);
   await page.waitForTimeout(800);
-  await dismissBanners(page);
-  // Warm the scroll range once so lazy content is in place before frame 0.
-  const maxY = shot.scrollY(shot.frames - 1, shot.frames);
+  const hide = [...(spec.hide || []), ...(shot.hide || [])];
+  await dismissBanners(page, hide);
+  // Warm the whole scroll range once so lazy content is in place before frame 0.
+  const maxY = Math.max(...shot.scroll.map((k) => k[1]));
   await page.evaluate((y) => window.scrollTo(0, y), maxY);
   await page.waitForTimeout(1200);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.waitForTimeout(600);
 
-  // Frames live under public/rec/<id>-<shot>/ (git-ignored). Encoding is a
-  // separate step (tools/encode-rec.sh) on a host with a full ffmpeg: the
-  // Playwright ffmpeg build has libvpx only and cannot even decode JPEG.
   fs.mkdirSync(OUT_DIR, { recursive: true });
   const framesDir = path.join(OUT_DIR, `${id}-${shot.name}`);
   fs.rmSync(framesDir, { recursive: true, force: true });
   fs.mkdirSync(framesDir);
   const cursor = [];
+  const clicks = new Set(shot.clicks || []);
   const t0 = Date.now();
   for (let f = 0; f < shot.frames; f++) {
-    const y = shot.scrollY(f, shot.frames);
-    const m = shot.mouse(f, shot.frames);
-    await page.evaluate((yy) => window.scrollTo(0, yy), y);
-    await page.mouse.move(m.x, m.y);
+    const [y] = track(shot.scroll, f);
+    const [mx, my] = track(shot.mouse, f);
+    await page.evaluate((yy) => window.scrollTo(0, yy), Math.round(y));
+    await page.mouse.move(mx, my);
+    if (clicks.has(f)) {
+      // A real click: the page may navigate or open something; give it a beat.
+      await page.mouse.click(mx, my);
+      await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+      await page.waitForTimeout(300);
+      await dismissBanners(page, hide);
+    }
     await page.waitForTimeout(25);
     await page.screenshot({
       path: path.join(framesDir, `f${String(f).padStart(4, "0")}.jpg`),
       type: "jpeg",
       quality: 90,
     });
-    cursor.push([m.x, m.y]);
+    cursor.push([Math.round(mx), Math.round(my)]);
     if (f % 30 === 0) console.log(`[${shot.name}] frame ${f}/${shot.frames}`);
   }
   console.log(`[${shot.name}] ${shot.frames} frames in ${((Date.now() - t0) / 1000).toFixed(1)} s`);
@@ -147,10 +154,9 @@ async function recordShot(browser, cfg, shot, id) {
 
   const written = fs.readdirSync(framesDir).filter((n) => n.endsWith(".jpg")).length;
   if (written !== shot.frames) throw new Error(`[${shot.name}] expected ${shot.frames} frames, found ${written}`);
-
   fs.writeFileSync(
     path.join(OUT_DIR, `${id}-${shot.name}.json`),
-    JSON.stringify({ id, shot: shot.name, url: shot.url, fps: FPS, frames: shot.frames, viewport: cfg.viewport, dsf: cfg.dsf, cursor }),
+    JSON.stringify({ id, shot: shot.name, url: shot.url, fps: FPS, frames: shot.frames, viewport: spec.viewport, dsf: spec.dsf, cursor }),
   );
   const mb = (fs.readdirSync(framesDir).reduce((a, n) => a + fs.statSync(path.join(framesDir, n)).size, 0) / 1048576).toFixed(1);
   console.log(`[${shot.name}] -> ${path.relative(process.cwd(), framesDir)}/ (${mb} MB of frames)`);
@@ -158,24 +164,24 @@ async function recordShot(browser, cfg, shot, id) {
 
 (async () => {
   const [id, ...only] = process.argv.slice(2);
-  const cfg = SHOTS[id];
-  if (!cfg) {
-    console.error(`no shot table for "${id}" — known: ${Object.keys(SHOTS).join(", ")}`);
+  if (!id) {
+    console.error("usage: node tools/record-ui.cjs <feature id> [shot ...]");
     process.exit(2);
   }
+  const spec = loadSpec(id);
   const browser = await chromium.launch({
     executablePath: process.env.CHROME || undefined,
     args: ["--hide-scrollbars", "--disable-gpu"],
   });
   try {
-    for (const shot of cfg.shots) {
+    for (const shot of spec.shots) {
       if (only.length && !only.includes(shot.name)) continue;
-      await recordShot(browser, cfg, shot, id);
+      await recordShot(browser, spec, shot, id);
     }
   } finally {
     await browser.close();
   }
 })().catch((e) => {
-  console.error("record-ui failed:", e);
+  console.error("record-ui failed:", e.message || e);
   process.exit(1);
 });

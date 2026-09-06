@@ -79,6 +79,47 @@ Those numbers are not a suggestion and not a starting point — they are the aud
 Reference: `src/compositions/feature-demos/FeatureInstagramPublishing.tsx` (p15) — its header
 carries the measured table and explains how each window was used.
 
+## STEP 0c — UI beats show the REAL product (owner rule, 2026-09-06)
+
+The owner compared a drawn clip with one that plays a recording of the live product inside
+the browser window and chose the recording. From now on **every beat that is about the
+interface plays a recording, not a mockup**. Beats that are metaphors ("a stranger's
+diary") or invisible plumbing (a cron, an LLM chain) stay drawn. Reference:
+`src/compositions/feature-demos/FeatureTraceabilityScannerLive.tsx` (p61) + `shots/p61.json`.
+
+How it works — two files, one spec:
+
+1. **`src/compositions/feature-demos/shots/<id>.json`** — the shot spec. One entry per
+   recording: a public `url`, `frames` (= the beat window length you have to fill),
+   `scroll` keyframes `[[frame, y], …]` and `mouse` keyframes `[[frame, x, y], …]` in CSS px
+   of the 1120×466 viewport, optional `clicks: [frame, …]` (a real click at the mouse
+   position — the page may navigate) and `hide: [selector, …]`. Motion is eased between
+   keyframes. `tools/record-ui.cjs <id>` turns it into `public/rec/<id>-<shot>.mp4` **on the
+   GitHub runner before every render** — you never record, never commit a video.
+2. **The composition** imports that same JSON (`import shots from "./shots/<id>.json"`) and
+   stages each recording with `<LiveWindow file={shots} shot="hub" title="vitalii.no/features"
+   from={15} hold={166} zoom={(t) => 1 + 0.16 * t} focus={{ x: 0.5, y: 0.45 }} opacity={b1} />`
+   from `live-primitives.tsx`. `from` is the beat's first frame, `hold` how many frames the
+   window stays (the last recorded frame is frozen after `frames`; it is NEVER looped).
+   The drawn cursor lands exactly where the recorder's mouse was, so put the mouse on the
+   element the beat talks about. Overlays (pills, a linked-rows card, the result strip) sit
+   ON TOP of the window, in the same bright style; the hero number moves to the top-left.
+
+Which pages you may record — only what is public, and only URLs the brief lists as
+verified (the host checks each with curl before the render):
+- the feature's own page `https://vitalii.no/features/<slug_en>` and the hub
+  `https://vitalii.no/features` — every feature has these;
+- for public repos: the commit page of the feature's own `source_commits`
+  (`<repo_url>/commit/<hash>` — the real diff is the strongest "this is the product" shot for
+  a backend feature), the repo's `/commits/main`, `/actions`, `/actions/workflows/<file>`;
+- any other public page of the product named in the brief (vitalii.no news/blog, ghost.vitalii.no).
+Never an admin panel, never a URL you have not seen answer 200. The recorder fails the
+render on a 4xx/5xx — on purpose.
+
+Camera: `zoom` runs 1.0–1.2 at most, one direction per shot; `focus` picks what stays on
+screen. Text inside the recording is small — a zoom that crops the left edge of a sidebar
+mid-word is a defect just like a cropped caption.
+
 ## STEP 1 — Learn the style (read each ONCE, never re-read)
 - `src/compositions/feature-demos/FeatureVideoFactoryV3.tsx` — the reference for the NEW
   art direction (archetype 7 "hero number", mood `violet`, 5 beats). Read it for HOW a clip wires a

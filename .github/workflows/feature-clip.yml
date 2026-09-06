@@ -179,6 +179,23 @@ jobs:
       - name: Install edge-tts
         run: python3 -m pip install --quiet edge-tts
 
+      # ── Live UI ────────────────────────────────────────────────────────────
+      # Owner rule 2026-09-06: a UI beat shows the real product. If the clip has
+      # a shot spec, record the live pages here — one screenshot per frame, so
+      # the picture is as deterministic as the render — and encode them where
+      # the composition reads them. Nothing under public/rec is committed.
+      - name: Record the live UI shots (if the clip has any)
+        working-directory: ./scripts/remotion-video
+        run: |
+          set -euo pipefail
+          SPEC="src/compositions/feature-demos/shots/${FEATURE_ID}.json"
+          if [ ! -f "$SPEC" ]; then echo "no $SPEC — a drawn clip, nothing to record"; exit 0; fi
+          npm install --no-save --no-audit --no-fund playwright@1.61.1
+          npx playwright install --with-deps chromium
+          node tools/record-ui.cjs "$FEATURE_ID"
+          bash tools/encode-rec.sh "$FEATURE_ID"
+          ls -la public/rec/*.mp4
+
       # ── Voice ──────────────────────────────────────────────────────────────
       # Beats are the committed source of truth. The track is rebuilt here so a
       # clip is reproducible from git alone, with no audio files to shuttle.

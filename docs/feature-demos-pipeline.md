@@ -21,6 +21,19 @@ clips. The pilot (v06, v12, j59 — 2026-08-11) proved the flow; follow it exact
    framed callouts (not subtitles), commercial benefit-led voiceover,
    loop-friendly silent site version.
 
+## UI beats play the real product (owner rule, 2026-09-06)
+
+A beat about the interface no longer shows a drawn mockup: it plays a recording of the
+live page inside the bright `BrowserWindow`, with a camera move and a drawn cursor. The
+recording is made on the GitHub runner before every render by `tools/record-ui.cjs` from
+`src/compositions/feature-demos/shots/<id>.json` (public URL + scroll/mouse keyframes per
+shot; one screenshot per frame, so there is no timeline drift), encoded by
+`tools/encode-rec.sh`, and staged by `LiveWindow` / `LiveShot` from `live-primitives.tsx`.
+Reference: `FeatureTraceabilityScannerLive.tsx` (p61). Rules and allowed pages: STEP 0c of
+`scripts/remotion-video/out/lux-batch-instructions.md`. Metaphor beats and invisible
+plumbing stay drawn. Everything already made is being re-shot at the factory's pace
+(2 new + 1 redo a night).
+
 ## Two visual templates — pick ONE per clip (2026-08-21)
 
 The Remotion feature-demo compositions now have two design systems in

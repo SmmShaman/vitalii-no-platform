@@ -4,9 +4,9 @@
  * PILOT (2026-09-06): the same narration, the same beat windows and the same
  * "hero number" / dawn staging as FeatureTraceabilityScanner.tsx — but the
  * centre of every UI beat is a RECORDING OF THE REAL PRODUCT, not a drawn
- * mockup. The recordings come from tools/record-ui.cjs (one screenshot per
- * frame of the live page, scroll and mouse computed from the frame number, so
- * there is no timeline drift) and are read from public/rec/p61-<shot>.mp4:
+ * mockup. The recordings are made by tools/record-ui.cjs from shots/p61.json
+ * (one screenshot per frame of the live page, scroll and mouse computed from
+ * the frame number, so there is no timeline drift) into public/rec/p61-<shot>.mp4:
  *
  *   hub      vitalii.no/features                        150 f   beat 1
  *   commits  github.com/…/vitalii-no-platform/commits    171 f   beat 2
@@ -26,17 +26,7 @@
  * Single tech name in the whole clip: GitHub Action (beat 4 chip only).
  */
 import React from "react";
-import {
-  Easing,
-  Freeze,
-  OffthreadVideo,
-  Sequence,
-  interpolate,
-  spring,
-  staticFile,
-  useCurrentFrame,
-  useVideoConfig,
-} from "remotion";
+import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider } from "./bright-theme";
 import {
   LightBg,
@@ -48,106 +38,20 @@ import {
   BrowserWindow,
   Panel,
   FlowArrow,
-  Cursor,
   seg,
   fontFamily,
 } from "./bright-primitives";
+import { LiveShot, WIN_DEFAULT, WIN_BAR } from "./live-primitives";
+import shots from "./shots/p61.json";
 
 const P = MOODS.dawn;
 
-// ── The recordings ──────────────────────────────────────────────────────
-// Recorder viewport 1120x466 css px at dsf 1.25 → 1400x583 device px, cropped
-// to 1400x582 by the encoder. The window's inner area is 980x408, so the
-// picture sits at 0.7 and any zoom is applied on top of that.
-const REC_W = 1400;
-const REC_H = 582;
-const DSF = 1.25;
-const WIN = { x: 150, y: 196, w: 980, h: 450 };
-const BAR = 42;
-const INNER_H = WIN.h - BAR;
-const BASE = WIN.w / REC_W;
-
+// The recordings: shots/p61.json is what tools/record-ui.cjs recorded, and
+// LiveShot plays each one inside the window with a camera move.
+const WIN = WIN_DEFAULT;
+const BAR = WIN_BAR;
 const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
-
-/** Mouse paths — the same functions the recorder used, so the drawn cursor sits on the hover it caused. */
-const MOUSE: Record<string, (f: number, n: number) => { x: number; y: number }> = {
-  hub: (f, n) => {
-    const t = f / (n - 1);
-    return { x: 220 + 680 * t + 120 * Math.sin(t * 9), y: 180 + 120 * Math.sin(t * 5.2) };
-  },
-  commits: (f, n) => ({ x: 420, y: 150 + 200 * clamp01(Math.sin((f / n) * 6) * 0.5 + 0.5) }),
-  actions: (f, n) => ({ x: 300 + 220 * easeOut(f / (n - 1)), y: 250 }),
-  page: (f, n) => ({ x: 560, y: 220 + 80 * (f / (n - 1)) }),
-};
-
-/**
- * One recording inside the browser window. `from`/`frames` are the clip
- * frames the shot covers; after `frames` the last frame is frozen until
- * `hold` (never looped — a repeated picture under new words is a defect).
- */
-const Recording: React.FC<{
-  name: "hub" | "commits" | "actions" | "page";
-  from: number;
-  frames: number;
-  hold?: number;
-  zoom: (t: number) => number;
-  focus: { x: number; y: number };
-  opacity: number;
-  clicks?: number[];
-}> = ({ name, from, frames, hold, zoom, focus, opacity, clicks = [] }) => {
-  const frame = useCurrentFrame();
-  const local = frame - from;
-  const span = (hold ?? frames) - 0;
-  if (local < 0 || local >= span || opacity <= 0.004) return null;
-
-  const t = clamp01(local / (frames - 1));
-  const s = BASE * zoom(t);
-  const tx = focus.x * WIN.w - focus.x * REC_W * s;
-  const ty = focus.y * INNER_H - focus.y * REC_H * s;
-  const videoStyle: React.CSSProperties = {
-    position: "absolute",
-    left: 0,
-    top: 0,
-    width: REC_W,
-    height: REC_H,
-    transform: `translate(${tx}px, ${ty}px) scale(${s})`,
-    transformOrigin: "0 0",
-  };
-  const src = staticFile(`rec/p61-${name}.mp4`);
-  const m = MOUSE[name](Math.min(local, frames - 1), frames);
-  const cx = m.x * DSF * s + tx;
-  const cy = m.y * DSF * s + ty;
-  const click = clicks.reduce((acc, c) => Math.max(acc, local >= c && local < c + 16 ? seg(local, c, c + 16) : 0), 0);
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: WIN.x,
-        top: WIN.y + BAR,
-        width: WIN.w,
-        height: INNER_H,
-        overflow: "hidden",
-        borderRadius: "0 0 14px 14px",
-        opacity,
-        background: "#fff",
-      }}
-    >
-      <Sequence from={from} durationInFrames={span} layout="none">
-        {local < frames ? (
-          <OffthreadVideo src={src} muted style={videoStyle} />
-        ) : (
-          <Freeze frame={frames - 1}>
-            <OffthreadVideo src={src} muted style={videoStyle} />
-          </Freeze>
-        )}
-      </Sequence>
-      <Cursor x={cx} y={cy} click={click} />
-    </div>
-  );
-};
 
 // Real rows from vitalii.no/api/features (title · first commit), 2026-09-06.
 const LINKED: { name: string; hash: string }[] = [
@@ -241,10 +145,10 @@ export const FeatureTraceabilityScannerLive: React.FC = () => {
           <StatPill x={690} y={112} emoji="🔍" text="15-30 min just to check" tone="danger" opacity={b1} />
           <BrowserWindow x={WIN.x} y={WIN.y} w={WIN.w} h={WIN.h} title="vitalii.no/features" opacity={b1} />
         </Group>
-        <Recording
-          name="hub"
+        <LiveShot
+          file={shots}
+          shot="hub"
           from={15}
-          frames={150}
           hold={166}
           zoom={(t) => 1 + 0.16 * easeInOut(t)}
           focus={{ x: 0.5, y: 0.45 }}
@@ -261,10 +165,10 @@ export const FeatureTraceabilityScannerLive: React.FC = () => {
           <StatPill x={690} y={112} emoji="⏱" text="every single time" tone="danger" opacity={b2} />
           <BrowserWindow x={WIN.x} y={WIN.y} w={WIN.w} h={WIN.h} title="github.com/SmmShaman/vitalii-no-platform — commits · main" opacity={b2} />
         </Group>
-        <Recording
-          name="commits"
+        <LiveShot
+          file={shots}
+          shot="commits"
           from={174}
-          frames={171}
           hold={172}
           zoom={(t) => 1.1 + 0.08 * easeInOut(t)}
           focus={{ x: 0.5, y: 0.5 }}
@@ -356,10 +260,10 @@ export const FeatureTraceabilityScannerLive: React.FC = () => {
           <StatPill x={690} y={112} emoji="🔧" text="manual override when needed" tone="accent" opacity={b4} />
           <BrowserWindow x={WIN.x} y={WIN.y} w={WIN.w} h={WIN.h} title="github.com — Actions · Discover Features, every night" opacity={b4} />
         </Group>
-        <Recording
-          name="actions"
+        <LiveShot
+          file={shots}
+          shot="actions"
           from={499}
-          frames={100}
           hold={164}
           zoom={(t) => 1 + 0.08 * easeOut(t)}
           focus={{ x: 0, y: 0.3 }}
@@ -413,10 +317,10 @@ export const FeatureTraceabilityScannerLive: React.FC = () => {
           <CheckBadge x={1080} y={44} size={44} opacity={b5} scale={heroPop5} />
           <BrowserWindow x={WIN.x} y={WIN.y} w={WIN.w} h={WIN.h} title="vitalii.no/features/feature-traceability-…-p61" opacity={b5} />
         </Group>
-        <Recording
-          name="page"
+        <LiveShot
+          file={shots}
+          shot="page"
           from={671}
-          frames={220}
           hold={220}
           zoom={(t) => 1 + 0.08 * easeInOut(t)}
           focus={{ x: 0.5, y: 0.4 }}

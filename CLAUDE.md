@@ -48,6 +48,7 @@ orders what is left in it.
 | Canonical rules (styles, Story cut, SEO, budgets) | `docs/feature-demos-pipeline.md` |
 | Ready-made subagent prompt for a batch | `scripts/remotion-video/out/lux-batch-instructions.md` |
 | Art-direction log (which staging is already used) | `scripts/remotion-video/out/lux-archetypes.md` |
+| LIVE clip reference (real product in the window, 2026-09-06) | `.../feature-demos/FeatureTraceabilityScannerLive.tsx` + `shots/p61.json` + `live-primitives.tsx` |
 | New-rules clip reference (archetype + mood + free rhythm) | `.../feature-demos/FeatureVideoFactoryV3.tsx` |
 | Older bright reference (real-data mockups; its fixed 4-beat rhythm is retired) | `.../feature-demos/FeatureJobTable.tsx` |
 | Story cut reference (54 s, voice-first) | `.../feature-demos/FeatureJobTableStory.tsx` |
@@ -55,6 +56,18 @@ orders what is left in it.
 | Per-beat voiceover generator (any feature) | `scripts/remotion-video/vo-scripts/vo-beats.py` |
 | Render cell — no PC needed | `.github/workflows/feature-clip.yml` |
 | Beat texts + measurements + YouTube SEO, per feature | `scripts/remotion-video/vo-scripts/feature-vo/` |
+
+**UI beats play the REAL product (owner rule, 2026-09-06).** After comparing the drawn p61
+with a version that plays recordings of the live pages inside the browser window, the owner
+chose the recordings and ordered them for every clip from now on, and for the ones already
+made, at the same 3-a-night rate. Mechanics: the agent writes `shots/<id>.json` (public URLs +
+scroll/mouse keyframes) next to the composition, the composition stages each recording with
+`LiveWindow` from `live-primitives.tsx`, and `feature-clip.yml` records the pages with
+`tools/record-ui.cjs` on the runner before rendering (one screenshot per frame, no timeline
+drift; nothing under `public/rec` is committed). Reference: `FeatureTraceabilityScannerLive.tsx`
++ `shots/p61.json`; brief: STEP 0c of `lux-batch-instructions.md`. The factory now picks
+**2 new + 1 redo** a night (`/root/feature-demos/factory.py`); a feature counts as done in the
+new style when its `shots/<id>.json` exists.
 
 **Staging is drawn, not copied (2026-08-30).** Each clip gets an archetype (8 of them) and a
 palette mood (`dawn`/`sand`/`slate`/`mint`/`violet`) from its feature id, may not repeat the

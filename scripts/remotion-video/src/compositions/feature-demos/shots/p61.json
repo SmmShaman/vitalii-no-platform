@@ -1,0 +1,35 @@
+{
+  "id": "p61",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 150,
+      "scroll": [[0, 0], [149, 2200]],
+      "mouse": [[0, 220, 180], [40, 620, 300], [80, 380, 140], [120, 900, 280], [149, 640, 200]]
+    },
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commits/main",
+      "frames": 171,
+      "scroll": [[0, 0], [170, 2600]],
+      "mouse": [[0, 420, 150], [40, 420, 340], [85, 420, 160], [130, 420, 350], [170, 420, 200]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/actions/workflows/discover-features.yml",
+      "frames": 100,
+      "scroll": [[0, 0], [99, 260]],
+      "mouse": [[0, 300, 250], [99, 520, 250]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/feature-traceability-every-feature-every-commit-instantly-linked-p61",
+      "frames": 220,
+      "scroll": [[0, 0], [219, 760]],
+      "mouse": [[0, 560, 220], [219, 560, 300]]
+    }
+  ]
+}

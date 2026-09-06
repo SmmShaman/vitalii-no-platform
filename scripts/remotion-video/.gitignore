@@ -1,5 +1,5 @@
 out/
 node_modules/
 
-# record-ui.cjs frame dumps (encode with tools/encode-rec.sh; only the .mp4 + .json are committed)
-public/rec/*/
+# record-ui.cjs output — recorded on the GitHub runner before every render, never committed
+public/rec/
