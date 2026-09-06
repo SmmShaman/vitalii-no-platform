@@ -1,6 +1,13 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 
+// LinkedIn's Assets API caps native video at 200 MB, and this worker buffers the whole
+// file in memory (memoryLimitMb in the self-hosted runtime's main/index.ts, 512 MB since
+// 2026-09-06). Anything bigger is refused BEFORE the download: on 2026-09-06 a 262 MB digest
+// killed the worker twice ("memory limit reached" → WorkerRequestCancelled) before the old
+// post-download guard could run.
+const MAX_VIDEO_BYTES = 200 * 1024 * 1024
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -30,6 +37,14 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
   let videoAsset: string | null = null
   if (videoUrl) {
     try {
+      const head = await fetch(videoUrl, { method: 'HEAD' })
+      if (!head.ok) throw new Error(`video HEAD ${head.status}`)
+      const declared = Number(head.headers.get('content-length') || 0)
+      if (declared > MAX_VIDEO_BYTES) {
+        throw new Error(`video too large for native upload: ${Math.round(declared / 1048576)} MB > ${MAX_VIDEO_BYTES / 1048576} MB`)
+      }
+      console.log(`LinkedIn native video: ${Math.round(declared / 1048576)} MB declared, uploading`)
+
       const regRes = await fetch('https://api.linkedin.com/v2/assets?action=registerUpload', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', 'X-Restli-Protocol-Version': '2.0.0' },
@@ -50,7 +65,7 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
       const videoRes = await fetch(videoUrl)
       if (!videoRes.ok) throw new Error(`video fetch ${videoRes.status}`)
       const bytes = new Uint8Array(await videoRes.arrayBuffer())
-      if (bytes.length > 50 * 1024 * 1024) throw new Error(`video too large: ${bytes.length} bytes`)
+      if (bytes.length > MAX_VIDEO_BYTES) throw new Error(`video too large: ${bytes.length} bytes`)
 
       const putRes = await fetch(uploadUrl, {
         method: 'PUT',
@@ -59,10 +74,11 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
       })
       if (putRes.status < 200 || putRes.status >= 300) throw new Error(`upload PUT ${putRes.status}`)
 
-      // Poll asset processing (feature clips are ~2.5 MB; usually AVAILABLE well under a minute)
+      // Poll asset processing (feature clips ~2.5 MB are AVAILABLE well under a minute;
+      // the 720p digest copy ~60-80 MB can take a few minutes — worker timeout is 400 s)
       const assetId = asset.split(':').pop()
       let ready = false
-      for (let i = 0; i < 24; i++) {
+      for (let i = 0; i < 36; i++) {
         await new Promise(r => setTimeout(r, 5000))
         const stRes = await fetch(`https://api.linkedin.com/v2/assets/${assetId}`, {
           headers: { Authorization: `Bearer ${token}`, 'X-Restli-Protocol-Version': '2.0.0' },
@@ -73,7 +89,7 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
         if (status === 'AVAILABLE') { ready = true; break }
         if (status === 'CLIENT_ERROR' || status === 'SERVER_ERROR') throw new Error(`asset processing ${status}`)
       }
-      if (!ready) throw new Error('asset not AVAILABLE after 120s')
+      if (!ready) throw new Error('asset not AVAILABLE after 180s')
       videoAsset = asset
     } catch (e) {
       console.error('LinkedIn video upload failed, falling back to text-only:', (e as Error).message)

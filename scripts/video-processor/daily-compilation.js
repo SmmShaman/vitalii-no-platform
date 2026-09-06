@@ -384,8 +384,14 @@ async function getVideoDuration(filePath) {
  * LinkedIn Assets API and Facebook file_url both need a public file URL,
  * and YouTube links can't be re-uploaded natively.
  *
- * Key is deterministic (digest/<date>.mp4) so consumers can construct the
- * URL from the date alone. Keeps ~1 week of files: deletes <date-8 days>.
+ * Two objects per day, deterministic keys so consumers build the URL from
+ * the date alone:
+ *   digest/<date>.mp4         the YouTube master (1080p, ~150-260 MB)
+ *   digest/<date>-social.mp4  720p / CRF 26 copy (~60-80 MB) for LinkedIn
+ * The social copy exists because LinkedIn's Assets API caps video at 200 MB
+ * and the Edge Function that uploads it buffers the whole file in memory —
+ * the master never fit (2026-09-06: 262 MB killed the worker; no digest had
+ * ever gone out with native video). Keeps ~1 week: deletes <date-8 days>.
  */
 async function uploadDigestToR2(filePath, dateStr) {
   const token = process.env.CF_API_TOKEN;
@@ -395,30 +401,52 @@ async function uploadDigestToR2(filePath, dateStr) {
     return null;
   }
   const bucket = 'daily-videos';
-  const key = `digest/${dateStr}.mp4`;
   const apiBase = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/${bucket}/objects`;
+  const publicBase = 'https://pub-7661840103ab403f956452c3a70df9de.r2.dev';
 
-  const data = await fs.readFile(filePath);
-  console.log(`📤 Uploading digest to R2: ${key} (${Math.round(data.length / 1024 / 1024)} MB)`);
-  const res = await fetch(`${apiBase}/${encodeURIComponent(key)}`, {
-    method: 'PUT',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'video/mp4' },
-    body: data,
-  });
-  if (!res.ok) throw new Error(`R2 PUT ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  const putObject = async (key, localPath) => {
+    const data = await fs.readFile(localPath);
+    console.log(`📤 Uploading digest to R2: ${key} (${Math.round(data.length / 1024 / 1024)} MB)`);
+    const res = await fetch(`${apiBase}/${encodeURIComponent(key)}`, {
+      method: 'PUT',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'video/mp4' },
+      body: data,
+    });
+    if (!res.ok) throw new Error(`R2 PUT ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    const url = `${publicBase}/${key}`;
+    console.log(`✅ Digest on R2: ${url}`);
+    return url;
+  };
 
-  // Rolling cleanup: remove the digest from 8 days ago (deterministic key, no listing needed)
+  const masterUrl = await putObject(`digest/${dateStr}.mp4`, filePath);
+
+  // Social copy: 720p, CRF 26, faststart. Non-fatal — the master is already up.
+  let socialUrl = null;
+  try {
+    const socialPath = path.join(path.dirname(filePath), `digest-${dateStr}-social.mp4`);
+    execSync(
+      `ffmpeg -y -loglevel error -i "${filePath}" -vf "scale=1280:-2" -c:v libx264 -preset medium -crf 26 ` +
+      `-c:a aac -b:a 128k -movflags +faststart "${socialPath}"`,
+      { stdio: 'inherit', timeout: 900_000 }
+    );
+    socialUrl = await putObject(`digest/${dateStr}-social.mp4`, socialPath);
+    await fs.unlink(socialPath).catch(() => {});
+  } catch (e) {
+    console.log(`⚠️ Social copy failed (LinkedIn will get the text fallback): ${e.message}`);
+  }
+
+  // Rolling cleanup: remove the digest from 8 days ago (deterministic keys, no listing needed)
   const old = new Date(`${dateStr}T00:00:00Z`);
   old.setUTCDate(old.getUTCDate() - 8);
-  const oldKey = `digest/${old.toISOString().slice(0, 10)}.mp4`;
-  await fetch(`${apiBase}/${encodeURIComponent(oldKey)}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${token}` },
-  }).catch(() => {});
+  const oldDate = old.toISOString().slice(0, 10);
+  for (const oldKey of [`digest/${oldDate}.mp4`, `digest/${oldDate}-social.mp4`]) {
+    await fetch(`${apiBase}/${encodeURIComponent(oldKey)}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    }).catch(() => {});
+  }
 
-  const publicUrl = `https://pub-7661840103ab403f956452c3a70df9de.r2.dev/${key}`;
-  console.log(`✅ Digest on R2: ${publicUrl}`);
-  return publicUrl;
+  return { masterUrl, socialUrl };
 }
 
 /**
@@ -588,7 +616,7 @@ async function notifyTelegramDirect(dateStr, youtubeUrl) {
 async function notifyBotComplete(dateStr, youtubeUrl) {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_ANON_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!SUPABASE_URL) { console.log('⚠️ SUPABASE_URL not set, skipping bot notification'); return; }
+  if (!SUPABASE_URL) { console.log('⚠️ SUPABASE_URL not set, skipping bot notification'); return false; }
 
   try {
     const resp = await fetch(`${SUPABASE_URL}/functions/v1/daily-video-bot?action=notify_complete`, {
@@ -602,11 +630,13 @@ async function notifyBotComplete(dateStr, youtubeUrl) {
     const body = await resp.text();
     if (!resp.ok) {
       console.log(`⚠️ Bot notification failed (${resp.status}): ${body}`);
-    } else {
-      console.log(`📺 Bot notified of completion: ${body}`);
+      return false;
     }
+    console.log(`📺 Bot notified of completion: ${body}`);
+    return true;
   } catch (e) {
     console.log(`⚠️ Failed to notify bot: ${e.message}`);
+    return false;
   }
 }
 
@@ -1642,11 +1672,14 @@ async function main() {
     await fs.unlink(path.join(publicDir, avatarFile)).catch(() => {});
   }
 
-  // Notify Telegram bot
-  if (DRAFT_ID) {
-    await notifyBotComplete(dateStr, result.watchUrl);
-  } else {
-    // Direct Telegram notification for cron/manual runs
+  // Close the draft through the bot for EVERY run, not only repository_dispatch
+  // ones: notify_complete flips daily_video_drafts to 'completed' by target_date,
+  // and the LinkedIn digest task only posts drafts that are 'completed' with a
+  // youtube_url. Manual workflow_dispatch renders (no DRAFT_ID) used to skip this,
+  // so 2026-09-04 was rendered to YouTube but stayed 'rendering' and never posted.
+  // Direct Telegram is the fallback when the bot cannot be reached.
+  const botNotified = await notifyBotComplete(dateStr, result.watchUrl);
+  if (!botNotified) {
     await notifyTelegramDirect(dateStr, result.watchUrl);
   }
 
