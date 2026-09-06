@@ -8,6 +8,7 @@ import { useTranslations, type Language } from '@/contexts/TranslationContext';
 import { heroContrastColors } from '@/components/sections/BentoGrid';
 import { HeroTextAnimation } from '@/components/ui/HeroTextAnimation';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import NeoIconButton from '@/components/ui/NeoIconButton'
 
 interface HeaderProps {
   isCompact?: boolean;
@@ -148,15 +149,12 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
           <div className="flex items-center gap-1 flex-shrink-0">
             {/* Search — before lang buttons, expands right */}
             <div className="relative z-20">
-              <button
+              <NeoIconButton
                 onClick={handleSearchToggle}
-                className={`relative z-10 p-1.5 rounded-lg transition-all duration-300 ${
-                  searchQuery.trim()
-                    ? 'bg-brand text-white'
-                    : searchOpen
-                      ? 'bg-surface/80 text-content-secondary'
-                      : 'bg-surface/70 text-content-muted'
-                }`}
+                effect="shine"
+                size="sm"
+                pressed={searchOpen}
+                className={`relative z-10 ${searchQuery.trim() ? '!text-brand-light' : ''}`}
                 aria-label="Search"
               >
                 <Search className="w-3.5 h-3.5" />
@@ -164,7 +162,7 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
                 {searchQuery.trim() && (
                   <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 border border-surface" />
                 )}
-              </button>
+              </NeoIconButton>
               <AnimatePresence>
                 {searchOpen && (
                   <motion.div
@@ -280,15 +278,12 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
         <div className="flex items-center gap-1 flex-shrink-0 ml-2">
           {/* Search — before lang buttons, input expands right */}
           <div className="relative z-20">
-            <button
+            <NeoIconButton
               onClick={handleSearchToggle}
-              className={`relative z-10 p-1.5 rounded-lg transition-all duration-300 ${
-                searchQuery.trim()
-                  ? 'bg-brand text-white'
-                  : searchOpen
-                    ? 'bg-surface/80 text-content-secondary'
-                    : 'bg-surface/70 text-content-muted hover:bg-surface/90'
-              }`}
+              effect="shine"
+              size="sm"
+              pressed={searchOpen}
+              className={`relative z-10 ${searchQuery.trim() ? '!text-brand-light' : ''}`}
               aria-label="Search"
             >
               <Search className="w-4 h-4" />
@@ -296,7 +291,7 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
               {searchQuery.trim() && (
                 <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-amber-400 border border-surface" />
               )}
-            </button>
+            </NeoIconButton>
             <AnimatePresence>
               {searchOpen && (
                 <motion.div
@@ -322,19 +317,21 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
           </div>
           {/* Marquee pause/play */}
           {!isMobile && (
-            <button
+            <NeoIconButton
               onClick={() => {
                 window.dispatchEvent(new CustomEvent('marquee-toggle'));
                 setMarqueePaused(p => !p);
               }}
-              className="p-1.5 rounded-lg transition-all duration-300 bg-surface/70 text-content-muted hover:bg-surface/90 hover:text-content-secondary"
+              effect="ring"
+              size="sm"
+              pressed={marqueePaused}
               aria-label={marqueePaused ? 'Play features marquee' : 'Pause features marquee'}
             >
               {marqueePaused
                 ? <Play className="w-4 h-4" />
                 : <Pause className="w-4 h-4" />
               }
-            </button>
+            </NeoIconButton>
           )}
           {/* Language buttons */}
           {languages.map((lang) => (

@@ -9,6 +9,7 @@ import ReactMarkdown from 'react-markdown';
 import { useTranslations } from '@/contexts/TranslationContext';
 import { getLatestNews, getNewsById, getAllNews } from '@/integrations/supabase/client';
 import type { LatestNews, NewsItem } from '@/integrations/supabase/types';
+import NeoIconButton from '@/components/ui/NeoIconButton'
 
 interface NewsSectionProps {
   isExpanded?: boolean;
@@ -274,16 +275,15 @@ const NewsSectionComponent = ({
         {/* Floating Back Button - Sticky at top-right, absolute positioning to avoid blocking content */}
         <div className="sticky top-0 z-50 h-0">
           <div className="flex justify-end">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+            <NeoIconButton
               onClick={onBack}
-              className="m-2 sm:m-4 w-11 h-11 sm:w-12 sm:h-12 min-w-[44px] min-h-[44px] rounded-full bg-surface/95 backdrop-blur-sm shadow-lg flex items-center justify-center text-content-secondary hover:bg-surface-elevated transition-all duration-300 border border-surface-border active:scale-95"
+              effect="lift"
+              className="m-2 sm:m-4"
               title="Back to news"
               aria-label="Back to news list"
             >
               <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-            </motion.button>
+            </NeoIconButton>
           </div>
         </div>
 

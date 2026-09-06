@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useCallback, useRef, useId } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
+import NeoIconButton from '@/components/ui/NeoIconButton'
 
 interface ModalProps {
   children: React.ReactNode
@@ -123,13 +124,14 @@ export function Modal({ children, title = 'Article' }: ModalProps) {
         {/* Visually hidden title for screen readers */}
         <h2 id={titleId} className="sr-only">{title}</h2>
 
-        <button
+        <NeoIconButton
           onClick={onDismiss}
           aria-label="Close modal"
-          className="absolute top-4 right-4 z-20 p-2 min-w-[44px] min-h-[44px] rounded-full bg-surface-elevated hover:bg-surface-border transition-colors text-content-secondary flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-brand focus:ring-offset-2 shadow-md"
+          base="surface-darker"
+          className="absolute top-4 right-4 z-20"
         >
           <X className="w-5 h-5" />
-        </button>
+        </NeoIconButton>
 
         {/* Live region for loading status */}
         <div

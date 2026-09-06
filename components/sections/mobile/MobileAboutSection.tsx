@@ -7,6 +7,7 @@ import { sectionColors } from './types'
 import { VerticalLabel } from './VerticalLabel'
 import type { TranslateFn } from './types'
 import { stripMarkdown } from '@/utils/markdown'
+import NeoIconButton from '@/components/ui/NeoIconButton'
 
 // About Explosion Overlay - Fast word-by-word animation
 const AboutExplosionOverlay = ({
@@ -34,16 +35,15 @@ const AboutExplosionOverlay = ({
       transition={{ duration: 0.2 }}
     >
       {/* Close button */}
-      <button
+      <NeoIconButton
         onClick={onClose}
-        className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center rounded-full z-10 transition-colors"
-        style={{ backgroundColor: `${color}20` }}
+        className="absolute top-4 right-4 z-10"
         aria-label="Close"
       >
         <svg className="w-6 h-6" style={{ color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
-      </button>
+      </NeoIconButton>
 
       {/* Scrollable content */}
       <div className="h-full overflow-y-auto pt-16 pb-8 px-6">
