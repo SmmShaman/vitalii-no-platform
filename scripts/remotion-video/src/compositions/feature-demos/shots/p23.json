@@ -1,0 +1,21 @@
+{
+  "id": "p23",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "commit",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/5f2b6be",
+      "frames": 130,
+      "scroll": [[0, 0], [129, 1800]],
+      "mouse": [[0, 400, 150], [65, 400, 300], [129, 400, 200]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/actions",
+      "frames": 90,
+      "scroll": [[0, 0], [89, 240]],
+      "mouse": [[0, 300, 220], [89, 520, 240]]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "j01",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commits/main",
+      "frames": 150,
+      "scroll": [[0, 0], [149, 2000]],
+      "mouse": [[0, 420, 150], [70, 420, 340], [149, 420, 200]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/jobbot-norway/actions",
+      "frames": 120,
+      "scroll": [[0, 0], [119, 300]],
+      "mouse": [[0, 300, 220], [119, 560, 260]]
+    }
+  ]
+}
