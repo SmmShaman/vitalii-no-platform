@@ -952,7 +952,19 @@ export function assembleInstagramCaption(
   language: 'en' | 'no' | 'ua' = 'en',
   sourceLine?: string | null
 ): string {
-  const lines = teaser.trim().split('\n')
+  const { body, tags } = splitTrailingHashtags(teaser)
+  const cta = INSTAGRAM_LINK_CTA[language] || INSTAGRAM_LINK_CTA.en
+  const tail = [cta, sourceLine?.trim()].filter(Boolean).join('\n')
+  return `${body}\n\n${tail}${tags ? `\n\n${tags}` : ''}`.substring(0, 2200)
+}
+
+/**
+ * Split an AI teaser into its body and the trailing hashtag block (lines made only of
+ * hashtags at the very end). Used by every platform so the footer (CTA, link, source)
+ * can be inserted BEFORE the hashtags instead of after them.
+ */
+export function splitTrailingHashtags(text: string): { body: string; tags: string } {
+  const lines = text.trim().split('\n')
   const tagLines: string[] = []
   while (lines.length) {
     const l = lines[lines.length - 1].trim()
@@ -961,11 +973,17 @@ export function assembleInstagramCaption(
       lines.pop()
     } else break
   }
-  const body = lines.join('\n').trim()
-  const cta = INSTAGRAM_LINK_CTA[language] || INSTAGRAM_LINK_CTA.en
-  const tail = [cta, sourceLine?.trim()].filter(Boolean).join('\n')
-  const tags = tagLines.join(' ')
-  return `${body}\n\n${tail}${tags ? `\n\n${tags}` : ''}`.substring(0, 2200)
+  return { body: lines.join('\n').trim(), tags: tagLines.join(' ') }
+}
+
+/** Fallback hashtags built from article tags when the teaser carries none. */
+export function hashtagsFromTags(tags: string[] | null | undefined, max = 5): string {
+  if (!Array.isArray(tags)) return ''
+  return tags
+    .map(t => '#' + String(t).split(/[\s\-_]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('').replace(/[^\p{L}\p{N}]/gu, ''))
+    .filter(t => t.length > 2)
+    .slice(0, max)
+    .join(' ')
 }
 
 /**

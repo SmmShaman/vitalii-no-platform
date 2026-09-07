@@ -10,6 +10,13 @@ import {
   type Language
 } from '../_shared/social-media-helpers.ts'
 import { fetchWithRetry } from '../_shared/fetch-with-retry.ts'
+import { splitTrailingHashtags } from '../_shared/facebook-helpers.ts'
+import {
+  uploadImageToLinkedIn,
+  commentOnLinkedInPost,
+  LINKEDIN_LINK_IN_COMMENT,
+  LINKEDIN_COMMENT_LABEL
+} from '../_shared/linkedin-helpers.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -310,9 +317,15 @@ serve(async (req) => {
         })
         .eq('id', updateId)
 
-      // Update social_media_posts record
+      // Update social_media_posts record (and store the text that actually went out)
       if (socialPost && result.postId) {
         await updateSocialPostSuccess(socialPost.id, result.postId, linkedinPostUrl || '')
+        if (result.commentary) {
+          await supabase.from('social_media_posts').update({ post_content: result.commentary }).eq('id', socialPost.id)
+        }
+        if (result.commentPosted === false) {
+          await supabase.from('social_media_posts').update({ error_message: 'posted, but the link comment failed' }).eq('id', socialPost.id)
+        }
         console.log('✅ Updated social_media_posts record')
       }
 
@@ -321,6 +334,7 @@ serve(async (req) => {
           success: true,
           postId: result.postId,
           postUrl: linkedinPostUrl,
+          commentPosted: result.commentPosted ?? false,
           message: `Posted to LinkedIn (${requestData.language.toUpperCase()})`
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -460,90 +474,6 @@ async function fetchBlogContent(
   }
 }
 
-/**
- * Upload image to LinkedIn and get asset URN
- * Required for native image sharing
- */
-async function uploadImageToLinkedIn(imageUrl: string): Promise<string | null> {
-  try {
-    console.log('🖼️ Uploading image to LinkedIn...', imageUrl.substring(0, 50))
-
-    // Step 1: Register the upload
-    const registerResponse = await fetch('https://api.linkedin.com/v2/assets?action=registerUpload', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LINKEDIN_ACCESS_TOKEN}`,
-        'Content-Type': 'application/json',
-        'X-Restli-Protocol-Version': '2.0.0'
-      },
-      body: JSON.stringify({
-        registerUploadRequest: {
-          recipes: ['urn:li:digitalmediaRecipe:feedshare-image'],
-          owner: LINKEDIN_PERSON_URN,
-          serviceRelationships: [
-            {
-              relationshipType: 'OWNER',
-              identifier: 'urn:li:userGeneratedContent'
-            }
-          ]
-        }
-      })
-    })
-
-    if (!registerResponse.ok) {
-      const errorText = await registerResponse.text()
-      console.error('LinkedIn register upload error:', registerResponse.status, errorText)
-      return null
-    }
-
-    const registerResult = await registerResponse.json()
-    const uploadUrl = registerResult.value?.uploadMechanism?.['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest']?.uploadUrl
-    const asset = registerResult.value?.asset
-
-    if (!uploadUrl || !asset) {
-      console.error('Missing upload URL or asset from register response')
-      return null
-    }
-
-    console.log('📤 Got upload URL, downloading source image...')
-
-    // Step 2: Download the source image
-    const imageResponse = await fetch(imageUrl)
-    if (!imageResponse.ok) {
-      console.error('Failed to download source image:', imageResponse.status)
-      return null
-    }
-
-    const imageBuffer = await imageResponse.arrayBuffer()
-    const contentType = imageResponse.headers.get('content-type') || 'image/jpeg'
-
-    console.log('📤 Uploading image to LinkedIn...', imageBuffer.byteLength, 'bytes')
-
-    // Step 3: Upload the image to LinkedIn
-    const uploadResponse = await fetch(uploadUrl, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${LINKEDIN_ACCESS_TOKEN}`,
-        'Content-Type': contentType
-      },
-      body: imageBuffer
-    })
-
-    if (!uploadResponse.ok) {
-      const errorText = await uploadResponse.text()
-      console.error('LinkedIn upload error:', uploadResponse.status, errorText)
-      return null
-    }
-
-    console.log('✅ Image uploaded to LinkedIn, asset:', asset)
-    return asset
-
-  } catch (error: any) {
-    console.error('Error uploading image to LinkedIn:', error)
-    return null
-  }
-}
-
 // Localized source attribution label
 const SOURCE_LABEL: Record<string, string> = {
   en: 'Source',
@@ -584,7 +514,7 @@ async function postToLinkedIn(content: {
   teaser?: string  // AI-generated teaser (priority)
   hashtags?: string
   language: 'en' | 'no' | 'ua'  // For localized CTA
-}): Promise<{ success: boolean; postId?: string; error?: string }> {
+}): Promise<{ success: boolean; postId?: string; error?: string; commentary?: string; commentPosted?: boolean }> {
   try {
     // Build the share commentary (LinkedIn limit is 3000 chars).
     // Everything — teaser included — goes through sanitizeText so raw JSON,
@@ -599,17 +529,20 @@ async function postToLinkedIn(content: {
       console.log('📝 Using title+description fallback for LinkedIn post')
     }
 
-    // Footer: one clear CTA link, source as plain domain (no second raw URL), hashtags last
-    const readLabel = READ_LABEL[content.language] || READ_LABEL.en
+    // Footer: no raw URL in the body (LinkedIn down-ranks external links there) — the
+    // article link goes into the first comment right after publishing. Source stays a
+    // plain domain. Hashtags: the teaser's own block if it has one, else article tags. Last.
     const sourceLabel = SOURCE_LABEL[content.language] || SOURCE_LABEL.en
     const sourceDomain = extractDomain(content.sourceLink)
+    const { body, tags: teaserTags } = splitTrailingHashtags(commentary)
+    const hashtags = teaserTags || content.hashtags || ''
 
-    commentary += `\n\n📖 ${readLabel}: ${content.url}`
-    if (sourceDomain) {
+    commentary = `${body}\n\n${LINKEDIN_LINK_IN_COMMENT[content.language] || LINKEDIN_LINK_IN_COMMENT.en}`
+    if (sourceDomain && sourceDomain !== 'vitalii.no') {
       commentary += `\n${sourceLabel}: ${sourceDomain}`
     }
-    if (content.hashtags) {
-      commentary += `\n\n${content.hashtags}`
+    if (hashtags) {
+      commentary += `\n\n${hashtags}`
     }
 
     const safeCommentary = commentary.substring(0, 2900)
@@ -621,7 +554,7 @@ async function postToLinkedIn(content: {
     // If we have an image, try to upload it natively to LinkedIn
     let imageAsset: string | null = null
     if (content.imageUrl) {
-      imageAsset = await uploadImageToLinkedIn(content.imageUrl)
+      imageAsset = await uploadImageToLinkedIn(content.imageUrl, LINKEDIN_ACCESS_TOKEN!, LINKEDIN_PERSON_URN!)
     }
 
     if (imageAsset) {
@@ -721,9 +654,20 @@ async function postToLinkedIn(content: {
     // Extract post ID from response
     const postId = result.id || result.activity
 
+    // First comment = the article link (see footer note above). Never fails the post.
+    let commentPosted = false
+    if (postId) {
+      const label = LINKEDIN_COMMENT_LABEL[content.language] || LINKEDIN_COMMENT_LABEL.en
+      const c = await commentOnLinkedInPost(postId, `${label}: ${content.url}`, LINKEDIN_ACCESS_TOKEN!, LINKEDIN_PERSON_URN!)
+      commentPosted = c.ok
+      if (!c.ok) console.error('❌ Link comment failed, post is live without its link:', c.error)
+    }
+
     return {
       success: true,
-      postId
+      postId,
+      commentary: safeCommentary,
+      commentPosted
     }
 
   } catch (error: any) {

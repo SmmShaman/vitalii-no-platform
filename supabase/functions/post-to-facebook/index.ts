@@ -4,7 +4,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import {
   postToFacebookPage,
   formatFacebookPost,
-  isFacebookConfigured
+  isFacebookConfigured,
+  splitTrailingHashtags,
+  hashtagsFromTags
 } from '../_shared/facebook-helpers.ts'
 import {
   getContent,
@@ -272,9 +274,11 @@ serve(async (req) => {
     const sourceDomain = extractDomain(content.sourceLink)
 
     if (teaser) {
-      // Source attribution + article link (Facebook link param already creates preview)
-      const sourceAttr = sourceDomain ? `\n\n${sourceLabel}: ${content.sourceLink}` : ''
-      message = `${teaser}${sourceAttr}\n🔗 ${articleUrl}`.substring(0, 2000)
+      // Body → our link → source as a plain domain (never a second raw URL) → hashtags last.
+      const { body, tags } = splitTrailingHashtags(teaser)
+      const hashtags = tags || hashtagsFromTags(content.tags, 5)
+      const sourceAttr = sourceDomain && sourceDomain !== 'vitalii.no' ? `\n${sourceLabel}: ${sourceDomain}` : ''
+      message = `${body}\n\n🔗 ${articleUrl}${sourceAttr}${hashtags ? `\n\n${hashtags}` : ''}`.substring(0, 2000)
       console.log('📝 Using AI-generated teaser for Facebook post')
     } else {
       message = formatFacebookPost(

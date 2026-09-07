@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
+import { uploadImageToLinkedIn, commentOnLinkedInPost } from '../_shared/linkedin-helpers.ts'
 
 // LinkedIn's Assets API caps native video at 200 MB, and this worker buffers the whole
 // file in memory (memoryLimitMb in the self-hosted runtime's main/index.ts, 512 MB since
@@ -27,7 +28,7 @@ async function getSetting(supabase: ReturnType<typeof createClient>, key: string
   return (data?.key_value as string) || ''
 }
 
-async function postToLinkedIn(text: string, supabase: ReturnType<typeof createClient>, videoUrl?: string | null): Promise<{ url?: string; error?: string; videoUsed?: boolean }> {
+async function postToLinkedIn(text: string, supabase: ReturnType<typeof createClient>, videoUrl?: string | null, imageUrl?: string | null, commentUrl?: string | null): Promise<{ url?: string; error?: string; videoUsed?: boolean; imageUsed?: boolean; commentPosted?: boolean }> {
   const token = (await getSetting(supabase, 'LINKEDIN_ACCESS_TOKEN')) || Deno.env.get('LINKEDIN_ACCESS_TOKEN') || ''
   const urn = (await getSetting(supabase, 'LINKEDIN_PERSON_URN')) || Deno.env.get('LINKEDIN_PERSON_URN') || ''
   if (!token || !urn) return { error: 'LinkedIn credentials not configured' }
@@ -97,11 +98,23 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
     }
   }
 
+  // Native image when there is no video: a text-only (NONE) share is the weakest feed format.
+  let imageAsset: string | null = null
+  if (!videoAsset && imageUrl) {
+    imageAsset = await uploadImageToLinkedIn(imageUrl, token, urn)
+  }
+
   const shareContent = videoAsset
     ? {
         shareCommentary: { text: text.slice(0, 3000) },
         shareMediaCategory: 'VIDEO',
         media: [{ status: 'READY', media: videoAsset }],
+      }
+    : imageAsset
+    ? {
+        shareCommentary: { text: text.slice(0, 3000) },
+        shareMediaCategory: 'IMAGE',
+        media: [{ status: 'READY', media: imageAsset }],
       }
     : { shareCommentary: { text: text.slice(0, 3000) }, shareMediaCategory: 'NONE' }
 
@@ -118,7 +131,16 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
   if (res.status === 401) return { error: 'LinkedIn token expired' }
   if (!res.ok) return { error: `LinkedIn ${res.status}: ${(await res.text()).slice(0, 300)}` }
   const postId = res.headers.get('x-restli-id') || ''
-  return { url: postId ? `https://www.linkedin.com/feed/update/${postId}/` : undefined, videoUsed: !!videoAsset }
+
+  // Article link as the first comment (external URLs in the body are down-ranked).
+  let commentPosted = false
+  if (postId && commentUrl) {
+    const c = await commentOnLinkedInPost(postId, `🔗 ${commentUrl}`, token, urn)
+    commentPosted = c.ok
+    if (!c.ok) console.error('LinkedIn link comment failed:', c.error)
+  }
+
+  return { url: postId ? `https://www.linkedin.com/feed/update/${postId}/` : undefined, videoUsed: !!videoAsset, imageUsed: !!imageAsset, commentPosted }
 }
 
 async function postToFacebook(text: string, imageUrl: string | null, videoUrl?: string | null): Promise<{ url?: string; error?: string; videoUsed?: boolean }> {
@@ -181,11 +203,13 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}))
-    const { platform, text, imageUrl, videoUrl, dryRun } = body as {
+    const { platform, text, imageUrl, videoUrl, commentUrl, dryRun } = body as {
       platform?: 'linkedin' | 'facebook' | 'instagram'
       text?: string
       imageUrl?: string | null
       videoUrl?: string | null
+      /** LinkedIn only: article URL to post as the first comment (keep it OUT of `text`). */
+      commentUrl?: string | null
       dryRun?: boolean
     }
 
@@ -201,14 +225,14 @@ serve(async (req) => {
       return json({ ok: true, dryRun: true, platform, credentialsOk: checks[platform], textLength: text.length })
     }
 
-    let result: { url?: string; error?: string; videoUsed?: boolean }
-    if (platform === 'linkedin') result = await postToLinkedIn(text, supabase, videoUrl || null)
+    let result: { url?: string; error?: string; videoUsed?: boolean; imageUsed?: boolean; commentPosted?: boolean }
+    if (platform === 'linkedin') result = await postToLinkedIn(text, supabase, videoUrl || null, imageUrl || null, commentUrl || null)
     else if (platform === 'facebook') result = await postToFacebook(text, imageUrl || null, videoUrl || null)
     else if (platform === 'instagram') result = await postToInstagram(text, imageUrl || null)
     else return json({ ok: false, error: `Unknown platform: ${platform}` }, 400)
 
     if (result.error) return json({ ok: false, error: result.error })
-    return json({ ok: true, url: result.url, videoUsed: result.videoUsed ?? false })
+    return json({ ok: true, url: result.url, videoUsed: result.videoUsed ?? false, imageUsed: result.imageUsed ?? false, commentPosted: result.commentPosted ?? false })
   } catch (err) {
     return json({ ok: false, error: String(err) }, 500)
   }
