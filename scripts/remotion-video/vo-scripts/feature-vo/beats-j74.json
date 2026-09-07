@@ -1,0 +1,7 @@
+{"id": "j74", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My AI screened every LinkedIn posting with one generic prompt — and let scores above 70 slip past missing degrees and experience gaps."],
+ ["b2", "A junior role needing a degree, a manager role needing a master's — both scored high anyway; the language check only caught exact phrases."],
+ ["b3", "So a Groq model now reports language, paid years, and education as structured facts, not a soft opinion."],
+ ["b4", "Code then applies hard caps from those facts — missing degree, wrong language, years that don't add up."],
+ ["b5", "Postings that used to score seventy or higher now score zero."]
+]}

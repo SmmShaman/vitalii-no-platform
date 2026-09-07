@@ -1,0 +1,56 @@
+{
+ "id": "j73",
+ "beat_durations": {
+  "b1": 8.928,
+  "b2": 6.528,
+  "b3": 6.384,
+  "b4": 6.168,
+  "b5": 4.992
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My scraper marked almost every LinkedIn posting Easy Apply and threw it away \u2014 643 of 644 in a month.",
+   "start_s": 0.5,
+   "end_s": 9.428,
+   "start_f": 15,
+   "end_f": 283
+  },
+  {
+   "beat": "b2",
+   "text": "It hunted for a button LinkedIn stopped showing guests months ago, so real postings landed straight in the trash.",
+   "start_s": 9.728,
+   "end_s": 16.256,
+   "start_f": 292,
+   "end_f": 488
+  },
+  {
+   "beat": "b3",
+   "text": "So I built a Python resolver that reads LinkedIn's own guest-page marker to spot a real application form.",
+   "start_s": 16.556,
+   "end_s": 22.94,
+   "start_f": 497,
+   "end_f": 688
+  },
+  {
+   "beat": "b4",
+   "text": "It checks the posting text, then that marker, then the employer's site, before any paid search.",
+   "start_s": 23.24,
+   "end_s": 29.408,
+   "start_f": 697,
+   "end_f": 882
+  },
+  {
+   "beat": "b5",
+   "text": "Out of the next thirty postings, real working links went from zero to twenty.",
+   "start_s": 29.708,
+   "end_s": 34.7,
+   "start_f": 891,
+   "end_f": 1041
+  }
+ ],
+ "total_s": 36.2,
+ "durationInFrames": 1086,
+ "measured_track_s": 34.752,
+ "track": "/root/feature-demos/vo-j73/vo-j73.mp3"
+}

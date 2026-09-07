@@ -1,0 +1,56 @@
+{
+ "id": "j74",
+ "beat_durations": {
+  "b1": 9.192,
+  "b2": 8.784,
+  "b3": 7.152,
+  "b4": 6.552,
+  "b5": 3.744
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My AI screened every LinkedIn posting with one generic prompt \u2014 and let scores above 70 slip past missing degrees and experience gaps.",
+   "start_s": 0.5,
+   "end_s": 9.692,
+   "start_f": 15,
+   "end_f": 291
+  },
+  {
+   "beat": "b2",
+   "text": "A junior role needing a degree, a manager role needing a master's \u2014 both scored high anyway; the language check only caught exact phrases.",
+   "start_s": 9.992,
+   "end_s": 18.776,
+   "start_f": 300,
+   "end_f": 563
+  },
+  {
+   "beat": "b3",
+   "text": "So a Groq model now reports language, paid years, and education as structured facts, not a soft opinion.",
+   "start_s": 19.076,
+   "end_s": 26.228,
+   "start_f": 572,
+   "end_f": 787
+  },
+  {
+   "beat": "b4",
+   "text": "Code then applies hard caps from those facts \u2014 missing degree, wrong language, years that don't add up.",
+   "start_s": 26.528,
+   "end_s": 33.08,
+   "start_f": 796,
+   "end_f": 992
+  },
+  {
+   "beat": "b5",
+   "text": "Postings that used to score seventy or higher now score zero.",
+   "start_s": 33.38,
+   "end_s": 37.124,
+   "start_f": 1001,
+   "end_f": 1114
+  }
+ ],
+ "total_s": 38.624,
+ "durationInFrames": 1159,
+ "measured_track_s": 37.176,
+ "track": "/root/feature-demos/vo-j74/vo-j74.mp3"
+}

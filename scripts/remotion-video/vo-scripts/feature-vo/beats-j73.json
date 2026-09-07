@@ -1,0 +1,7 @@
+{"id": "j73", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My scraper marked almost every LinkedIn posting Easy Apply and threw it away — 643 of 644 in a month."],
+ ["b2", "It hunted for a button LinkedIn stopped showing guests months ago, so real postings landed straight in the trash."],
+ ["b3", "So I built a Python resolver that reads LinkedIn's own guest-page marker to spot a real application form."],
+ ["b4", "It checks the posting text, then that marker, then the employer's site, before any paid search."],
+ ["b5", "Out of the next thirty postings, real working links went from zero to twenty."]
+]}
