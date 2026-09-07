@@ -490,3 +490,31 @@ h4, h5, .text-xl, .text-2xl {
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(13, 148, 136, 0.6);
 }
+
+/* =========================================================
+   NEUMORPHIC BENTO TILES — .neo-tile
+   The six home-screen windows rest slightly raised on the page and sink
+   into the surface on hover (same embossed language as .neo-btn).
+   The inset shadow lives on an overlay (.neo-tile-inset) because the tile's
+   own background layers would paint over an inset shadow on the wrapper.
+   Plain CSS, not @layer — the pressed class is toggled at runtime. */
+.neo-tile {
+  --neo-d: 8px;
+  --neo-b: 18px;
+  box-shadow:
+    var(--neo-d) var(--neo-d) var(--neo-b) var(--neo-shadow-dark),
+    calc(var(--neo-d) * -1) calc(var(--neo-d) * -1) var(--neo-b) var(--neo-shadow-light);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.neo-tile.is-pressed {
+  box-shadow:
+    2px 2px 4px var(--neo-shadow-dark),
+    -2px -2px 4px var(--neo-shadow-light);
+}
+.neo-tile-inset {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.neo-tile.is-pressed .neo-tile-inset {
+  opacity: 1;
+}

@@ -939,7 +939,7 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
                             debugLog(`❌ BLOG: Умова НЕ виконалась - таймер НЕ встановлено`);
                           }
                         }}
-                        className={`relative rounded-lg transition-all duration-300 w-full ${(section.id === 'news' && selectedNewsId) || (section.id === 'blog' && selectedBlogId) ? 'cursor-default' : 'cursor-pointer'} ${(section.id === 'news' && !isNewsExpanded) || (section.id === 'blog' && !isBlogExpanded) ? 'hover:scale-105 active:scale-[0.98]' : 'active:scale-[0.99]'
+                        className={`neo-tile relative rounded-lg transition-all duration-300 w-full ${hoveredSection === section.id ? 'is-pressed' : ''} ${(section.id === 'news' && selectedNewsId) || (section.id === 'blog' && selectedBlogId) ? 'cursor-default' : 'cursor-pointer'} ${(section.id === 'news' && !isNewsExpanded) || (section.id === 'blog' && !isBlogExpanded) ? 'hover:scale-[0.985] active:scale-[0.97]' : 'active:scale-[0.99]'
                           } ${
                           // Allow scroll when news/blog item is selected, otherwise hide overflow
                           (section.id === 'news' && selectedNewsId) || (section.id === 'blog' && selectedBlogId)
@@ -1087,12 +1087,12 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
                         {/* Hover Effect Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-purple-500/30 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-                        {/* Neon perimeter outline on hover - matches section title color, z-40 to stay above content (z-30) */}
+                        {/* Hover state: neon perimeter in the section colour + neumorphic pressed-in shadow.
+                            z-40 to stay above content (z-30); opacity is driven by .neo-tile.is-pressed */}
                         <div
-                          className="absolute inset-0 rounded-lg pointer-events-none transition-opacity duration-300 z-40"
+                          className="neo-tile-inset absolute inset-0 rounded-lg pointer-events-none z-40"
                           style={{
-                            boxShadow: `inset 0 0 0 2px ${neonColors[section.id]?.primary ?? 'transparent'}`,
-                            opacity: hoveredSection === section.id ? 1 : 0,
+                            boxShadow: `inset 0 0 0 2px ${neonColors[section.id]?.primary ?? 'transparent'}, inset 8px 8px 16px var(--neo-shadow-dark), inset -8px -8px 16px var(--neo-shadow-light)`,
                           }}
                         />
                       </motion.div>
