@@ -471,6 +471,11 @@ def main():
         # two nights running before 2026-09-05.
         voiced = {f[len("beats-"):-len(".json")]
                   for f in os.listdir(VO_DIR) if f.startswith("beats-")}
+        # Beats alone do not make a feature "voiced": a run killed between
+        # wave A and wave B (2026-09-07) left beats-v32.json behind, and the
+        # next run filed v32 under re-shoots — behind 14 older features —
+        # instead of new. Only beats + a composition count.
+        voiced = {f for f in voiced if composition_for(f)}
         os.makedirs(SHOTS_DIR, exist_ok=True)
         live = {f[:-len(".json")] for f in os.listdir(SHOTS_DIR) if f.endswith(".json")}
         rows = [r.split("|") for r in psql(FEATURES_SQL).splitlines() if r]
