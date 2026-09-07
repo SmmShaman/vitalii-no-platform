@@ -1,11 +1,16 @@
 name: Discover Features
 
 on:
-  # Cron re-enabled 2026-07-24: the Nano-agent replacement never got its scheduled
-  # task, and the Edge Function now runs on Groq (callLLM) instead of the dead
-  # Anthropic key, so the daily GH scan works again.
-  schedule:
-    - cron: '30 5 * * *'  # 07:30 Oslo (summer)
+  # Cron DISABLED 2026-09-07 (owner decision). Since 2026-07-26 the Nano agent's
+  # daily task `oq43qb` (08:00 UTC) scans the same repos, analyses the commits
+  # with its own Claude subscription and POSTs `precomputed_features` — no Groq
+  # call at all. This cron was a second scan of the same commits through
+  # callLLM/gpt-oss-120b and failed on the shared Groq daily token limit
+  # (429 TPD) on 4 of its last 6 runs. Manual dispatch stays for backfills.
+  # (History: cron re-enabled 2026-07-24 because the agent task did not exist
+  # yet; the agent task was fixed two days later and nobody retired this one.)
+  # schedule:
+  #   - cron: '30 5 * * *'  # 07:30 Oslo (summer)
   workflow_dispatch:
     inputs:
       since:

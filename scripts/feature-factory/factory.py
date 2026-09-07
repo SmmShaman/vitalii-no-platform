@@ -170,11 +170,40 @@ PUBLIC_SITES = {
 }
 
 
-def url_ok(url):
-    code = run(f'curl -s -o /dev/null -w "%{{http_code}}" -L --max-time 25 '
-               f'-A "Mozilla/5.0 (X11; Linux x86_64) Chrome/128.0" {shlex.quote(url)}',
-               check=False)
-    return code.isdigit() and int(code) < 400
+_PROBED = {}
+
+
+def url_ok(url, tries=3, pauses=(5, 20)):
+    """One curl is not a verdict. 2026-09-07: github.com/.../commits/main failed
+    a single probe at 23:32 UTC and two clips were dropped, while the same page
+    answered 200 all day. Three things fixed here:
+    - the answer is cached per URL for the whole night — the old code hit the
+      same page once per feature in recordable_urls() and again in shots_ok(),
+      and github.com throttles that exact page per IP;
+    - a miss is retried with a growing pause;
+    - HTTP 429 means "the page exists, this IP is being throttled" — the clip is
+      recorded on a GitHub runner from another IP, so 429 counts as alive."""
+    if url in _PROBED:
+        return _PROBED[url]
+    code = ""
+    for i in range(tries):
+        code = run(f'curl -s -o /dev/null -w "%{{http_code}}" -L --max-time 25 '
+                   f'-A "Mozilla/5.0 (X11; Linux x86_64) Chrome/128.0" {shlex.quote(url)}',
+                   check=False).strip()
+        if code.isdigit() and int(code) < 400:
+            _PROBED[url] = True
+            return True
+        if i < tries - 1:
+            pause = pauses[min(i, len(pauses) - 1)]
+            log(f"probe {i + 1}/{tries} of {url} -> {code or 'no answer'}; retrying in {pause}s")
+            time.sleep(pause)
+    if code == "429":
+        log(f"{url}: 429 after {tries} probes — throttled, not dead; treated as alive "
+            f"(the runner records from another IP)")
+        _PROBED[url] = True
+        return True
+    _PROBED[url] = False
+    return False
 
 
 def recordable_urls(row):
@@ -202,13 +231,13 @@ def recordable_urls(row):
 
 
 def choose(rows, voiced, live):
-    """N_NEW never-voiced features (old tier order) + N_REDO voiced-but-not-live
-    ones (unposted first, so the new style is what airs). Fills from the other
-    pool when one runs dry."""
-    def tier(style):
-        return 1 if style == "bright" else 2 if style == "dark" else 3
+    """N_NEW never-voiced features, NEWEST FIRST (owner decision 2026-09-07:
+    a feature discovered today gets its clip tonight; the old tier order
+    bright > dark > no-clip, oldest first, parked fresh features behind ~220
+    older ones) + N_REDO voiced-but-not-live ones (unposted first, so the new
+    style is what airs). Fills from the other pool when one runs dry."""
     new = sorted([r for r in rows if r[0] not in voiced and r[0] not in live],
-                 key=lambda r: (tier(r[1]), r[8], r[0]))
+                 key=lambda r: (r[8], r[0]), reverse=True)
     redo = sorted([r for r in rows if r[0] in voiced and r[0] not in live],
                   key=lambda r: (int(r[6]), r[8], r[0]))
     picks = new[:N_NEW] + redo[:N_REDO]
@@ -256,6 +285,19 @@ def composition_for(fid):
         if line.endswith(".tsx"):
             return os.path.basename(line)[:-4]
     return None
+
+
+def new_composition_name(fid, title):
+    """A feature the factory picks for the first time (newest-first order,
+    2026-09-07) has no composition yet. Name it from the title so the agent can
+    create the file and register it in Root.tsx under exactly this id."""
+    words = [w for w in re.sub(r"[^A-Za-z0-9 ]", " ", title).split()
+             if w.lower() not in {"a", "an", "the", "of", "to", "in", "on", "for",
+                                  "and", "or", "my", "now", "not", "it", "its",
+                                  "with", "from", "by", "that", "this", "is", "are",
+                                  "feature", "features"}]
+    core = "".join(w[:1].upper() + w[1:].lower() for w in words[:4]) or "Clip"
+    return f"Feature{core}{fid.upper()}"
 
 
 def draw(fid, recent):
@@ -412,12 +454,16 @@ def main():
             fid, style, title = row[0], row[1], row[2]
             redo = fid in voiced
             comp = composition_for(fid)
+            newfile = comp is None
+            if newfile:
+                comp = new_composition_name(fid, title)
+                log(f"{fid}: no composition yet -> agent will create {comp}.tsx")
             arche, mood = draw(fid, recent)
             recent.append((arche, mood))
             urls = recordable_urls(row)
             picks.append({"id": fid, "style": style, "title": title, "redo": redo,
-                          "composition": comp, "archetype": arche, "mood": mood,
-                          "urls": urls, "youtube": bool(row[7])})
+                          "composition": comp, "newfile": newfile, "archetype": arche,
+                          "mood": mood, "urls": urls, "youtube": bool(row[7])})
         if not picks:
             log("nothing left to make")
             telegram("🏭 Завод: усі фічі вже зняті в новому стилі. Черга вичерпана.")
@@ -471,6 +517,11 @@ def main():
                 f"### {p['id']} — `{p['composition']}` — durationInFrames = "
                 f"**{m['durationInFrames']}**"
                 + (" — RE-SHOOT: keep the narration, rewrite the picture" if p["redo"] else "")
+                + (" — NEW FILE: this composition does not exist yet; create "
+                   f"`src/compositions/feature-demos/{p['composition']}.tsx` with the header "
+                   f"line `{p['composition']} — feature {p['id']} — …` (the factory finds the file "
+                   "by that `feature <id>` header) and register it in `src/Root.tsx` under exactly "
+                   f"this id" if p.get("newfile") else "")
                 + f"\narchetype **{p['archetype']}**, mood **{p['mood']}**\n\n"
                 f"| beat | frames | words |\n|---|---|---|\n{rowsmd}\n\n"
                 f"Verified public pages you may record (answered 2xx/3xx tonight):\n{urlmd}")
@@ -667,6 +718,12 @@ Read `out/lux-batch-instructions.md` in full first — it is the canonical brief
 For EACH feature above, rewrite its composition file completely
 (`src/compositions/feature-demos/<Composition>.tsx`, keeping the export name),
 and set its `durationInFrames` in `src/Root.tsx` to the number given.
+A feature marked NEW FILE has no composition yet: create the file under the
+name given (export a component of that exact name, first header line
+`<Composition> — feature <id> — 1280x720, <frames> frames @ 30fps, VOICE-SYNCED.`)
+and add a `<Composition id="<Composition>" …>` entry to `src/Root.tsx` with the
+same fps/width/height as the other feature clips. The render is dispatched by
+that id, so the name must match to the letter.
 
 Use the archetype and mood given for each — they were drawn already; do not
 re-draw them and do not edit `out/lux-archetypes.md`. Wrap each tree in
