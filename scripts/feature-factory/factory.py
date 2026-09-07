@@ -433,6 +433,14 @@ def git(cmd):
     return run(f"git {cmd}", cwd=REPO, user="stuar")
 
 
+def push():
+    """origin may have moved while the agent worked (2026-09-07: a fix pushed
+    from the PC mid-run made the narration push fail with "fetch first" and
+    killed the night). Rebase our commits on top of origin first."""
+    git("pull -q --rebase origin main")
+    push()
+
+
 def main():
     if os.path.exists(LOCK):
         log("another run holds the lock — exiting")
@@ -556,7 +564,7 @@ def main():
         git('-c user.name="feature-factory" -c user.email="factory@vitalii.no" '
             'commit -q -m "feat(feature-vo): narration measured for tonight\'s batch" '
             '|| true')
-        git("push -q origin main")
+        push()
 
         # ── wave B: the pictures ─────────────────────────────────────────
         wake(WAVE_B_PROMPT.format(tables="\n\n".join(tables), marker=to_container(mark_b),
@@ -589,7 +597,7 @@ def main():
         git("add -A scripts/remotion-video/src")
         git('-c user.name="feature-factory" -c user.email="factory@vitalii.no" '
             'commit -q -m "feat(feature-demos): tonight\'s clips" || true')
-        git("push -q origin main")
+        push()
 
         # ── wave C: the agent looks at its own work ──────────────────────
         # The gap that cost three rework rounds on 2026-09-03 is that an agent
@@ -621,7 +629,7 @@ def main():
                 git("add -A scripts/remotion-video/src")
                 git('-c user.name="feature-factory" -c user.email="factory@vitalii.no" '
                     'commit -q -m "fix(feature-demos): self-review pass" || true')
-                git("push -q origin main")
+                push()
             else:
                 log("wave C timed out — publishing the clips as they stand")
 
