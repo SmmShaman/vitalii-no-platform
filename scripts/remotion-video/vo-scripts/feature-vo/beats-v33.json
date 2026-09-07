@@ -1,0 +1,7 @@
+{"id": "v33", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My feature demo clips looked close to the real product — but a redrawn screen isn't it."],
+ ["b2", "Compared side by side against a real recording, the hand-drawn version was obviously the weaker copy."],
+ ["b3", "So every interface beat plays a Playwright recording — commit history, live runs, the site itself."],
+ ["b4", "The old built-in video capture drifted one-point-one times off the clock, walking narration off the picture."],
+ ["b5", "Now it's one screenshot per frame — locked exactly to the voice, with zero drift."]
+]}

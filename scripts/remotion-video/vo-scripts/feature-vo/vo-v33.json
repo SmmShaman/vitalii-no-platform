@@ -1,0 +1,56 @@
+{
+ "id": "v33",
+ "beat_durations": {
+  "b1": 5.064,
+  "b2": 6.24,
+  "b3": 6.624,
+  "b4": 6.528,
+  "b5": 5.304
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My feature demo clips looked close to the real product \u2014 but a redrawn screen isn't it.",
+   "start_s": 0.5,
+   "end_s": 5.564,
+   "start_f": 15,
+   "end_f": 167
+  },
+  {
+   "beat": "b2",
+   "text": "Compared side by side against a real recording, the hand-drawn version was obviously the weaker copy.",
+   "start_s": 5.864,
+   "end_s": 12.104,
+   "start_f": 176,
+   "end_f": 363
+  },
+  {
+   "beat": "b3",
+   "text": "So every interface beat plays a Playwright recording \u2014 commit history, live runs, the site itself.",
+   "start_s": 12.404,
+   "end_s": 19.028,
+   "start_f": 372,
+   "end_f": 571
+  },
+  {
+   "beat": "b4",
+   "text": "The old built-in video capture drifted one-point-one times off the clock, walking narration off the picture.",
+   "start_s": 19.328,
+   "end_s": 25.856,
+   "start_f": 580,
+   "end_f": 776
+  },
+  {
+   "beat": "b5",
+   "text": "Now it's one screenshot per frame \u2014 locked exactly to the voice, with zero drift.",
+   "start_s": 26.156,
+   "end_s": 31.46,
+   "start_f": 785,
+   "end_f": 944
+  }
+ ],
+ "total_s": 32.96,
+ "durationInFrames": 989,
+ "measured_track_s": 31.512,
+ "track": "/root/feature-demos/vo-v33/vo-v33.mp3"
+}

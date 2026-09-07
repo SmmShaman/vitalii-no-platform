@@ -1,0 +1,56 @@
+{
+ "id": "v32",
+ "beat_durations": {
+  "b1": 5.712,
+  "b2": 5.472,
+  "b3": 5.448,
+  "b4": 5.856,
+  "b5": 6.024
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every button on my site felt different \u2014 some flat, some barely reacting when you pressed them.",
+   "start_s": 0.5,
+   "end_s": 6.212,
+   "start_f": 15,
+   "end_f": 186
+  },
+  {
+   "beat": "b2",
+   "text": "The home-screen tiles weren't any better \u2014 they just grew a little on hover, nothing felt physical.",
+   "start_s": 6.512,
+   "end_s": 11.984,
+   "start_f": 195,
+   "end_f": 360
+  },
+  {
+   "beat": "b3",
+   "text": "So I built one CSS recipe \u2014 an embossed shadow that makes anything look pressed.",
+   "start_s": 12.284,
+   "end_s": 17.732,
+   "start_f": 369,
+   "end_f": 532
+  },
+  {
+   "beat": "b4",
+   "text": "Now every circular button uses it, in light mode and dark, across every palette.",
+   "start_s": 18.032,
+   "end_s": 23.888,
+   "start_f": 541,
+   "end_f": 717
+  },
+  {
+   "beat": "b5",
+   "text": "The tiles got the same recipe too \u2014 one shadow language, six tiles, pressed into the page.",
+   "start_s": 24.188,
+   "end_s": 30.212,
+   "start_f": 726,
+   "end_f": 906
+  }
+ ],
+ "total_s": 31.712,
+ "durationInFrames": 951,
+ "measured_track_s": 30.264,
+ "track": "/root/feature-demos/vo-v32/vo-v32.mp3"
+}

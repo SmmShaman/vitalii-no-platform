@@ -1,0 +1,7 @@
+{"id": "v32", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every button on my site felt different — some flat, some barely reacting when you pressed them."],
+ ["b2", "The home-screen tiles weren't any better — they just grew a little on hover, nothing felt physical."],
+ ["b3", "So I built one CSS recipe — an embossed shadow that makes anything look pressed."],
+ ["b4", "Now every circular button uses it, in light mode and dark, across every palette."],
+ ["b5", "The tiles got the same recipe too — one shadow language, six tiles, pressed into the page."]
+]}
