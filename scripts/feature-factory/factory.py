@@ -438,7 +438,7 @@ def push():
     from the PC mid-run made the narration push fail with "fetch first" and
     killed the night). Rebase our commits on top of origin first."""
     git("pull -q --rebase origin main")
-    push()
+    git("push -q origin main")
 
 
 def main():
