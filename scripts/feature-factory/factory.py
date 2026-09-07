@@ -124,6 +124,27 @@ def gh_token():
     return re.sub(r"https://[^:]+:([^@]+)@github\.com", r"\1", line)
 
 
+R2_PUBLIC = "https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev"
+
+
+def r2_etag(fid):
+    """ETag of the published clip on R2, '' when there is none yet."""
+    out = run(f'curl -sI --max-time 25 {R2_PUBLIC}/features/feature-{fid}.mp4', check=False)
+    m = re.search(r"(?im)^etag:\s*(\S+)", out)
+    return m.group(1) if m else ""
+
+
+def wait_for_r2(fid, etag_before, timeout=30 * 60, every=60):
+    """True once the R2 key holds a different object than before dispatch."""
+    t0 = time.time()
+    while time.time() - t0 < timeout:
+        tag = r2_etag(fid)
+        if tag and tag != etag_before:
+            return True
+        time.sleep(every)
+    return False
+
+
 def dispatch(feature_id, composition, mode="render", upload="true"):
     body = {"ref": "main", "inputs": {"feature_id": feature_id, "mode": mode}}
     if mode == "render":
@@ -607,16 +628,39 @@ def main():
         # ── publish ──────────────────────────────────────────────────────
         sent = []
         for p in picks:
+            p["etag_before"] = r2_etag(p["id"])
             code = dispatch(p["id"], p["composition"], mode="render", upload="true")
             sent.append(f"{p['id']} ({p['composition']}) → HTTP {code}")
             log(f"dispatched {p['id']}: {code}")
             time.sleep(5)
+
+        # The dispatch above only STARTS a render; the R2 object lands ~10 min
+        # later. Before 2026-09-07 the code below downloaded the key right away,
+        # i.e. whatever was on R2 from before (the old clip, or nothing for a
+        # feature rendered for the first time). Wait for the new object, then
+        # tell the database about it — nothing else does: feature-clip.yml
+        # writes R2 only, and a feature that never had a clip stays invisible to
+        # the site and to the publisher (demo_style/demo_media_url NULL).
+        for p in picks:
+            if not wait_for_r2(p["id"], p["etag_before"]):
+                log(f"{p['id']}: R2 object did not change in time — DB not updated, not queued")
+                p["published"] = False
+                continue
+            p["published"] = True
+            psql("UPDATE features SET demo_media_url = "
+                 f"'{R2_PUBLIC}/features/feature-{p['id']}.mp4', "
+                 "demo_media_type = 'video/mp4', demo_style = 'bright', "
+                 f"updated_at = now() WHERE feature_id = '{p['id']}' "
+                 "AND (demo_style IS DISTINCT FROM 'bright' OR demo_media_url IS NULL)")
+            log(f"{p['id']}: R2 updated, features row marked bright")
 
         # Hand the clips to the YouTube runner (feature-yt-queue.timer, 09:30).
         # It is what writes youtube_video_id back, which is what puts the sound
         # button on the site and the video link in the post.
         queued = []
         for p in picks:
+            if not p.get("published"):
+                continue
             meta = f"{VO_DIR}/meta-{p['id']}.json"
             if not os.path.exists(meta):
                 log(f"{p['id']}: no meta-{p['id']}.json — not queued for YouTube")
@@ -629,8 +673,7 @@ def main():
                 continue
             try:
                 run(f"cp {meta} /root/feature-demos/yt/meta-{p['id']}.json")
-                run(f"curl -sfL https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev/"
-                    f"features/feature-{p['id']}.mp4 "
+                run(f"curl -sfL {R2_PUBLIC}/features/feature-{p['id']}.mp4 "
                     f"-o /root/feature-demos/yt/yt-feature-{p['id']}.mp4")
                 run(f"grep -qx {p['id']} /root/feature-demos/yt/queue.txt 2>/dev/null "
                     f"|| echo {p['id']} >> /root/feature-demos/yt/queue.txt")
