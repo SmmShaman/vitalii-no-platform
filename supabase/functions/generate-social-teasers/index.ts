@@ -73,7 +73,7 @@ serve(async (req) => {
 
     const { data: existingRecord, error: fetchError } = await supabase
       .from(tableName)
-      .select(teaserField)
+      .select(`${teaserField}, tags`)
       .eq('id', recordId)
       .single()
 
@@ -115,12 +115,14 @@ serve(async (req) => {
     console.log(`📝 Using prompt: ${prompt.name}`)
 
     // Generate the teaser
+    const articleTags: string[] = Array.isArray(existingRecord?.tags) ? existingRecord.tags : []
     const teaser = await generateTeaser(
       prompt.prompt_text,
       title,
       content,
       language,
-      platform
+      platform,
+      articleTags
     )
 
     console.log(`✅ Generated ${platform}_${language}: ${teaser.substring(0, 50)}...`)
@@ -191,7 +193,8 @@ async function generateTeaser(
   title: string,
   content: string,
   language: Language,
-  platform: Platform
+  platform: Platform,
+  tags: string[] = []
 ): Promise<string> {
   // Build the prompt
   const openingStyle = getRandomOpeningStyle('social')
@@ -199,6 +202,7 @@ async function generateTeaser(
     .replace(/{title}/g, title)
     .replace(/{content}/g, content.substring(0, 3000)) // Limit content for context
     .replace(/{language}/g, LANGUAGE_NAMES[language] || language)
+    .replace(/{tags}/g, tags.length ? tags.join(', ') : '(none)') // article tags → niche hashtags
     + `\n\nOPENING STYLE DIRECTIVE (ОБОВ'ЯЗКОВО ДОТРИМУЙСЯ): ${openingStyle}`
 
   console.log(`🎲 Opening style for ${platform}: ${openingStyle}`)

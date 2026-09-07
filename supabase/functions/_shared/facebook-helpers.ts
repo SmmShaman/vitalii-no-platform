@@ -321,6 +321,8 @@ export async function postToInstagram(options: {
   imageUrl?: string;
   videoUrl?: string;
   caption: string;
+  /** Accessibility + search text for image posts (Graph API `alt_text`, images only). */
+  altText?: string;
 }): Promise<InstagramPostResult> {
   const pageAccessToken = Deno.env.get("FACEBOOK_PAGE_ACCESS_TOKEN");
   const instagramAccountId = Deno.env.get("INSTAGRAM_ACCOUNT_ID");
@@ -329,7 +331,7 @@ export async function postToInstagram(options: {
     return { success: false, error: "Instagram credentials not configured" };
   }
 
-  const { imageUrl, videoUrl, caption } = options;
+  const { imageUrl, videoUrl, caption, altText } = options;
 
   if (!imageUrl && !videoUrl) {
     return { success: false, error: "Instagram requires an image or video URL" };
@@ -362,6 +364,10 @@ export async function postToInstagram(options: {
     } else {
       // For Images
       containerParams.image_url = imageUrl!;
+      // Alt text is indexed by Instagram search and read by screen readers.
+      if (altText && altText.trim()) {
+        containerParams.alt_text = altText.trim().substring(0, 1000);
+      }
     }
 
     const containerResponse = await fetch(
@@ -929,11 +935,37 @@ export async function debugInstagramToken(): Promise<TokenDebugInfo> {
   }
 }
 
-// Localized CTA for Instagram captions
-const INSTAGRAM_LINK_CTA: Record<string, string> = {
-  en: '🔗 Read on vitalii.no',
-  no: '🔗 Les på vitalii.no',
-  ua: '🔗 Читати на vitalii.no'
+// Localized CTA for Instagram captions (links are not clickable there, so point to the bio)
+export const INSTAGRAM_LINK_CTA: Record<string, string> = {
+  en: '🔗 Full story on vitalii.no — link in bio',
+  no: '🔗 Hele saken på vitalii.no — lenke i bio',
+  ua: '🔗 Повна стаття на vitalii.no — посилання в біо'
+}
+
+/**
+ * Assemble an Instagram caption from an AI teaser so that the hashtag block stays LAST.
+ * The teaser ends with its hashtags; the CTA and the source line must sit between the
+ * body and the hashtags, otherwise they get buried under the tag wall.
+ */
+export function assembleInstagramCaption(
+  teaser: string,
+  language: 'en' | 'no' | 'ua' = 'en',
+  sourceLine?: string | null
+): string {
+  const lines = teaser.trim().split('\n')
+  const tagLines: string[] = []
+  while (lines.length) {
+    const l = lines[lines.length - 1].trim()
+    if (l === '' || /^(#[\p{L}\p{N}_]+\s*)+$/u.test(l)) {
+      if (l) tagLines.unshift(l)
+      lines.pop()
+    } else break
+  }
+  const body = lines.join('\n').trim()
+  const cta = INSTAGRAM_LINK_CTA[language] || INSTAGRAM_LINK_CTA.en
+  const tail = [cta, sourceLine?.trim()].filter(Boolean).join('\n')
+  const tags = tagLines.join(' ')
+  return `${body}\n\n${tail}${tags ? `\n\n${tags}` : ''}`.substring(0, 2200)
 }
 
 /**

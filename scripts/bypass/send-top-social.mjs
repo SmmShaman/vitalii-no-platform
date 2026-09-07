@@ -35,10 +35,11 @@ async function postFacebook(message, imageUrl) {
   return `https://www.facebook.com/${data.id || data.post_id || ''}`
 }
 
-async function postInstagram(caption, imageUrl) {
+async function postInstagram(caption, imageUrl, altText) {
   if (!FB_TOKEN || !IG_ACCOUNT_ID) throw new Error('Instagram credentials not configured')
   if (!imageUrl) throw new Error('Instagram requires an image')
   const createForm = new URLSearchParams({ image_url: imageUrl, caption: caption.substring(0, 2200), access_token: FB_TOKEN })
+  if (altText) createForm.set('alt_text', String(altText).substring(0, 1000))
   const createRes = await fetch(`https://graph.facebook.com/v18.0/${IG_ACCOUNT_ID}/media`, { method: 'POST', body: createForm })
   const createData = await createRes.json()
   if (!createRes.ok || createData.error) throw new Error(createData.error?.message || `IG create ${createRes.status}`)
@@ -137,7 +138,7 @@ async function main() {
 
       let postUrl
       if (platform === 'facebook') postUrl = await postFacebook(teaser, imageUrl)
-      else if (platform === 'instagram') postUrl = await postInstagram(teaser, imageUrl)
+      else if (platform === 'instagram') postUrl = await postInstagram(teaser, imageUrl, article.title_en)
       else if (platform === 'linkedin') postUrl = await postLinkedIn(teaser)
 
       await dbQuery(`

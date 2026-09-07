@@ -5,7 +5,8 @@ import {
   postToInstagram,
   formatInstagramCaption,
   isInstagramConfigured,
-  debugInstagramToken
+  debugInstagramToken,
+  assembleInstagramCaption
 } from '../_shared/facebook-helpers.ts'
 import {
   getContent,
@@ -389,10 +390,12 @@ serve(async (req) => {
     // Use AI teaser if available, otherwise fallback to basic format
     let caption: string
     if (teaser) {
-      // Instagram: no clickable links, so just show source domain
+      // Instagram: no clickable links → CTA points to the bio; source domain only when external.
+      // Hashtags are moved to the very end by assembleInstagramCaption.
       const sourceLabel = SOURCE_LABEL[requestData.language] || SOURCE_LABEL.en
-      const sourceDomain = extractDomain(content.sourceLink) || 'vitalii.no'
-      caption = `${teaser}\n\n${sourceLabel}: ${sourceDomain}`.substring(0, 2200)
+      const sourceDomain = extractDomain(content.sourceLink)
+      const sourceLine = sourceDomain && sourceDomain !== 'vitalii.no' ? `${sourceLabel}: ${sourceDomain}` : null
+      caption = assembleInstagramCaption(teaser, requestData.language, sourceLine)
       console.log('📝 Using AI-generated teaser for Instagram caption')
     } else {
       caption = formatInstagramCaption(
@@ -457,7 +460,8 @@ serve(async (req) => {
     const result = await postToInstagram({
       imageUrl: hasImage && !hasVideo ? content.imageUrl : undefined,
       videoUrl: hasVideo ? videoUrlForInstagram : undefined,
-      caption
+      caption,
+      altText: content.title
     })
 
     if (result.success && result.mediaId) {
