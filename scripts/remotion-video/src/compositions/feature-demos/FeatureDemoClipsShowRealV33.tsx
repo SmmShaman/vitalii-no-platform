@@ -46,7 +46,7 @@ const RIGHT_WIN: Win = { x: 680, y: 170, w: 560, h: 380 };
 const SRC1: Win = { x: 36, y: 78, w: 300, h: 172 };
 const SRC2: Win = { x: 36, y: 264, w: 300, h: 172 };
 const SRC3: Win = { x: 36, y: 450, w: 300, h: 172 };
-const PAGE_WIN: Win = { x: 150, y: 196, w: 980, h: 450 };
+const PAGE_WIN: Win = { x: 150, y: 196, w: 980, h: 420 };
 
 /** The hero number, top-left, leaving the centre of the frame to the product. */
 const hero = (value: string, unit: string | undefined, label: string, color: string, scale: number) => (
