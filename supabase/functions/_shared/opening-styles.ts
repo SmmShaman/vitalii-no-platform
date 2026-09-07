@@ -39,17 +39,20 @@ const BLOG_OPENING_STRATEGIES = [
   'Start with a before-and-after comparison showing how things have shifted',
 ]
 
-/** Scroll-stopping hooks for social media teasers */
+/** Scroll-stopping hooks for social media teasers.
+ *  No first-person anecdotes here: the model invents them as the owner's biography
+ *  ("I tried to roll out an AI tool at my startup…" on 2026-09-07), and no "breaking"
+ *  framing for reposts. */
 const SOCIAL_OPENING_STRATEGIES = [
   'Start with a striking statistic or number that shocks',
   'Start with a bold controversial statement that invites debate',
   'Start with a "what if" scenario that makes people imagine',
   'Start with a contrasting pair: "While X happened, Y is doing the opposite"',
-  'Start with an urgent "breaking" or "just announced" framing',
+  'Start with the named company, product or person and the single most concrete fact about it',
   'Start with a myth-busting opener: "Everyone thinks X, but actually..."',
   'Start with a future prediction: "In 2 years, this will..."',
-  'Start with a personal success or failure story related to the topic',
-  'Start with a challenge to the reader: "Can you guess..." or "Try this..."',
+  'Start with the number that matters most, then say who it affects',
+  'Start with the consequence for the reader\'s industry, stated in one plain sentence',
   'Start with a "most people don\'t know" insider knowledge angle',
   'Start with an emotional consequence — how this affects real people',
   'Start with a minimalist one-liner that creates a dramatic pause before the next paragraph',

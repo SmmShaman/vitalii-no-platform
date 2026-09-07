@@ -149,7 +149,7 @@ export async function postToFacebookPage(options: {
       // Post with photo
       endpoint = `${GRAPH_API_BASE}/${pageId}/photos`;
       formData.append("url", imageUrl);
-      if (link) {
+      if (link && !message.includes(link)) {
         // Add link to message since photos don't support link parameter
         formData.set("message", `${message}\n\n${link}`);
       }
@@ -973,6 +973,9 @@ export function splitTrailingHashtags(text: string): { body: string; tags: strin
       lines.pop()
     } else break
   }
+  // Drop a dangling emoji-only line left behind when the model prefixed the hashtag
+  // paragraph with an emoji (e.g. "💡" alone above the tags).
+  while (lines.length && !/[\p{L}\p{N}]/u.test(lines[lines.length - 1])) lines.pop()
   return { body: lines.join('\n').trim(), tags: tagLines.join(' ') }
 }
 
