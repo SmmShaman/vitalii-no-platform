@@ -1,0 +1,12 @@
+{
+  "id": "v33",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "hub", "url": "https://vitalii.no/features", "frames": 175, "scroll": [[0, 0], [174, 1800]], "mouse": [[0, 240, 160], [60, 600, 260], [120, 420, 320], [174, 680, 220]] },
+    { "name": "commits", "url": "https://github.com/SmmShaman/vitalii-no-platform/commits/main", "frames": 180, "scroll": [[0, 0], [179, 2200]], "mouse": [[0, 380, 140], [60, 380, 300], [120, 380, 180], [179, 380, 260]] },
+    { "name": "actions", "url": "https://github.com/SmmShaman/vitalii-no-platform/actions", "frames": 180, "scroll": [[0, 0], [179, 300]], "mouse": [[0, 300, 200], [90, 560, 240], [179, 420, 280]] },
+    { "name": "page-mini", "url": "https://vitalii.no/features/feature-demo-clips-now-show-the-real-product-not-a-redrawn-copy-of-it-v33", "frames": 180, "scroll": [[0, 0], [179, 900]], "mouse": [[0, 500, 180], [179, 500, 320]] },
+    { "name": "page", "url": "https://vitalii.no/features/feature-demo-clips-now-show-the-real-product-not-a-redrawn-copy-of-it-v33", "frames": 190, "scroll": [[0, 0], [189, 1100]], "mouse": [[0, 540, 200], [95, 560, 340], [189, 540, 260]] }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "id": "v32",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "hub", "url": "https://vitalii.no/features", "frames": 180, "scroll": [[0, 0], [179, 500]], "mouse": [[0, 1060, 40], [60, 1060, 40], [120, 600, 300], [179, 300, 320]] }
+  ]
+}

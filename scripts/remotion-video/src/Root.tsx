@@ -149,6 +149,8 @@ import { FeatureMultiRepoScanner } from "./compositions/feature-demos/FeatureMul
 import { FeatureLocalClockScheduling } from "./compositions/feature-demos/FeatureLocalClockScheduling";
 import { FeatureTraceabilityScanner } from "./compositions/feature-demos/FeatureTraceabilityScanner";
 import { FeatureTraceabilityScannerLive } from "./compositions/feature-demos/FeatureTraceabilityScannerLive";
+import { FeatureDemoClipsShowRealV33 } from "./compositions/feature-demos/FeatureDemoClipsShowRealV33";
+import { FeatureButtonsTilesPressIntoV32 } from "./compositions/feature-demos/FeatureButtonsTilesPressIntoV32";
 import { FeatureAiFeaturePosts } from "./compositions/feature-demos/FeatureAiFeaturePosts";
 import { FeatureMultiRepoSync } from "./compositions/feature-demos/FeatureMultiRepoSync";
 import { FeatureTelegramVideoStealth } from "./compositions/feature-demos/FeatureTelegramVideoStealth";
@@ -1457,6 +1459,25 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureTraceabilityScannerLive"
         component={FeatureTraceabilityScannerLive}
         durationInFrames={891}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      {/* v33 / v32 (2026-09-07): first features rendered by the factory from scratch, live UI. */}
+      <Composition
+        id="FeatureDemoClipsShowRealV33"
+        component={FeatureDemoClipsShowRealV33}
+        durationInFrames={989}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureButtonsTilesPressIntoV32"
+        component={FeatureButtonsTilesPressIntoV32}
+        durationInFrames={951}
         fps={30}
         width={1280}
         height={720}
