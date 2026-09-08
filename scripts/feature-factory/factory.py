@@ -33,7 +33,7 @@ N_NEW features that have never been voiced (new material for the publisher)
 plus N_REDO already-voiced ones re-shot in the new style — the narration is
 kept, only the picture is rewritten.
 """
-import json, os, random, re, shlex, sqlite3, subprocess, sys, time
+import glob, json, os, random, re, shlex, sqlite3, subprocess, sys, time
 from datetime import datetime, timezone
 
 REPO = "/home/stuar/Projects/vitalii_claude-code-in-browser"
@@ -361,6 +361,64 @@ def wake(prompt, tag):
     return tid
 
 
+AGENT_DIR = INBOUND.split("/sess-")[0]
+OUTBOUND = INBOUND.replace("inbound.db", "outbound.db")
+TAIL_MAX_MB = 0.25
+
+
+def conversation_tail_mb():
+    """Bytes piled up in the agent's transcript since its last compaction —
+    the number that decides whether the next wake can even open the
+    conversation (see publish-watchdog.py). Returns (path, mb)."""
+    files = glob.glob(f"{AGENT_DIR}/.claude-shared/projects/-workspace-agent/*.jsonl")
+    if not files:
+        return None, 0.0
+    f = max(files, key=os.path.getsize)
+    sizes, last = [], -1
+    with open(f, "rb") as fh:
+        for i, line in enumerate(fh):
+            sizes.append(len(line))
+            if b"compact_boundary" in line:
+                last = i
+    return f, sum(sizes[last + 1:]) / 1048576
+
+
+def fresh_session(what):
+    """Rotate the agent's conversation before a wave when the tail is big.
+    2026-09-07 23:16 UTC: wave B died with 'Prompt is too long' at a 0.41 MB
+    tail (the watchdog only warns at 0.55) after reading just 78 KB; the same
+    brief had gone through fine the afternoon before on a freshly rotated
+    conversation. Procedure = the one from the 2026-09-06 handoff: move the
+    transcript aside, drop the session pointers, ping — the first wake clears
+    the stale pointer, and the agent answers from a clean conversation."""
+    f, mb = conversation_tail_mb()
+    log(f"agent tail before {what}: {mb:.2f} MB")
+    if f is None or mb <= TAIL_MAX_MB:
+        return True
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
+    dest = f"{AGENT_DIR}/.claude-shared/projects/{os.path.basename(f)[:-6]}-ROTATED-{stamp}.jsonl.bak"
+    os.rename(f, dest)
+    for sj in glob.glob(f"{AGENT_DIR}/.claude-shared/sessions/*.json"):
+        os.remove(sj)
+    c = sqlite3.connect(OUTBOUND)
+    before = c.execute("select coalesce(max(rowid),0) from messages_out").fetchone()[0]
+    c.close()
+    log(f"rotated conversation ({mb:.2f} MB tail) -> {os.path.basename(dest)}; pinging")
+    wake("Reply with the single word OK. Do nothing else.", "ping")
+    deadline = time.time() + 10 * 60
+    while time.time() < deadline:
+        c = sqlite3.connect(OUTBOUND)
+        row = c.execute("select content from messages_out where rowid > ? "
+                        "order by rowid desc limit 1", (before,)).fetchone()
+        c.close()
+        if row and "OK" in row[0]:
+            log("agent answered from a fresh conversation")
+            return True
+        time.sleep(15)
+    log("agent did not answer the ping in 10 min — continuing anyway")
+    return False
+
+
 API = "https://api.github.com/repos/SmmShaman/vitalii-no-platform/actions"
 
 
@@ -512,8 +570,12 @@ def main():
         mark_b = f"{MARKER_DIR}/waveB-{stamp}.done"
 
         # ── wave A: the narration (new features only; a re-shoot keeps its voice)
-        fresh = [p for p in picks if not p["redo"]]
+        # A feature whose beats already sit in git (a run killed after wave A)
+        # keeps them — narration is not rewritten, only the picture is missing.
+        fresh = [p for p in picks if not p["redo"]
+                 and not os.path.exists(f"{VO_DIR}/beats-{p['id']}.json")]
         if fresh:
+            fresh_session("wave A")
             lines = "\n".join(
                 f"- **{p['id']}** — {p['title']}" for p in fresh)
             wake(WAVE_A_PROMPT.format(features=lines, marker=to_container(mark_a),
@@ -532,11 +594,12 @@ def main():
                 log(f"{p['id']}: no beats file — dropping from tonight's batch")
                 continue
             vo_path = f"{VO_DIR}/vo-{p['id']}.json"
-            if p["redo"] and os.path.exists(vo_path):
+            if os.path.exists(vo_path):
                 # The picture is rewritten against the SAME windows the runner
                 # will verify the rebuilt voice against — never re-measure here.
+                # (Also true for a new feature whose beats survived a killed run.)
                 m = json.load(open(vo_path))
-                log(f"{p['id']}: re-shoot, keeping the committed measurement")
+                log(f"{p['id']}: keeping the committed measurement")
             else:
                 out = run(f"cd {RVID} && VO_OUT_ROOT=/root/feature-demos python3 "
                           f"vo-scripts/vo-beats.py {beats}")
@@ -572,6 +635,7 @@ def main():
         push()
 
         # ── wave B: the pictures ─────────────────────────────────────────
+        fresh_session("wave B")
         wake(WAVE_B_PROMPT.format(tables="\n\n".join(tables), marker=to_container(mark_b),
                                   rvid=CONTAINER_RVID,
                                   ids=", ".join(p["id"] for p in picks)), "wb")
@@ -628,6 +692,7 @@ def main():
                 f"mood {p['mood']}) — your frames: `{to_container(sheet)}`"
                 for p, sheet in sheets)
             mark_c = f"{MARKER_DIR}/waveC-{stamp}.done"
+            fresh_session("wave C")
             wake(WAVE_C_PROMPT.format(listing=listing, marker=to_container(mark_c),
                                       rvid=CONTAINER_RVID), "wc")
             if wait_for(mark_c, WAVE_B_TIMEOUT, "wave C"):
