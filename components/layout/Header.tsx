@@ -120,13 +120,25 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
   // tile's own neon colour. The liquid fill is switched off; the amber text stays
   // as the resting state and fades out while a tile is hovered.
   // The last hovered tile is kept so the falling grains keep their word and colour.
+  // Leaving is debounced: the grid re-lays itself out under the cursor while a
+  // tile is hovered, which makes hoveredSection blink null for a frame or two,
+  // and every blink would otherwise restart the dust cloud.
   const [sandSection, setSandSection] = useState<string>('about');
+  const [sandActive, setSandActive] = useState(false);
   useEffect(() => {
-    if (hoveredSection) setSandSection(hoveredSection);
+    if (hoveredSection) {
+      setSandSection(hoveredSection);
+      setSandActive(true);
+      return;
+    }
+    const id = setTimeout(() => setSandActive(false), 160);
+    return () => clearTimeout(id);
   }, [hoveredSection]);
-  const sandActive = !!hoveredSection;
   const sandText = t(`${sandSection}_title` as any) as string;
-  const sandColor = sectionNeonColors[sandSection]?.primary ?? heroContrastColors[sandSection] ?? '#AF601A';
+  // Features' pastel pink is unreadable on the light header; owner asked for a darker one (2026-09-08).
+  const sandColor = sandSection === 'features'
+    ? '#D63384'
+    : sectionNeonColors[sandSection]?.primary ?? heroContrastColors[sandSection] ?? '#AF601A';
   const isActive = !!(debouncedSection && !isTransitioning) && !sandActive;
 
   const languages: Language[] = ['NO', 'EN', 'UA'];
@@ -260,7 +272,11 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
             />
             <div
               className="space-y-1"
-              style={{ opacity: sandActive ? 0 : 1, transition: 'opacity 250ms ease-out' }}
+              style={{
+                opacity: sandActive ? 0 : 1,
+                // Out fast (the dust takes over), back in late (after the dust has drifted home).
+                transition: sandActive ? 'opacity 180ms ease-out' : 'opacity 450ms ease-in 350ms',
+              }}
             >
               {/* First line: Name + Subtitle */}
               <div className="flex items-baseline gap-2">
