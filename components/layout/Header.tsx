@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Globe, Search, Pause, Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useTranslations, type Language } from '@/contexts/TranslationContext';
-import { heroContrastColors } from '@/components/sections/BentoGrid';
+import { heroContrastColors, sectionNeonColors } from '@/components/sections/BentoGrid';
 import { HeroTextAnimation } from '@/components/ui/HeroTextAnimation';
 import { ParticleText } from '@/components/ui/ParticleText';
 import { useIsMobile } from '@/hooks/useIsMobile';
@@ -115,8 +115,18 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
   };
 
   const fillColor = getContrastColor();
-  // Prototype (2026-09-08): the About tile drives the sand-text canvas instead of the liquid fill.
-  const sandActive = hoveredSection === 'about';
+
+  // Sand text (2026-09-08): every tile lifts its own title out of the mound, in the
+  // tile's own neon colour. The liquid fill is switched off; the amber text stays
+  // as the resting state and fades out while a tile is hovered.
+  // The last hovered tile is kept so the falling grains keep their word and colour.
+  const [sandSection, setSandSection] = useState<string>('about');
+  useEffect(() => {
+    if (hoveredSection) setSandSection(hoveredSection);
+  }, [hoveredSection]);
+  const sandActive = !!hoveredSection;
+  const sandText = t(`${sandSection}_title` as any) as string;
+  const sandColor = sectionNeonColors[sandSection]?.primary ?? heroContrastColors[sandSection] ?? '#AF601A';
   const isActive = !!(debouncedSection && !isTransitioning) && !sandActive;
 
   const languages: Language[] = ['NO', 'EN', 'UA'];
@@ -243,8 +253,8 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
             // Full version for normal state
             <div className="relative">
             <ParticleText
-              text={t('about') as string}
-              color={heroContrastColors.about}
+              text={sandText}
+              color={sandColor}
               isActive={sandActive}
               grain={2}
             />

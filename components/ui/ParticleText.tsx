@@ -280,12 +280,14 @@ export const ParticleText = ({
     };
   }, [text, fontWeight, grain]);
 
+  // Re-stamp the lift-off clock when the word changes while active, so a new
+  // title still rises bottom-row-first instead of all at once.
   useEffect(() => {
     activeRef.current = isActive;
     if (isActive) activatedAtRef.current = performance.now();
     const canvas = canvasRef.current as (HTMLCanvasElement & { __kick?: () => void }) | null;
     canvas?.__kick?.();
-  }, [isActive]);
+  }, [isActive, text]);
 
   return (
     <canvas
