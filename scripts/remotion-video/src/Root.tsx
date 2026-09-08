@@ -171,6 +171,8 @@ import { FeatureGeminiPreScreen } from "./compositions/feature-demos/FeatureGemi
 import { FeatureOpenrouterImageBudget } from "./compositions/feature-demos/FeatureOpenrouterImageBudget";
 import { FeatureTelegramCreditStrip } from "./compositions/feature-demos/FeatureTelegramCreditStrip";
 import { FeaturePortfolioAutoDeploy } from "./compositions/feature-demos/FeaturePortfolioAutoDeploy";
+import { FeatureLinkedinPostingsGetGradedJ74 } from "./compositions/feature-demos/FeatureLinkedinPostingsGetGradedJ74";
+import { FeatureUnmaskingLinkedinSHiddenJ73 } from "./compositions/feature-demos/FeatureUnmaskingLinkedinSHiddenJ73";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -1658,6 +1660,25 @@ export const RemotionRoot: React.FC = () => {
         id="FeaturePortfolioAutoDeploy"
         component={FeaturePortfolioAutoDeploy}
         durationInFrames={450}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      {/* Wave B (2026-09-08): voice-synced, real UI recordings inside. */}
+      <Composition
+        id="FeatureLinkedinPostingsGetGradedJ74"
+        component={FeatureLinkedinPostingsGetGradedJ74}
+        durationInFrames={1159}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureUnmaskingLinkedinSHiddenJ73"
+        component={FeatureUnmaskingLinkedinSHiddenJ73}
+        durationInFrames={1086}
         fps={30}
         width={1280}
         height={720}

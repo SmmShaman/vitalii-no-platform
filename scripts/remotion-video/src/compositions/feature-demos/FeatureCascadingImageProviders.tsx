@@ -2,6 +2,10 @@
  * FeatureCascadingImageProviders — feature p24 — 1280x720, 954 frames @ 30fps.
  * VOICE-SYNCED clip (2026-09-05 rewrite) — narration beats and frame windows
  * are fixed by the committed voiceover measurement; do not shift them.
+ * RE-SHOOT (2026-09-08): the picture only — beats 1, 3, 4, 5 now play real
+ * recordings of vitalii.no and the vitalii-no-platform repo (shots/p24.json)
+ * inside the stage; beat 2 stays drawn (it's an analogy, no real screen for
+ * "a coin toss on every call").
  *
  * Archetype 6 — "sidebar narrative": a fixed 320px-wide left column runs the
  * full height for the whole clip, holding a running stat that updates per
@@ -22,7 +26,9 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
 import { MOODS, PaletteProvider } from "./bright-theme";
-import { LightBg, Group, BrowserWindow, FlowArrow, CheckBadge, seg, fontFamily } from "./bright-primitives";
+import { LightBg, Group, FlowArrow, FilterChip, CheckBadge, seg, fontFamily } from "./bright-primitives";
+import { LiveWindow, Win } from "./live-primitives";
+import shots from "./shots/p24.json";
 
 const P = MOODS.violet;
 
@@ -30,22 +36,14 @@ const SIDEBAR_W = 320;
 const STAGE_L = 372;
 const STAGE_W = 848; // 372 .. 1220
 
+const WIN: Win = { x: STAGE_L, y: 112, w: STAGE_W, h: 444 };
+
 // Light-on-dark accents for the sidebar (P.* tones are tuned for light cards).
 const SIDE_DANGER = "#FF8FA6";
 const SIDE_ACCENT = "#C9BBFA";
 const SIDE_AMBER = "#FFCB6B";
 const SIDE_SUCCESS = "#7FE8B4";
 const SIDE_MUTED = "rgba(255,255,255,0.56)";
-
-type Attempt = { title: string; outcome: "success" | "fail"; reason: string };
-const ATTEMPTS: Attempt[] = [
-  { title: "Product launch cover", outcome: "success", reason: "Generated" },
-  { title: "Funding round teaser", outcome: "fail", reason: "Blank frame" },
-  { title: "Weekly market recap", outcome: "success", reason: "Generated" },
-  { title: "Startup office feature", outcome: "success", reason: "Generated" },
-];
-
-const PROVIDERS5 = ["Provider A", "Provider B", "Provider C", "Provider D", "Provider E"];
 
 /** Sidebar hero stat block — fixed column, content swaps per beat. */
 const SideStat: React.FC<{ big: string; color: string; label: string; sub: string; opacity: number }> = ({
@@ -92,42 +90,26 @@ export const FeatureCascadingImageProviders: React.FC = () => {
   const b4 = seg(frame, 668, 684) * (1 - seg(frame, 815, 831));
   const b5 = seg(frame, 824, 840); // no fade-out — stays full through 954
 
-  // ── Beat 2: single-provider flicker (analogy) ─────────────────────
+  // ── Beat 2: single-provider flicker (analogy, stays fully drawn) ────
   const flickerOn = Math.floor(Math.max(0, frame - 263) / 20) % 2 === 0;
   const flickerIcon = flickerOn ? "✓" : "✕";
   const flickerColor = flickerOn ? SIDE_SUCCESS : SIDE_DANGER;
 
-  // ── Beat 3: five-lane race ─────────────────────────────────────────
-  const raceSlide = seg(frame, 479, 511, Easing.out(Easing.cubic)); // slide-up (non-crossfade transition)
-  const laneFill = (i: number) => {
-    // Provider C (idx 2) wins fastest; others keep climbing then get cut.
-    const speed = [0.62, 0.78, 1.05, 0.7, 0.5][i];
-    const raw = interpolate(frame, [500, 600], [0, 100 * speed], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: Easing.out(Easing.cubic),
-    });
-    return Math.min(100, raw);
-  };
-  const raceWon = frame >= 566;
-  const techOp = seg(frame, 486, 502, Easing.out(Easing.cubic));
+  // ── Beat 3: real commit, slide-up (non-crossfade transition) ────────
+  const raceSlide = seg(frame, 479, 511, Easing.out(Easing.cubic));
+  const chipPop = pop(524);
 
-  // ── Beat 4: fallback chain ──────────────────────────────────────────
-  const countdown = Math.max(0, Math.round(interpolate(frame, [668, 730], [40, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })));
-  const timeoutHit = frame >= 730;
-  const cardB_check = seg(frame, 742, 754);
-  const cardB_fail = frame >= 760;
-  const arr1 = seg(frame, 726, 744, Easing.inOut(Easing.cubic));
-  const arr2 = seg(frame, 762, 780, Easing.inOut(Easing.cubic));
-  const successPop = pop(782);
+  // ── Beat 4: fallback chain — three status chips over the real Actions run
+  const chipA = pop(692);
+  const chipB = pop(716);
+  const chipC = pop(740);
 
   // ── Beat 5: the payoff ───────────────────────────────────────────────
   const pctNow = Math.round(
     interpolate(frame, [824, 892], [75, 98], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) }),
   );
-  const heroScale = pop(824);
-  const check5 = pop(860);
-  const chipOp = seg(frame, 834, 850);
+  const badgePop = pop(860);
+  const resultChip = seg(frame, 834, 850);
 
   // ── Sidebar hero swap (mirrors beat windows exactly) ─────────────────
   const sideOp1 = b1;
@@ -135,6 +117,42 @@ export const FeatureCascadingImageProviders: React.FC = () => {
   const sideOp3 = b3;
   const sideOp4 = b4;
   const sideOp5 = b5;
+
+  const stageHeadline = (text: string, opacity: number) => (
+    <div
+      style={{
+        position: "absolute",
+        left: STAGE_L - 12,
+        top: 46,
+        width: STAGE_W + 24,
+        textAlign: "center",
+        fontSize: 29,
+        fontWeight: 800,
+        color: P.ink,
+        opacity,
+      }}
+    >
+      {text}
+    </div>
+  );
+
+  const stageCaption = (text: string, color: string, opacity: number) => (
+    <div
+      style={{
+        position: "absolute",
+        left: STAGE_L - 12,
+        top: 578,
+        width: STAGE_W + 24,
+        textAlign: "center",
+        fontSize: 21,
+        fontWeight: 650,
+        color,
+        opacity,
+      }}
+    >
+      {text}
+    </div>
+  );
 
   return (
     <PaletteProvider value={P}>
@@ -169,65 +187,22 @@ export const FeatureCascadingImageProviders: React.FC = () => {
           </div>
         </div>
 
-        {/* ════ Beat 1 — the problem: one provider, a live feed ════ */}
-        <Group opacity={b1}>
-          <div style={{ position: "absolute", left: STAGE_L - 12, top: 46, width: STAGE_W + 24, textAlign: "center", fontSize: 29, fontWeight: 800, color: P.ink, opacity: seg(frame, 24, 42) }}>
-            One provider meant playing the odds
-          </div>
-          <BrowserWindow x={STAGE_L} y={112} w={STAGE_W} h={444} title="image generator — single provider" opacity={Math.min(1, pop(24))}>
-            {ATTEMPTS.map((a, i) => {
-              const t = seg(frame, 40 + i * 28, 40 + i * 28 + 16);
-              const fail = a.outcome === "fail";
-              return (
-                <div
-                  key={a.title}
-                  style={{
-                    position: "absolute",
-                    left: 24,
-                    top: 18 + i * 100,
-                    width: STAGE_W - 48,
-                    height: 86,
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 18,
-                    padding: "0 22px",
-                    borderRadius: 14,
-                    background: fail ? P.dangerBg : P.successBg,
-                    border: `1.5px solid ${fail ? P.dangerEdge : P.successEdge}`,
-                    opacity: t,
-                    transform: `translateX(${(1 - t) * 28}px)`,
-                  }}
-                >
-                  <div style={{ fontSize: 32 }}>{fail ? "🚫" : "🖼"}</div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: P.ink }}>{a.title}</div>
-                    <div style={{ fontSize: 14.5, fontWeight: 650, color: fail ? P.danger : P.success, marginTop: 4 }}>
-                      {fail ? "✕ " : "✓ "}
-                      {a.reason}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </BrowserWindow>
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L - 12,
-              top: 578,
-              width: STAGE_W + 24,
-              textAlign: "center",
-              fontSize: 21,
-              fontWeight: 650,
-              color: P.danger,
-              opacity: seg(frame, 176, 196),
-            }}
-          >
-            Every fourth image needed a manual redo
-          </div>
-        </Group>
+        {/* ════ Beat 1 — the problem: real hub, a quarter of images broken ════ */}
+        <Group opacity={b1}>{stageHeadline("One provider meant playing the odds", seg(frame, 24, 42))}</Group>
+        <LiveWindow
+          file={shots}
+          shot="hub"
+          title="vitalii.no/features — 250 shipped"
+          from={15}
+          hold={255}
+          zoom={(t) => 1 + 0.12 * t}
+          focus={{ x: 0.5, y: 0.4 }}
+          opacity={b1}
+          win={WIN}
+        />
+        <Group opacity={b1}>{stageCaption("Every fourth image needed a manual redo", P.danger, seg(frame, 176, 196))}</Group>
 
-        {/* ════ Beat 2 — analogy: single point of failure ════ */}
+        {/* ════ Beat 2 — analogy: single point of failure (stays fully drawn) ════ */}
         <Group opacity={b2}>
           <div style={{ position: "absolute", left: STAGE_L - 12, top: 46, width: STAGE_W + 24, textAlign: "center", fontSize: 29, fontWeight: 800, color: P.ink, opacity: seg(frame, 272, 290) }}>
             One provider. Every request. No backup.
@@ -329,257 +304,86 @@ export const FeatureCascadingImageProviders: React.FC = () => {
           </div>
         </Group>
 
-        {/* ════ Beat 3 — solution: Edge Function races five providers ════ */}
+        {/* ════ Beat 3 — solution: the real commit, Edge Function races five providers ════ */}
         <Group opacity={b3} dy={(1 - raceSlide) * 26}>
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L - 12,
-              top: 44,
-              width: STAGE_W + 24,
-              textAlign: "center",
-              opacity: techOp,
-            }}
-          >
-            <span
-              style={{
-                display: "inline-block",
-                padding: "9px 22px",
-                borderRadius: 999,
-                background: P.accentBg,
-                border: `1.5px solid ${P.accentEdge}`,
-                fontSize: 18,
-                fontWeight: 800,
-                color: P.accent,
-                letterSpacing: 0.6,
-              }}
-            >
-              ⚡ EDGE FUNCTION — image race
-            </span>
-          </div>
-
-          {PROVIDERS5.map((label, i) => {
-            const fill = laneFill(i);
-            const isWinner = i === 2;
-            const cut = raceWon && !isWinner;
-            const y = 132 + i * 78;
-            const rowOp = Math.min(1, pop(479 + i * 6));
-            return (
-              <div key={label} style={{ position: "absolute", left: STAGE_L, top: y, width: STAGE_W, display: "flex", alignItems: "center", gap: 18, opacity: rowOp }}>
-                <div style={{ width: 148, fontSize: 17.5, fontWeight: 700, color: P.ink }}>{label}</div>
-                <div style={{ flex: 1, height: 22, borderRadius: 11, background: P.chipBg, border: `1.5px solid ${P.border}`, overflow: "hidden" }}>
-                  <div
-                    style={{
-                      width: `${fill}%`,
-                      height: "100%",
-                      borderRadius: 11,
-                      background: isWinner ? P.success : cut ? P.dangerEdge : P.accent,
-                      opacity: cut ? 0.55 : 1,
-                    }}
-                  />
-                </div>
-                <div style={{ width: 44, textAlign: "center", fontSize: 24 }}>
-                  {isWinner && raceWon ? "✓" : cut ? "✕" : ""}
-                </div>
-              </div>
-            );
-          })}
-
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L - 12,
-              top: 570,
-              width: STAGE_W + 24,
-              textAlign: "center",
-              fontSize: 21,
-              fontWeight: 650,
-              color: P.success,
-              opacity: seg(frame, 566, 584),
-            }}
-          >
-            Whichever finishes first wins — instantly
-          </div>
+          {stageHeadline("So an Edge Function races five providers at once", 1)}
+        </Group>
+        <LiveWindow
+          file={shots}
+          shot="diff"
+          title="github.com/SmmShaman/vitalii-no-platform — commit 5f2b6be"
+          from={479}
+          hold={200}
+          zoom={(t) => 1.06 + 0.06 * t}
+          focus={{ x: 0.5, y: 0.5 }}
+          opacity={b3}
+          win={WIN}
+        />
+        <Group opacity={b3}>
+          <FilterChip x={WIN.x + 20} y={WIN.y + WIN.h - 40} text="Edge Function · 5-provider race" icon="⚡" color={P.accent} scale={chipPop} opacity={Math.min(1, chipPop)} />
+          {stageCaption("Whichever finishes first wins — instantly", P.success, seg(frame, 566, 584))}
         </Group>
 
-        {/* ════ Beat 4 — automatic fallback chain ════ */}
+        {/* ════ Beat 4 — mechanism: the real run, automatic fallback chain ════ */}
+        <Group opacity={b4}>{stageHeadline("One stalls, the next steps in — automatically", seg(frame, 676, 694))}</Group>
+        <LiveWindow
+          file={shots}
+          shot="actions"
+          title="github.com/SmmShaman/vitalii-no-platform — Actions"
+          from={668}
+          hold={170}
+          zoom={(t) => 1 + 0.05 * t}
+          focus={{ x: 0.3, y: 0.35 }}
+          opacity={b4}
+          win={WIN}
+        />
         <Group opacity={b4}>
-          <div style={{ position: "absolute", left: STAGE_L - 12, top: 46, width: STAGE_W + 24, textAlign: "center", fontSize: 29, fontWeight: 800, color: P.ink, opacity: seg(frame, 676, 694) }}>
-            One stalls, the next steps in — automatically
+          <div style={{ position: "absolute", left: WIN.x + 20, top: WIN.y + WIN.h - 40, display: "flex", gap: 10 }}>
+            <FilterChip x={0} y={0} text="Provider A · timeout" icon="✕" color={P.danger} scale={chipA} opacity={Math.min(1, chipA)} />
+            <FilterChip x={220} y={0} text="Provider B · rejected" icon="✕" color={P.danger} scale={chipB} opacity={Math.min(1, chipB)} />
+            <FilterChip x={440} y={0} text="Provider C · delivered" icon="✓" color={P.success} scale={chipC} opacity={Math.min(1, chipC)} />
           </div>
-
-          {/* Provider A — timeout */}
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L + 6,
-              top: 190,
-              width: 240,
-              height: 340,
-              borderRadius: 20,
-              background: timeoutHit ? P.dangerBg : P.card,
-              border: `2px solid ${timeoutHit ? P.dangerEdge : P.border}`,
-              boxShadow: "0 12px 30px rgba(27,23,64,0.12)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 14,
-              opacity: Math.min(1, pop(668)),
-            }}
-          >
-            <div style={{ fontSize: 20, fontWeight: 800, color: P.ink }}>Provider A</div>
-            {!timeoutHit ? (
-              <>
-                <div style={{ fontSize: 54, fontWeight: 800, color: P.amber, fontVariantNumeric: "tabular-nums" }}>{countdown}s</div>
-                <div style={{ fontSize: 14.5, fontWeight: 650, color: P.muted }}>waiting for a response</div>
-              </>
-            ) : (
-              <>
-                <div style={{ fontSize: 54, fontWeight: 800, color: P.danger }}>✕</div>
-                <div style={{ fontSize: 14.5, fontWeight: 650, color: P.danger }}>timed out at 40s</div>
-              </>
-            )}
-          </div>
-
-          <FlowArrow x={STAGE_L + 254} y={358} len={64} progress={arr1} color={P.danger} />
-
-          {/* Provider B — fast fail */}
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L + 300,
-              top: 190,
-              width: 240,
-              height: 340,
-              borderRadius: 20,
-              background: cardB_fail ? P.dangerBg : P.card,
-              border: `2px solid ${cardB_fail ? P.dangerEdge : P.border}`,
-              boxShadow: "0 12px 30px rgba(27,23,64,0.12)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 14,
-              opacity: Math.min(1, cardB_check),
-            }}
-          >
-            <div style={{ fontSize: 20, fontWeight: 800, color: P.ink }}>Provider B</div>
-            {!cardB_fail ? (
-              <div style={{ fontSize: 15.5, fontWeight: 650, color: P.muted }}>checking response…</div>
-            ) : (
-              <>
-                <div style={{ fontSize: 54, fontWeight: 800, color: P.danger }}>✕</div>
-                <div style={{ fontSize: 14.5, fontWeight: 650, color: P.danger }}>unusable result</div>
-              </>
-            )}
-          </div>
-
-          <FlowArrow x={STAGE_L + 548} y={358} len={64} progress={arr2} color={P.success} />
-
-          {/* Provider C — success */}
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L + 594,
-              top: 190,
-              width: 240,
-              height: 340,
-              borderRadius: 20,
-              background: successPop > 0.1 ? P.successBg : P.card,
-              border: `2px solid ${successPop > 0.1 ? P.successEdge : P.border}`,
-              boxShadow: "0 12px 30px rgba(27,23,64,0.12)",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 14,
-              opacity: Math.min(1, pop(680)),
-            }}
-          >
-            <div style={{ fontSize: 20, fontWeight: 800, color: P.ink }}>Provider C</div>
-            <div style={{ transform: `scale(${Math.min(1, successPop)})` }}>
-              <CheckBadge x={0} y={0} size={56} scale={1} opacity={Math.min(1, successPop)} />
-            </div>
-            <div style={{ fontSize: 14.5, fontWeight: 650, color: P.success, opacity: Math.min(1, successPop) }}>image delivered</div>
-          </div>
-
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L - 12,
-              top: 560,
-              width: STAGE_W + 24,
-              textAlign: "center",
-              fontSize: 21,
-              fontWeight: 650,
-              color: P.muted,
-              opacity: seg(frame, 792, 810),
-            }}
-          >
-            No retry button. No one has to notice.
-          </div>
+          {stageCaption("No retry button. No one has to notice.", P.muted, seg(frame, 792, 810))}
         </Group>
 
-        {/* ════ Beat 5 — the payoff ════ */}
+        {/* ════ Beat 5 — the payoff: the real feature page ════ */}
         <Group opacity={b5}>
-          <div style={{ position: "absolute", left: STAGE_L - 12, top: 96, width: STAGE_W + 24, textAlign: "center", opacity: chipOp }}>
+          {stageHeadline("Five providers, one Edge Function, zero manual retries", 1)}
+          <CheckBadge x={WIN.x + WIN.w - 60} y={WIN.y - 20} size={40} opacity={b5} scale={badgePop} />
+        </Group>
+        <LiveWindow
+          file={shots}
+          shot="page"
+          title="vitalii.no/features/…-cascading-image-providers-p24"
+          from={824}
+          hold={135}
+          zoom={(t) => 1 + 0.08 * t}
+          focus={{ x: 0.5, y: 0.35 }}
+          opacity={b5}
+          win={WIN}
+        />
+        <Group opacity={b5}>
+          <div style={{ position: "absolute", left: WIN.x + 20, top: WIN.y + WIN.h - 40, opacity: resultChip }}>
             <span
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 14,
-                padding: "10px 24px",
+                gap: 12,
+                padding: "9px 20px",
                 borderRadius: 999,
                 background: P.card,
                 border: `1.5px solid ${P.border}`,
                 boxShadow: "0 10px 26px rgba(27,23,64,0.12)",
-                fontSize: 19,
+                fontSize: 17,
                 fontWeight: 700,
               }}
             >
               <span style={{ color: P.danger }}>75%</span>
               <span style={{ color: P.muted }}>→</span>
-              <span style={{ color: P.success }}>98%</span>
+              <span style={{ color: P.success }}>{pctNow}%</span>
             </span>
           </div>
-
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L - 12,
-              top: 216,
-              width: STAGE_W + 24,
-              textAlign: "center",
-              transform: `scale(${0.72 + Math.min(1, heroScale) * 0.28})`,
-              transformOrigin: "center",
-              opacity: Math.min(1, heroScale),
-            }}
-          >
-            <div style={{ fontSize: 198, fontWeight: 800, lineHeight: 1, color: P.success, letterSpacing: -6, fontVariantNumeric: "tabular-nums" }}>
-              {pctNow}%
-            </div>
-            <div style={{ marginTop: 10, fontSize: 24, fontWeight: 700, color: P.ink, letterSpacing: 0.5 }}>image success rate</div>
-          </div>
-
-          <div style={{ position: "absolute", left: STAGE_L - 12 + STAGE_W / 2 - 26, top: 552 }}>
-            <CheckBadge x={0} y={0} size={52} scale={check5} opacity={Math.min(1, check5)} />
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L - 12,
-              top: 618,
-              width: STAGE_W + 24,
-              textAlign: "center",
-              fontSize: 20,
-              fontWeight: 650,
-              color: P.muted,
-              opacity: seg(frame, 872, 890),
-            }}
-          >
-            Five providers, one Edge Function, zero manual retries
-          </div>
+          {stageCaption("98% of images succeed now — zero manual retries", P.success, seg(frame, 872, 890))}
         </Group>
       </div>
     </PaletteProvider>

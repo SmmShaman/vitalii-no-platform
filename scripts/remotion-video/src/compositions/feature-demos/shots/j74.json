@@ -1,0 +1,35 @@
+{
+  "id": "j74",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 260,
+      "scroll": [[0, 0], [259, 1800]],
+      "mouse": [[0, 240, 160], [70, 600, 220], [140, 380, 300], [200, 820, 180], [259, 600, 240]]
+    },
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commits/main",
+      "frames": 200,
+      "scroll": [[0, 0], [199, 2200]],
+      "mouse": [[0, 420, 140], [60, 420, 300], [120, 420, 180], [199, 420, 260]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/jobbot-norway/actions",
+      "frames": 180,
+      "scroll": [[0, 0], [179, 500]],
+      "mouse": [[0, 300, 220], [90, 560, 260], [179, 560, 300]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/linkedin-postings-get-graded-on-the-employers-own-words-language-paid-years-degr-j74",
+      "frames": 150,
+      "scroll": [[0, 0], [149, 650]],
+      "mouse": [[0, 560, 210], [149, 560, 300]]
+    }
+  ]
+}

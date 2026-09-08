@@ -1,0 +1,35 @@
+{
+  "id": "j73",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 260,
+      "scroll": [[0, 0], [259, 1600]],
+      "mouse": [[0, 260, 150], [80, 640, 210], [160, 400, 280], [259, 620, 230]]
+    },
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commits/main",
+      "frames": 185,
+      "scroll": [[0, 0], [184, 1900]],
+      "mouse": [[0, 440, 160], [90, 440, 320], [184, 440, 220]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/jobbot-norway/actions",
+      "frames": 180,
+      "scroll": [[0, 0], [179, 400]],
+      "mouse": [[0, 320, 200], [90, 560, 250], [179, 560, 300]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/unmasking-linkedins-hidden-apply-button-from-0-working-links-to-20-in-30-posting-j73",
+      "frames": 170,
+      "scroll": [[0, 0], [169, 700]],
+      "mouse": [[0, 560, 210], [169, 560, 300]]
+    }
+  ]
+}

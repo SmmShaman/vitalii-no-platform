@@ -1,0 +1,35 @@
+{
+  "id": "p24",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 255,
+      "scroll": [[0, 0], [254, 1500]],
+      "mouse": [[0, 300, 160], [70, 600, 220], [150, 420, 280], [254, 600, 240]]
+    },
+    {
+      "name": "diff",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/5f2b6be",
+      "frames": 200,
+      "scroll": [[0, 0], [199, 1900]],
+      "mouse": [[0, 400, 150], [100, 400, 300], [199, 400, 220]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/actions",
+      "frames": 170,
+      "scroll": [[0, 0], [169, 450]],
+      "mouse": [[0, 300, 200], [90, 560, 250], [169, 560, 300]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/cascading-image-providers-when-plan-a-fails-theres-always-plan-e-p24",
+      "frames": 135,
+      "scroll": [[0, 0], [134, 700]],
+      "mouse": [[0, 560, 210], [134, 560, 300]]
+    }
+  ]
+}
