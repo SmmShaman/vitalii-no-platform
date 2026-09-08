@@ -110,6 +110,17 @@ async function recordShot(browser, spec, shot, id) {
   } catch (e) {
     console.log(`[${shot.name}] networkidle not reached (${e.message.split("\n")[0]}) — continuing with what loaded`);
   }
+  if (resp && resp.status() === 429) {
+    // github.com throttles /commits/<branch> per IP without a Retry-After; one
+    // pause and one more try before failing the run (factory rule 2026-09-08).
+    console.log(`[${shot.name}] HTTP 429 — waiting 30 s and retrying once`);
+    await page.waitForTimeout(30000);
+    try {
+      resp = await page.goto(shot.url, { waitUntil: "networkidle", timeout: 90000 });
+    } catch (e) {
+      console.log(`[${shot.name}] retry: networkidle not reached (${e.message.split("\n")[0]}) — continuing with what loaded`);
+    }
+  }
   if (resp && resp.status() >= 400) throw new Error(`[${shot.name}] ${shot.url} answered HTTP ${resp.status()}`);
   await page.waitForTimeout(800);
   const hide = [...(spec.hide || []), ...(shot.hide || [])];

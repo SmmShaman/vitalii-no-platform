@@ -61,13 +61,15 @@ N_CLIPS = 3
 # down the old-style backlog. When nothing new is left, all three are re-shoots.
 N_NEW = 2
 N_REDO = 1
+REDO_MIN_RUNWAY = 8   # below this every slot goes to new material
 SHOTS_DIR = f"{RVID}/src/compositions/feature-demos/shots"
 SITE = "https://vitalii.no"
 # Circuit breaker, not a throttle. Three a night against two a day is a
 # deliberate surplus; this only stops a runaway if publishing ever halts.
 RUNWAY_CEILING = 60
 WAVE_A_TIMEOUT = 30 * 60
-WAVE_B_TIMEOUT = 75 * 60
+WAVE_B_TIMEOUT = 75 * 60            # wave C (all features in one task)
+WAVE_B_FEATURE_TIMEOUT = 45 * 60    # wave B, one feature per task
 
 ARCHETYPES = ["0 split-duel", "1 timeline", "2 zoom-in", "3 card-deck",
               "4 flow-map", "5 ledger", "6 sidebar", "7 hero-number"]
@@ -251,7 +253,7 @@ def recordable_urls(row):
     return out
 
 
-def choose(rows, voiced, live):
+def choose(rows, voiced, live, runway=None):
     """N_NEW never-voiced features, NEWEST FIRST (owner decision 2026-09-07:
     a feature discovered today gets its clip tonight; the old tier order
     bright > dark > no-clip, oldest first, parked fresh features behind ~220
@@ -261,9 +263,13 @@ def choose(rows, voiced, live):
                  key=lambda r: (r[8], r[0]), reverse=True)
     redo = sorted([r for r in rows if r[0] in voiced and r[0] not in live],
                   key=lambda r: (int(r[6]), r[8], r[0]))
-    picks = new[:N_NEW] + redo[:N_REDO]
+    # The re-shoot slot is a luxury: when the runway is short (owner, 2026-09-08)
+    # all three slots make NEW material, so the publisher never runs dry.
+    n_redo = N_REDO if runway is None or runway >= REDO_MIN_RUNWAY else 0
+    n_new = N_CLIPS - n_redo
+    picks = new[:n_new] + redo[:n_redo]
     if len(picks) < N_CLIPS:
-        extra = [r for r in new[N_NEW:] + redo[N_REDO:] if r not in picks]
+        extra = [r for r in new[n_new:] + redo[n_redo:] if r not in picks]
         picks += extra[:N_CLIPS - len(picks)]
     return picks[:N_CLIPS]
 
@@ -370,7 +376,11 @@ def wake(prompt, tag):
 
 AGENT_DIR = INBOUND.split("/sess-")[0]
 OUTBOUND = INBOUND.replace("inbound.db", "outbound.db")
-TAIL_MAX_MB = 0.25
+# 0 = rotate before EVERY wave. Measured 2026-09-08 across all agents: the
+# average gap between two compactions is 0.35-0.97 MB, so any threshold below
+# that is "always" anyway — say so instead of pretending to measure. A fresh
+# conversation costs one ping (~1 min); a dead wave costs the night.
+TAIL_MAX_MB = 0
 
 
 def conversation_tail_mb():
@@ -400,7 +410,7 @@ def fresh_session(what):
     the stale pointer, and the agent answers from a clean conversation."""
     f, mb = conversation_tail_mb()
     log(f"agent tail before {what}: {mb:.2f} MB")
-    if f is None or mb <= TAIL_MAX_MB:
+    if f is None or (TAIL_MAX_MB > 0 and mb <= TAIL_MAX_MB):
         return True
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
     dest = f"{AGENT_DIR}/.claude-shared/projects/{os.path.basename(f)[:-6]}-ROTATED-{stamp}.jsonl.bak"
@@ -581,7 +591,7 @@ def main():
         os.makedirs(SHOTS_DIR, exist_ok=True)
         live = {f[:-len(".json")] for f in os.listdir(SHOTS_DIR) if f.endswith(".json")}
         rows = [r.split("|") for r in psql(FEATURES_SQL).splitlines() if r]
-        chosen = choose(rows, voiced, live)
+        chosen = choose(rows, voiced, live, runway)
         log(f"voiced: {len(voiced)}, live: {len(live)}, published: {len(rows)}; "
             f"picking {len(chosen)}")
         picks = []
@@ -611,7 +621,6 @@ def main():
 
         stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M")
         mark_a = f"{MARKER_DIR}/waveA-{stamp}.done"
-        mark_b = f"{MARKER_DIR}/waveB-{stamp}.done"
 
         # ── wave A: the narration (new features only; a re-shoot keeps its voice)
         # A feature whose beats already sit in git (a run killed after wave A)
@@ -654,7 +663,7 @@ def main():
                 f"| {b['beat']} | {b['start_f']}–{b['end_f']} | {b['text']} |"
                 for b in m["timeline"])
             urlmd = "\n".join(f"- {what}: `{u}`" for what, u in p["urls"]) or "- (none verified)"
-            tables.append(
+            p["table"] = (
                 f"### {p['id']} — `{p['composition']}` — durationInFrames = "
                 f"**{m['durationInFrames']}**"
                 + (" — RE-SHOOT: keep the narration, rewrite the picture" if p["redo"] else "")
@@ -666,6 +675,7 @@ def main():
                 + f"\narchetype **{p['archetype']}**, mood **{p['mood']}**\n\n"
                 f"| beat | frames | words |\n|---|---|---|\n{rowsmd}\n\n"
                 f"Verified public pages you may record (answered 2xx/3xx tonight):\n{urlmd}")
+            tables.append(p["table"])
             log(f"{p['id']}: measured {m['durationInFrames']} frames")
         picks = [p for p in picks if "frames" in p]
         if not picks:
@@ -678,13 +688,24 @@ def main():
             '|| true')
         push()
 
-        # ── wave B: the pictures ─────────────────────────────────────────
-        fresh_session("wave B")
-        wake(WAVE_B_PROMPT.format(tables="\n\n".join(tables), marker=to_container(mark_b),
-                                  rvid=CONTAINER_RVID,
-                                  ids=", ".join(p["id"] for p in picks)), "wb")
-        if not wait_for(mark_b, WAVE_B_TIMEOUT, "wave B"):
-            telegram("🏭 Завод став на хвилі B: агент не дописав композиції вчасно. "
+        # ── wave B: the pictures — ONE feature per task ──────────────────
+        # A brief for three features (two of them new files) overflowed the
+        # agent's context twice (2026-09-07 15:54 and 23:16 UTC). One feature
+        # per conversation keeps every request small; a feature that still
+        # fails is dropped alone instead of taking the night with it.
+        drawn = []
+        for p in picks:
+            mark = f"{MARKER_DIR}/waveB-{stamp}-{p['id']}.done"
+            fresh_session(f"wave B {p['id']}")
+            wake(WAVE_B_PROMPT.format(tables=p["table"], marker=to_container(mark),
+                                      rvid=CONTAINER_RVID, ids=p["id"]), "wb")
+            if wait_for(mark, WAVE_B_FEATURE_TIMEOUT, f"wave B {p['id']}"):
+                drawn.append(p)
+            else:
+                log(f"{p['id']}: dropped — composition not delivered")
+        picks = drawn
+        if not picks:
+            telegram("🏭 Завод став на хвилі B: агент не дописав жодної композиції. "
                      "Озвучка збережена, кліпи НЕ відрендерені.")
             return 1
 
