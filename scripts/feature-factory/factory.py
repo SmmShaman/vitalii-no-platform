@@ -312,8 +312,8 @@ def new_composition_name(fid, title):
     """A feature the factory picks for the first time (newest-first order,
     2026-09-07) has no composition yet. Name it from the title so the agent can
     create the file and register it in Root.tsx under exactly this id."""
-    words = [w for w in re.sub(r"[^A-Za-z0-9 ]", " ", title).split()
-             if w.lower() not in {"a", "an", "the", "of", "to", "in", "on", "for",
+    words = [w for w in re.sub(r"[^A-Za-z0-9 ]", " ", title.replace("'", "")).split()
+             if len(w) > 1 and w.lower() not in {"a", "an", "the", "of", "to", "in", "on", "for",
                                   "and", "or", "my", "now", "not", "it", "its",
                                   "with", "from", "by", "that", "this", "is", "are",
                                   "feature", "features"}]
@@ -411,6 +411,11 @@ def fresh_session(what):
         row = c.execute("select content from messages_out where rowid > ? "
                         "order by rowid desc limit 1", (before,)).fetchone()
         c.close()
+        if row and "No conversation found" in row[0]:
+            # The first wake after a rotation always fails this way — that is
+            # the runner clearing the stale pointer; the next wake starts clean.
+            log("stale session pointer cleared; the next wake starts a fresh conversation")
+            return True
         if row and "OK" in row[0]:
             log("agent answered from a fresh conversation")
             return True
