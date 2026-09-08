@@ -357,6 +357,13 @@ def wake(prompt, tag):
          now.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
          tid, content))
     c.commit(); c.close()
+    global _WAKE_ROWID
+    try:
+        oc = sqlite3.connect(OUTBOUND)
+        _WAKE_ROWID = oc.execute("select coalesce(max(rowid),0) from messages_out").fetchone()[0]
+        oc.close()
+    except sqlite3.Error:
+        pass
     log(f"queued {tid}")
     return tid
 
@@ -480,6 +487,32 @@ def fetch_contact_sheet(rid, fid):
     return None
 
 
+QUOTA_SIGNS = ("out of extra usage", "usage limit", "hit your limit", "rate limit")
+_WAKE_ROWID = 0
+
+
+def agent_quota_hit():
+    """The subscription behind every agent on this VPS is shared; when it runs
+    dry the agent's task is marked completed and the only trace is one line in
+    messages_out ("You're out of extra usage · resets 6:30pm (UTC)", 2026-09-07
+    15:54). Returns that text, or None."""
+    try:
+        c = sqlite3.connect(OUTBOUND)
+        rows = c.execute("select content from messages_out where rowid > ?",
+                         (_WAKE_ROWID,)).fetchall()
+        c.close()
+    except sqlite3.Error:
+        return None
+    for (content,) in rows:
+        low = content.lower()
+        if any(sign in low for sign in QUOTA_SIGNS):
+            try:
+                return json.loads(content).get("text", content)[:160]
+            except ValueError:
+                return content[:160]
+    return None
+
+
 def wait_for(path, timeout, what):
     deadline = time.time() + timeout
     while time.time() < deadline:
@@ -487,6 +520,12 @@ def wait_for(path, timeout, what):
             log(f"{what}: marker appeared after "
                 f"{int(timeout - (deadline - time.time()))}s")
             return True
+        hit = agent_quota_hit()
+        if hit:
+            log(f"{what}: agent reports the subscription is exhausted — {hit}")
+            telegram(f"🏭 Завод став на {what}: підписка Claude вичерпана "
+                     f"(«{hit}»). Нічого не рендерю; наступний прогін за таймером.")
+            return False
         time.sleep(30)
     log(f"{what}: TIMED OUT after {timeout}s")
     return False
