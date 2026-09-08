@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslations, type Language } from '@/contexts/TranslationContext';
 import { heroContrastColors } from '@/components/sections/BentoGrid';
 import { HeroTextAnimation } from '@/components/ui/HeroTextAnimation';
+import { ParticleText } from '@/components/ui/ParticleText';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import NeoIconButton from '@/components/ui/NeoIconButton'
 
@@ -114,7 +115,9 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
   };
 
   const fillColor = getContrastColor();
-  const isActive = !!(debouncedSection && !isTransitioning);
+  // Prototype (2026-09-08): the About tile drives the sand-text canvas instead of the liquid fill.
+  const sandActive = hoveredSection === 'about';
+  const isActive = !!(debouncedSection && !isTransitioning) && !sandActive;
 
   const languages: Language[] = ['NO', 'EN', 'UA'];
 
@@ -238,7 +241,17 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
             </div>
           ) : (
             // Full version for normal state
-            <div className="space-y-1">
+            <div className="relative">
+            <ParticleText
+              text={t('about') as string}
+              color={heroContrastColors.about}
+              isActive={sandActive}
+              grain={2}
+            />
+            <div
+              className="space-y-1"
+              style={{ opacity: sandActive ? 0 : 1, transition: 'opacity 250ms ease-out' }}
+            >
               {/* First line: Name + Subtitle */}
               <div className="flex items-baseline gap-2">
                 <h1
@@ -270,6 +283,7 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
                 fontSize="var(--text-subheading)"
                 fontWeight="400"
               />
+            </div>
             </div>
           )}
         </motion.div>
