@@ -1,0 +1,56 @@
+{
+ "id": "v31",
+ "beat_durations": {
+  "b1": 5.856,
+  "b2": 6.048,
+  "b3": 5.688,
+  "b4": 5.76,
+  "b5": 4.8
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Making one of these clips used to mean a laptop had to stay awake all night running tools nothing else needed.",
+   "start_s": 0.5,
+   "end_s": 6.356,
+   "start_f": 15,
+   "end_f": 191
+  },
+  {
+   "beat": "b2",
+   "text": "Timing the voice needed those same tools, so an unattended process in a bare container was stuck.",
+   "start_s": 6.656,
+   "end_s": 12.704,
+   "start_f": 200,
+   "end_f": 381
+  },
+  {
+   "beat": "b3",
+   "text": "Now GitHub Actions measures the voice from the script already written \u2014 no laptop required.",
+   "start_s": 13.004,
+   "end_s": 18.692,
+   "start_f": 390,
+   "end_f": 561
+  },
+  {
+   "beat": "b4",
+   "text": "A second run rebuilds that voice and refuses to render if it drifts past six frames.",
+   "start_s": 18.992,
+   "end_s": 24.752,
+   "start_f": 570,
+   "end_f": 743
+  },
+  {
+   "beat": "b5",
+   "text": "Two clips have now rendered this way, start to finish, PC switched off.",
+   "start_s": 25.052,
+   "end_s": 29.852,
+   "start_f": 752,
+   "end_f": 896
+  }
+ ],
+ "total_s": 31.352,
+ "durationInFrames": 941,
+ "measured_track_s": 29.904,
+ "track": "/root/feature-demos/vo-v31/vo-v31.mp3"
+}

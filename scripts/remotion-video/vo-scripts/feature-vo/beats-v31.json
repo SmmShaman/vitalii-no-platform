@@ -1,0 +1,7 @@
+{"id": "v31", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Making one of these clips used to mean a laptop had to stay awake all night running tools nothing else needed."],
+ ["b2", "Timing the voice needed those same tools, so an unattended process in a bare container was stuck."],
+ ["b3", "Now GitHub Actions measures the voice from the script already written — no laptop required."],
+ ["b4", "A second run rebuilds that voice and refuses to render if it drifts past six frames."],
+ ["b5", "Two clips have now rendered this way, start to finish, PC switched off."]
+]}

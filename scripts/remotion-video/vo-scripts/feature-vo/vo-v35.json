@@ -1,0 +1,56 @@
+{
+ "id": "v35",
+ "beat_durations": {
+  "b1": 7.92,
+  "b2": 5.52,
+  "b3": 4.728,
+  "b4": 5.688,
+  "b5": 4.584
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every photo we posted to Instagram was invisible to screen readers \u2014 and its hashtags were guesses, unrelated to the article.",
+   "start_s": 0.5,
+   "end_s": 8.42,
+   "start_f": 15,
+   "end_f": 253
+  },
+  {
+   "beat": "b2",
+   "text": "The caption order shifted post to post too \u2014 no fixed spot for the link or the source.",
+   "start_s": 8.72,
+   "end_s": 14.24,
+   "start_f": 262,
+   "end_f": 427
+  },
+  {
+   "beat": "b3",
+   "text": "Now the Instagram Graph API adds real alt text to every image.",
+   "start_s": 14.54,
+   "end_s": 19.268,
+   "start_f": 436,
+   "end_f": 578
+  },
+  {
+   "beat": "b4",
+   "text": "And the hashtags come straight from the article's own tags, in one fixed order every time.",
+   "start_s": 19.568,
+   "end_s": 25.256,
+   "start_f": 587,
+   "end_f": 758
+  },
+  {
+   "beat": "b5",
+   "text": "The formula lands eight to twelve hashtags \u2014 real ones, not guesses.",
+   "start_s": 25.556,
+   "end_s": 30.14,
+   "start_f": 767,
+   "end_f": 904
+  }
+ ],
+ "total_s": 31.64,
+ "durationInFrames": 949,
+ "measured_track_s": 30.192,
+ "track": "/root/feature-demos/vo-v35/vo-v35.mp3"
+}

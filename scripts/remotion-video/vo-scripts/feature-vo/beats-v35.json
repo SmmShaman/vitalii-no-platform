@@ -1,0 +1,7 @@
+{"id": "v35", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every photo we posted to Instagram was invisible to screen readers — and its hashtags were guesses, unrelated to the article."],
+ ["b2", "The caption order shifted post to post too — no fixed spot for the link or the source."],
+ ["b3", "Now the Instagram Graph API adds real alt text to every image."],
+ ["b4", "And the hashtags come straight from the article's own tags, in one fixed order every time."],
+ ["b5", "The formula lands eight to twelve hashtags — real ones, not guesses."]
+]}

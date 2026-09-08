@@ -1,0 +1,56 @@
+{
+ "id": "v34",
+ "beat_durations": {
+  "b1": 7.224,
+  "b2": 6.024,
+  "b3": 7.56,
+  "b4": 5.856,
+  "b5": 4.272
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every LinkedIn post carried a raw link in the text \u2014 exactly what LinkedIn's algorithm seems to quietly punish.",
+   "start_s": 0.5,
+   "end_s": 7.724,
+   "start_f": 15,
+   "end_f": 232
+  },
+  {
+   "beat": "b2",
+   "text": "Facebook was inconsistent too \u2014 link, hashtags, source, in no fixed order.",
+   "start_s": 8.024,
+   "end_s": 14.048,
+   "start_f": 241,
+   "end_f": 421
+  },
+  {
+   "beat": "b3",
+   "text": "Now the link never touches the post body. A Supabase Edge Function publishes first, then drops it into the first comment.",
+   "start_s": 14.348,
+   "end_s": 21.908,
+   "start_f": 430,
+   "end_f": 657
+  },
+  {
+   "beat": "b4",
+   "text": "Facebook now follows one fixed order, showing the plain source domain instead of a raw link.",
+   "start_s": 22.208,
+   "end_s": 28.064,
+   "start_f": 666,
+   "end_f": 842
+  },
+  {
+   "beat": "b5",
+   "text": "And if that comment fails, it retries \u2014 up to three times.",
+   "start_s": 28.364,
+   "end_s": 32.636,
+   "start_f": 851,
+   "end_f": 979
+  }
+ ],
+ "total_s": 34.136,
+ "durationInFrames": 1024,
+ "measured_track_s": 32.688,
+ "track": "/root/feature-demos/vo-v34/vo-v34.mp3"
+}

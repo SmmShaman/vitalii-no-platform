@@ -1,0 +1,7 @@
+{"id": "v34", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every LinkedIn post carried a raw link in the text — exactly what LinkedIn's algorithm seems to quietly punish."],
+ ["b2", "Facebook was inconsistent too — link, hashtags, source, in no fixed order."],
+ ["b3", "Now the link never touches the post body. A Supabase Edge Function publishes first, then drops it into the first comment."],
+ ["b4", "Facebook now follows one fixed order, showing the plain source domain instead of a raw link."],
+ ["b5", "And if that comment fails, it retries — up to three times."]
+]}
