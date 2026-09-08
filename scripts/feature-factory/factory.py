@@ -736,6 +736,18 @@ def main():
                  f"updated_at = now() WHERE feature_id = '{p['id']}' "
                  "AND (demo_style IS DISTINCT FROM 'bright' OR demo_media_url IS NULL)")
             log(f"{p['id']}: R2 updated, features row marked bright")
+            if not p["redo"]:
+                # Newest-first applies to the posts too (owner, 2026-09-07):
+                # the publisher orders by feature_video_repost_queue.scheduled_for
+                # first, so a fresh clip gets a row dated today and airs next,
+                # ahead of the August backlog. v33/v32 were queued by hand.
+                psql("INSERT INTO feature_video_repost_queue (feature_id, video_url, "
+                     "scheduled_for, status) SELECT "
+                     f"'{p['id']}', '{R2_PUBLIC}/features/feature-{p['id']}.mp4', "
+                     "current_date, 'pending' WHERE NOT EXISTS (SELECT 1 FROM "
+                     f"feature_video_repost_queue WHERE feature_id = '{p['id']}' "
+                     "AND status = 'pending')")
+                log(f"{p['id']}: queued at the head of the publisher's order")
 
         # Hand the clips to the YouTube runner (feature-yt-queue.timer, 09:30).
         # It is what writes youtube_video_id back, which is what puts the sound
