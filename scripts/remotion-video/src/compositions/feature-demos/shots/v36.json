@@ -1,0 +1,21 @@
+{
+  "id": "v36",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "fix",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/e030b46102f4a338a67acfc3b78a65d1eea09099",
+      "frames": 190,
+      "scroll": [[0, 0], [40, 0], [189, 900]],
+      "mouse": [[0, 560, 40], [40, 560, 40], [120, 700, 300], [189, 700, 300]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-headers-hero-text-now-bursts-into-a-dust-cloud-and-settles-into-whatever-til-v36",
+      "frames": 250,
+      "scroll": [[0, 0], [50, 0], [150, 500], [249, 950]],
+      "mouse": [[0, 560, 60], [50, 560, 60], [150, 500, 400], [249, 500, 400]]
+    }
+  ]
+}

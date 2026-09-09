@@ -175,6 +175,9 @@ import { FeatureTelegramCreditStrip } from "./compositions/feature-demos/Feature
 import { FeaturePortfolioAutoDeploy } from "./compositions/feature-demos/FeaturePortfolioAutoDeploy";
 import { FeatureLinkedinPostingsGetGradedJ74 } from "./compositions/feature-demos/FeatureLinkedinPostingsGetGradedJ74";
 import { FeatureUnmaskingLinkedinSHiddenJ73 } from "./compositions/feature-demos/FeatureUnmaskingLinkedinSHiddenJ73";
+import { FeatureNightlyClipFactoryRotatesV37 } from "./compositions/feature-demos/FeatureNightlyClipFactoryRotatesV37";
+import { FeatureHeadersHeroTextBurstsV36 } from "./compositions/feature-demos/FeatureHeadersHeroTextBurstsV36";
+import { FeatureKnowingPlatformBeforeWakingJ77 } from "./compositions/feature-demos/FeatureKnowingPlatformBeforeWakingJ77";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -1699,6 +1702,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureUnmaskingLinkedinSHiddenJ73"
         component={FeatureUnmaskingLinkedinSHiddenJ73}
         durationInFrames={1086}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNightlyClipFactoryRotatesV37"
+        component={FeatureNightlyClipFactoryRotatesV37}
+        durationInFrames={982}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureHeadersHeroTextBurstsV36"
+        component={FeatureHeadersHeroTextBurstsV36}
+        durationInFrames={993}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureKnowingPlatformBeforeWakingJ77"
+        component={FeatureKnowingPlatformBeforeWakingJ77}
+        durationInFrames={1084}
         fps={30}
         width={1280}
         height={720}
