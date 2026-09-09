@@ -1,0 +1,56 @@
+{
+ "id": "v37",
+ "beat_durations": {
+  "b1": 5.568,
+  "b2": 5.808,
+  "b3": 6.744,
+  "b4": 4.2,
+  "b5": 7.224
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Our nightly video factory went dark for two nights \u2014 and every log still said 'completed'.",
+   "start_s": 0.5,
+   "end_s": 6.068,
+   "start_f": 15,
+   "end_f": 182
+  },
+  {
+   "beat": "b2",
+   "text": "Like a worker still clocking in after they'd gone home, its own memory had ballooned unnoticed.",
+   "start_s": 6.368,
+   "end_s": 12.176,
+   "start_f": 191,
+   "end_f": 365
+  },
+  {
+   "beat": "b3",
+   "text": "Now a Python routine resets the agent's memory before every single run, not after some size limit.",
+   "start_s": 12.476,
+   "end_s": 19.22,
+   "start_f": 374,
+   "end_f": 577
+  },
+  {
+   "beat": "b4",
+   "text": "One task per clip too, so one failure can't take down the whole night.",
+   "start_s": 19.52,
+   "end_s": 23.72,
+   "start_f": 586,
+   "end_f": 712
+  },
+  {
+   "beat": "b5",
+   "text": "And if a night still fails, it gets one retry \u2014 catching what the old system missed at 47.5 megabytes.",
+   "start_s": 24.02,
+   "end_s": 31.244,
+   "start_f": 721,
+   "end_f": 937
+  }
+ ],
+ "total_s": 32.744,
+ "durationInFrames": 982,
+ "measured_track_s": 31.296,
+ "track": "/root/feature-demos/vo-v37/vo-v37.mp3"
+}

@@ -1,0 +1,7 @@
+{"id": "j77", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "One day, our job-application bot woke up 17 times — and submitted exactly zero applications."],
+ ["b2", "It treated brand-new employer sites as total strangers, even when it already knew their software."],
+ ["b3", "Like calling every Ford dealership a mystery, just because you'd never visited that exact one."],
+ ["b4", "A Playwright-based registry now recognizes the underlying platform, so a familiar system on a new site counts as known."],
+ ["b5", "It checks for captchas and dead ends before waking at all — never again 17 rows, zero submissions."]
+]}

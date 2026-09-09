@@ -1,0 +1,56 @@
+{
+ "id": "v36",
+ "beat_durations": {
+  "b1": 5.544,
+  "b2": 4.896,
+  "b3": 4.8,
+  "b4": 6.336,
+  "b5": 8.328
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My homepage's hero title used to have a faint dust smudge sitting on it \u2014 even at rest.",
+   "start_s": 0.5,
+   "end_s": 6.044,
+   "start_f": 15,
+   "end_f": 181
+  },
+  {
+   "beat": "b2",
+   "text": "And a stray cursor flicker between tiles could restart the whole burst mid-flight.",
+   "start_s": 6.344,
+   "end_s": 11.24,
+   "start_f": 190,
+   "end_f": 337
+  },
+  {
+   "beat": "b3",
+   "text": "Like a movie jumping back to its opening frame because someone coughed in the theater.",
+   "start_s": 11.54,
+   "end_s": 16.34,
+   "start_f": 346,
+   "end_f": 490
+  },
+  {
+   "beat": "b4",
+   "text": "A single canvas component now stays invisible at rest, only bursting apart when you hover.",
+   "start_s": 16.64,
+   "end_s": 22.976,
+   "start_f": 499,
+   "end_f": 689
+  },
+  {
+   "beat": "b5",
+   "text": "A 160-millisecond pause now swallows that flicker, holding the swirl to 7,000 grains so it never restarts.",
+   "start_s": 23.276,
+   "end_s": 31.604,
+   "start_f": 698,
+   "end_f": 948
+  }
+ ],
+ "total_s": 33.104,
+ "durationInFrames": 993,
+ "measured_track_s": 31.656,
+ "track": "/root/feature-demos/vo-v36/vo-v36.mp3"
+}

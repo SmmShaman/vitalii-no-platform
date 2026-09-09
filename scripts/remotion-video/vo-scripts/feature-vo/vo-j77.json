@@ -1,0 +1,56 @@
+{
+ "id": "j77",
+ "beat_durations": {
+  "b1": 6.84,
+  "b2": 5.976,
+  "b3": 5.736,
+  "b4": 7.272,
+  "b5": 7.104
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One day, our job-application bot woke up 17 times \u2014 and submitted exactly zero applications.",
+   "start_s": 0.5,
+   "end_s": 7.34,
+   "start_f": 15,
+   "end_f": 220
+  },
+  {
+   "beat": "b2",
+   "text": "It treated brand-new employer sites as total strangers, even when it already knew their software.",
+   "start_s": 7.64,
+   "end_s": 13.616,
+   "start_f": 229,
+   "end_f": 408
+  },
+  {
+   "beat": "b3",
+   "text": "Like calling every Ford dealership a mystery, just because you'd never visited that exact one.",
+   "start_s": 13.916,
+   "end_s": 19.652,
+   "start_f": 417,
+   "end_f": 590
+  },
+  {
+   "beat": "b4",
+   "text": "A Playwright-based registry now recognizes the underlying platform, so a familiar system on a new site counts as known.",
+   "start_s": 19.952,
+   "end_s": 27.224,
+   "start_f": 599,
+   "end_f": 817
+  },
+  {
+   "beat": "b5",
+   "text": "It checks for captchas and dead ends before waking at all \u2014 never again 17 rows, zero submissions.",
+   "start_s": 27.524,
+   "end_s": 34.628,
+   "start_f": 826,
+   "end_f": 1039
+  }
+ ],
+ "total_s": 36.128,
+ "durationInFrames": 1084,
+ "measured_track_s": 34.68,
+ "track": "/root/feature-demos/vo-j77/vo-j77.mp3"
+}

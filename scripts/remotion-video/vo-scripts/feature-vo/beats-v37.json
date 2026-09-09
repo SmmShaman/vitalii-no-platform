@@ -1,0 +1,7 @@
+{"id": "v37", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Our nightly video factory went dark for two nights — and every log still said 'completed'."],
+ ["b2", "Like a worker still clocking in after they'd gone home, its own memory had ballooned unnoticed."],
+ ["b3", "Now a Python routine resets the agent's memory before every single run, not after some size limit."],
+ ["b4", "One task per clip too, so one failure can't take down the whole night."],
+ ["b5", "And if a night still fails, it gets one retry — catching what the old system missed at 47.5 megabytes."]
+]}

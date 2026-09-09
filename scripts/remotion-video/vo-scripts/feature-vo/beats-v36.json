@@ -1,0 +1,7 @@
+{"id": "v36", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My homepage's hero title used to have a faint dust smudge sitting on it — even at rest."],
+ ["b2", "And a stray cursor flicker between tiles could restart the whole burst mid-flight."],
+ ["b3", "Like a movie jumping back to its opening frame because someone coughed in the theater."],
+ ["b4", "A single canvas component now stays invisible at rest, only bursting apart when you hover."],
+ ["b5", "A 160-millisecond pause now swallows that flicker, holding the swirl to 7,000 grains so it never restarts."]
+]}
