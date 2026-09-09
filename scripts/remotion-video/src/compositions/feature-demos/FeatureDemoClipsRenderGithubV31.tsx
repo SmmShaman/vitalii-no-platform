@@ -40,11 +40,14 @@ const P = MOODS.mint;
 const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
 // The one growing window — same bottom edge (626), bigger every beat.
-const STAGE1: Win = { x: 450, y: 396, w: 380, h: 230 };
-const STAGE2: Win = { x: 360, y: 326, w: 560, h: 300 };
-const WIN3: Win = { x: 260, y: 226, w: 760, h: 400 };
-const WIN4: Win = { x: 170, y: 170, w: 940, h: 456 };
-const WIN5: Win = { x: 100, y: 150, w: 1080, h: 476 };
+// Centered horizontally, sized to actually fill the 1280x720 canvas instead
+// of sitting small in the middle of empty background (fixed 2026-09-09 after
+// the contact sheet showed beats 1-2 at under 20% of the frame).
+const STAGE1: Win = { x: 300, y: 246, w: 680, h: 380 };
+const STAGE2: Win = { x: 210, y: 216, w: 860, h: 410 };
+const WIN3: Win = { x: 140, y: 196, w: 1000, h: 430 };
+const WIN4: Win = { x: 80, y: 166, w: 1120, h: 460 };
+const WIN5: Win = { x: 50, y: 146, w: 1180, h: 480 };
 
 const TERMINAL_LINES = [
   "$ node record-ui.cjs p29",
@@ -202,7 +205,7 @@ export const FeatureDemoClipsRenderGithubV31: React.FC = () => {
           win={WIN3}
         />
         <Group opacity={b3}>
-          <FilterChip x={WIN3.x + WIN3.w - 210} y={WIN3.y + 42 + 14} text="GitHub Action" icon="⚙" color={P.success} scale={chipPop} opacity={Math.min(1, chipPop)} />
+          <FilterChip x={WIN3.x + WIN3.w - 230} y={WIN3.y + 42 + 14} text="GitHub Action" icon="⚙" color={P.success} scale={chipPop} opacity={Math.min(1, chipPop)} />
           <CaptionBand y={646} fontSize={21} text="GitHub Actions measures the voice from the script already written" tone="success" opacity={b3} />
         </Group>
 

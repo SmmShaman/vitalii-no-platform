@@ -77,7 +77,7 @@ export const FeatureInstagramCaptionsGetAltV35: React.FC = () => {
     extrapolateRight: "clamp",
     easing: Easing.inOut(Easing.cubic),
   });
-  const stepsIn = 1 - seg(frame, 436, 468);
+  const stepsIn = seg(frame, 436, 468) * (1 - seg(frame, 578, 594));
   const stepsX = interpolate(frame, [436, 468], [1400, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
