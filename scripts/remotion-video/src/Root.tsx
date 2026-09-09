@@ -151,6 +151,8 @@ import { FeatureTraceabilityScanner } from "./compositions/feature-demos/Feature
 import { FeatureTraceabilityScannerLive } from "./compositions/feature-demos/FeatureTraceabilityScannerLive";
 import { FeatureDemoClipsShowRealV33 } from "./compositions/feature-demos/FeatureDemoClipsShowRealV33";
 import { FeatureButtonsTilesPressIntoV32 } from "./compositions/feature-demos/FeatureButtonsTilesPressIntoV32";
+import { FeatureInstagramCaptionsGetAltV35 } from "./compositions/feature-demos/FeatureInstagramCaptionsGetAltV35";
+import { FeatureDemoClipsRenderGithubV31 } from "./compositions/feature-demos/FeatureDemoClipsRenderGithubV31";
 import { FeatureAiFeaturePosts } from "./compositions/feature-demos/FeatureAiFeaturePosts";
 import { FeatureMultiRepoSync } from "./compositions/feature-demos/FeatureMultiRepoSync";
 import { FeatureTelegramVideoStealth } from "./compositions/feature-demos/FeatureTelegramVideoStealth";
@@ -1480,6 +1482,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureButtonsTilesPressIntoV32"
         component={FeatureButtonsTilesPressIntoV32}
         durationInFrames={951}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureInstagramCaptionsGetAltV35"
+        component={FeatureInstagramCaptionsGetAltV35}
+        durationInFrames={949}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureDemoClipsRenderGithubV31"
+        component={FeatureDemoClipsRenderGithubV31}
+        durationInFrames={941}
         fps={30}
         width={1280}
         height={720}

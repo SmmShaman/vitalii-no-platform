@@ -1,0 +1,10 @@
+{
+  "id": "v31",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "actions", "url": "https://github.com/SmmShaman/vitalii-no-platform/actions", "frames": 187, "scroll": [[0, 0], [186, 180]], "mouse": [[0, 300, 200], [60, 560, 240], [120, 420, 300], [186, 480, 260]] },
+    { "name": "runs", "url": "https://github.com/SmmShaman/vitalii-no-platform/actions", "frames": 189, "scroll": [[0, 0], [188, 760]], "mouse": [[0, 380, 160], [70, 380, 340], [140, 380, 220], [188, 380, 300]] },
+    { "name": "page", "url": "https://vitalii.no/features/feature-demo-clips-now-render-on-github-not-on-whichever-pc-happens-to-be-awake-v31", "frames": 189, "scroll": [[0, 0], [188, 640]], "mouse": [[0, 540, 200], [94, 560, 320], [188, 540, 260]] }
+  ]
+}

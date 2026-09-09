@@ -1,0 +1,9 @@
+{
+  "id": "v35",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "commits", "url": "https://github.com/SmmShaman/vitalii-no-platform/commits/main", "frames": 187, "scroll": [[0, 0], [90, 500], [186, 1000]], "mouse": [[0, 300, 180], [60, 640, 240], [120, 420, 320], [186, 560, 260]] },
+    { "name": "page", "url": "https://vitalii.no/features/instagram-captions-get-alt-text-and-a-real-hashtag-formula-instead-of-guesswork-v35", "frames": 182, "scroll": [[0, 0], [90, 700], [181, 1450]], "mouse": [[0, 400, 160], [90, 620, 260], [181, 500, 340]] }
+  ]
+}
