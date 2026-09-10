@@ -1,0 +1,7 @@
+{"id": "k02", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "How do you test a trading strategy before risking real money?"],
+ ["b2", "Pump-dot-fun has no test net, no safe practice ground at all."],
+ ["b3", "So my trading agent now runs a paper mode, a flight simulator for trades."],
+ ["b4", "It fills orders at real prices, charging the same three percent slippage and fees a live trade would."],
+ ["b5", "It ran for days on real prices before I trusted it with all eight trading agents."]
+]}

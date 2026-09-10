@@ -1,0 +1,7 @@
+{"id": "k03", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "How do you catch a scammer who's minted dozens of throwaway coins before?"],
+ ["b2", "My risk scorer only checked how concentrated the top holders were."],
+ ["b3", "That let a serial token creator score the same as a clean, first-time launch, like trusting a repeat shoplifter as a first-time customer."],
+ ["b4", "Now it pulls real holder and creator data from Jupiter's market API."],
+ ["b5", "A wallet is vetoed outright the moment it crosses fifty of its own mints."]
+]}

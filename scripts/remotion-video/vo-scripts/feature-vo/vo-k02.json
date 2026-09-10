@@ -1,0 +1,56 @@
+{
+ "id": "k02",
+ "beat_durations": {
+  "b1": 3.384,
+  "b2": 4.224,
+  "b3": 4.608,
+  "b4": 6.216,
+  "b5": 5.112
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "How do you test a trading strategy before risking real money?",
+   "start_s": 0.5,
+   "end_s": 3.884,
+   "start_f": 15,
+   "end_f": 117
+  },
+  {
+   "beat": "b2",
+   "text": "Pump-dot-fun has no test net, no safe practice ground at all.",
+   "start_s": 4.184,
+   "end_s": 8.408,
+   "start_f": 126,
+   "end_f": 252
+  },
+  {
+   "beat": "b3",
+   "text": "So my trading agent now runs a paper mode, a flight simulator for trades.",
+   "start_s": 8.708,
+   "end_s": 13.316,
+   "start_f": 261,
+   "end_f": 399
+  },
+  {
+   "beat": "b4",
+   "text": "It fills orders at real prices, charging the same three percent slippage and fees a live trade would.",
+   "start_s": 13.616,
+   "end_s": 19.832,
+   "start_f": 408,
+   "end_f": 595
+  },
+  {
+   "beat": "b5",
+   "text": "It ran for days on real prices before I trusted it with all eight trading agents.",
+   "start_s": 20.132,
+   "end_s": 25.244,
+   "start_f": 604,
+   "end_f": 757
+  }
+ ],
+ "total_s": 26.744,
+ "durationInFrames": 802,
+ "measured_track_s": 25.296,
+ "track": "/root/feature-demos/vo-k02/vo-k02.mp3"
+}

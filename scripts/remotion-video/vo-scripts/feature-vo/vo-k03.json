@@ -1,0 +1,56 @@
+{
+ "id": "k03",
+ "beat_durations": {
+  "b1": 3.936,
+  "b2": 3.984,
+  "b3": 8.328,
+  "b4": 4.488,
+  "b5": 4.584
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "How do you catch a scammer who's minted dozens of throwaway coins before?",
+   "start_s": 0.5,
+   "end_s": 4.436,
+   "start_f": 15,
+   "end_f": 133
+  },
+  {
+   "beat": "b2",
+   "text": "My risk scorer only checked how concentrated the top holders were.",
+   "start_s": 4.736,
+   "end_s": 8.72,
+   "start_f": 142,
+   "end_f": 262
+  },
+  {
+   "beat": "b3",
+   "text": "That let a serial token creator score the same as a clean, first-time launch, like trusting a repeat shoplifter as a first-time customer.",
+   "start_s": 9.02,
+   "end_s": 17.348,
+   "start_f": 271,
+   "end_f": 520
+  },
+  {
+   "beat": "b4",
+   "text": "Now it pulls real holder and creator data from Jupiter's market API.",
+   "start_s": 17.648,
+   "end_s": 22.136,
+   "start_f": 529,
+   "end_f": 664
+  },
+  {
+   "beat": "b5",
+   "text": "A wallet is vetoed outright the moment it crosses fifty of its own mints.",
+   "start_s": 22.436,
+   "end_s": 27.02,
+   "start_f": 673,
+   "end_f": 811
+  }
+ ],
+ "total_s": 28.52,
+ "durationInFrames": 856,
+ "measured_track_s": 27.072,
+ "track": "/root/feature-demos/vo-k03/vo-k03.mp3"
+}
