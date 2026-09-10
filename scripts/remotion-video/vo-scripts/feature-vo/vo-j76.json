@@ -1,0 +1,56 @@
+{
+ "id": "j76",
+ "beat_durations": {
+  "b1": 5.808,
+  "b2": 4.896,
+  "b3": 4.776,
+  "b4": 8.256,
+  "b5": 8.304
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "An automated agent kept crashing mid-task, twice in one week, with nothing to show for it.",
+   "start_s": 0.5,
+   "end_s": 6.308,
+   "start_f": 15,
+   "end_f": 189
+  },
+  {
+   "beat": "b2",
+   "text": "Each time, its conversation history had quietly grown too large to think.",
+   "start_s": 6.608,
+   "end_s": 11.504,
+   "start_f": 198,
+   "end_f": 345
+  },
+  {
+   "beat": "b3",
+   "text": "Now it watches itself: a systemd timer checks in every five minutes.",
+   "start_s": 11.804,
+   "end_s": 16.58,
+   "start_f": 354,
+   "end_f": 497
+  },
+  {
+   "beat": "b4",
+   "text": "Like a whiteboard wiped clean before it overflows, it archives the old conversation and starts over, before failing, not after.",
+   "start_s": 16.88,
+   "end_s": 25.136,
+   "start_f": 506,
+   "end_f": 754
+  },
+  {
+   "beat": "b5",
+   "text": "Both real crashes hit past 0.7 megabytes. The new threshold catches it at 0.25, twice as early.",
+   "start_s": 25.436,
+   "end_s": 33.74,
+   "start_f": 763,
+   "end_f": 1012
+  }
+ ],
+ "total_s": 35.24,
+ "durationInFrames": 1057,
+ "measured_track_s": 33.792,
+ "track": "/root/feature-demos/vo-j76/vo-j76.mp3"
+}

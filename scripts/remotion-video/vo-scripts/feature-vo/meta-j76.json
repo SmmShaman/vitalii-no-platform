@@ -1,0 +1,7 @@
+{
+  "id": "j76",
+  "file": "yt-feature-j76.mp4",
+  "title": "The Agent That Rotates Its Own Memory Before It Crashes | vitalii.no",
+  "description": "How a background automation agent learned to clear its own head before running out of room to think — instead of crashing mid-task with nothing to show for it.\n\nTwice in one week, an always-on fill agent's conversation history quietly grew past its limit and started failing every time it woke up. Both times the transcript looked nowhere near dangerous by size alone, so the failure came as a surprise rather than a warning.\n\nA small watcher script now measures only the recent growth in that conversation log while the agent is idle, and if it crosses a threshold, it archives the log and clears the pointer so the next wake starts genuinely fresh. It runs on its own schedule every five minutes, quietly, in the background.\n\nThe two real crashes happened at 0.73 and 0.70 megabytes of growth. The new threshold catches it at 0.25 megabytes — more than twice as early as either failure that came before it.\n\n🔗 Full write-up: https://vitalii.no/features/the-fill-agent-rotates-its-own-conversation-before-the-context-cliff-kills-it-j76\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#automation #devops #selfhealing #ai #backgroundagents",
+  "tags": ["automation", "self healing systems", "devops", "background agents", "systemd timer", "reliability engineering", "context management", "ai agents", "monitoring", "vitalii berbeha"]
+}

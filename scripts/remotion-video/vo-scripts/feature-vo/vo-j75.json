@@ -1,0 +1,56 @@
+{
+ "id": "j75",
+ "beat_durations": {
+  "b1": 4.44,
+  "b2": 5.52,
+  "b3": 4.488,
+  "b4": 4.704,
+  "b5": 6.216
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I'd tap 'confirm' on a job in Telegram, and nothing happened right away.",
+   "start_s": 0.5,
+   "end_s": 4.94,
+   "start_f": 15,
+   "end_f": 148
+  },
+  {
+   "beat": "b2",
+   "text": "The agent only checked every two to five minutes, so a tap could sit ignored that long.",
+   "start_s": 5.24,
+   "end_s": 10.76,
+   "start_f": 157,
+   "end_f": 323
+  },
+  {
+   "beat": "b3",
+   "text": "Like pressing a crosswalk button that does nothing until the light changes anyway.",
+   "start_s": 11.06,
+   "end_s": 15.548,
+   "start_f": 332,
+   "end_f": 466
+  },
+  {
+   "beat": "b4",
+   "text": "Now the button press sends a webhook straight to the agent the instant it fires.",
+   "start_s": 15.848,
+   "end_s": 20.552,
+   "start_f": 475,
+   "end_f": 617
+  },
+  {
+   "beat": "b5",
+   "text": "The old pollers still run, but only as a 30-minute safety net, not the main way work gets found.",
+   "start_s": 20.852,
+   "end_s": 27.068,
+   "start_f": 626,
+   "end_f": 812
+  }
+ ],
+ "total_s": 28.568,
+ "durationInFrames": 857,
+ "measured_track_s": 27.12,
+ "track": "/root/feature-demos/vo-j75/vo-j75.mp3"
+}

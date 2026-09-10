@@ -1,0 +1,7 @@
+{"id": "j75", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "I'd tap 'confirm' on a job in Telegram, and nothing happened right away."],
+  ["b2", "The agent only checked every two to five minutes, so a tap could sit ignored that long."],
+  ["b3", "Like pressing a crosswalk button that does nothing until the light changes anyway."],
+  ["b4", "Now the button press sends a webhook straight to the agent the instant it fires."],
+  ["b5", "The old pollers still run, but only as a 30-minute safety net, not the main way work gets found."]
+]}

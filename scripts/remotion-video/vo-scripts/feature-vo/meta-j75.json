@@ -1,0 +1,7 @@
+{
+  "id": "j75",
+  "file": "yt-feature-j75.mp4",
+  "title": "The Confirm Button Now Wakes the Agent Instantly | vitalii.no",
+  "description": "How tapping 'confirm' on a job in Telegram went from a silent wait to an instant handoff — no code touched, just a faster way to say 'go'.\n\nConfirming a job didn't touch the background fill agent at all. It just sat in a queue until a two- or five-minute poller happened to notice it, so a single tap could mean waiting almost as long as the poller's own interval for work that had already been approved.\n\nA small bridge script now closes that gap two ways: a tiny local endpoint that the confirm handlers call the instant a button is pressed, and a matching path for jobs that get resolved automatically rather than by a tap. Either way, the agent hears about new work immediately instead of waiting to be asked. If the bridge call fails for any reason, it falls back silently to the regular poller.\n\nThe two- and five-minute pollers are no longer the only way the agent finds new work — they've become 30-minute safety nets instead of the main path.\n\n🔗 Full write-up: https://vitalii.no/features/the-fill-agent-wakes-on-the-button-press-now-not-the-next-poll-j75\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#automation #telegrambot #backgroundagents #devops #ai",
+  "tags": ["automation", "telegram bot", "background agents", "webhooks", "job queues", "devops", "ai agents", "workflow automation", "real time systems", "vitalii berbeha"]
+}

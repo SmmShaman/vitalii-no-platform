@@ -1,0 +1,7 @@
+{"id": "j76", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "An automated agent kept crashing mid-task, twice in one week, with nothing to show for it."],
+  ["b2", "Each time, its conversation history had quietly grown too large to think."],
+  ["b3", "Now it watches itself: a systemd timer checks in every five minutes."],
+  ["b4", "Like a whiteboard wiped clean before it overflows, it archives the old conversation and starts over, before failing, not after."],
+  ["b5", "Both real crashes hit past 0.7 megabytes. The new threshold catches it at 0.25, twice as early."]
+]}
