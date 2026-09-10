@@ -1,0 +1,14 @@
+{
+  "id": "k03",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/risk-scoring-now-vetoes-serial-token-creators-after-50-mints-not-just-whale-conc-k03",
+      "frames": 138,
+      "scroll": [[0, 0], [137, 640]],
+      "mouse": [[0, 560, 200], [70, 560, 340], [137, 560, 260]]
+    }
+  ]
+}

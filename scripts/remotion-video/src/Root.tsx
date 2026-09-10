@@ -149,6 +149,8 @@ import { FeatureMultiRepoScanner } from "./compositions/feature-demos/FeatureMul
 import { FeatureLocalClockScheduling } from "./compositions/feature-demos/FeatureLocalClockScheduling";
 import { FeatureTraceabilityScanner } from "./compositions/feature-demos/FeatureTraceabilityScanner";
 import { FeatureTraceabilityScannerLive } from "./compositions/feature-demos/FeatureTraceabilityScannerLive";
+import { FeatureRiskScoringVetoesSerialK03 } from "./compositions/feature-demos/FeatureRiskScoringVetoesSerialK03";
+import { FeaturePaperModeSimulatesSlippageK02 } from "./compositions/feature-demos/FeaturePaperModeSimulatesSlippageK02";
 import { FeatureDemoClipsShowRealV33 } from "./compositions/feature-demos/FeatureDemoClipsShowRealV33";
 import { FeatureButtonsTilesPressIntoV32 } from "./compositions/feature-demos/FeatureButtonsTilesPressIntoV32";
 import { FeatureInstagramCaptionsGetAltV35 } from "./compositions/feature-demos/FeatureInstagramCaptionsGetAltV35";
@@ -1759,6 +1761,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureNoMoreRawLinksV34"
         component={FeatureNoMoreRawLinksV34}
         durationInFrames={1024}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureRiskScoringVetoesSerialK03"
+        component={FeatureRiskScoringVetoesSerialK03}
+        durationInFrames={856}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeaturePaperModeSimulatesSlippageK02"
+        component={FeaturePaperModeSimulatesSlippageK02}
+        durationInFrames={802}
         fps={30}
         width={1280}
         height={720}

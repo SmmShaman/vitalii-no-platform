@@ -1,0 +1,28 @@
+{
+  "id": "p25",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/actions",
+      "frames": 195,
+      "scroll": [[0, 0], [80, 180], [194, 420]],
+      "mouse": [[0, 300, 160], [60, 560, 220], [130, 420, 300], [194, 600, 260]]
+    },
+    {
+      "name": "commit",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/a02b809",
+      "frames": 164,
+      "scroll": [[0, 0], [80, 500], [163, 1100]],
+      "mouse": [[0, 400, 180], [70, 700, 260], [163, 500, 320]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/scheduled-publishing-taming-the-content-firehose-with-smart-delays-p25",
+      "frames": 112,
+      "scroll": [[0, 0], [111, 420]],
+      "mouse": [[0, 560, 220], [111, 560, 300]]
+    }
+  ]
+}
