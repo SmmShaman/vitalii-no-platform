@@ -322,7 +322,7 @@ export const FeatureFillAgentWakesButtonJ75: React.FC = () => {
             shot="webhook"
             title="github.com — commit 87443d8 · webhook bridge"
             from={475}
-            hold={142}
+            hold={160}
             zoom={(t) => 1 + 0.12 * t}
             focus={{ x: 0.5, y: 0.35 }}
             opacity={b4}
@@ -355,7 +355,7 @@ export const FeatureFillAgentWakesButtonJ75: React.FC = () => {
             shot="page"
             title="vitalii.no/features — the-fill-agent-wakes-…-j75"
             from={626}
-            hold={186}
+            hold={232}
             zoom={(t) => 1 + 0.1 * t}
             focus={{ x: 0.5, y: 0.4 }}
             opacity={b5}
