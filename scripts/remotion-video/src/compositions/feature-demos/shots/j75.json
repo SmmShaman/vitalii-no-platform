@@ -1,0 +1,21 @@
+{
+  "id": "j75",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "webhook",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commit/87443d8d53fdad3d1f22efde8404baa3837c7b07",
+      "frames": 142,
+      "scroll": [[0, 0], [30, 0], [141, 700]],
+      "mouse": [[0, 560, 60], [30, 560, 60], [90, 650, 300], [141, 650, 340]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-fill-agent-wakes-on-the-button-press-now-not-the-next-poll-j75",
+      "frames": 186,
+      "scroll": [[0, 0], [40, 0], [185, 900]],
+      "mouse": [[0, 560, 60], [40, 560, 60], [185, 560, 320]]
+    }
+  ]
+}

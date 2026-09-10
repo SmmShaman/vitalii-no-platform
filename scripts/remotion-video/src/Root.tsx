@@ -178,6 +178,9 @@ import { FeatureUnmaskingLinkedinSHiddenJ73 } from "./compositions/feature-demos
 import { FeatureNightlyClipFactoryRotatesV37 } from "./compositions/feature-demos/FeatureNightlyClipFactoryRotatesV37";
 import { FeatureHeadersHeroTextBurstsV36 } from "./compositions/feature-demos/FeatureHeadersHeroTextBurstsV36";
 import { FeatureKnowingPlatformBeforeWakingJ77 } from "./compositions/feature-demos/FeatureKnowingPlatformBeforeWakingJ77";
+import { FeatureFillAgentRotatesOwnJ76 } from "./compositions/feature-demos/FeatureFillAgentRotatesOwnJ76";
+import { FeatureFillAgentWakesButtonJ75 } from "./compositions/feature-demos/FeatureFillAgentWakesButtonJ75";
+import { FeatureNoMoreRawLinksV34 } from "./compositions/feature-demos/FeatureNoMoreRawLinksV34";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -1729,6 +1732,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureKnowingPlatformBeforeWakingJ77"
         component={FeatureKnowingPlatformBeforeWakingJ77}
         durationInFrames={1084}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFillAgentRotatesOwnJ76"
+        component={FeatureFillAgentRotatesOwnJ76}
+        durationInFrames={1057}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFillAgentWakesButtonJ75"
+        component={FeatureFillAgentWakesButtonJ75}
+        durationInFrames={857}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNoMoreRawLinksV34"
+        component={FeatureNoMoreRawLinksV34}
+        durationInFrames={1024}
         fps={30}
         width={1280}
         height={720}

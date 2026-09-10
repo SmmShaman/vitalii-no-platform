@@ -1,0 +1,28 @@
+{
+  "id": "j76",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "timer",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commit/87443d8d53fdad3d1f22efde8404baa3837c7b07",
+      "frames": 140,
+      "scroll": [[0, 0], [30, 0], [139, 900]],
+      "mouse": [[0, 560, 60], [30, 560, 60], [80, 700, 260], [139, 700, 320]]
+    },
+    {
+      "name": "archive",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commit/f28763ba53c825b571353ae904edfb2fde7157f6",
+      "frames": 220,
+      "scroll": [[0, 0], [40, 0], [219, 1400]],
+      "mouse": [[0, 560, 60], [40, 560, 60], [120, 680, 300], [219, 680, 340]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-fill-agent-rotates-its-own-conversation-before-the-context-cliff-kills-it-j76",
+      "frames": 240,
+      "scroll": [[0, 0], [50, 0], [239, 850]],
+      "mouse": [[0, 560, 60], [50, 560, 60], [239, 560, 320]]
+    }
+  ]
+}
