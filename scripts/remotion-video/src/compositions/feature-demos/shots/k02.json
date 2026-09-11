@@ -7,7 +7,7 @@
       "name": "page",
       "url": "https://vitalii.no/features/paper-mode-simulates-3-slippage-and-15-fees-because-pumpfun-has-no-test-net-k02",
       "frames": 153,
-      "scroll": [[0, 0], [152, 640]],
+      "scroll": [[0, 0], [100, 0], [130, 640], [152, 640]],
       "mouse": [[0, 560, 200], [76, 560, 340], [152, 560, 260]]
     }
   ]

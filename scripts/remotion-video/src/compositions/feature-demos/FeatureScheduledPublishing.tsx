@@ -327,7 +327,7 @@ export const FeatureScheduledPublishing: React.FC = () => {
             from={428}
             hold={211}
             zoom={(t) => 1 + 0.1 * easeInOut(t)}
-            focus={{ x: 0.5, y: 0.35 }}
+            focus={{ x: 0.1, y: 0.35 }}
             opacity={b3}
           />
         </div>

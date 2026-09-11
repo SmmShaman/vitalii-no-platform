@@ -262,8 +262,8 @@ export const FeaturePaperModeSimulatesSlippageK02: React.FC = () => {
         <div style={{ position: "absolute", left: CARD_X + PAD, top: CARD_Y + 212, fontSize: 13, fontWeight: 700, letterSpacing: 2, color: P.muted }}>
           TOTAL PER STRATEGY TESTED
         </div>
-        <div style={{ position: "absolute", left: CARD_X + PAD, top: CARD_Y + 232, width: CARD_W - PAD * 2 }}>
-          <span style={{ position: "relative", fontSize: 28, fontWeight: 800, color: P.danger, opacity: totalOldOp }}>
+        <div style={{ position: "absolute", left: CARD_X + PAD, top: CARD_Y + 232, width: CARD_W - PAD * 2, height: 36 }}>
+          <span style={{ position: "absolute", left: 0, top: 0, whiteSpace: "nowrap", fontSize: 28, fontWeight: 800, color: P.danger, opacity: totalOldOp }}>
             -1.3 SOL
             <span
               style={{
@@ -276,7 +276,7 @@ export const FeaturePaperModeSimulatesSlippageK02: React.FC = () => {
               }}
             />
           </span>
-          <span style={{ fontSize: 28, fontWeight: 800, color: P.success, opacity: totalNewOp, marginLeft: totalNewOp > 0.01 ? -280 : 0 }}>
+          <span style={{ position: "absolute", left: 0, top: 0, whiteSpace: "nowrap", fontSize: 28, fontWeight: 800, color: P.success, opacity: totalNewOp }}>
             $0 real risk
           </span>
         </div>

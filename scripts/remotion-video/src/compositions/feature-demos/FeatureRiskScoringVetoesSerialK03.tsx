@@ -284,7 +284,7 @@ export const FeatureRiskScoringVetoesSerialK03: React.FC = () => {
         <StageHeading text="Same wallet. New coin. Again." opacity={b1} />
         <StatPill x={STAGE_X} y={112} emoji="😵" text="buyers fooled, every single time" tone="danger" opacity={b1} />
         {COINS.map((c, i) => (
-          <Panel key={c.ticker} x={STAGE_X + i * 172} y={214} w={152} h={112} tone="danger" opacity={b1 * coinIn(i)}>
+          <Panel key={c.ticker} x={STAGE_X + i * 172} y={200} w={152} h={250} tone="danger" opacity={b1 * coinIn(i)}>
             <div
               style={{
                 position: "absolute",
