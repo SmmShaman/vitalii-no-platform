@@ -1,0 +1,56 @@
+{
+ "id": "g04",
+ "beat_durations": {
+  "b1": 4.44,
+  "b2": 5.184,
+  "b3": 4.224,
+  "b4": 6.024,
+  "b5": 3.552
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I had one door into my Claude proxy, guarded by one person's login.",
+   "start_s": 0.5,
+   "end_s": 4.94,
+   "start_f": 15,
+   "end_f": 148
+  },
+  {
+   "beat": "b2",
+   "text": "Then a second, browser-less program needed the same door \u2014 with no login to show.",
+   "start_s": 5.24,
+   "end_s": 10.424,
+   "start_f": 157,
+   "end_f": 313
+  },
+  {
+   "beat": "b3",
+   "text": "It would have needed its own paid key, or a fake login just to get in.",
+   "start_s": 10.724,
+   "end_s": 14.948,
+   "start_f": 322,
+   "end_f": 448
+  },
+  {
+   "beat": "b4",
+   "text": "Instead, it got a shared secret, checked one character at a time so a wrong guess leaks nothing.",
+   "start_s": 15.248,
+   "end_s": 21.272,
+   "start_f": 457,
+   "end_f": 638
+  },
+  {
+   "beat": "b5",
+   "text": "Now that same door has two valid ways in instead of one.",
+   "start_s": 21.572,
+   "end_s": 25.124,
+   "start_f": 647,
+   "end_f": 754
+  }
+ ],
+ "total_s": 26.624,
+ "durationInFrames": 799,
+ "measured_track_s": 25.176,
+ "track": "/root/feature-demos/vo-g04/vo-g04.mp3"
+}

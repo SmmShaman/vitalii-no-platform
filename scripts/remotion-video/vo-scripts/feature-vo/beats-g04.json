@@ -1,0 +1,7 @@
+{"id": "g04", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "I had one door into my Claude proxy, guarded by one person's login."],
+ ["b2", "Then a second, browser-less program needed the same door — with no login to show."],
+ ["b3", "It would have needed its own paid key, or a fake login just to get in."],
+ ["b4", "Instead, it got a shared secret, checked one character at a time so a wrong guess leaks nothing."],
+ ["b5", "Now that same door has two valid ways in instead of one."]
+]}

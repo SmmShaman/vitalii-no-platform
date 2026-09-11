@@ -1,0 +1,7 @@
+{"id": "v30", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every night, a robot voice reads the day's tech news out loud, in Norwegian."],
+ ["b2", "That voice came from a paid service, and when its balance ran dry, every video broke at that step."],
+ ["b3", "Nobody could tell if the voice failed, or the bill was just unpaid."],
+ ["b4", "The fix switches to Edge TTS, a free voice engine, cutting the middleman out."],
+ ["b5", "It also times every word for the subtitles, instead of guessing from silence. The digest is unblocked after four days."]
+]}

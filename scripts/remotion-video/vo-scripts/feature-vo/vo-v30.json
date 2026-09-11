@@ -1,0 +1,56 @@
+{
+ "id": "v30",
+ "beat_durations": {
+  "b1": 5.112,
+  "b2": 6.024,
+  "b3": 3.936,
+  "b4": 5.088,
+  "b5": 7.608
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every night, a robot voice reads the day's tech news out loud, in Norwegian.",
+   "start_s": 0.5,
+   "end_s": 5.612,
+   "start_f": 15,
+   "end_f": 168
+  },
+  {
+   "beat": "b2",
+   "text": "That voice came from a paid service, and when its balance ran dry, every video broke at that step.",
+   "start_s": 5.912,
+   "end_s": 11.936,
+   "start_f": 177,
+   "end_f": 358
+  },
+  {
+   "beat": "b3",
+   "text": "Nobody could tell if the voice failed, or the bill was just unpaid.",
+   "start_s": 12.236,
+   "end_s": 16.172,
+   "start_f": 367,
+   "end_f": 485
+  },
+  {
+   "beat": "b4",
+   "text": "The fix switches to Edge TTS, a free voice engine, cutting the middleman out.",
+   "start_s": 16.472,
+   "end_s": 21.56,
+   "start_f": 494,
+   "end_f": 647
+  },
+  {
+   "beat": "b5",
+   "text": "It also times every word for the subtitles, instead of guessing from silence. The digest is unblocked after four days.",
+   "start_s": 21.86,
+   "end_s": 29.468,
+   "start_f": 656,
+   "end_f": 884
+  }
+ ],
+ "total_s": 30.968,
+ "durationInFrames": 929,
+ "measured_track_s": 29.52,
+ "track": "/root/feature-demos/vo-v30/vo-v30.mp3"
+}
