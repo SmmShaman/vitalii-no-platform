@@ -1,0 +1,56 @@
+{
+ "id": "v29",
+ "beat_durations": {
+  "b1": 5.136,
+  "b2": 5.4,
+  "b3": 3.528,
+  "b4": 5.376,
+  "b5": 4.56
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A feature page showed a silent looping clip \u2014 and that's all most visitors ever saw.",
+   "start_s": 0.5,
+   "end_s": 5.636,
+   "start_f": 15,
+   "end_f": 169
+  },
+  {
+   "beat": "b2",
+   "text": "The full explanation sat behind a plain text link underneath it, and almost nobody clicked.",
+   "start_s": 5.936,
+   "end_s": 11.336,
+   "start_f": 178,
+   "end_f": 340
+  },
+  {
+   "beat": "b3",
+   "text": "Now that silent loop doubles as a poster for the real thing.",
+   "start_s": 11.636,
+   "end_s": 15.164,
+   "start_f": 349,
+   "end_f": 455
+  },
+  {
+   "beat": "b4",
+   "text": "A button appears on top of it; tap it, and the clip swaps for the narrated cut on YouTube.",
+   "start_s": 15.464,
+   "end_s": 20.84,
+   "start_f": 464,
+   "end_f": 625
+  },
+  {
+   "beat": "b5",
+   "text": "Every visitor now reaches that narrated cut in exactly one click.",
+   "start_s": 21.14,
+   "end_s": 25.7,
+   "start_f": 634,
+   "end_f": 771
+  }
+ ],
+ "total_s": 27.2,
+ "durationInFrames": 816,
+ "measured_track_s": 25.752,
+ "track": "/root/feature-demos/vo-v29/vo-v29.mp3"
+}

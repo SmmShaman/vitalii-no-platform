@@ -1,0 +1,7 @@
+{"id": "j71", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "For two weeks, jobs kept piling up on a site my agent had never seen before."],
+  ["b2", "Unlocking it needed one tap within a two-hour window — and I kept missing it."],
+  ["b3", "So I let the agent grant itself permission, capped at two new sites a day."],
+  ["b4", "It spends that budget on whichever queue is busiest first, before it even wakes up."],
+  ["b5", "Learning one new site costs about 6.8 million tokens — capped, so the backlog finally clears."]
+]}

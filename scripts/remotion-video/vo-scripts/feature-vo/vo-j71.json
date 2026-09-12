@@ -1,0 +1,56 @@
+{
+ "id": "j71",
+ "beat_durations": {
+  "b1": 5.088,
+  "b2": 4.56,
+  "b3": 4.344,
+  "b4": 5.424,
+  "b5": 6.984
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "For two weeks, jobs kept piling up on a site my agent had never seen before.",
+   "start_s": 0.5,
+   "end_s": 5.588,
+   "start_f": 15,
+   "end_f": 168
+  },
+  {
+   "beat": "b2",
+   "text": "Unlocking it needed one tap within a two-hour window \u2014 and I kept missing it.",
+   "start_s": 5.888,
+   "end_s": 10.448,
+   "start_f": 177,
+   "end_f": 313
+  },
+  {
+   "beat": "b3",
+   "text": "So I let the agent grant itself permission, capped at two new sites a day.",
+   "start_s": 10.748,
+   "end_s": 15.092,
+   "start_f": 322,
+   "end_f": 453
+  },
+  {
+   "beat": "b4",
+   "text": "It spends that budget on whichever queue is busiest first, before it even wakes up.",
+   "start_s": 15.392,
+   "end_s": 20.816,
+   "start_f": 462,
+   "end_f": 624
+  },
+  {
+   "beat": "b5",
+   "text": "Learning one new site costs about 6.8 million tokens \u2014 capped, so the backlog finally clears.",
+   "start_s": 21.116,
+   "end_s": 28.1,
+   "start_f": 633,
+   "end_f": 843
+  }
+ ],
+ "total_s": 29.6,
+ "durationInFrames": 888,
+ "measured_track_s": 28.152,
+ "track": "/root/feature-demos/vo-j71/vo-j71.mp3"
+}
