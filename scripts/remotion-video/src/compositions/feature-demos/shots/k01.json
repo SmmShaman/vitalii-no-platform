@@ -1,14 +1,51 @@
 {
   "id": "k01",
-  "viewport": { "width": 1120, "height": 466 },
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
   "dsf": 1.25,
   "shots": [
     {
       "name": "page",
       "url": "https://vitalii.no/features/eight-trading-agents-share-one-durable-object-alarm-instead-of-eight-cron-jobs-k01",
       "frames": 232,
-      "scroll": [[0, 0], [110, 420], [232, 780]],
-      "mouse": [[0, 560, 200], [90, 560, 300], [160, 560, 360], [232, 560, 300]]
+      "scroll": [
+        [
+          0,
+          0
+        ],
+        [
+          110,
+          420
+        ],
+        [
+          231,
+          780
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          560,
+          200
+        ],
+        [
+          90,
+          560,
+          300
+        ],
+        [
+          160,
+          560,
+          360
+        ],
+        [
+          231,
+          560,
+          300
+        ]
+      ]
     }
   ]
 }

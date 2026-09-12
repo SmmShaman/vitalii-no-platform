@@ -1,0 +1,21 @@
+{
+  "id": "v29",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-feature-pages-silent-loop-now-doubles-as-a-poster-for-the-narrated-cut-v29",
+      "frames": 276,
+      "scroll": [[0, 0], [275, 120]],
+      "mouse": [[0, 700, 150], [100, 700, 150], [195, 650, 230], [275, 650, 230]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 140,
+      "scroll": [[0, 0], [139, 500]],
+      "mouse": [[0, 300, 200], [70, 600, 260], [139, 450, 320]]
+    }
+  ]
+}

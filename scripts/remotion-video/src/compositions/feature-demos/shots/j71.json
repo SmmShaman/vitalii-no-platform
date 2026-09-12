@@ -1,0 +1,28 @@
+{
+  "id": "j71",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commits",
+      "frames": 120,
+      "scroll": [[0, 0], [119, 850]],
+      "mouse": [[0, 220, 140], [40, 220, 320], [80, 220, 200], [119, 220, 260]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/jobbot-norway/actions",
+      "frames": 145,
+      "scroll": [[0, 0], [144, 420]],
+      "mouse": [[0, 300, 180], [50, 600, 220], [100, 320, 300], [144, 560, 240]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/bounded-auto-recon-ending-two-weeks-of-zero-applications-without-blowing-the-tok-j71",
+      "frames": 210,
+      "scroll": [[0, 0], [209, 680]],
+      "mouse": [[0, 560, 200], [209, 560, 300]]
+    }
+  ]
+}

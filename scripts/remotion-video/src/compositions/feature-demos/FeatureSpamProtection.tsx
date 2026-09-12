@@ -1,6 +1,6 @@
 /**
  * FeatureSpamProtection — feature p26 — 1280x720 @ 30fps, VOICE-SYNCED (955
- * frames), mood "sand".
+ * frames), mood "mint".
  *
  * ARCHETYPE 0 — "split duel". The whole canvas is halved by a divider whose
  * x-position slides over the course of the clip: chaos (spam) lives on the
@@ -9,6 +9,16 @@
  * described); as the defense gets built and the result lands, the divider
  * slides left and the order side swallows most of the frame — spam visually
  * squeezed into a thin trickle by the end.
+ *
+ * RE-SHOOT (2026-09-12): narration and beat windows are UNCHANGED — only the
+ * picture on the order side changed. Beat 3 (the trap) now plays the real
+ * commit that shipped it (github.com/.../commit/8cbd82d, scrolling through
+ * the actual honeypot/timing/rate-limit code) instead of three drawn icon
+ * cards; beat 4 (bots vs. real people) now plays a real recording of the
+ * feature's own page instead of a mockup inbox. The chaos side (a
+ * dramatization of an inbox no one has ever screenshotted) and the beat-5
+ * payoff number stay drawn, per STEP 0c: metaphor beats stay drawn, real UI
+ * beats play the real product.
  *
  * Beats (voice-synced, do not change without re-measuring the VO):
  *  b1  15–304  "...50 spam messages a day — SEO offers, casino links, crypto junk."
@@ -26,12 +36,15 @@ import {
   Panel,
   IconCard,
   StatPill,
+  FilterChip,
   CaptionBand,
   seg,
   fontFamily,
 } from "./bright-primitives";
+import { LiveWindow } from "./live-primitives";
+import shotsP26 from "./shots/p26.json";
 
-const P = MOODS.sand;
+const P = MOODS.mint;
 
 const SPAM_LINES: { icon: string; text: string }[] = [
   { icon: "🎰", text: "CASINO BONUS — claim $500 free spins now!!!" },
@@ -125,13 +138,21 @@ const ArrivalRow: React.FC<{ text: string; t: number }> = ({ text, t }) => {
   );
 };
 
-type Check = { emoji: string; title: string; sub: string; tone: Tone; x: number; activateAt: number };
+type Technique = { emoji: string; text: string; tone: Tone; activateAt: number };
 
-const CHECKS: Check[] = [
-  { emoji: "🍯", title: "Honeypot field", sub: "a bot fills it in", tone: "accent", x: 40, activateAt: 484 },
-  { emoji: "⏱", title: "3-second timer", sub: "too fast is a bot", tone: "accent", x: 214, activateAt: 540 },
-  { emoji: "🚦", title: "Rate limit", sub: "5 per 10 minutes", tone: "success", x: 388, activateAt: 600 },
+/** The three layers of the trap — same activation beats as before, now callouts
+ *  under the real commit diff instead of standalone icon cards. */
+const TECHNIQUES: Technique[] = [
+  { emoji: "🍯", text: "Honeypot field — a bot fills it in", tone: "accent", activateAt: 484 },
+  { emoji: "⏱", text: "3-second timer — too fast is a bot", tone: "accent", activateAt: 540 },
+  { emoji: "🚦", text: "Rate limit — 5 requests / 10 min", tone: "success", activateAt: 600 },
 ];
+
+/** Order-side window boxes — x/y are relative to the order-side wrapper div
+ *  (its own left:dividerX origin), not the full canvas. Sized to fit the
+ *  narrowest the order side gets during each beat's active window. */
+const COMMIT_WIN = { x: 24, y: 90, w: 480, h: 380 };
+const PAGE_WIN = { x: 40, y: 70, w: 600, h: 380 };
 
 export const FeatureSpamProtection: React.FC = () => {
   const frame = useCurrentFrame();
@@ -176,10 +197,10 @@ export const FeatureSpamProtection: React.FC = () => {
     easing: Easing.out(Easing.cubic),
   });
 
-  // ── Beat 4: blocked-bot flashes at each checkpoint ─────────────────
-  const blockPop = [pop(690), pop(715), pop(740)];
+  // ── Beat 3: the real commit diff, tech-credit chip pop, techniques list ──
+  const chipPop = pop(478, 9);
 
-  // ── Beat 4/5: real messages arriving in the clean inbox ────────────
+  // ── Beat 4: real messages arriving in the clean inbox, under the recording ──
   const arrival = [
     seg(frame, 700, 716, Easing.out(Easing.cubic)),
     seg(frame, 724, 740, Easing.out(Easing.cubic)),
@@ -196,7 +217,7 @@ export const FeatureSpamProtection: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, fontFamily, opacity: structureOp }}>
         <LightBg />
 
-        {/* ════ CHAOS SIDE — spam flooding in ════ */}
+        {/* ════ CHAOS SIDE — spam flooding in (dramatization, stays drawn) ════ */}
         <div style={{ position: "absolute", left: 0, top: 0, width: leftW, height: 720, overflow: "hidden" }}>
           <Panel x={0} y={0} w={leftW} h={720} tone="danger" radius={0} />
           <div
@@ -223,7 +244,7 @@ export const FeatureSpamProtection: React.FC = () => {
           </div>
         </div>
 
-        {/* ════ ORDER SIDE — the 3-tier defense ════ */}
+        {/* ════ ORDER SIDE — the 3-tier defense, now proven with the real product ════ */}
         <div style={{ position: "absolute", left: dividerX, top: 0, width: rightW, height: 720, overflow: "hidden" }}>
           <Panel x={0} y={0} w={rightW} h={720} tone="success" radius={0} />
           <div
@@ -243,85 +264,69 @@ export const FeatureSpamProtection: React.FC = () => {
             🛡 YOUR DEFENSE
           </div>
 
-          {/* Ghost slots — foreshadow the 3 checkpoints before they activate */}
-          {CHECKS.map((c) => {
-            const ghostOp = structureOp * (1 - seg(frame, c.activateAt - 10, c.activateAt + 6));
-            if (ghostOp <= 0.004) return null;
-            return (
-              <div
-                key={`ghost-${c.title}`}
-                style={{
-                  position: "absolute",
-                  left: c.x + 25,
-                  top: 100,
-                  width: 110,
-                  height: 110,
-                  borderRadius: 30,
-                  border: `2px dashed ${P.border}`,
-                  opacity: ghostOp * 0.7,
-                }}
-              />
-            );
-          })}
-
-          {/* The 3 checkpoints, activating in sequence during beat 3 */}
-          {CHECKS.map((c) => {
-            const s = pop(c.activateAt);
-            return (
-              <IconCard
-                key={c.title}
-                x={c.x}
-                y={100}
-                w={160}
-                emoji={c.emoji}
-                title={c.title}
-                sub={c.sub}
-                tone={c.tone}
-                scale={s}
-                opacity={Math.min(1, s)}
-              />
-            );
-          })}
-
-          {/* Beat 4 — blocked-bot flashes right under each checkpoint */}
-          <Group opacity={b4}>
-            {CHECKS.map((c, i) => (
-              <div
-                key={`block-${c.title}`}
-                style={{
-                  position: "absolute",
-                  left: c.x + 55,
-                  top: 232,
-                  width: 46,
-                  height: 46,
-                  borderRadius: "50%",
-                  background: P.dangerBg,
-                  border: `2px solid ${P.danger}`,
-                  color: P.danger,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 22,
-                  fontWeight: 800,
-                  transform: `scale(${Math.min(1, blockPop[i])})`,
-                  opacity: Math.min(1, blockPop[i]),
-                }}
-              >
-                ✕
-              </div>
-            ))}
+          {/* Beat 3 — the real commit that shipped the trap, with the three
+              techniques it contains popping in as it scrolls past them */}
+          <Group opacity={b3}>
+            <LiveWindow
+              file={shotsP26}
+              shot="commit"
+              title="github.com/.../commit/8cbd82d"
+              from={468}
+              hold={201}
+              zoom={(t) => 1 + 0.05 * t}
+              focus={{ x: 0.5, y: 0.3 }}
+              opacity={b3}
+              win={COMMIT_WIN}
+            />
+            <FilterChip
+              x={COMMIT_WIN.x + COMMIT_WIN.w - 226}
+              y={COMMIT_WIN.y + 42 + 14}
+              text="send-contact-email/index.ts"
+              icon="⚙"
+              color={P.accent}
+              scale={Math.min(1.05, chipPop)}
+              opacity={Math.min(1, chipPop)}
+            />
+            {TECHNIQUES.map((t, i) => {
+              const s = pop(t.activateAt);
+              return (
+                <StatPill
+                  key={t.text}
+                  x={COMMIT_WIN.x}
+                  y={COMMIT_WIN.y + COMMIT_WIN.h + 16 + i * 44}
+                  emoji={t.emoji}
+                  text={t.text}
+                  tone={t.tone}
+                  fontSize={15}
+                  scale={Math.min(1.05, s)}
+                  opacity={Math.min(1, s)}
+                />
+              );
+            })}
           </Group>
 
-          {/* Beat 4/5 — the clean inbox: real messages get through */}
-          <Group opacity={Math.max(b4, b5)}>
-            <div style={{ position: "absolute", left: 430, top: 100, width: 340 }}>
+          {/* Beat 4 — the real page, undisturbed, while real messages arrive
+              underneath it */}
+          <Group opacity={b4}>
+            <LiveWindow
+              file={shotsP26}
+              shot="page"
+              title="vitalii.no/features/3-tier-spam-protection..."
+              from={678}
+              hold={145}
+              zoom={(t) => 1 + 0.04 * t}
+              focus={{ x: 0.5, y: 0.35 }}
+              opacity={b4}
+              win={PAGE_WIN}
+            />
+            <div style={{ position: "absolute", left: PAGE_WIN.x, top: PAGE_WIN.y + PAGE_WIN.h + 12, width: 400 }}>
               <div
                 style={{
                   fontSize: 13,
                   fontWeight: 800,
                   letterSpacing: 0.6,
                   color: P.success,
-                  marginBottom: 12,
+                  marginBottom: 10,
                   fontFamily,
                 }}
               >
@@ -387,7 +392,7 @@ export const FeatureSpamProtection: React.FC = () => {
         />
 
         {/* ════ Caption backdrop — keeps every CaptionBand legible over the
-             full-bleed spam feed / checklist behind it ════ */}
+             full-bleed spam feed / live recordings behind it ════ */}
         <div
           style={{
             position: "absolute",
@@ -395,7 +400,7 @@ export const FeatureSpamProtection: React.FC = () => {
             top: 606,
             width: 1280,
             height: 114,
-            background: "linear-gradient(180deg, rgba(253,250,244,0) 0%, rgba(253,250,244,0.92) 28%, rgba(253,250,244,0.92) 100%)",
+            background: "linear-gradient(180deg, rgba(240,250,246,0) 0%, rgba(240,250,246,0.92) 28%, rgba(240,250,246,0.92) 100%)",
           }}
         />
 
@@ -409,7 +414,7 @@ export const FeatureSpamProtection: React.FC = () => {
               width: 520,
               height: 216,
               borderRadius: 26,
-              background: "rgba(253,250,244,0.9)",
+              background: "rgba(240,250,246,0.9)",
               boxShadow: "0 16px 36px rgba(0,0,0,0.22)",
             }}
           />
