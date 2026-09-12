@@ -68,18 +68,26 @@ const BIG_W = 270;
 const BIG_H = 170;
 
 const MINI_W = 210;
-const MINI_H = 104;
+const MINI_H = 80;
 const MINI_START_X = (1280 - (MINI_W * 4 + 24 * 3)) / 2;
-const MINI_SLOTS = [0, 1, 2, 3].map((i) => ({ x: MINI_START_X + i * (MINI_W + 24), y: 40 }));
+const MINI_SLOTS = [0, 1, 2, 3].map((i) => ({ x: MINI_START_X + i * (MINI_W + 24), y: 18 }));
 
 const FINAL_SLOT = { x: WIN.x + WIN.w - 300, y: WIN.y + WIN.h - 128, w: 270, h: 112 };
 
-const hero = (value: string, unit: string | undefined, label: string, color: string, scale: number) => (
+const hero = (
+  value: string,
+  unit: string | undefined,
+  label: string,
+  color: string,
+  scale: number,
+  top: number = 34,
+  size: number = 96,
+) => (
   <div
     style={{
       position: "absolute",
       left: 90,
-      top: 34,
+      top,
       width: 470,
       transform: `scale(${0.86 + 0.14 * Math.min(1, scale)})`,
       transformOrigin: "left top",
@@ -88,7 +96,7 @@ const hero = (value: string, unit: string | undefined, label: string, color: str
   >
     <div
       style={{
-        fontSize: 96,
+        fontSize: size,
         lineHeight: 1,
         fontWeight: 800,
         letterSpacing: -3,
@@ -97,7 +105,7 @@ const hero = (value: string, unit: string | undefined, label: string, color: str
       }}
     >
       {value}
-      {unit ? <span style={{ fontSize: 96 * 0.34, marginLeft: 6 }}>{unit}</span> : null}
+      {unit ? <span style={{ fontSize: size * 0.34, marginLeft: 6 }}>{unit}</span> : null}
     </div>
     <div style={{ marginTop: 6, fontSize: 16, fontWeight: 700, letterSpacing: 1.6, color: P.muted }}>{label}</div>
   </div>
@@ -211,9 +219,9 @@ export const FeatureBotRegistersOwnJobJ72: React.FC = () => {
 
         {/* ================= beat 5 : the feature's own page proves the result ================= */}
         <Group opacity={b5}>
-          {hero("3", undefined, "SECTIONS FILLED AND READY", P.success, heroPop5)}
-          <StatPill x={780} y={52} emoji="✅" text="zero before, filled now" tone="success" opacity={b5} />
-          <StatPill x={780} y={112} emoji="📄" text="personal, questions, cover letter" tone="success" opacity={b5} />
+          {hero("3", undefined, "SECTIONS FILLED AND READY", P.success, heroPop5, 106, 52)}
+          <StatPill x={780} y={106} emoji="✅" text="zero before, filled now" tone="success" opacity={b5} />
+          <StatPill x={780} y={150} emoji="📄" text="personal, questions, cover letter" tone="success" opacity={b5} />
           <CaptionBand y={664} fontSize={22} text="Tested live on Webcruiter: every section filled, ready to send" tone="success" opacity={b5} />
         </Group>
         <LiveWindow
