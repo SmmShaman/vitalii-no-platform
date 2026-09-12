@@ -5,7 +5,7 @@
   "shots": [
     {
       "name": "commits",
-      "url": "https://github.com/SmmShaman/calendar-bot/commits/master",
+      "url": "https://github.com/SmmShaman/calendar-bot",
       "frames": 130,
       "scroll": [[0, 0], [129, 260]],
       "mouse": [[0, 300, 180], [45, 480, 240], [90, 520, 300], [129, 460, 260]]
