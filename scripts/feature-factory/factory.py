@@ -83,12 +83,28 @@ def log(msg):
     print(line, flush=True)
 
 
+def redact(text):
+    """Strip GitHub tokens out of anything that can reach the log or Telegram.
+    2026-09-09 23:48 UTC: a failed curl to the Actions API raised with its full
+    command line, PAT included, and that line went into factory.log AND the
+    owner's Telegram."""
+    text = str(text)
+    try:
+        tok = gh_token()
+        if tok:
+            text = text.replace(tok, "ghp_***")
+    except Exception:
+        pass
+    return re.sub(r"\b(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{20,}|\bgithub_pat_[A-Za-z0-9_]{20,}",
+                  r"\1_***", text)
+
+
 def run(cmd, cwd=None, check=True, user=None):
     if user:
         cmd = f"sudo -u {user} bash -lc {shlex.quote(cmd)}"
     r = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True, text=True)
     if check and r.returncode != 0:
-        raise RuntimeError(f"{cmd}\n{r.stdout}\n{r.stderr}")
+        raise RuntimeError(redact(f"{cmd}\n{r.stdout}\n{r.stderr}"))
     return r.stdout.strip()
 
 
@@ -240,7 +256,7 @@ def recordable_urls(row):
     if repo in PUBLIC_REPOS:
         for h in [c for c in commits.split(",") if c][:2]:
             cands.append(("the feature's real commit (its diff)", f"{repo}/commit/{h}"))
-        cands.append(("the repo's commit history", f"{repo}/commits/main"))
+        cands.append(("the repo's commit history", f"{repo}/commits"))  # GitHub redirects to the default branch
         cands.append(("the repo's Actions runs", f"{repo}/actions"))
     for site in PUBLIC_SITES.get(row[9], []):
         cands.append(("the product itself", site))
@@ -253,7 +269,7 @@ def recordable_urls(row):
     return out
 
 
-def choose(rows, voiced, live, runway=None):
+def choose(rows, voiced, live, runway=None, stranded=()):
     """N_NEW never-voiced features, NEWEST FIRST (owner decision 2026-09-07:
     a feature discovered today gets its clip tonight; the old tier order
     bright > dark > no-clip, oldest first, parked fresh features behind ~220
@@ -271,7 +287,41 @@ def choose(rows, voiced, live, runway=None):
     if len(picks) < N_CLIPS:
         extra = [r for r in new[n_new:] + redo[n_redo:] if r not in picks]
         picks += extra[:N_CLIPS - len(picks)]
-    return picks[:N_CLIPS]
+    picks = picks[:N_CLIPS]
+    # Stranded features — voiced, drawn, shots written, but never published
+    # because the night died between wave B and the R2 write (j77/v36/v37 on
+    # 2026-09-10, k01/g04/v30 on 2026-09-12). Both file markers exist, so the
+    # pools above never see them again, and the paid work sits in git unused.
+    # They cost no agent time (waves A and B are skipped), only render minutes,
+    # so they ride ON TOP of tonight's regular picks, newest first, N_CLIPS at
+    # a time.
+    fin = sorted([r for r in rows if r[0] in stranded and r not in picks],
+                 key=lambda r: (r[8], r[0]), reverse=True)[:N_CLIPS]
+    return fin + picks
+
+
+def clamp_shots(spec):
+    """The one slip that killed the night of 2026-09-11: every shot had its last
+    scroll/mouse keyframe on frame == frames (232 of 232), one past the last
+    frame the recorder writes (0..frames-1). Three fresh conversations made the
+    same off-by-one. Pull such a keyframe (and a click) back by one instead of
+    throwing the whole clip away. Returns True when anything changed."""
+    changed = False
+    for sh in spec.get("shots") or []:
+        frames = sh.get("frames")
+        if not isinstance(frames, int):
+            continue
+        for key in ("scroll", "mouse"):
+            k = sh.get(key) or []
+            if k and isinstance(k[-1], list) and k[-1] and k[-1][0] == frames \
+                    and (len(k) < 2 or k[-2][0] < frames - 1):
+                k[-1][0] = frames - 1
+                changed = True
+        clicks = sh.get("clicks")
+        if isinstance(clicks, list) and frames in clicks:
+            sh["clicks"] = [frames - 1 if c == frames else c for c in clicks]
+            changed = True
+    return changed
 
 
 def shots_ok(fid):
@@ -284,6 +334,9 @@ def shots_ok(fid):
         spec = json.load(open(p))
     except Exception as e:
         return [f"shots file is not JSON: {e}"]
+    if clamp_shots(spec):
+        json.dump(spec, open(p, "w"), indent=2)
+        log(f"{fid}: shots file clamped — last keyframe moved from frames to frames-1")
     probs = []
     for sh in spec.get("shots") or [{}]:
         name, url, frames = sh.get("name", "?"), sh.get("url", ""), sh.get("frames", 0)
@@ -591,14 +644,19 @@ def main():
         os.makedirs(SHOTS_DIR, exist_ok=True)
         live = {f[:-len(".json")] for f in os.listdir(SHOTS_DIR) if f.endswith(".json")}
         rows = [r.split("|") for r in psql(FEATURES_SQL).splitlines() if r]
-        chosen = choose(rows, voiced, live, runway)
-        log(f"voiced: {len(voiced)}, live: {len(live)}, published: {len(rows)}; "
-            f"picking {len(chosen)}")
+        bright = {r[0] for r in rows if r[1] == "bright"}
+        stranded = (voiced & live) - bright
+        chosen = choose(rows, voiced, live, runway, stranded)
+        log(f"voiced: {len(voiced)}, live: {len(live)}, published: {len(rows)}, "
+            f"stranded: {sorted(stranded)}; picking {len(chosen)}")
         picks = []
         recent = []
         for row in chosen:
             fid, style, title = row[0], row[1], row[2]
-            redo = fid in voiced
+            finish = fid in stranded
+            # A stranded feature is NEW material for the publisher: not a redo,
+            # so it gets its queue row and its YouTube upload like any new clip.
+            redo = fid in voiced and not finish
             comp = composition_for(fid)
             newfile = comp is None
             if newfile:
@@ -609,7 +667,10 @@ def main():
             urls = recordable_urls(row)
             picks.append({"id": fid, "style": style, "title": title, "redo": redo,
                           "composition": comp, "newfile": newfile, "archetype": arche,
-                          "mood": mood, "urls": urls, "youtube": bool(row[7])})
+                          "mood": mood, "urls": urls, "youtube": bool(row[7]),
+                          "finish": finish})
+            if finish:
+                log(f"{fid}: stranded (voiced + drawn, never published) -> straight to render")
         if not picks:
             log("nothing left to make")
             telegram("🏭 Завод: усі фічі вже зняті в новому стилі. Черга вичерпана.")
@@ -695,6 +756,9 @@ def main():
         # fails is dropped alone instead of taking the night with it.
         drawn = []
         for p in picks:
+            if p.get("finish"):
+                drawn.append(p)   # composition + shots already in git
+                continue
             mark = f"{MARKER_DIR}/waveB-{stamp}-{p['id']}.done"
             fresh_session(f"wave B {p['id']}")
             wake(WAVE_B_PROMPT.format(tables=p["table"], marker=to_container(mark),
@@ -939,6 +1003,10 @@ hub are always there; a real commit diff is the strongest shot for a backend
 feature. Metaphor beats stay drawn. A feature marked RE-SHOOT keeps its beats
 and windows exactly; you rewrite only the picture. Do NOT record anything
 yourself and do NOT create files under `public/rec` — the GitHub runner records.
+Frames in a shot are numbered `0 … frames-1`: the LAST keyframe of every `scroll`
+and `mouse` list and every `clicks` entry must be at most `frames - 1` (a shot with
+`frames: 232` ends its keyframes at 231, never 232). The recorder rejects anything
+past that, and the whole feature is dropped for the night.
 
 The four defects that failed review on earlier clips, all of which you must avoid:
 1. **A `seg()` fade-in with no fade-out clamps at 1 forever**, leaving one beat's
@@ -1021,6 +1089,6 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception as exc:  # never die silently at 2am
-        log(f"FATAL {exc!r}")
-        telegram(f"🏭 Завод впав: <code>{str(exc)[:300]}</code>")
+        log(f"FATAL {redact(repr(exc))}")
+        telegram(f"🏭 Завод впав: <code>{redact(exc)[:300]}</code>")
         sys.exit(1)
