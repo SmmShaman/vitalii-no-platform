@@ -1,0 +1,7 @@
+{"id": "c06", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A cancelled game or a declined practice still looked like a normal event on the calendar."],
+ ["b2", "Parents assumed everything was still on, because nothing on the calendar ever said otherwise."],
+ ["b3", "Our calendar just wasn't reading Spond's own cancel and decline signals."],
+ ["b4", "Now it checks both signals, per child, and marks the event clearly instead of just hiding it."],
+ ["b5", "A moved fixture, a declined training — two mixed-up games, finally shown correctly, not deleted."]
+]}

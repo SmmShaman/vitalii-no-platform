@@ -1,0 +1,56 @@
+{
+ "id": "j72",
+ "beat_durations": {
+  "b1": 4.704,
+  "b2": 3.432,
+  "b3": 3.648,
+  "b4": 5.328,
+  "b5": 7.896
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Some job sites make you create an account just to apply \u2014 no guest option at all.",
+   "start_s": 0.5,
+   "end_s": 5.204,
+   "start_f": 15,
+   "end_f": 156
+  },
+  {
+   "beat": "b2",
+   "text": "A perfect match got skipped the second that wall showed up.",
+   "start_s": 5.504,
+   "end_s": 8.936,
+   "start_f": 165,
+   "end_f": 268
+  },
+  {
+   "beat": "b3",
+   "text": "Our bot used to see that wall and simply give up every time.",
+   "start_s": 9.236,
+   "end_s": 12.884,
+   "start_f": 277,
+   "end_f": 387
+  },
+  {
+   "beat": "b4",
+   "text": "Now it registers the account on its own, confirms the email, and imports the resume.",
+   "start_s": 13.184,
+   "end_s": 18.512,
+   "start_f": 396,
+   "end_f": 555
+  },
+  {
+   "beat": "b5",
+   "text": "Tested live on a real Webcruiter posting: zero applications before, every section filled and ready to send now.",
+   "start_s": 18.812,
+   "end_s": 26.708,
+   "start_f": 564,
+   "end_f": 801
+  }
+ ],
+ "total_s": 28.208,
+ "durationInFrames": 846,
+ "measured_track_s": 26.76,
+ "track": "/root/feature-demos/vo-j72/vo-j72.mp3"
+}

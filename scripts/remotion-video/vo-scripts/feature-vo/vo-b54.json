@@ -1,0 +1,56 @@
+{
+ "id": "b54",
+ "beat_durations": {
+  "b1": 5.088,
+  "b2": 5.328,
+  "b3": 4.824,
+  "b4": 4.92,
+  "b5": 7.056
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "There are two different times for game day \u2014 when to actually show up, and when the whistle blows.",
+   "start_s": 0.5,
+   "end_s": 5.588,
+   "start_f": 15,
+   "end_f": 168
+  },
+  {
+   "beat": "b2",
+   "text": "Our kiosk only ever showed the whistle time, copied straight from Spond's kickoff field.",
+   "start_s": 5.888,
+   "end_s": 11.216,
+   "start_f": 177,
+   "end_f": 336
+  },
+  {
+   "beat": "b3",
+   "text": "A kid told to arrive early walked in exactly on time \u2014 and still looked late.",
+   "start_s": 11.516,
+   "end_s": 16.34,
+   "start_f": 345,
+   "end_f": 490
+  },
+  {
+   "beat": "b4",
+   "text": "Now the kiosk compares both times and shows both when they're far enough apart.",
+   "start_s": 16.64,
+   "end_s": 21.56,
+   "start_f": 499,
+   "end_f": 647
+  },
+  {
+   "beat": "b5",
+   "text": "A five-minute gap stays simple, but a real one prints clearly \u2014 17:15 to 18:00.",
+   "start_s": 21.86,
+   "end_s": 28.916,
+   "start_f": 656,
+   "end_f": 867
+  }
+ ],
+ "total_s": 30.416,
+ "durationInFrames": 912,
+ "measured_track_s": 28.968,
+ "track": "/root/feature-demos/vo-b54/vo-b54.mp3"
+}

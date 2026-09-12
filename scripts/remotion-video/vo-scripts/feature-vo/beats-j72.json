@@ -1,0 +1,7 @@
+{"id": "j72", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Some job sites make you create an account just to apply — no guest option at all."],
+ ["b2", "A perfect match got skipped the second that wall showed up."],
+ ["b3", "Our bot used to see that wall and simply give up every time."],
+ ["b4", "Now it registers the account on its own, confirms the email, and imports the resume."],
+ ["b5", "Tested live on a real Webcruiter posting: zero applications before, every section filled and ready to send now."]
+]}

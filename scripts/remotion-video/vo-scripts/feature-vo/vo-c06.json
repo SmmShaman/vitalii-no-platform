@@ -1,0 +1,56 @@
+{
+ "id": "c06",
+ "beat_durations": {
+  "b1": 5.376,
+  "b2": 5.544,
+  "b3": 4.656,
+  "b4": 5.688,
+  "b5": 6.696
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A cancelled game or a declined practice still looked like a normal event on the calendar.",
+   "start_s": 0.5,
+   "end_s": 5.876,
+   "start_f": 15,
+   "end_f": 176
+  },
+  {
+   "beat": "b2",
+   "text": "Parents assumed everything was still on, because nothing on the calendar ever said otherwise.",
+   "start_s": 6.176,
+   "end_s": 11.72,
+   "start_f": 185,
+   "end_f": 352
+  },
+  {
+   "beat": "b3",
+   "text": "Our calendar just wasn't reading Spond's own cancel and decline signals.",
+   "start_s": 12.02,
+   "end_s": 16.676,
+   "start_f": 361,
+   "end_f": 500
+  },
+  {
+   "beat": "b4",
+   "text": "Now it checks both signals, per child, and marks the event clearly instead of just hiding it.",
+   "start_s": 16.976,
+   "end_s": 22.664,
+   "start_f": 509,
+   "end_f": 680
+  },
+  {
+   "beat": "b5",
+   "text": "A moved fixture, a declined training \u2014 two mixed-up games, finally shown correctly, not deleted.",
+   "start_s": 22.964,
+   "end_s": 29.66,
+   "start_f": 689,
+   "end_f": 890
+  }
+ ],
+ "total_s": 31.16,
+ "durationInFrames": 935,
+ "measured_track_s": 29.712,
+ "track": "/root/feature-demos/vo-c06/vo-c06.mp3"
+}
