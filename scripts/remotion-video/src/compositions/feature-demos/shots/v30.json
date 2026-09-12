@@ -1,0 +1,14 @@
+{
+  "id": "v30",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-video-digest-went-silent-for-four-days-now-it-speaks-for-free-v30",
+      "frames": 200,
+      "scroll": [[0, 0], [90, 240], [200, 480]],
+      "mouse": [[0, 560, 200], [90, 560, 300], [200, 560, 340]]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "j72",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/jobbot-norway/actions",
+      "frames": 130,
+      "scroll": [[0, 0], [129, 320]],
+      "mouse": [[0, 300, 200], [55, 520, 260], [100, 460, 300], [129, 420, 220]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-bot-now-registers-its-own-job-site-accounts-instead-of-giving-up-at-the-logi-j72",
+      "frames": 260,
+      "scroll": [[0, 0], [259, 950]],
+      "mouse": [[0, 560, 220], [130, 560, 420], [259, 560, 320]]
+    }
+  ]
+}

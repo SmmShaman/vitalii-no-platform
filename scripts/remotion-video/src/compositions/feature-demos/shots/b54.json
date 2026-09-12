@@ -1,0 +1,14 @@
+{
+  "id": "b54",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/meet-up-at-1715-whistle-at-1800-the-kiosk-finally-shows-both-b54",
+      "frames": 210,
+      "scroll": [[0, 0], [209, 880]],
+      "mouse": [[0, 560, 210], [100, 560, 380], [209, 560, 300]]
+    }
+  ]
+}

@@ -151,6 +151,9 @@ import { FeatureTraceabilityScanner } from "./compositions/feature-demos/Feature
 import { FeatureTraceabilityScannerLive } from "./compositions/feature-demos/FeatureTraceabilityScannerLive";
 import { FeatureRiskScoringVetoesSerialK03 } from "./compositions/feature-demos/FeatureRiskScoringVetoesSerialK03";
 import { FeaturePaperModeSimulatesSlippageK02 } from "./compositions/feature-demos/FeaturePaperModeSimulatesSlippageK02";
+import { FeatureBotRegistersOwnJobJ72 } from "./compositions/feature-demos/FeatureBotRegistersOwnJobJ72";
+import { FeatureCancelledGameStaysCalendarC06 } from "./compositions/feature-demos/FeatureCancelledGameStaysCalendarC06";
+import { FeatureMeetUpAt17B54 } from "./compositions/feature-demos/FeatureMeetUpAt17B54";
 import { FeatureDemoClipsShowRealV33 } from "./compositions/feature-demos/FeatureDemoClipsShowRealV33";
 import { FeatureButtonsTilesPressIntoV32 } from "./compositions/feature-demos/FeatureButtonsTilesPressIntoV32";
 import { FeatureInstagramCaptionsGetAltV35 } from "./compositions/feature-demos/FeatureInstagramCaptionsGetAltV35";
@@ -1779,6 +1782,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeaturePaperModeSimulatesSlippageK02"
         component={FeaturePaperModeSimulatesSlippageK02}
         durationInFrames={802}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureBotRegistersOwnJobJ72"
+        component={FeatureBotRegistersOwnJobJ72}
+        durationInFrames={846}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureCancelledGameStaysCalendarC06"
+        component={FeatureCancelledGameStaysCalendarC06}
+        durationInFrames={935}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureMeetUpAt17B54"
+        component={FeatureMeetUpAt17B54}
+        durationInFrames={912}
         fps={30}
         width={1280}
         height={720}
