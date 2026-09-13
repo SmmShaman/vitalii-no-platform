@@ -14,8 +14,8 @@
       "name": "page",
       "url": "https://vitalii.no/features/3-tier-spam-protection-killing-bots-before-they-hit-my-inbox-p26",
       "frames": 150,
-      "scroll": [[0, 0], [149, 560]],
-      "mouse": [[0, 560, 200], [75, 560, 260], [149, 560, 320]]
+      "scroll": [[0, 0], [110, 0], [149, 560]],
+      "mouse": [[0, 560, 200], [110, 560, 260], [149, 560, 320]]
     }
   ]
 }

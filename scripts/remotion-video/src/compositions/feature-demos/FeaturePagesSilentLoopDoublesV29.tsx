@@ -381,7 +381,7 @@ export const FeaturePagesSilentLoopDoublesV29: React.FC = () => {
         />
         <Group opacity={b34}>
           <FilterChip
-            x={WIN2.x + WIN2.w - 210}
+            x={WIN2.x + WIN2.w - 330}
             y={WIN2.y + 42 + 14}
             text="FeatureDemoClip.tsx — youtubeId prop"
             icon="🔊"

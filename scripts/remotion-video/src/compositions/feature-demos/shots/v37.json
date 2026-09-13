@@ -15,14 +15,14 @@
       "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/01b477a8c9855f86ab2bd1cbb85b2ec1124618d7",
       "frames": 125,
       "scroll": [[0, 0], [30, 0], [124, 700]],
-      "mouse": [[0, 560, 40], [30, 560, 40], [90, 650, 260], [124, 650, 260]]
+      "mouse": [[0, 560, 40], [30, 560, 40], [90, 600, 160], [124, 600, 160]]
     },
     {
       "name": "page",
       "url": "https://vitalii.no/features/the-nightly-feature-clip-factory-now-rotates-its-own-conversation-every-wave-and-v37",
       "frames": 240,
-      "scroll": [[0, 0], [50, 0], [150, 500], [239, 900]],
-      "mouse": [[0, 560, 60], [50, 560, 60], [150, 500, 400], [239, 500, 400]]
+      "scroll": [[0, 0], [180, 0], [195, 900], [239, 900]],
+      "mouse": [[0, 560, 60], [180, 560, 60], [195, 500, 400], [239, 500, 400]]
     }
   ]
 }

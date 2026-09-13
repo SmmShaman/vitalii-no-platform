@@ -282,7 +282,7 @@ export const FeatureBoundedAutoReconEndingJ71: React.FC = () => {
           title="github.com/SmmShaman/jobbot-norway — Actions"
           from={462}
           hold={162}
-          zoom={(t) => 1 + 0.1 * easeOut(t)}
+          zoom={(t) => 1 + 0.04 * easeOut(t)}
           focus={{ x: 0.5, y: 0.35 }}
           opacity={b4}
         />

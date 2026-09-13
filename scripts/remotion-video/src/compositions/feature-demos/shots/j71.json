@@ -21,8 +21,8 @@
       "name": "page",
       "url": "https://vitalii.no/features/bounded-auto-recon-ending-two-weeks-of-zero-applications-without-blowing-the-tok-j71",
       "frames": 210,
-      "scroll": [[0, 0], [209, 680]],
-      "mouse": [[0, 560, 200], [209, 560, 300]]
+      "scroll": [[0, 0], [160, 0], [209, 680]],
+      "mouse": [[0, 560, 200], [160, 560, 200], [209, 560, 300]]
     }
   ]
 }
