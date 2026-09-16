@@ -1,0 +1,56 @@
+{
+ "id": "b56",
+ "beat_durations": {
+  "b1": 6.12,
+  "b2": 5.448,
+  "b3": 6.072,
+  "b4": 5.328,
+  "b5": 5.448
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My son can't read yet, so his tasks are pictures and letters \u2014 no words, on purpose.",
+   "start_s": 0.5,
+   "end_s": 6.62,
+   "start_f": 15,
+   "end_f": 199
+  },
+  {
+   "beat": "b2",
+   "text": "But one card still blinked a question mark, with no way to know what to do without me right there.",
+   "start_s": 6.92,
+   "end_s": 12.368,
+   "start_f": 208,
+   "end_f": 371
+  },
+  {
+   "beat": "b3",
+   "text": "So each card now writes its own instruction \u2014 one line in Norwegian, one in Ukrainian.",
+   "start_s": 12.668,
+   "end_s": 18.74,
+   "start_f": 380,
+   "end_f": 562
+  },
+  {
+   "beat": "b4",
+   "text": "A parent or older sibling reads it aloud; he still can't read a single word himself.",
+   "start_s": 19.04,
+   "end_s": 24.368,
+   "start_f": 571,
+   "end_f": 731
+  },
+  {
+   "beat": "b5",
+   "text": "Every card, letter, number, or handwriting \u2014 now speaks in two languages.",
+   "start_s": 24.668,
+   "end_s": 30.116,
+   "start_f": 740,
+   "end_f": 903
+  }
+ ],
+ "total_s": 31.616,
+ "durationInFrames": 948,
+ "measured_track_s": 30.168,
+ "track": "/root/feature-demos/vo-b56/vo-b56.mp3"
+}

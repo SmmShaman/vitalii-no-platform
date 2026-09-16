@@ -1,0 +1,56 @@
+{
+ "id": "b55",
+ "beat_durations": {
+  "b1": 4.512,
+  "b2": 6.672,
+  "b3": 7.344,
+  "b4": 6.624,
+  "b5": 5.088
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My kids read English words on their study wall, but they've never heard them spoken.",
+   "start_s": 0.5,
+   "end_s": 5.012,
+   "start_f": 15,
+   "end_f": 150
+  },
+  {
+   "beat": "b2",
+   "text": "A word like suddenly was just letters \u2014 no clue how to say it, and IPA means nothing to a first-grader.",
+   "start_s": 5.312,
+   "end_s": 11.984,
+   "start_f": 159,
+   "end_f": 360
+  },
+  {
+   "beat": "b3",
+   "text": "So I built a plain respelling dictionary \u2014 Norwegian letters instead of phonetic symbols. Suddenly becomes SAD-en-li.",
+   "start_s": 12.284,
+   "end_s": 19.628,
+   "start_f": 369,
+   "end_f": 589
+  },
+  {
+   "beat": "b4",
+   "text": "It shows up under every vocabulary answer, beside each choice before they pick, and in their review history.",
+   "start_s": 19.928,
+   "end_s": 26.552,
+   "start_f": 598,
+   "end_f": 797
+  },
+  {
+   "beat": "b5",
+   "text": "2,588 words. Every one of them now sounds like something.",
+   "start_s": 26.852,
+   "end_s": 31.94,
+   "start_f": 806,
+   "end_f": 958
+  }
+ ],
+ "total_s": 33.44,
+ "durationInFrames": 1003,
+ "measured_track_s": 31.992,
+ "track": "/root/feature-demos/vo-b55/vo-b55.mp3"
+}
