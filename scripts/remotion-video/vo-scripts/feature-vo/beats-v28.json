@@ -1,0 +1,7 @@
+{"id": "v28", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Watch an old clip of mine and something feels off."],
+ ["b2", "The picture had a fixed length, so when the voice ran longer, it just looped — you'd see the same scene twice while the words moved on."],
+ ["b3", "So I flipped it. Now I write the narration first and measure each sentence."],
+ ["b4", "The video, built in Remotion, follows those exact measurements, beat by beat."],
+ ["b5", "This clip now runs exactly nine hundred seven frames — precisely as long as the voice needs."]
+]}

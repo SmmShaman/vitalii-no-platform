@@ -1,0 +1,56 @@
+{
+ "id": "v28",
+ "beat_durations": {
+  "b1": 2.928,
+  "b2": 7.584,
+  "b3": 4.68,
+  "b4": 5.52,
+  "b5": 6.192
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Watch an old clip of mine and something feels off.",
+   "start_s": 0.5,
+   "end_s": 3.428,
+   "start_f": 15,
+   "end_f": 103
+  },
+  {
+   "beat": "b2",
+   "text": "The picture had a fixed length, so when the voice ran longer, it just looped \u2014 you'd see the same scene twice while the words moved on.",
+   "start_s": 3.728,
+   "end_s": 11.312,
+   "start_f": 112,
+   "end_f": 339
+  },
+  {
+   "beat": "b3",
+   "text": "So I flipped it. Now I write the narration first and measure each sentence.",
+   "start_s": 11.612,
+   "end_s": 16.292,
+   "start_f": 348,
+   "end_f": 489
+  },
+  {
+   "beat": "b4",
+   "text": "The video, built in Remotion, follows those exact measurements, beat by beat.",
+   "start_s": 16.592,
+   "end_s": 22.112,
+   "start_f": 498,
+   "end_f": 663
+  },
+  {
+   "beat": "b5",
+   "text": "This clip now runs exactly nine hundred seven frames \u2014 precisely as long as the voice needs.",
+   "start_s": 22.412,
+   "end_s": 28.604,
+   "start_f": 672,
+   "end_f": 858
+  }
+ ],
+ "total_s": 30.104,
+ "durationInFrames": 903,
+ "measured_track_s": 28.656,
+ "track": "/root/feature-demos/vo-v28/vo-v28.mp3"
+}
