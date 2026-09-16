@@ -601,12 +601,48 @@ def git(cmd):
 def push():
     """origin may have moved while the agent worked (2026-09-07: a fix pushed
     from the PC mid-run made the narration push fail with "fetch first" and
-    killed the night). Rebase our commits on top of origin first."""
-    git("pull -q --rebase origin main")
-    git("push -q origin main")
+    killed the night). Rebase our commits on top of origin first.
+
+    2026-09-16: `git pull --rebase origin main` died with "Cannot rebase onto
+    multiple branches" — FETCH_HEAD is shared with the agent container that
+    mounts this clone and a concurrent fetch there left two merge heads in it.
+    Rebase onto the remote-tracking ref instead (never reads FETCH_HEAD) and
+    retry once before giving up."""
+    for attempt in (1, 2):
+        try:
+            git("fetch -q origin main")
+            git("rebase -q origin/main")
+            git("push -q origin main")
+            return
+        except RuntimeError as exc:
+            run("git rebase --abort", cwd=REPO, check=False, user="stuar")
+            if attempt == 2:
+                raise
+            log(f"push: attempt {attempt} failed ({redact(str(exc))[:160]!r}); retrying in 20s")
+            time.sleep(20)
+
+
+QUOTA_FILE = "/home/stuar/nanoclaw-v2/data/quota.json"
+
+
+def quota_until_ms():
+    """nanoclaw records the subscription reset time it last saw from any agent
+    (data/quota.json, written by its quota guard). While that is in the future
+    every wake would only produce another 'out of extra usage' line."""
+    try:
+        d = json.load(open(QUOTA_FILE))
+        until = float(d.get("untilMs", 0))
+    except (OSError, ValueError, TypeError):
+        return None
+    return until if until > time.time() * 1000 else None
 
 
 def main():
+    q = quota_until_ms()
+    if q:
+        log("subscription quota exhausted until "
+            f"{time.strftime('%Y-%m-%d %H:%M UTC', time.gmtime(q / 1000))} — skipping this run quietly")
+        return 0
     if os.path.exists(LOCK):
         log("another run holds the lock — exiting")
         return 0

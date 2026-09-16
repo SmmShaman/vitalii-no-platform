@@ -9,7 +9,7 @@ completed. Nothing was broken loudly enough to be seen.
 Everything here checks for ABSENCE, because that is the failure mode that hides:
 a post that did not happen, an agent that said nothing, a clip nobody rendered.
 """
-import glob, json, os, re, shlex, subprocess, sys
+import glob, hashlib, json, os, re, shlex, subprocess, sys, time
 from datetime import datetime, timezone
 
 PUB_OUTBOUND = ("/home/stuar/nanoclaw-v2/data/v2-sessions/ag-1777451495719-mbqkcm/"
@@ -30,6 +30,18 @@ MAX_SILENCE_H = 26
 MIN_RUNWAY = 6
 FACTORY_LOG = "/root/feature-demos/factory.log"
 RETRY_MARK = "/root/feature-demos/.factory-retry-%s"   # one daytime retry per UTC day
+ALARM_STATE = "/root/feature-demos/.watchdog-last-alarm.json"
+QUOTA_FILE = "/home/stuar/nanoclaw-v2/data/quota.json"
+
+
+def quota_until_ms():
+    """Reset time of the shared Claude subscription as last seen by nanoclaw's
+    quota guard (data/quota.json); None when no quota block is active."""
+    try:
+        until = float(json.load(open(QUOTA_FILE)).get("untilMs", 0))
+    except (OSError, ValueError, TypeError):
+        return None
+    return until if until > time.time() * 1000 else None
 
 
 def factory_night_failed():
@@ -180,7 +192,12 @@ def main():
 
     # ── a failed night gets one daytime retry (owner, 2026-09-08) ──
     failed, why = factory_night_failed()
-    if failed:
+    quota_ms = quota_until_ms()
+    if failed and quota_ms:
+        alarms.append(f"Нічний прогін заводу впав ({why}). Підписка Claude вичерпана до "
+                      f"{time.strftime('%d.%m %H:%M UTC', time.gmtime(quota_ms / 1000))} — "
+                      f"денний повтор відкладено, нічого не запускаю.")
+    elif failed:
         mark = RETRY_MARK % datetime.now(timezone.utc).strftime("%Y-%m-%d")
         state = subprocess.run(["systemctl", "is-active", "feature-factory.service"],
                                capture_output=True, text=True).stdout.strip()
@@ -205,7 +222,21 @@ def main():
         alarms.append("Не вдалося порахувати запас кліпів.")
 
     if alarms:
+        # 2026-09-16: the same alarm went to Telegram every 6 h for three days
+        # while the subscription was exhausted (27 identical messages). Send a
+        # given set of alarms once per 24 h; numbers ("мовчить 31 год") are
+        # masked so a growing counter does not count as news.
+        key = hashlib.sha1("\n".join(re.sub(r"\d+", "#", a) for a in alarms).encode()).hexdigest()
+        prev = {}
+        try:
+            prev = json.load(open(ALARM_STATE))
+        except (OSError, ValueError):
+            pass
+        if prev.get("key") == key and time.time() - prev.get("ts", 0) < 24 * 3600:
+            print("ALARMS (unchanged, Telegram suppressed):", *alarms, sep="\n  ")
+            return 1
         telegram("🚨 <b>Сторож публікації</b>\n\n" + "\n\n".join(f"• {a}" for a in alarms))
+        json.dump({"key": key, "ts": time.time()}, open(ALARM_STATE, "w"))
         print("ALARMS:", *alarms, sep="\n  ")
         return 1
     print(f"ok — останній пост {age:.1f} год тому, запас {runway}")
