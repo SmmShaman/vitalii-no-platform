@@ -282,7 +282,21 @@ export const FeatureQuestionMarkWasBlinkingB56: React.FC = () => {
       ) : null}
 
       {/* ---------------- beat 3 : each card writes its own instruction ---------------- */}
-      {b3 > 0.004 ? <BeatLabel kicker="THE FIX" title="Each card now writes its own instruction — NO + UA" /> : null}
+      {b3 > 0.004 ? (
+        <div style={{ opacity: b3 }}>
+          <BeatLabel kicker="THE FIX" title="Each card now writes its own instruction — NO + UA" />
+          <Panel x={RIGHT.x} y={RIGHT.y} w={RIGHT.w} h={RIGHT.h} tone="card">
+            <div style={{ padding: 28, fontFamily, textAlign: "center" }}>
+              <div style={{ fontSize: 44 }}>{ROWS[0].emoji}</div>
+              <div style={{ marginTop: 18, fontSize: 14, fontWeight: 800, letterSpacing: 1.5, color: B.muted, textTransform: "uppercase" }}>
+                one line, two languages
+              </div>
+              <div style={{ marginTop: 22, fontSize: 17, fontWeight: 700, color: B.ink }}>NO: {ROWS[0].no}</div>
+              <div style={{ marginTop: 10, fontSize: 16, fontWeight: 600, color: B.muted }}>UA: {ROWS[0].ua}</div>
+            </div>
+          </Panel>
+        </div>
+      ) : null}
 
       {/* ---------------- beat 4 : read aloud, still can't read it himself ---------------- */}
       {b4 > 0.004 ? (

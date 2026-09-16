@@ -209,6 +209,11 @@ export const FeatureKidsReadEnglishTheyB55: React.FC = () => {
 
   const captionOpacity = seg(frame, B3_S + 10, B3_S + 10 + FADE);
 
+  // ghost baseline: the un-lit destinations stay faintly visible from frame 0
+  // so the flow-map fills the frame before the route lights up at beat 3
+  const GHOST = 0.26;
+  const nodeOp = Math.max(GHOST, fixedT);
+
   const wordCount = Math.floor(
     interpolate(frame, [B5_S + 10, B5_S + 80], [0, 2588], {
       extrapolateLeft: "clamp",
@@ -223,6 +228,10 @@ export const FeatureKidsReadEnglishTheyB55: React.FC = () => {
 
       {/* ---------------- persistent flow map (all beats) ---------------- */}
       <svg style={{ position: "absolute", inset: 0, width: 1280, height: 720 }}>
+        <Route a={NODE_A} b={NODE_B} color={B.border} opacity={GHOST * (1 - fixedT)} dashed />
+        <Route a={NODE_B} b={NODE_C1} color={B.border} opacity={GHOST * (1 - fixedT)} dashed />
+        <Route a={NODE_B} b={NODE_C2} color={B.border} opacity={GHOST * (1 - fixedT)} dashed />
+        <Route a={NODE_B} b={NODE_C3} color={B.border} opacity={GHOST * (1 - fixedT)} dashed />
         <Route a={NODE_A} b={NODE_B} color={B.accent} opacity={fixedT} />
         <Route a={NODE_B} b={NODE_C1} color={B.success} opacity={Math.min(1, leg1 * 1.4) * fixedT} />
         <Route a={NODE_B} b={NODE_C2} color={B.success} opacity={Math.min(1, leg2 * 1.4) * fixedT} />
@@ -230,14 +239,14 @@ export const FeatureKidsReadEnglishTheyB55: React.FC = () => {
       </svg>
 
       <Node pos={NODE_A} r={58} emoji="🔤" label="SUDDENLY" tone={B.accent} />
-      <Node pos={NODE_B} r={64} emoji="📖" label="DICTIONARY" tone={B.accent} opacity={fixedT} />
+      <Node pos={NODE_B} r={64} emoji="📖" label="DICTIONARY" tone={B.accent} opacity={nodeOp} />
       <Node
         pos={NODE_C1}
         r={46}
         emoji="📝"
         label={arrived1 > 0.5 ? "✅ ANSWER" : "ANSWER"}
         tone={arrived1 > 0.5 ? B.success : B.border}
-        opacity={fixedT}
+        opacity={nodeOp}
       />
       {c2NodeVisible > 0.02 ? (
         <Node
@@ -246,7 +255,7 @@ export const FeatureKidsReadEnglishTheyB55: React.FC = () => {
           emoji="🔘"
           label={arrived2 > 0.5 ? "✅ CHOICES" : "CHOICES"}
           tone={arrived2 > 0.5 ? B.success : B.border}
-          opacity={fixedT * c2NodeVisible}
+          opacity={nodeOp * c2NodeVisible}
         />
       ) : null}
       <Node
@@ -255,7 +264,7 @@ export const FeatureKidsReadEnglishTheyB55: React.FC = () => {
         emoji="📜"
         label={arrived3 > 0.5 ? "✅ HISTORY" : "HISTORY"}
         tone={arrived3 > 0.5 ? B.success : B.border}
-        opacity={fixedT}
+        opacity={nodeOp}
       />
 
       {/* beat 4 travelling tokens */}
