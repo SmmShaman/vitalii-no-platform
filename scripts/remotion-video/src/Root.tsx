@@ -188,6 +188,9 @@ import { FeatureFillAgentWakesButtonJ75 } from "./compositions/feature-demos/Fea
 import { FeatureNoMoreRawLinksV34 } from "./compositions/feature-demos/FeatureNoMoreRawLinksV34";
 import { FeatureBoundedAutoReconEndingJ71 } from "./compositions/feature-demos/FeatureBoundedAutoReconEndingJ71";
 import { FeaturePagesSilentLoopDoublesV29 } from "./compositions/feature-demos/FeaturePagesSilentLoopDoublesV29";
+import { FeatureQuestionMarkWasBlinkingB56 } from "./compositions/feature-demos/FeatureQuestionMarkWasBlinkingB56";
+import { FeatureKidsReadEnglishTheyB55 } from "./compositions/feature-demos/FeatureKidsReadEnglishTheyB55";
+import { FeatureNoMoreLoopingPictureV28 } from "./compositions/feature-demos/FeatureNoMoreLoopingPictureV28";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -1829,6 +1832,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeaturePagesSilentLoopDoublesV29"
         component={FeaturePagesSilentLoopDoublesV29}
         durationInFrames={816}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureQuestionMarkWasBlinkingB56"
+        component={FeatureQuestionMarkWasBlinkingB56}
+        durationInFrames={948}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureKidsReadEnglishTheyB55"
+        component={FeatureKidsReadEnglishTheyB55}
+        durationInFrames={1003}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNoMoreLoopingPictureV28"
+        component={FeatureNoMoreLoopingPictureV28}
+        durationInFrames={907}
         fps={30}
         width={1280}
         height={720}

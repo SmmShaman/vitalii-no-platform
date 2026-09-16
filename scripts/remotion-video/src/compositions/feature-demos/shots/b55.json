@@ -1,0 +1,14 @@
+{
+  "id": "b55",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/kids-read-english-they-dont-hear-it-so-now-every-word-shows-how-it-sounds-b55",
+      "frames": 170,
+      "scroll": [[0, 0], [85, 500], [169, 940]],
+      "mouse": [[0, 560, 200], [55, 560, 310], [110, 560, 250], [169, 560, 300]]
+    }
+  ]
+}
