@@ -191,6 +191,9 @@ import { FeaturePagesSilentLoopDoublesV29 } from "./compositions/feature-demos/F
 import { FeatureQuestionMarkWasBlinkingB56 } from "./compositions/feature-demos/FeatureQuestionMarkWasBlinkingB56";
 import { FeatureKidsReadEnglishTheyB55 } from "./compositions/feature-demos/FeatureKidsReadEnglishTheyB55";
 import { FeatureNoMoreLoopingPictureV28 } from "./compositions/feature-demos/FeatureNoMoreLoopingPictureV28";
+import { FeatureEightTradingAgentsShareK01 } from "./compositions/feature-demos/FeatureEightTradingAgentsShareK01";
+import { FeatureClaudeProxyTrustsSharedG04 } from "./compositions/feature-demos/FeatureClaudeProxyTrustsSharedG04";
+import { FeatureVideoDigestWentSilentV30 } from "./compositions/feature-demos/FeatureVideoDigestWentSilentV30";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -1872,6 +1875,33 @@ export const RemotionRoot: React.FC = () => {
         height={720}
         defaultProps={THUMBNAIL_PROPS}
       />
+      <Composition
+        id="FeatureEightTradingAgentsShareK01"
+        component={FeatureEightTradingAgentsShareK01}
+        durationInFrames={933}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureClaudeProxyTrustsSharedG04"
+        component={FeatureClaudeProxyTrustsSharedG04}
+        durationInFrames={799}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureVideoDigestWentSilentV30"
+        component={FeatureVideoDigestWentSilentV30}
+        durationInFrames={929}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
     </>
   );
 };

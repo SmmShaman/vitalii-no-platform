@@ -367,6 +367,40 @@ def composition_for(fid):
     return None
 
 
+ROOT_TSX = f"{RVID}/src/Root.tsx"
+
+
+def ensure_registered(comp):
+    """A stranded feature (k01 and g04 on 2026-09-16, v30 too) had its
+    composition file and shots in git but no <Composition> entry in Root.tsx:
+    the run that drew it died before the agent registered it, and the render it
+    was sent "straight to" failed three times with "Could not find composition".
+    Register it from the file header instead of trusting the marker."""
+    root = open(ROOT_TSX).read()
+    if f'id="{comp}"' in root:
+        return True
+    path = f"{RVID}/src/compositions/feature-demos/{comp}.tsx"
+    if not os.path.exists(path):
+        return False
+    m = re.search(r"(\d+) frames @ 30fps", open(path).read(2000))
+    if not m:
+        return False
+    frames = int(m.group(1))
+    lines = root.split("\n")
+    last_import = max(i for i, l in enumerate(lines) if l.startswith("import "))
+    lines.insert(last_import + 1,
+                 f'import {{ {comp} }} from "./compositions/feature-demos/{comp}";')
+    root = "\n".join(lines)
+    entry = (f'      <Composition\n        id="{comp}"\n        component={{{comp}}}\n'
+             f'        durationInFrames={{{frames}}}\n        fps={{30}}\n'
+             f'        width={{1280}}\n        height={{720}}\n      />\n\n')
+    idx = root.rfind("    </>")
+    root = root[:idx] + entry + root[idx:]
+    open(ROOT_TSX, "w").write(root)
+    log(f"{comp}: registered in Root.tsx ({frames} frames)")
+    return True
+
+
 def new_composition_name(fid, title):
     """A feature the factory picks for the first time (newest-first order,
     2026-09-07) has no composition yet. Name it from the title so the agent can
@@ -793,7 +827,12 @@ def main():
         drawn = []
         for p in picks:
             if p.get("finish"):
-                drawn.append(p)   # composition + shots already in git
+                # composition + shots already in git — but make sure Root.tsx
+                # knows the composition, or the render dies (2026-09-16 k01/g04)
+                if ensure_registered(p["composition"]):
+                    drawn.append(p)
+                else:
+                    log(f"{p['id']}: composition file missing or unreadable — dropped")
                 continue
             mark = f"{MARKER_DIR}/waveB-{stamp}-{p['id']}.done"
             fresh_session(f"wave B {p['id']}")
