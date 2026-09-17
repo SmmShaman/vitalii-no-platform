@@ -271,13 +271,10 @@ export const getNewsById = async (id: string) => {
     return null;
   }
 
-  // Increment view count
-  if (data) {
-    await supabase
-      .from('news')
-      .update({ views_count: (data.views_count || 0) + 1 })
-      .eq('id', id);
-  }
+  // views_count is no longer bumped here: the anon client could never pass the
+  // UPDATE policy (RLS silently matched 0 rows) and this runs inside an ISR cache
+  // anyway. Views now come from Cloudflare Web Analytics via
+  // scripts/cf-views-sync (nightly on the VPS) — see supabase/migrations/20260917120000_page_views_daily.sql.
 
   return data;
 };
@@ -322,13 +319,10 @@ export const getNewsBySlug = async (slug: string, language: 'en' | 'no' | 'ua' =
     return null;
   }
 
-  // Increment view count
-  if (data) {
-    await supabase
-      .from('news')
-      .update({ views_count: (data.views_count || 0) + 1 })
-      .eq('id', data.id);
-  }
+  // views_count is no longer bumped here: the anon client could never pass the
+  // UPDATE policy (RLS silently matched 0 rows) and this runs inside an ISR cache
+  // anyway. Views now come from Cloudflare Web Analytics via
+  // scripts/cf-views-sync (nightly on the VPS) — see supabase/migrations/20260917120000_page_views_daily.sql.
 
   return data;
 };
@@ -556,13 +550,10 @@ export const getBlogPostBySlug = async (slug: string, language: 'en' | 'no' | 'u
     return null;
   }
 
-  // Increment view count
-  if (data) {
-    await supabase
-      .from('blog_posts')
-      .update({ views_count: (data.views_count || 0) + 1 })
-      .eq('id', data.id);
-  }
+  // views_count is no longer bumped here: the anon client could never pass the
+  // UPDATE policy (RLS silently matched 0 rows) and this runs inside an ISR cache
+  // anyway. Views now come from Cloudflare Web Analytics via
+  // scripts/cf-views-sync (nightly on the VPS) — see supabase/migrations/20260917120000_page_views_daily.sql.
 
   return data;
 };

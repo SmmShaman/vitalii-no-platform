@@ -71,3 +71,6 @@ output/test-renders/
 # pnpm store: a local cache left by remotion experiments on the VPS.
 # CI installs with `npm ci`, so nothing here belongs in the repo.
 .pnpm-store/
+
+# python bytecode (scripts/)
+__pycache__/

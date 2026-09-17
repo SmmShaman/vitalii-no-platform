@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, Suspense } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -8,7 +8,7 @@ import { getAllBlogPosts, getTagFrequencies } from '@/integrations/supabase/clie
 import type { TagFrequency } from '@/integrations/supabase/client'
 import { useTranslations, type Language } from '@/contexts/TranslationContext'
 import { SearchResultCard } from '@/components/search/SearchResultCard'
-import type { SearchResult } from '@/components/search/SearchResultCard'
+import { toListingItem, toSearchResult, type ListingItem, type ListingLang } from '@/utils/listing'
 import { CategoryTabs, getActivePageBg } from '@/components/CategoryTabs'
 import { Loader2, SearchX, ArrowLeft } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
@@ -18,10 +18,35 @@ const Footer = dynamic(
   { ssr: false }
 )
 
-const ITEMS_PER_PAGE = 12
+export interface BlogListingProps {
+  /** First page rendered on the server (see page.tsx); empty = fetch on the client as before. */
+  initialItems?: ListingItem[]
+  initialCount?: number
+  initialTags?: TagFrequency[]
+  pageSize?: number
+}
 
-function BlogListingInner() {
+const DEFAULT_PAGE_SIZE = 12
+
+// useSearchParams() makes a statically rendered route bail out to client
+// rendering up to the nearest Suspense boundary — which is why crawlers saw an
+// empty shell. Keep it in a leaf that renders nothing, so the list itself is
+// part of the server HTML and only the ?tag= sync waits for hydration.
+function TagParamSync({ onChange }: { onChange: (tag: string) => void }) {
   const searchParams = useSearchParams()
+  const tag = searchParams.get('tag') || ''
+  useEffect(() => {
+    onChange(tag)
+  }, [tag, onChange])
+  return null
+}
+
+function BlogListingInner({
+  initialItems = [],
+  initialCount = 0,
+  initialTags = [],
+  pageSize = DEFAULT_PAGE_SIZE,
+}: BlogListingProps) {
   const router = useRouter()
   const { t, currentLanguage, setCurrentLanguage } = useTranslations()
   const languages: Language[] = ['NO', 'EN', 'UA']
@@ -31,34 +56,35 @@ function BlogListingInner() {
     return () => { document.body.style.backgroundColor = '' }
   }, [])
 
-  const tagParam = searchParams.get('tag') || ''
+  const [tagParam, setTagParam] = useState('')
 
-  const [results, setResults] = useState<SearchResult[]>([])
-  const [totalCount, setTotalCount] = useState(0)
-  const [loading, setLoading] = useState(true)
+  const [items, setItems] = useState<ListingItem[]>(initialItems)
+  const [totalCount, setTotalCount] = useState(initialCount)
+  const [loading, setLoading] = useState(initialItems.length === 0)
   const [loadingMore, setLoadingMore] = useState(false)
   const [page, setPage] = useState(0)
-  const [hasMore, setHasMore] = useState(false)
-  const [tags, setTags] = useState<TagFrequency[]>([])
+  const [hasMore, setHasMore] = useState(pageSize < initialCount)
+  const [tags, setTags] = useState<TagFrequency[]>(initialTags)
+  // The server already rendered page 0 without a tag filter — skip that first fetch once.
+  const serverPagePending = useRef(initialItems.length > 0)
 
   const visibleCount = 7
   const topTagNames = useMemo(() => tags.slice(0, visibleCount).map(t => t.tag_name), [tags])
   const activeTag = tagParam === '__other__' ? '__other__' : (tagParam || null)
 
   useEffect(() => {
-    getTagFrequencies('blog').then(setTags)
-  }, [])
+    if (initialTags.length === 0) getTagFrequencies('blog').then(setTags)
+  }, [initialTags.length])
 
   const fetchResults = useCallback(async (pageNum: number = 0, append: boolean = false) => {
     if (!append) setLoading(true)
     else setLoadingMore(true)
 
-    const lang = currentLanguage.toLowerCase() as 'en' | 'no' | 'ua'
-    const offset = pageNum * ITEMS_PER_PAGE
+    const offset = pageNum * pageSize
 
     try {
       const filters: any = {
-        limit: ITEMS_PER_PAGE,
+        limit: pageSize,
         offset,
       }
 
@@ -70,41 +96,37 @@ function BlogListingInner() {
 
       const { data, count } = await getAllBlogPosts(filters)
 
-      const items: SearchResult[] = (data || []).map((item: any) => ({
-        id: item.id,
-        type: 'blog' as const,
-        title: item[`title_${lang}`] || item.title_en || '',
-        description: item[`description_${lang}`] || item.description_en || '',
-        slug: item[`slug_${lang}`] || item.slug_en || item.id,
-        image_url: item.image_url,
-        processed_image_url: item.processed_image_url,
-        tags: item.tags,
-        published_at: item.published_at,
-        views_count: item.views_count || 0,
-        category: item.category,
-        reading_time: item.reading_time,
-      }))
+      const rows: ListingItem[] = (data || []).map((item: any) => toListingItem(item, 'blog'))
 
       if (append) {
-        setResults(prev => [...prev, ...items])
+        setItems(prev => [...prev, ...rows])
       } else {
-        setResults(items)
+        setItems(rows)
       }
 
       setTotalCount(count || 0)
-      setHasMore(offset + ITEMS_PER_PAGE < (count || 0))
+      setHasMore(offset + pageSize < (count || 0))
     } catch (error) {
       console.error('Blog listing error:', error)
     } finally {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [tagParam, currentLanguage, topTagNames])
+  }, [tagParam, topTagNames, pageSize])
 
   useEffect(() => {
     setPage(0)
+    if (serverPagePending.current && !tagParam) {
+      serverPagePending.current = false
+      return
+    }
+    serverPagePending.current = false
     fetchResults(0, false)
-  }, [fetchResults])
+  }, [fetchResults, tagParam])
+
+  // Language is applied here, so switching EN/NO/UA never refetches.
+  const lang = currentLanguage.toLowerCase() as ListingLang
+  const results = useMemo(() => items.map(item => toSearchResult(item, lang)), [items, lang])
 
   const handleLoadMore = () => {
     const nextPage = page + 1
@@ -113,20 +135,16 @@ function BlogListingInner() {
   }
 
   const handleTagChange = (tag: string | null) => {
-    const params = new URLSearchParams(searchParams.toString())
-    if (tag) {
-      params.set('tag', tag)
-    } else {
-      params.delete('tag')
-    }
-    const qs = params.toString()
-    router.replace(qs ? `/blog?${qs}` : '/blog', { scroll: false })
+    router.replace(tag ? `/blog?tag=${encodeURIComponent(tag)}` : '/blog', { scroll: false })
   }
 
   const pageBgTint = getActivePageBg(activeTag, tags, 7)
 
   return (
     <div className="min-h-screen bg-[rgb(var(--surface-listing))] flex flex-col" style={{ backgroundImage: pageBgTint !== 'transparent' ? `linear-gradient(${pageBgTint}, ${pageBgTint})` : undefined }}>
+      <Suspense fallback={null}>
+        <TagParamSync onChange={setTagParam} />
+      </Suspense>
       {/* Header */}
       <header className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))]/95 backdrop-blur-sm border-b border-[#3C3C44]">
         <div className="px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3">
@@ -222,18 +240,6 @@ function BlogListingInner() {
   )
 }
 
-function ListingSkeleton() {
-  return (
-    <div className="min-h-screen bg-[rgb(var(--surface-listing))] flex items-center justify-center">
-      <Loader2 className="w-8 h-8 text-brand-light animate-spin" />
-    </div>
-  )
-}
-
-export function BlogListingClient() {
-  return (
-    <Suspense fallback={<ListingSkeleton />}>
-      <BlogListingInner />
-    </Suspense>
-  )
+export function BlogListingClient(props: BlogListingProps) {
+  return <BlogListingInner {...props} />
 }

@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly Cloudflare Web Analytics → views_count sync
+
+[Timer]
+# Cloudflare buckets by UTC day; 03:20 CEST = 01:20 UTC, yesterday is complete.
+OnCalendar=*-*-* 03:20:00
+Persistent=true
+AccuracySec=5min
+
+[Install]
+WantedBy=timers.target

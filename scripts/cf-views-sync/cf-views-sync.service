@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync per-page views from Cloudflare Web Analytics into portfolio-db
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/cf-views-sync/cf_views_sync.py
+TimeoutStartSec=600
+StandardOutput=append:/root/cf-views-sync/sync.log
+StandardError=append:/root/cf-views-sync/sync.log
