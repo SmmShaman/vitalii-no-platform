@@ -342,6 +342,11 @@ export const translations = {
     live_week: "7 days",
     live_month: "30 days",
     live_views_hint: "Page views on vitalii.no (Cloudflare Web Analytics, updated every minute)",
+    top_read_title: "Most read",
+    top_period_7: "7 days",
+    top_period_30: "30 days",
+    top_period_all: "All time",
+    top_read_time_hint: "Average time readers spent on the article",
     map_marker_you: "You",
 
     // Weather descriptions
@@ -725,6 +730,11 @@ export const translations = {
     live_week: "7 dager",
     live_month: "30 dager",
     live_views_hint: "Sidevisninger på vitalii.no (Cloudflare Web Analytics, oppdateres hvert minutt)",
+    top_read_title: "Mest lest",
+    top_period_7: "7 dager",
+    top_period_30: "30 dager",
+    top_period_all: "Hele tiden",
+    top_read_time_hint: "Gjennomsnittlig tid leserne brukte på artikkelen",
     map_marker_you: "Deg",
 
     // Weather descriptions
@@ -1027,6 +1037,11 @@ export const translations = {
     live_week: "7 днів",
     live_month: "30 днів",
     live_views_hint: "Перегляди сторінок vitalii.no (Cloudflare Web Analytics, оновлення щохвилини)",
+    top_read_title: "Найбільш читане",
+    top_period_7: "7 днів",
+    top_period_30: "30 днів",
+    top_period_all: "За весь час",
+    top_read_time_hint: "Середній час, який читачі провели зі статтею",
     map_marker_you: "Ти",
 
     // Weather descriptions

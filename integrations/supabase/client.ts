@@ -665,6 +665,50 @@ export const getTagFrequencies = async (contentType: 'all' | 'news' | 'blog' = '
 };
 
 /**
+ * Top-read articles for the strip above /news and /blog.
+ * period: 7 or 30 days, or 0 for all time (then views = the number shown under
+ * each article). avg_seconds is null until GA4 engagement data exists for it.
+ */
+export type TopPeriod = 7 | 30 | 0;
+
+export interface TopArticle {
+  id: string;
+  kind: 'news' | 'blog';
+  title_en: string | null;
+  title_no: string | null;
+  title_ua: string | null;
+  slug_en: string | null;
+  slug_no: string | null;
+  slug_ua: string | null;
+  image_url: string | null;
+  processed_image_url: string | null;
+  published_at: string | null;
+  views: number;
+  avg_seconds: number | null;
+}
+
+export const getTopArticles = async (
+  kind: 'news' | 'blog' = 'news',
+  period: TopPeriod = 30,
+  limit: number = 10
+): Promise<TopArticle[]> => {
+  if (!isSupabaseConfigured()) return [];
+
+  const { data, error } = await supabase.rpc('get_top_articles', {
+    p_kind: kind,
+    p_days: period,
+    p_limit: limit,
+  });
+
+  if (error) {
+    console.error('Error fetching top articles:', error);
+    return [];
+  }
+
+  return (data || []) as TopArticle[];
+};
+
+/**
  * Get all tags (uses RPC for real-time frequencies from articles)
  */
 export const getAllTags = async () => {

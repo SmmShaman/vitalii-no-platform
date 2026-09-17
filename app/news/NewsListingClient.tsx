@@ -10,6 +10,8 @@ import { useTranslations, type Language } from '@/contexts/TranslationContext'
 import { SearchResultCard } from '@/components/search/SearchResultCard'
 import { toListingItem, toSearchResult, type ListingItem, type ListingLang } from '@/utils/listing'
 import { CategoryTabs, getActivePageBg } from '@/components/CategoryTabs'
+import { TopArticlesStrip } from '@/components/sections/TopArticlesStrip'
+import type { TopArticle, TopPeriod } from '@/integrations/supabase/client'
 import { Loader2, SearchX, ArrowLeft } from 'lucide-react'
 import { AnimatePresence } from 'framer-motion'
 
@@ -23,6 +25,9 @@ export interface NewsListingProps {
   initialItems?: ListingItem[]
   initialCount?: number
   initialTags?: TagFrequency[]
+  /** Most-read strip for the default window, also rendered on the server. */
+  initialTop?: TopArticle[]
+  initialTopPeriod?: TopPeriod
   pageSize?: number
 }
 
@@ -45,6 +50,8 @@ function NewsListingInner({
   initialItems = [],
   initialCount = 0,
   initialTags = [],
+  initialTop = [],
+  initialTopPeriod = 30,
   pageSize = DEFAULT_PAGE_SIZE,
 }: NewsListingProps) {
   const router = useRouter()
@@ -194,6 +201,7 @@ function NewsListingInner({
 
       {/* Main Content */}
       <main className="flex-1 px-4 sm:px-6 lg:px-8 py-4">
+        <TopArticlesStrip kind="news" initialItems={initialTop} initialPeriod={initialTopPeriod} />
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader2 className="w-8 h-8 text-brand-light animate-spin" />

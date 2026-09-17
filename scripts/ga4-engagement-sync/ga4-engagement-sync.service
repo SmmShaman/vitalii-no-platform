@@ -1,0 +1,11 @@
+[Unit]
+Description=Sync per-article engagement time from GA4 into portfolio-db
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /root/ga4-engagement-sync/ga4_sync.py
+TimeoutStartSec=900
+StandardOutput=append:/root/ga4-engagement-sync/sync.log
+StandardError=append:/root/ga4-engagement-sync/sync.log

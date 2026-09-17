@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly GA4 engagement-time sync
+
+[Timer]
+# 03:40 CEST — after cf-views-sync (03:20) so both feed the same morning's numbers.
+OnCalendar=*-*-* 03:40:00
+Persistent=true
+AccuracySec=5min
+
+[Install]
+WantedBy=timers.target

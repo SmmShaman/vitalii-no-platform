@@ -1,8 +1,11 @@
 /**
  * vitalii-live-stats — public, cached page-view numbers for the badge on vitalii.no.
  *
- * GET /  →  { now, today, week, month, updated_at }
- *   now    page loads in the last 5 minutes ("on the site right now")
+ * GET /  →  { now, countries, today, week, month, updated_at }
+ *   now       page loads in the last 5 minutes ("on the site right now")
+ *   countries one ISO-2 code per those page loads, most recent country first —
+ *             two readers in China come back as ["CN","CN"], so the badge can
+ *             draw one flag each
  *   today  page loads since midnight Europe/Oslo
  *   week   page loads in the last 7 days (UTC days, incl. today)
  *   month  page loads in the last 30 days
@@ -14,11 +17,13 @@
  */
 
 const GRAPHQL = 'https://api.cloudflare.com/client/v4/graphql'
+const MAX_FLAGS = 12
 
 const QUERY = `
 query($acct:String!,$site:String!,$hosts:[String!],$now5:Time!,$todayStart:Time!,$weekDate:Date!,$monthDate:Date!){
   viewer{ accounts(filter:{accountTag:$acct}){
     now:   rumPageloadEventsAdaptiveGroups(filter:{siteTag:$site,requestHost_in:$hosts,datetime_geq:$now5},      limit:1){count sum{visits} avg{sampleInterval}}
+    countries: rumPageloadEventsAdaptiveGroups(filter:{siteTag:$site,requestHost_in:$hosts,datetime_geq:$now5}, limit:50, orderBy:[count_DESC]){count dimensions{countryName}}
     today: rumPageloadEventsAdaptiveGroups(filter:{siteTag:$site,requestHost_in:$hosts,datetime_geq:$todayStart},limit:1){count sum{visits} avg{sampleInterval}}
     week:  rumPageloadEventsAdaptiveGroups(filter:{siteTag:$site,requestHost_in:$hosts,date_geq:$weekDate},      limit:1){count sum{visits} avg{sampleInterval}}
     month: rumPageloadEventsAdaptiveGroups(filter:{siteTag:$site,requestHost_in:$hosts,date_geq:$monthDate},     limit:1){count sum{visits} avg{sampleInterval}}
@@ -79,8 +84,22 @@ async function fetchStats(env) {
   const acct = body.data.viewer.accounts[0] || {}
   const out = {}
   for (const k of ['now', 'today', 'week', 'month']) out[k] = scaled(acct[k])
+
+  // One entry per page load, biggest country first, capped so the badge stays on one line.
+  const countries = []
+  for (const g of acct.countries || []) {
+    const code = (g.dimensions && g.dimensions.countryName) || ''
+    if (!/^[A-Z]{2}$/.test(code)) continue
+    for (let i = 0; i < Math.min(g.count || 0, MAX_FLAGS); i++) {
+      if (countries.length >= MAX_FLAGS) break
+      countries.push(code)
+    }
+    if (countries.length >= MAX_FLAGS) break
+  }
+
   return {
     now: out.now.views,
+    countries,
     today: out.today.views,
     week: out.week.views,
     month: out.month.views,
