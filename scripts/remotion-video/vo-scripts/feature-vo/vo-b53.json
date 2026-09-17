@@ -1,0 +1,56 @@
+{
+ "id": "b53",
+ "beat_durations": {
+  "b1": 7.152,
+  "b2": 5.16,
+  "b3": 6.744,
+  "b4": 5.88,
+  "b5": 6.12
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My son writes a math question. The old system matched a template to its shape and printed a card \u2014 no explanation.",
+   "start_s": 0.5,
+   "end_s": 7.652,
+   "start_f": 15,
+   "end_f": 230
+  },
+  {
+   "beat": "b2",
+   "text": "A kid who doesn't know a quarter equals 25% learns nothing from a shaded bar.",
+   "start_s": 7.952,
+   "end_s": 13.112,
+   "start_f": 239,
+   "end_f": 393
+  },
+  {
+   "beat": "b3",
+   "text": "Now every card explains the idea first, names the misconception it fights, then shows one example.",
+   "start_s": 13.412,
+   "end_s": 20.156,
+   "start_f": 402,
+   "end_f": 605
+  },
+  {
+   "beat": "b4",
+   "text": "AI agents dig up the real teaching method with a source attached \u2014 no citation, no card.",
+   "start_s": 20.456,
+   "end_s": 26.336,
+   "start_f": 614,
+   "end_f": 790
+  },
+  {
+   "beat": "b5",
+   "text": "Nine verified teaching ideas live on the wall now, each traceable to a real source.",
+   "start_s": 26.636,
+   "end_s": 32.756,
+   "start_f": 799,
+   "end_f": 983
+  }
+ ],
+ "total_s": 34.256,
+ "durationInFrames": 1028,
+ "measured_track_s": 32.808,
+ "track": "/root/feature-demos/vo-b53/vo-b53.mp3"
+}

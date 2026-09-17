@@ -1,0 +1,47 @@
+{
+ "id": "v27",
+ "beat_durations": {
+  "b1": 7.416,
+  "b2": 8.976,
+  "b3": 7.752,
+  "b4": 5.64
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Watch a few of my videos back to back and they blur together \u2014 same layout, same colors, same rhythm every time.",
+   "start_s": 0.5,
+   "end_s": 7.916,
+   "start_f": 15,
+   "end_f": 237
+  },
+  {
+   "beat": "b2",
+   "text": "Thirty-five different stories ended up looking identical. The problem wasn't the video \u2014 it was instructions telling every clip to copy one file.",
+   "start_s": 8.216,
+   "end_s": 17.192,
+   "start_f": 246,
+   "end_f": 516
+  },
+  {
+   "beat": "b3",
+   "text": "Now each Remotion clip rolls its own staging: one of eight layouts, a fresh mood, never repeating the last two.",
+   "start_s": 17.492,
+   "end_s": 25.244,
+   "start_f": 525,
+   "end_f": 757
+  },
+  {
+   "beat": "b4",
+   "text": "Six new videos went out, and for the first time, every single one actually looks different.",
+   "start_s": 25.544,
+   "end_s": 31.184,
+   "start_f": 766,
+   "end_f": 936
+  }
+ ],
+ "total_s": 32.684,
+ "durationInFrames": 981,
+ "measured_track_s": 31.248,
+ "track": "/root/feature-demos/vo-v27/vo-v27.mp3"
+}
