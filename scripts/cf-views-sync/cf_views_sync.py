@@ -36,6 +36,8 @@ GRAPHQL = "https://api.cloudflare.com/client/v4/graphql"
 DEFAULT_SITE_TOKEN = "9aad069e09264dd5aedbad7f61d004c5"  # data-cf-beacon in app/layout.tsx
 PSQL = ["docker", "exec", "-i", "portfolio-db", "psql", "-U", "postgres", "-v", "ON_ERROR_STOP=1", "-t", "-A"]
 DQ = "$cfviews$"  # dollar-quote tag for the JSON payload
+# The beacon also fires on Netlify deploy previews (…--remarkable-monstera.netlify.app); count only the real site.
+HOSTS = ["vitalii.no", "www.vitalii.no"]
 
 
 def log(msg):
@@ -74,27 +76,44 @@ class Cloudflare:
         self.with_sample = True
 
     def site_tag(self, site_token):
-        """Web Analytics 'siteTag' differs from the beacon token; look it up once."""
+        """Web Analytics 'siteTag' differs from the beacon token; look it up once.
+
+        rum/site_info/list needs a scope the analytics token does not have, so fall
+        back to asking GraphQL which siteTag has served HOSTS in the last week.
+        """
         url = f"https://api.cloudflare.com/client/v4/accounts/{self.account_id}/rum/site_info/list"
-        r = requests.get(url, headers=self.headers, params={"per_page": 50}, timeout=30)
-        body = r.json()
-        if not body.get("success"):
-            raise RuntimeError(f"rum/site_info/list failed: {body.get('errors')}")
-        for site in body.get("result", []):
+        try:
+            body = requests.get(url, headers=self.headers, params={"per_page": 50}, timeout=30).json()
+        except (requests.RequestException, ValueError):
+            body = {}
+        for site in (body.get("result") or []) if body.get("success") else []:
             if site.get("site_token") == site_token:
                 return site["site_tag"]
-        raise RuntimeError(f"no Web Analytics site with token {site_token[:8]}…; "
-                           f"set CF_WEB_ANALYTICS_SITE_TAG (candidates: "
-                           f"{[(s.get('host'), s.get('site_tag')) for s in body.get('result', [])]})")
+        since = (dt.datetime.now(dt.timezone.utc).date() - dt.timedelta(days=7)).isoformat()
+        query = """
+        query($acct: String!, $since: Date!) {
+          viewer { accounts(filter: { accountTag: $acct }) {
+            rum: rumPageloadEventsAdaptiveGroups(filter: { date_geq: $since }, limit: 50, orderBy: [count_DESC]) {
+              count dimensions { siteTag requestHost } } } } }"""
+        r = requests.post(GRAPHQL, headers=self.headers,
+                          json={"query": query, "variables": {"acct": self.account_id, "since": since}}, timeout=60)
+        body = r.json()
+        if body.get("errors"):
+            raise RuntimeError(f"siteTag discovery: {body['errors'][0].get('message')}")
+        accounts = (body.get("data") or {}).get("viewer", {}).get("accounts") or []
+        for g in (accounts[0].get("rum") if accounts else []) or []:
+            if g["dimensions"].get("requestHost") in HOSTS:
+                return g["dimensions"]["siteTag"]
+        raise RuntimeError("no Web Analytics siteTag served vitalii.no in the last 7 days; set CF_WEB_ANALYTICS_SITE_TAG")
 
     def _query(self, site_tag, day, with_sample):
         sample = "avg { sampleInterval }" if with_sample else ""
         query = f"""
-        query($acct: String!, $site: String!, $day: Date!) {{
+        query($acct: String!, $site: String!, $day: Date!, $hosts: [String!]) {{
           viewer {{
             accounts(filter: {{ accountTag: $acct }}) {{
               rum: rumPageloadEventsAdaptiveGroups(
-                filter: {{ siteTag: $site, date: $day }}
+                filter: {{ siteTag: $site, date: $day, requestHost_in: $hosts }}
                 limit: 10000
                 orderBy: [count_DESC]
               ) {{
@@ -106,7 +125,7 @@ class Cloudflare:
             }}
           }}
         }}"""
-        variables = {"acct": self.account_id, "site": site_tag, "day": day.isoformat()}
+        variables = {"acct": self.account_id, "site": site_tag, "day": day.isoformat(), "hosts": HOSTS}
         r = requests.post(GRAPHQL, headers=self.headers, json={"query": query, "variables": variables}, timeout=60)
         try:
             body = r.json()

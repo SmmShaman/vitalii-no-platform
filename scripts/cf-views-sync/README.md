@@ -19,7 +19,8 @@ readers came from" can be shown later without another API call.
 | script | `/root/cf-views-sync/cf_views_sync.py` (VPS) — this directory is the source |
 | units | `/etc/systemd/system/cf-views-sync.{service,timer}` — nightly 03:20 CEST |
 | log | `/root/cf-views-sync/sync.log` |
-| env | `/home/stuar/Projects/ENV-FILES/cloudflare-zone-vitalii.env` |
+| env | `/home/stuar/Projects/ENV-FILES/cloudflare-zone-vitalii.env` (`CF_ANALYTICS_TOKEN`, `CF_WEB_ANALYTICS_SITE_TAG`) |
+| counted hosts | `vitalii.no`, `www.vitalii.no` only — the beacon also fires on Netlify deploy previews |
 | schema | `supabase/migrations/20260917120000_page_views_daily.sql` (applied on portfolio-db by hand) |
 
 ## One-time setup (owner)
@@ -27,8 +28,10 @@ readers came from" can be shown later without another API call.
 1. Cloudflare dashboard → My Profile → API Tokens → Create Token → *Custom token*:
    permission **Account · Account Analytics · Read** (add **Account · Web Analytics · Read**
    if it is offered), Account Resources = the account that owns vitalii.no.
-2. Append to the env file on the VPS: `CF_ANALYTICS_TOKEN=<token>`
-   (`CF_ACCOUNT_ID` is already there). Never commit the value.
+2. Append to the env file on the VPS: `CF_ANALYTICS_TOKEN=<token>` (`CF_ACCOUNT_ID` is already there)
+   and `CF_WEB_ANALYTICS_SITE_TAG=<tag>` — the tag is discovered automatically via GraphQL when absent
+   (`rum/site_info/list` is not readable with an analytics-only token). Never commit the values.
+   Done 2026-09-17: token "analitics", site tag `8726e1b4…`; history back-filled the same day.
 3. First run with history:
    ```bash
    python3 /root/cf-views-sync/cf_views_sync.py --dry-run -v --days 3   # check the token + site tag
