@@ -1,0 +1,13 @@
+name = "vitalii-live-stats"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+[vars]
+CF_ACCOUNT_ID = "1438e8d03009209c4a82ea4c28bdb358"
+# Cloudflare Web Analytics siteTag for vitalii.no (see scripts/cf-views-sync/README.md)
+SITE_TAG = "8726e1b4dee74ac79d304c74e045ca4f"
+ALLOWED_HOSTS = "vitalii.no,www.vitalii.no"
+CACHE_SECONDS = "60"
+
+# secret: CF_ANALYTICS_TOKEN  (npx wrangler secret put CF_ANALYTICS_TOKEN) — Account Analytics: Read

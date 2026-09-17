@@ -48,4 +48,7 @@ docker exec portfolio-db psql -U postgres -c "SELECT day, sum(views) FROM page_v
 docker exec portfolio-db psql -U postgres -c "SELECT slug_en, views_count_legacy, views_count FROM news ORDER BY views_count DESC LIMIT 5;"
 ```
 
+Sampling: `count`/`sum.visits` from `*AdaptiveGroups` are already extrapolated by Cloudflare — never multiply by
+`sampleInterval` (the first backfill on 17.09 did, and inflated 1:10 days ×10; re-run the same day).
+
 Exit codes: 0 ok · 1 API/DB failure (see log) · 2 token missing (nothing written).

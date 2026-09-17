@@ -74,3 +74,4 @@ output/test-renders/
 
 # python bytecode (scripts/)
 __pycache__/
+.wrangler/

@@ -9,6 +9,7 @@ import { useTranslations } from '@/contexts/TranslationContext';
 import { sendContactEmail } from '@/integrations/supabase/client';
 import { useIsMobile } from '@/hooks/useIsMobile';
 import { useCookieConsent } from '@/contexts/CookieConsentContext';
+import { LiveStatsBadge } from '@/components/ui/LiveStatsBadge';
 
 interface SocialLink {
   icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>;
@@ -218,6 +219,12 @@ export const Footer = () => {
               style={{ fontSize: 'clamp(0.75rem, 1.5vw, 1rem)', ...(!isMobile && { color: dPrimary }) }}
             >
               {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
+              {!isMobile && (
+                <LiveStatsBadge
+                  className="ml-3 hidden lg:flex"
+                  style={{ fontSize: 'clamp(0.65rem, 1vw, 0.8rem)', color: dSecondary }}
+                />
+              )}
             </div>
 
             {/* Center: Weather & Location Info */}

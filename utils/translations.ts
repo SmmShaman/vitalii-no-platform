@@ -335,6 +335,13 @@ export const translations = {
     blog_listing_title: "Blog",
     listing_no_articles: "No articles found",
     listing_load_more: "Load More",
+
+    // Live stats badge (Cloudflare Web Analytics via vitalii-live-stats Worker)
+    live_now: "on site now",
+    live_today: "today",
+    live_week: "7 days",
+    live_month: "30 days",
+    live_views_hint: "Page views on vitalii.no (Cloudflare Web Analytics, updated every minute)",
     map_marker_you: "You",
 
     // Weather descriptions
@@ -711,6 +718,13 @@ export const translations = {
     blog_listing_title: "Blogg",
     listing_no_articles: "Ingen artikler funnet",
     listing_load_more: "Last inn mer",
+
+    // Live stats badge
+    live_now: "på siden nå",
+    live_today: "i dag",
+    live_week: "7 dager",
+    live_month: "30 dager",
+    live_views_hint: "Sidevisninger på vitalii.no (Cloudflare Web Analytics, oppdateres hvert minutt)",
     map_marker_you: "Deg",
 
     // Weather descriptions
@@ -1006,6 +1020,13 @@ export const translations = {
     blog_listing_title: "Блог",
     listing_no_articles: "Статей не знайдено",
     listing_load_more: "Завантажити ще",
+
+    // Live stats badge
+    live_now: "зараз на сайті",
+    live_today: "сьогодні",
+    live_week: "7 днів",
+    live_month: "30 днів",
+    live_views_hint: "Перегляди сторінок vitalii.no (Cloudflare Web Analytics, оновлення щохвилини)",
     map_marker_you: "Ти",
 
     // Weather descriptions

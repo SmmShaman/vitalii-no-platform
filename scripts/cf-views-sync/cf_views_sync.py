@@ -150,12 +150,14 @@ class Cloudflare:
         rows = []
         for g in accounts[0].get("rum") or []:
             dims = g.get("dimensions") or {}
-            interval = ((g.get("avg") or {}).get("sampleInterval") or 1) if self.with_sample else 1
-            views = int(round((g.get("count") or 0) * interval))
-            visits = int(round(((g.get("sum") or {}).get("visits") or 0) * interval))
+            # count / sum are ALREADY extrapolated by Cloudflare (verified 2026-09-17: on a 1:10
+            # sampled day every group's count is a multiple of 10). sampleInterval is informational.
+            views = int(round(g.get("count") or 0))
+            visits = int(round((g.get("sum") or {}).get("visits") or 0))
             rows.append((normalise_path(dims.get("requestPath")), dims.get("refererHost") or "", views, visits))
         if self.verbose:
-            log(f"{day}: {len(rows)} groups")
+            iv = max(((g.get("avg") or {}).get("sampleInterval") or 1) for g in accounts[0].get("rum") or [{}]) if rows else 1
+            log(f"{day}: {len(rows)} groups, max sampleInterval {iv:.0f}")
         return rows
 
 
