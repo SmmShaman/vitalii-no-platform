@@ -4,9 +4,16 @@ on:
   push:
     branches:
       - main
+    # The nightly feature-clip factory pushes 2-3 commits under scripts/ every
+    # night (2026-09-16: three site deploys for zero site changes). The site
+    # build does not read scripts/, so those pushes must not redeploy it.
+    paths-ignore:
+      - 'scripts/**'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'scripts/**'
   workflow_dispatch:
 
 env:
