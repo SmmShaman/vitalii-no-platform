@@ -194,6 +194,8 @@ import { FeatureNoMoreLoopingPictureV28 } from "./compositions/feature-demos/Fea
 import { FeatureEightTradingAgentsShareK01 } from "./compositions/feature-demos/FeatureEightTradingAgentsShareK01";
 import { FeatureClaudeProxyTrustsSharedG04 } from "./compositions/feature-demos/FeatureClaudeProxyTrustsSharedG04";
 import { FeatureVideoDigestWentSilentV30 } from "./compositions/feature-demos/FeatureVideoDigestWentSilentV30";
+import { FeatureVideoStagingRouletteKillingV27 } from "./compositions/feature-demos/FeatureVideoStagingRouletteKillingV27";
+import { FeatureCardExplainsIdeaBeforeB53 } from "./compositions/feature-demos/FeatureCardExplainsIdeaBeforeB53";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -1897,6 +1899,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureVideoDigestWentSilentV30"
         component={FeatureVideoDigestWentSilentV30}
         durationInFrames={929}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureVideoStagingRouletteKillingV27"
+        component={FeatureVideoStagingRouletteKillingV27}
+        durationInFrames={981}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureCardExplainsIdeaBeforeB53"
+        component={FeatureCardExplainsIdeaBeforeB53}
+        durationInFrames={1028}
         fps={30}
         width={1280}
         height={720}

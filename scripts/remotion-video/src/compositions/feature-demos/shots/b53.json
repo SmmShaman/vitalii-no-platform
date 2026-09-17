@@ -1,0 +1,16 @@
+{
+  "id": "b53",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "hub", "url": "https://vitalii.no/features", "frames": 215,
+      "scroll": [[0, 0], [107, 1000], [214, 2000]],
+      "mouse": [[0, 300, 200], [70, 650, 300], [140, 900, 250], [214, 500, 350]] },
+    { "name": "page", "url": "https://vitalii.no/features/a-card-now-explains-the-idea-before-it-asks-about-it-b53", "frames": 203,
+      "scroll": [[0, 300], [101, 900], [202, 1500]],
+      "mouse": [[0, 560, 220], [101, 560, 300], [202, 560, 260]] },
+    { "name": "result", "url": "https://vitalii.no/features/a-card-now-explains-the-idea-before-it-asks-about-it-b53", "frames": 229,
+      "scroll": [[0, 1500], [114, 2400], [228, 3200]],
+      "mouse": [[0, 560, 240], [114, 560, 300], [228, 560, 280]] }
+  ]
+}

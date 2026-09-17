@@ -1,0 +1,16 @@
+{
+  "id": "v27",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "hub", "url": "https://vitalii.no/features", "frames": 222,
+      "scroll": [[0, 0], [110, 900], [221, 1800]],
+      "mouse": [[0, 300, 200], [70, 600, 300], [140, 850, 250], [221, 500, 350]] },
+    { "name": "commits", "url": "https://github.com/SmmShaman/vitalii-no-platform/commits", "frames": 232,
+      "scroll": [[0, 0], [115, 1200], [231, 2400]],
+      "mouse": [[0, 400, 150], [80, 400, 300], [160, 400, 180], [231, 400, 320]] },
+    { "name": "page", "url": "https://vitalii.no/features/video-staging-roulette-killing-the-one-template-that-made-35-different-stories-l-v27", "frames": 215,
+      "scroll": [[0, 0], [107, 500], [214, 900]],
+      "mouse": [[0, 560, 200], [107, 560, 280], [214, 560, 320]] }
+  ]
+}
