@@ -1,0 +1,56 @@
+{
+ "id": "v39",
+ "beat_durations": {
+  "b1": 4.488,
+  "b2": 6.024,
+  "b3": 4.656,
+  "b4": 6.336,
+  "b5": 3.768
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A simple 'most read' list on the homepage nearly took down the whole page.",
+   "start_s": 0.5,
+   "end_s": 4.988,
+   "start_f": 15,
+   "end_f": 150
+  },
+  {
+   "beat": "b2",
+   "text": "Finding it meant scanning all twenty thousand articles, every single time someone opened the page.",
+   "start_s": 5.288,
+   "end_s": 11.312,
+   "start_f": 159,
+   "end_f": 339
+  },
+  {
+   "beat": "b3",
+   "text": "That crept past the three-second limit the server allows before it simply gives up.",
+   "start_s": 11.612,
+   "end_s": 16.268,
+   "start_f": 348,
+   "end_f": 488
+  },
+  {
+   "beat": "b4",
+   "text": "So one PostgreSQL function now answers with a single indexed lookup instead of a full rescan.",
+   "start_s": 16.568,
+   "end_s": 22.904,
+   "start_f": 497,
+   "end_f": 687
+  },
+  {
+   "beat": "b5",
+   "text": "One indexed call now replaces a scan of twenty thousand.",
+   "start_s": 23.204,
+   "end_s": 26.972,
+   "start_f": 696,
+   "end_f": 809
+  }
+ ],
+ "total_s": 28.472,
+ "durationInFrames": 854,
+ "measured_track_s": 27.024,
+ "track": "/root/feature-demos/vo-v39/vo-v39.mp3"
+}

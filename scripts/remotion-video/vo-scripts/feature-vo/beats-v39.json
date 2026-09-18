@@ -1,0 +1,7 @@
+{"id": "v39", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A simple 'most read' list on the homepage nearly took down the whole page."],
+ ["b2", "Finding it meant scanning all twenty thousand articles, every single time someone opened the page."],
+ ["b3", "That crept past the three-second limit the server allows before it simply gives up."],
+ ["b4", "So one PostgreSQL function now answers with a single indexed lookup instead of a full rescan."],
+ ["b5", "One indexed call now replaces a scan of twenty thousand."]
+]}

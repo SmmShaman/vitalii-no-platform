@@ -1,0 +1,7 @@
+{"id": "v40", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A search engine opened my news page and saw an empty shell. No headline, no words — just a blank spinner."],
+ ["b2", "Every article loaded after the page already arrived — like handing a librarian a sealed box."],
+ ["b3", "So now Next.js bakes those articles straight into the page on the server, before it reaches a browser."],
+ ["b4", "The first twelve articles now render before the page ever leaves the server."],
+ ["b5", "No more empty shell — crawlers and readers now see the same twelve."]
+]}

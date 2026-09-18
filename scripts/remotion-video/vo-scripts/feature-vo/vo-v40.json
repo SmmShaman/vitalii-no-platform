@@ -1,0 +1,56 @@
+{
+ "id": "v40",
+ "beat_durations": {
+  "b1": 7.032,
+  "b2": 5.952,
+  "b3": 6.312,
+  "b4": 4.608,
+  "b5": 4.872
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A search engine opened my news page and saw an empty shell. No headline, no words \u2014 just a blank spinner.",
+   "start_s": 0.5,
+   "end_s": 7.532,
+   "start_f": 15,
+   "end_f": 226
+  },
+  {
+   "beat": "b2",
+   "text": "Every article loaded after the page already arrived \u2014 like handing a librarian a sealed box.",
+   "start_s": 7.832,
+   "end_s": 13.784,
+   "start_f": 235,
+   "end_f": 414
+  },
+  {
+   "beat": "b3",
+   "text": "So now Next.js bakes those articles straight into the page on the server, before it reaches a browser.",
+   "start_s": 14.084,
+   "end_s": 20.396,
+   "start_f": 423,
+   "end_f": 612
+  },
+  {
+   "beat": "b4",
+   "text": "The first twelve articles now render before the page ever leaves the server.",
+   "start_s": 20.696,
+   "end_s": 25.304,
+   "start_f": 621,
+   "end_f": 759
+  },
+  {
+   "beat": "b5",
+   "text": "No more empty shell \u2014 crawlers and readers now see the same twelve.",
+   "start_s": 25.604,
+   "end_s": 30.476,
+   "start_f": 768,
+   "end_f": 914
+  }
+ ],
+ "total_s": 31.976,
+ "durationInFrames": 959,
+ "measured_track_s": 30.528,
+ "track": "/root/feature-demos/vo-v40/vo-v40.mp3"
+}
