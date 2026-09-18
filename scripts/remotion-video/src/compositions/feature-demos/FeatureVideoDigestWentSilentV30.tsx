@@ -133,9 +133,14 @@ export const FeatureVideoDigestWentSilentV30: React.FC = () => {
         {/* ════ THE RIBBON — alive for the whole clip ════ */}
         <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 190, opacity: ribbonOp }}>
           <div style={{ position: "absolute", left: 90, top: RIBBON_Y, width: 1100, height: 4, borderRadius: 2, background: P.border }} />
-          {STOPS.map((s) => {
+          {STOPS.map((s, i) => {
             const t = seg(frame, s.land, s.land + 14);
             const active = t > 0.5;
+            const next = STOPS[i + 1];
+            // the icon swap is permanent (the ribbon's history), but the headline
+            // paragraph below it must not persist once the next stop lands —
+            // their 300px-wide labels overlap (240px stop spacing), so it fades out.
+            const labelOp = next ? t * (1 - seg(frame, next.land, next.land + 14)) : t;
             return (
               <div key={s.x}>
                 <div
@@ -163,7 +168,7 @@ export const FeatureVideoDigestWentSilentV30: React.FC = () => {
                     {s.after}
                   </span>
                 </div>
-                <div style={{ position: "absolute", left: s.x - 150, top: RIBBON_Y + 46, width: 300, textAlign: "center", opacity: t, fontFamily }}>
+                <div style={{ position: "absolute", left: s.x - 150, top: RIBBON_Y + 46, width: 300, textAlign: "center", opacity: labelOp, fontFamily }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: active ? P.ink : P.muted }}>{s.headline}</div>
                   <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1, color: P.accent, marginTop: 4 }}>→ {s.effectKey}</div>
                 </div>

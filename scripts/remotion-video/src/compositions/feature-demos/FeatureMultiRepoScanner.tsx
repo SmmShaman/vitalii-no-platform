@@ -140,10 +140,13 @@ const StageFooter: React.FC<{ text: string; opacity: number; color?: string }> =
 export const FeatureMultiRepoScanner: React.FC = () => {
   const frame = useCurrentFrame();
 
-  const b1 = seg(frame, 15, 31) * (1 - seg(frame, 172, 188));
-  const b2 = seg(frame, 181, 197) * (1 - seg(frame, 322, 338));
-  const b3 = seg(frame, 331, 347) * (1 - seg(frame, 479, 495));
-  const b4 = seg(frame, 488, 504) * (1 - seg(frame, 691, 707));
+  // fade-out windows end exactly where the next beat's fade-in starts (9-frame
+  // gap, not the usual 16) — a wider fade-out here overlapped the incoming
+  // beat's content for 7 frames at every cut.
+  const b1 = seg(frame, 15, 31) * (1 - seg(frame, 172, 181));
+  const b2 = seg(frame, 181, 197) * (1 - seg(frame, 322, 331));
+  const b3 = seg(frame, 331, 347) * (1 - seg(frame, 479, 488));
+  const b4 = seg(frame, 488, 504) * (1 - seg(frame, 691, 700));
   const b5 = seg(frame, 700, 716); // holds full to 883 — no fade-out
 
   const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);

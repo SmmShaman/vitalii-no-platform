@@ -98,25 +98,25 @@ const NeatRow: React.FC<{ y: number; opacity: number; scale: number }> = ({ y, o
     <div
       style={{
         position: "absolute",
-        left: 460,
+        left: 520,
         top: y,
-        width: 380,
-        height: 62,
-        borderRadius: 12,
+        width: 600,
+        height: 76,
+        borderRadius: 14,
         background: P.card,
         border: `1.5px solid ${P.border}`,
         opacity,
         transform: `scale(${scale})`,
         display: "flex",
         alignItems: "center",
-        gap: 12,
-        padding: "0 16px",
+        gap: 16,
+        padding: "0 20px",
       }}
     >
-      <div style={{ width: 30, height: 30, borderRadius: 8, background: P.accentBg }} />
+      <div style={{ width: 38, height: 38, borderRadius: 10, background: P.accentBg }} />
       <div style={{ flex: 1 }}>
-        <div style={{ width: "80%", height: 9, borderRadius: 4, background: "#EFE3CC" }} />
-        <div style={{ width: "50%", height: 9, borderRadius: 4, background: "#F3EADB", marginTop: 7 }} />
+        <div style={{ width: "80%", height: 11, borderRadius: 5, background: "#EFE3CC" }} />
+        <div style={{ width: "50%", height: 11, borderRadius: 5, background: "#F3EADB", marginTop: 9 }} />
       </div>
     </div>
   );
@@ -144,10 +144,13 @@ export const FeatureLiveBadgeDrawsFlagV39: React.FC = () => {
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
 
-  const b1 = seg(frame, 15, 31) * (1 - seg(frame, 150, 166));
-  const b2 = seg(frame, 159, 175) * (1 - seg(frame, 339, 355));
-  const b3 = seg(frame, 348, 364) * (1 - seg(frame, 488, 504));
-  const b4 = seg(frame, 497, 513) * (1 - seg(frame, 687, 703));
+  // fade-out windows end exactly where the next beat's fade-in starts (9-frame
+  // gap, not the usual 16) — a wider fade-out here left the outgoing stat()
+  // number visibly ghosted under the incoming one for 7 frames at every cut.
+  const b1 = seg(frame, 15, 31) * (1 - seg(frame, 150, 159));
+  const b2 = seg(frame, 159, 175) * (1 - seg(frame, 339, 348));
+  const b3 = seg(frame, 348, 364) * (1 - seg(frame, 488, 497));
+  const b4 = seg(frame, 497, 513) * (1 - seg(frame, 687, 696));
   const b5 = seg(frame, 696, 712); // holds through 854
 
   const statPop1 = pop(15);
@@ -191,7 +194,7 @@ export const FeatureLiveBadgeDrawsFlagV39: React.FC = () => {
           {stat("1", undefined, "SIMPLE WIDGET, HOMEPAGE", P.muted, statPop1)}
           <StatPill x={150} y={560} emoji="📰" text="a most-read list on the homepage" tone="danger" opacity={b1} />
           {[0, 1, 2, 3].map((i) => (
-            <NeatRow key={`n1-${i}`} y={140 + i * 82} opacity={Math.min(1, pop(15 + i * 8))} scale={Math.min(1, pop(15 + i * 8))} />
+            <NeatRow key={`n1-${i}`} y={172 + i * 88} opacity={Math.min(1, pop(15 + i * 8))} scale={Math.min(1, pop(15 + i * 8))} />
           ))}
           <CaptionBand y={646} text="A simple 'most read' list nearly took down the whole page" tone="danger" opacity={b1} />
         </Group>
@@ -241,8 +244,8 @@ export const FeatureLiveBadgeDrawsFlagV39: React.FC = () => {
             3.0S LIMIT
           </div>
           {SCATTER.map((c, i) => {
-            const targetX = 900 - (i % 3) * 26;
-            const targetY = 140 + Math.floor(i / 3) * 90;
+            const targetX = 950 - (i % 4) * 90;
+            const targetY = 100 + Math.floor(i / 4) * 150;
             const x = c.x + (targetX - c.x) * slamT;
             const y = c.y + (targetY - c.y) * slamT;
             return <RowCard key={`w3-${i}`} x={x} y={y} rot={c.rot * (1 - slamT)} opacity={b3} scale={1} />;

@@ -68,10 +68,13 @@ export const FeatureCrawlersSawEmptyShellV40: React.FC = () => {
   const pop = (start: number, damping = 11) =>
     frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
 
-  const b1 = seg(frame, 15, 31) * (1 - seg(frame, 226, 242));
-  const b2 = seg(frame, 235, 251) * (1 - seg(frame, 414, 430));
-  const b3 = seg(frame, 423, 439) * (1 - seg(frame, 612, 628));
-  const b4 = seg(frame, 621, 637) * (1 - seg(frame, 759, 775));
+  // fade-out windows end exactly where the next beat's fade-in starts (9-frame
+  // gap, not the usual 16) — a wider fade-out here overlapped the incoming
+  // beat's content for 7 frames at every cut.
+  const b1 = seg(frame, 15, 31) * (1 - seg(frame, 226, 235));
+  const b2 = seg(frame, 235, 251) * (1 - seg(frame, 414, 423));
+  const b3 = seg(frame, 423, 439) * (1 - seg(frame, 612, 621));
+  const b4 = seg(frame, 621, 637) * (1 - seg(frame, 759, 768));
   const b5 = seg(frame, 768, 784); // holds through 959
 
   const heroPop1 = pop(15);
@@ -111,10 +114,10 @@ export const FeatureCrawlersSawEmptyShellV40: React.FC = () => {
             <div
               style={{
                 position: "absolute",
-                left: 470,
-                top: 220,
-                width: 340,
-                height: 230,
+                left: 290,
+                top: 190,
+                width: 700,
+                height: 400,
                 borderRadius: 16,
                 background: P.card,
                 border: `1.5px solid ${P.border}`,
@@ -124,29 +127,29 @@ export const FeatureCrawlersSawEmptyShellV40: React.FC = () => {
             >
               <div
                 style={{
-                  height: 34,
+                  height: 40,
                   display: "flex",
                   alignItems: "center",
-                  gap: 7,
-                  padding: "0 12px",
+                  gap: 8,
+                  padding: "0 16px",
                   borderBottom: `1px solid ${P.border}`,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 700,
                   color: P.muted,
                 }}
               >
-                <span style={{ width: 9, height: 9, borderRadius: 99, background: "#F0C3BB" }} />
-                <span style={{ width: 9, height: 9, borderRadius: 99, background: "#DFC96F" }} />
-                <span style={{ width: 9, height: 9, borderRadius: 99, background: "#B8E3C1" }} />
-                <span style={{ marginLeft: 6 }}>vitalii.no/news</span>
+                <span style={{ width: 10, height: 10, borderRadius: 99, background: "#F0C3BB" }} />
+                <span style={{ width: 10, height: 10, borderRadius: 99, background: "#DFC96F" }} />
+                <span style={{ width: 10, height: 10, borderRadius: 99, background: "#B8E3C1" }} />
+                <span style={{ marginLeft: 8 }}>vitalii.no/news</span>
               </div>
-              <div style={{ position: "relative", width: "100%", height: 230 - 34, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ position: "relative", width: "100%", height: 400 - 40, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <div
                   style={{
-                    width: 54,
-                    height: 54,
+                    width: 90,
+                    height: 90,
                     borderRadius: "50%",
-                    border: `6px solid ${P.accentEdge}`,
+                    border: `9px solid ${P.accentEdge}`,
                     borderTopColor: P.accent,
                     transform: `rotate(${spin}deg)`,
                   }}
@@ -166,10 +169,10 @@ export const FeatureCrawlersSawEmptyShellV40: React.FC = () => {
             <div
               style={{
                 position: "absolute",
-                left: 380,
-                top: 200,
-                width: 520,
-                height: 310,
+                left: 290,
+                top: 190,
+                width: 700,
+                height: 400,
                 borderRadius: 18,
                 background: P.card,
                 border: `1.5px solid ${P.border}`,
@@ -177,13 +180,13 @@ export const FeatureCrawlersSawEmptyShellV40: React.FC = () => {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: 40,
+                gap: 64,
               }}
             >
-              <div style={{ fontSize: 96 }}>📦</div>
+              <div style={{ fontSize: 150 }}>📦</div>
               <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 64 }}>📚</div>
-                <div style={{ marginTop: 8, fontSize: 15, fontWeight: 700, color: P.muted, letterSpacing: 1 }}>
+                <div style={{ fontSize: 100 }}>📚</div>
+                <div style={{ marginTop: 12, fontSize: 20, fontWeight: 700, color: P.muted, letterSpacing: 1 }}>
                   a sealed box on the desk
                 </div>
               </div>
