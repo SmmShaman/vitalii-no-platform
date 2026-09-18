@@ -156,6 +156,8 @@ import { FeatureCancelledGameStaysCalendarC06 } from "./compositions/feature-dem
 import { FeatureMeetUpAt17B54 } from "./compositions/feature-demos/FeatureMeetUpAt17B54";
 import { FeatureDemoClipsShowRealV33 } from "./compositions/feature-demos/FeatureDemoClipsShowRealV33";
 import { FeatureButtonsTilesPressIntoV32 } from "./compositions/feature-demos/FeatureButtonsTilesPressIntoV32";
+import { FeatureCrawlersSawEmptyShellV40 } from "./compositions/feature-demos/FeatureCrawlersSawEmptyShellV40";
+import { FeatureLiveBadgeDrawsFlagV39 } from "./compositions/feature-demos/FeatureLiveBadgeDrawsFlagV39";
 import { FeatureInstagramCaptionsGetAltV35 } from "./compositions/feature-demos/FeatureInstagramCaptionsGetAltV35";
 import { FeatureDemoClipsRenderGithubV31 } from "./compositions/feature-demos/FeatureDemoClipsRenderGithubV31";
 import { FeatureAiFeaturePosts } from "./compositions/feature-demos/FeatureAiFeaturePosts";
@@ -1503,6 +1505,26 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureButtonsTilesPressIntoV32"
         component={FeatureButtonsTilesPressIntoV32}
         durationInFrames={951}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      {/* v40 (2026-09-18): zoom-in archetype, mint mood, live SSR-fix recordings. */}
+      <Composition
+        id="FeatureCrawlersSawEmptyShellV40"
+        component={FeatureCrawlersSawEmptyShellV40}
+        durationInFrames={959}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      {/* v39 (2026-09-18): card-deck archetype, sand mood, deck absorbed into the real fix commit. */}
+      <Composition
+        id="FeatureLiveBadgeDrawsFlagV39"
+        component={FeatureLiveBadgeDrawsFlagV39}
+        durationInFrames={854}
         fps={30}
         width={1280}
         height={720}

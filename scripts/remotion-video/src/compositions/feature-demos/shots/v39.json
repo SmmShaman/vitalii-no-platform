@@ -1,0 +1,21 @@
+{
+  "id": "v39",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "fix1",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/d5b0d6f20c61bcd519c6827eab6a58597f6338e6",
+      "frames": 170,
+      "scroll": [[0, 0], [169, 650]],
+      "mouse": [[0, 300, 150], [60, 600, 240], [120, 450, 320], [169, 600, 260]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-live-badge-now-draws-a-flag-per-visitor-and-news-gets-a-most-read-strip-that-v39",
+      "frames": 150,
+      "scroll": [[0, 0], [149, 650]],
+      "mouse": [[0, 560, 200], [70, 560, 260], [149, 560, 300]]
+    }
+  ]
+}

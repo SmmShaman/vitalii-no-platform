@@ -1,12 +1,16 @@
 /**
  * FeatureMultiRepoScanner — feature p59 — 1280x720, 883 frames @ 30fps, VOICE-SYNCED.
  *
- * ART-DIRECTION REWRITE (2026-09-05). Archetype 6 "sidebar narrative" / mood
- * "slate". A fixed dark sidebar on the left carries the running claim (repo
- * count, minutes lost, the eventual 70-80% payoff) while the stage on the
- * right walks through: 7 unknown repos -> searching them one by one -> the
- * filing-cabinet analogy -> a workflow scanning all 7 in parallel -> one
- * click straight to the exact commit.
+ * ART-DIRECTION REWRITE (2026-09-05, re-shot 2026-09-18). Archetype 6 "sidebar
+ * narrative" / mood "slate". A fixed dark sidebar on the left carries the
+ * running claim (repo count, minutes lost, the eventual 70-80% payoff) —
+ * the sidebar itself is the one element that survives every beat — while
+ * the stage on the right walks through: 7 unknown repos -> searching them
+ * one by one -> the filing-cabinet analogy (all three stay drawn — no
+ * verified recording covers the manual-search stage, and beat 3 is an
+ * explicit metaphor) -> a REAL recording of GitHub Actions scanning all 7
+ * repos -> a REAL recording of the shipped feature page, one click away
+ * from the exact commit.
  *
  * Voice-synced beat table (narration windows, do not shift):
  *  b1  15–172  "Seven repos. One feature. And I could never remember which repo touched it last."
@@ -15,12 +19,16 @@
  *  b4 488–691  "Now GitHub Actions scans every repo on each push and builds one map straight to the exact commit."
  *  b5 700–838  "One click now finds it. Debugging time dropped seventy to eighty percent." — holds to 883.
  *
- * Single tech name in the whole clip: GitHub Actions (beat 4 headline only).
+ * Single tech name in the whole clip: GitHub Actions (beat 4 chip only).
+ * b1->b2 is a directional slide across the stage, not a plain crossfade —
+ * the sidebar itself never slides, only the stage content.
  */
 import React from "react";
 import { useCurrentFrame, interpolate, Easing } from "remotion";
 import { MOODS, PaletteProvider } from "./bright-theme";
-import { LightBg, Group, IconCard, Cursor, CheckBadge, seg, fontFamily } from "./bright-primitives";
+import { LightBg, Group, IconCard, Cursor, CheckBadge, FilterChip, seg, fontFamily } from "./bright-primitives";
+import { LiveWindow, Win } from "./live-primitives";
+import shots from "./shots/p59.json";
 
 const P = MOODS.slate;
 
@@ -37,13 +45,8 @@ const SIDE_MUTED = "rgba(255,255,255,0.56)";
 const REPOS = ["vitalii-portfolio", "boytasks", "jobbot-no", "+4 more"];
 const DRAWER_LABELS = ["vitalii", "boytasks", "jobbot", "repo 4", "repo 5", "repo 6", "repo 7"];
 
-type CommitRow = { feature: string; repo: string; commit: string; shipped: string };
-const ROWS: CommitRow[] = [
-  { feature: "LinkedIn Native Image Upload", repo: "vitalii-portfolio", commit: "a3f9c12", shipped: "2 days ago" },
-  { feature: "MTKruto Video Bypass", repo: "vitalii-portfolio", commit: "7e21bd4", shipped: "1 week ago" },
-  { feature: "Two-Tier Screen Gate", repo: "boytasks", commit: "5c88a01", shipped: "3 weeks ago" },
-  { feature: "Skyvern VPS Deploy", repo: "jobbot-no", commit: "d40f3aa", shipped: "1 month ago" },
-];
+/** The live-recording window for beats 4-5, sized to the stage (right of the fixed sidebar). */
+const STAGE_WIN: Win = { x: 380, y: 168, w: 832, h: 388 };
 
 const SideStat: React.FC<{ big: string; color: string; label: string; sub: string; opacity: number; fontSize?: number }> = ({
   big,
@@ -143,6 +146,20 @@ export const FeatureMultiRepoScanner: React.FC = () => {
   const b4 = seg(frame, 488, 504) * (1 - seg(frame, 691, 707));
   const b5 = seg(frame, 700, 716); // holds full to 883 — no fade-out
 
+  const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  // beat 1 -> beat 2: a directional slide on the stage only (the sidebar never moves).
+  const slideOut1 = interpolate(frame, [156, 188], [0, -160], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.in(Easing.cubic),
+  });
+  const slideIn2 = interpolate(frame, [181, 213], [160, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+
   // ---- beat 1 / 2 shared card geometry --------------------------------
   const cardW = 180;
   const cardGap = 20;
@@ -164,17 +181,6 @@ export const FeatureMultiRepoScanner: React.FC = () => {
   const drawersX0 = STAGE_L + (STAGE_W - drawersTotalW) / 2;
   const activeDrawer = Math.min(6, Math.max(0, Math.floor((frame - 331) / 21)));
   const drawerLocalT = Math.max(0, Math.min(1, (frame - 331 - activeDrawer * 21) / 21));
-
-  // ---- beat 4: 7 repos scanned in parallel, then the map forms -------
-  const barFill = interpolate(frame, [488, 630], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
-  const rowReveal = (i: number) => seg(frame, 636 + i * 12, 652 + i * 12);
-
-  // ---- beat 5: click straight to the exact commit ---------------------
-  const clickShow = interpolate(frame, [736, 752], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <PaletteProvider value={P}>
@@ -209,39 +215,43 @@ export const FeatureMultiRepoScanner: React.FC = () => {
           </div>
         </div>
 
-        {/* ---------------- beat 1 : problem ---------------- */}
+        {/* ---------------- beat 1 : problem (drawn — slides off left) ---------------- */}
         <Group opacity={b1}>
-          <StageTitle text="One feature. Seven repos. Which one has it?" opacity={1} />
-          <StageSub text="🔎 LinkedIn Native Image Upload — shipped somewhere in here" opacity={1} />
-          {REPOS.map((name, i) => (
-            <IconCard key={name} x={cardCenterX(i) - cardW / 2} y={250} w={cardW} emoji={i === 3 ? "➕" : "📁"} title={name} sub="?" tone="card" opacity={1} />
-          ))}
-          <StageFooter text="Nobody remembers which repo touched it last" opacity={1} color={P.danger} />
+          <div style={{ position: "absolute", inset: 0, transform: `translateX(${slideOut1}px)` }}>
+            <StageTitle text="One feature. Seven repos. Which one has it?" opacity={1} />
+            <StageSub text="🔎 LinkedIn Native Image Upload — shipped somewhere in here" opacity={1} />
+            {REPOS.map((name, i) => (
+              <IconCard key={name} x={cardCenterX(i) - cardW / 2} y={250} w={cardW} emoji={i === 3 ? "➕" : "📁"} title={name} sub="?" tone="card" opacity={1} />
+            ))}
+            <StageFooter text="Nobody remembers which repo touched it last" opacity={1} color={P.danger} />
+          </div>
         </Group>
 
-        {/* ---------------- beat 2 : sequential hunt ---------------- */}
+        {/* ---------------- beat 2 : sequential hunt (drawn — slides in from right) ---------------- */}
         <Group opacity={b2}>
-          <StageTitle text="Searching all seven, one at a time" opacity={1} />
-          <StageSub text="🔍 chasing a commit that could be anywhere" opacity={1} />
-          {REPOS.map((name, i) => {
-            const checked = i < searchIdx;
-            const checking = i === searchIdx;
-            return (
-              <IconCard
-                key={name}
-                x={cardCenterX(i) - cardW / 2}
-                y={250}
-                w={cardW}
-                emoji={i === 3 ? "➕" : "📁"}
-                title={name}
-                sub={checked ? "✗ not here" : checking ? "checking…" : ""}
-                tone={checked ? "danger" : checking ? "accent" : "card"}
-                opacity={1}
-              />
-            );
-          })}
-          <Cursor x={cursorX2} y={222 + cursorBob} opacity={1} />
-          <StageFooter text={`Checking ${REPOS[searchIdx]}…`} opacity={1} color={P.accent} />
+          <div style={{ position: "absolute", inset: 0, transform: `translateX(${slideIn2}px)` }}>
+            <StageTitle text="Searching all seven, one at a time" opacity={1} />
+            <StageSub text="🔍 chasing a commit that could be anywhere" opacity={1} />
+            {REPOS.map((name, i) => {
+              const checked = i < searchIdx;
+              const checking = i === searchIdx;
+              return (
+                <IconCard
+                  key={name}
+                  x={cardCenterX(i) - cardW / 2}
+                  y={250}
+                  w={cardW}
+                  emoji={i === 3 ? "➕" : "📁"}
+                  title={name}
+                  sub={checked ? "✗ not here" : checking ? "checking…" : ""}
+                  tone={checked ? "danger" : checking ? "accent" : "card"}
+                  opacity={1}
+                />
+              );
+            })}
+            <Cursor x={cursorX2} y={222 + cursorBob} opacity={1} />
+            <StageFooter text={`Checking ${REPOS[searchIdx]}…`} opacity={1} color={P.accent} />
+          </div>
         </Group>
 
         {/* ---------------- beat 3 : filing-cabinet analogy ---------------- */}
@@ -281,141 +291,42 @@ export const FeatureMultiRepoScanner: React.FC = () => {
           <StageFooter text={`Drawer ${activeDrawer + 1} of 7 — ${DRAWER_LABELS[activeDrawer]}`} opacity={1} color={P.accent} />
         </Group>
 
-        {/* ---------------- beat 4 : GitHub Actions scans all 7 in parallel ---------------- */}
+        {/* ---------------- beat 4 : GitHub Actions scans all 7 — REAL recording ---------------- */}
         <Group opacity={b4}>
           <StageTitle text="GitHub Actions scans all 7 — in parallel, on every push" opacity={1} fontSize={26} />
-          <StageSub text="🤖 one workflow, seven repos, together" opacity={1} top={130} />
-
-          {REPOS.map((name, i) => (
-            <div key={name} style={{ position: "absolute", left: STAGE_L + 60, top: 180 + i * 46, width: STAGE_W - 120, height: 30 }}>
-              <div style={{ position: "absolute", left: 0, top: 0, fontSize: 14, fontWeight: 700, color: P.ink }}>{name}</div>
-              <div style={{ position: "absolute", left: 0, top: 18, width: "100%", height: 8, borderRadius: 4, background: P.chipBg, overflow: "hidden" }}>
-                <div style={{ width: `${barFill * 100}%`, height: "100%", background: P.success, borderRadius: 4 }} />
-              </div>
-            </div>
-          ))}
-
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L + 12,
-              top: 360,
-              width: STAGE_W - 24,
-              height: 230,
-              background: P.card,
-              border: `1px solid ${P.border}`,
-              borderRadius: 12,
-              boxShadow: "0 14px 28px rgba(16,24,40,0.08)",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                height: 38,
-                background: P.chipBg,
-                display: "flex",
-                alignItems: "center",
-                paddingLeft: 16,
-                fontSize: 13,
-                fontWeight: 700,
-                color: P.muted,
-                borderBottom: `1px solid ${P.border}`,
-              }}
-            >
-              commit_map.json
-            </div>
-            {ROWS.map((r, i) => (
-              <div
-                key={r.feature}
-                style={{
-                  position: "absolute",
-                  left: 16,
-                  right: 16,
-                  top: 50 + i * 44,
-                  opacity: rowReveal(i),
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: 14,
-                }}
-              >
-                <span style={{ fontWeight: 700, color: P.ink }}>{r.feature}</span>
-                <span style={{ color: P.accent, fontWeight: 700 }}>
-                  {r.repo} · {r.commit}
-                </span>
-              </div>
-            ))}
-          </div>
+          <StageSub text="🤖 one workflow builds the map to the exact commit" opacity={1} top={130} />
+          <FilterChip x={STAGE_WIN.x + STAGE_WIN.w - 210} y={STAGE_WIN.y - 34} text="GitHub Actions" icon="🤖" color={P.accent} scale={1} opacity={b4} />
         </Group>
+        <LiveWindow
+          file={shots}
+          shot="actions"
+          title="github.com — Actions scanning all 7 repos"
+          from={488}
+          hold={203}
+          zoom={(t) => 1 + 0.08 * easeInOut(t)}
+          focus={{ x: 0.5, y: 0.3 }}
+          opacity={b4}
+          win={STAGE_WIN}
+        />
 
-        {/* ---------------- beat 5 : one click, straight to the commit ---------------- */}
+        {/* ---------------- beat 5 : one click, straight to the commit — REAL recording, holds to tail ---------------- */}
         <Group opacity={b5}>
           <StageTitle text="One click. Straight to the exact commit." opacity={1} />
-          <StageSub text="commit_map.json — always in sync" opacity={1} />
-
-          <div
-            style={{
-              position: "absolute",
-              left: STAGE_L + 12,
-              top: 150,
-              width: STAGE_W - 24,
-              height: 210,
-              background: P.card,
-              border: `1px solid ${P.border}`,
-              borderRadius: 12,
-              boxShadow: "0 14px 28px rgba(16,24,40,0.08)",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                height: 38,
-                background: P.chipBg,
-                display: "flex",
-                alignItems: "center",
-                paddingLeft: 16,
-                fontSize: 13,
-                fontWeight: 700,
-                color: P.muted,
-                borderBottom: `1px solid ${P.border}`,
-              }}
-            >
-              commit_map.json
-            </div>
-            {ROWS.map((r, i) => (
-              <div
-                key={r.feature}
-                style={{
-                  position: "absolute",
-                  left: 16,
-                  right: 16,
-                  top: 50 + i * 40,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  fontSize: 14,
-                  background: i === 0 ? P.accentBg : "transparent",
-                  borderRadius: 6,
-                  padding: i === 0 ? "4px 8px" : 0,
-                }}
-              >
-                <span style={{ fontWeight: 700, color: P.ink }}>{r.feature}</span>
-                <span style={{ color: P.accent, fontWeight: 700 }}>
-                  {r.repo} · {r.commit}
-                </span>
-              </div>
-            ))}
-            <Cursor x={STAGE_L + 12 + 40} y={150 + 58} opacity={clickShow} click={clickShow} />
-            <CheckBadge x={STAGE_L + 12 + (STAGE_W - 24) - 40} y={150 + 58} size={30} opacity={clickShow} />
-          </div>
-
-          <div style={{ position: "absolute", left: STAGE_L - 12, top: 400, width: STAGE_W + 24, textAlign: "center" }}>
-            <div style={{ fontSize: 90, fontWeight: 800, color: P.success, lineHeight: 1 }}>70–80%</div>
-            <div style={{ marginTop: 12, fontSize: 19, fontWeight: 700, color: P.muted, textTransform: "uppercase", letterSpacing: 1.2 }}>
-              less debugging &amp; context-switching time
-            </div>
-          </div>
-
+          <StageSub text="the shipped feature page — always in sync" opacity={1} />
+          <CheckBadge x={STAGE_WIN.x + STAGE_WIN.w - 30} y={STAGE_WIN.y - 26} size={34} opacity={b5} />
           <StageFooter text="One click now finds it — no more seven-tab hunting" opacity={1} color={P.success} />
         </Group>
+        <LiveWindow
+          file={shots}
+          shot="page"
+          title="vitalii.no/features — one click, exact commit"
+          from={700}
+          hold={183}
+          zoom={(t) => 1.08 + 0.1 * easeInOut(t)}
+          focus={{ x: 0.5, y: 0.4 }}
+          opacity={b5}
+          win={STAGE_WIN}
+        />
       </div>
     </PaletteProvider>
   );

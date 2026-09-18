@@ -1,0 +1,28 @@
+{
+  "id": "v40",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "fix1",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/d5b0d6f20c61bcd519c6827eab6a58597f6338e6",
+      "frames": 140,
+      "scroll": [[0, 0], [139, 700]],
+      "mouse": [[0, 300, 150], [40, 600, 220], [90, 450, 320], [139, 600, 260]]
+    },
+    {
+      "name": "fix2",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/7fcb068983e79e17367b0b3924c8ff1a3ab0a63d",
+      "frames": 100,
+      "scroll": [[0, 0], [99, 520]],
+      "mouse": [[0, 350, 140], [50, 600, 240], [99, 500, 280]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/crawlers-saw-an-empty-shell-on-news-and-blog-now-the-first-12-articles-render-se-v40",
+      "frames": 160,
+      "scroll": [[0, 0], [159, 600]],
+      "mouse": [[0, 560, 200], [80, 560, 260], [159, 560, 300]]
+    }
+  ]
+}
