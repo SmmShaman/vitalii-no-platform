@@ -1,0 +1,56 @@
+{
+ "id": "b52",
+ "beat_durations": {
+  "b1": 6.72,
+  "b2": 5.136,
+  "b3": 4.176,
+  "b4": 6.648,
+  "b5": 4.464
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My son looked at his study card and said, 'I see no change' \u2014 every subject was the same wall of text.",
+   "start_s": 0.5,
+   "end_s": 7.22,
+   "start_f": 15,
+   "end_f": 217
+  },
+  {
+   "beat": "b2",
+   "text": "A big question, a big answer, a rule underneath \u2014 nothing worth looking at.",
+   "start_s": 7.52,
+   "end_s": 12.656,
+   "start_f": 226,
+   "end_f": 380
+  },
+  {
+   "beat": "b3",
+   "text": "I rebuilt it in React to draw a real diagram from that same data.",
+   "start_s": 12.956,
+   "end_s": 17.132,
+   "start_f": 389,
+   "end_f": 514
+  },
+  {
+   "beat": "b4",
+   "text": "Compound words split apart now, math steps get their own layout, grammar rules sit in a fixed footer.",
+   "start_s": 17.432,
+   "end_s": 24.08,
+   "start_f": 523,
+   "end_f": 722
+  },
+  {
+   "beat": "b5",
+   "text": "The card now draws through thirty templates across six diagram styles.",
+   "start_s": 24.38,
+   "end_s": 28.844,
+   "start_f": 731,
+   "end_f": 865
+  }
+ ],
+ "total_s": 30.344,
+ "durationInFrames": 910,
+ "measured_track_s": 28.896,
+ "track": "/root/feature-demos/vo-b52/vo-b52.mp3"
+}

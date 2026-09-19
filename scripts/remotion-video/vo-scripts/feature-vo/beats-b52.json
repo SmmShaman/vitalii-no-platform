@@ -1,0 +1,7 @@
+{"id": "b52", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My son looked at his study card and said, 'I see no change' — every subject was the same wall of text."],
+ ["b2", "A big question, a big answer, a rule underneath — nothing worth looking at."],
+ ["b3", "I rebuilt it in React to draw a real diagram from that same data."],
+ ["b4", "Compound words split apart now, math steps get their own layout, grammar rules sit in a fixed footer."],
+ ["b5", "The card now draws through thirty templates across six diagram styles."]
+]}

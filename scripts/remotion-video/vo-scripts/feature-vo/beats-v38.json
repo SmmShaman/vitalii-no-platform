@@ -1,0 +1,7 @@
+{"id": "v38", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "I wanted a badge showing how many people are on my site right now — but some of my old numbers were already wrong."],
+ ["b2", "Some days had been multiplied by up to ten times, turning a quiet Tuesday into a viral one."],
+ ["b3", "A small Cloudflare worker now fetches the real count every minute, without ever exposing a secret key."],
+ ["b4", "I also rebuilt every inflated day in the history for good."],
+ ["b5", "Now the badge refreshes every sixty seconds, live and accurate."]
+]}

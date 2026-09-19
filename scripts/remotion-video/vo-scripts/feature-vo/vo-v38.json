@@ -1,0 +1,56 @@
+{
+ "id": "v38",
+ "beat_durations": {
+  "b1": 5.808,
+  "b2": 6.0,
+  "b3": 6.792,
+  "b4": 3.744,
+  "b5": 4.608
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I wanted a badge showing how many people are on my site right now \u2014 but some of my old numbers were already wrong.",
+   "start_s": 0.5,
+   "end_s": 6.308,
+   "start_f": 15,
+   "end_f": 189
+  },
+  {
+   "beat": "b2",
+   "text": "Some days had been multiplied by up to ten times, turning a quiet Tuesday into a viral one.",
+   "start_s": 6.608,
+   "end_s": 12.608,
+   "start_f": 198,
+   "end_f": 378
+  },
+  {
+   "beat": "b3",
+   "text": "A small Cloudflare worker now fetches the real count every minute, without ever exposing a secret key.",
+   "start_s": 12.908,
+   "end_s": 19.7,
+   "start_f": 387,
+   "end_f": 591
+  },
+  {
+   "beat": "b4",
+   "text": "I also rebuilt every inflated day in the history for good.",
+   "start_s": 20.0,
+   "end_s": 23.744,
+   "start_f": 600,
+   "end_f": 712
+  },
+  {
+   "beat": "b5",
+   "text": "Now the badge refreshes every sixty seconds, live and accurate.",
+   "start_s": 24.044,
+   "end_s": 28.652,
+   "start_f": 721,
+   "end_f": 860
+  }
+ ],
+ "total_s": 30.152,
+ "durationInFrames": 905,
+ "measured_track_s": 28.704,
+ "track": "/root/feature-demos/vo-v38/vo-v38.mp3"
+}
