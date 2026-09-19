@@ -1,0 +1,19 @@
+{
+  "id": "b52",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "hub", "url": "https://vitalii.no/features", "frames": 218,
+      "scroll": [[0, 0], [108, 900], [217, 1800]],
+      "mouse": [[0, 300, 200], [70, 650, 300], [140, 900, 260], [217, 500, 340]] },
+    { "name": "page", "url": "https://vitalii.no/features/a-wall-card-stops-being-text-it-becomes-a-diagram-b52", "frames": 141,
+      "scroll": [[0, 0], [70, 300], [140, 600]],
+      "mouse": [[0, 560, 200], [70, 560, 280], [140, 560, 240]] },
+    { "name": "detail", "url": "https://vitalii.no/features/a-wall-card-stops-being-text-it-becomes-a-diagram-b52", "frames": 215,
+      "scroll": [[0, 600], [107, 1200], [214, 1800]],
+      "mouse": [[0, 560, 220], [107, 560, 300], [214, 560, 260]] },
+    { "name": "result", "url": "https://vitalii.no/features/a-wall-card-stops-being-text-it-becomes-a-diagram-b52", "frames": 179,
+      "scroll": [[0, 1800], [89, 2400], [178, 3000]],
+      "mouse": [[0, 560, 240], [89, 560, 300], [178, 560, 270]] }
+  ]
+}
