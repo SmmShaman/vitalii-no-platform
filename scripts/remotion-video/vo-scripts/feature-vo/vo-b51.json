@@ -1,0 +1,56 @@
+{
+ "id": "b51",
+ "beat_durations": {
+  "b1": 3.888,
+  "b2": 5.808,
+  "b3": 3.792,
+  "b4": 5.016,
+  "b5": 6.168
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One kid here can go a whole term without ever earning TV time.",
+   "start_s": 0.5,
+   "end_s": 4.388,
+   "start_f": 15,
+   "end_f": 132
+  },
+  {
+   "beat": "b2",
+   "text": "The teaching wall was his only lesson, though three of four subjects came from his own finished homework.",
+   "start_s": 4.688,
+   "end_s": 10.496,
+   "start_f": 141,
+   "end_f": 315
+  },
+  {
+   "beat": "b3",
+   "text": "So it fell silent for exactly the child it existed to teach.",
+   "start_s": 10.796,
+   "end_s": 14.588,
+   "start_f": 324,
+   "end_f": 438
+  },
+  {
+   "beat": "b4",
+   "text": "Now every subject builds from the week's own curriculum plan, not past homework.",
+   "start_s": 14.888,
+   "end_s": 19.904,
+   "start_f": 447,
+   "end_f": 597
+  },
+  {
+   "beat": "b5",
+   "text": "All four subjects now teach from that same weekly plan \u2014 even for the kid who never turns on the TV.",
+   "start_s": 20.204,
+   "end_s": 26.372,
+   "start_f": 606,
+   "end_f": 791
+  }
+ ],
+ "total_s": 27.872,
+ "durationInFrames": 836,
+ "measured_track_s": 26.424,
+ "track": "/root/feature-demos/vo-b51/vo-b51.mp3"
+}

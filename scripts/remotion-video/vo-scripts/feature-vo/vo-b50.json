@@ -1,0 +1,56 @@
+{
+ "id": "b50",
+ "beat_durations": {
+  "b1": 5.616,
+  "b2": 3.768,
+  "b3": 5.736,
+  "b4": 4.536,
+  "b5": 4.992
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My son's teacher writes 'l' as a slanted loop. On his screen, it was a bare stick.",
+   "start_s": 0.5,
+   "end_s": 6.116,
+   "start_f": 15,
+   "end_f": 183
+  },
+  {
+   "beat": "b2",
+   "text": "He was learning letters he couldn't even recognize in his own notebook.",
+   "start_s": 6.416,
+   "end_s": 10.184,
+   "start_f": 192,
+   "end_f": 306
+  },
+  {
+   "beat": "b3",
+   "text": "So lessons now show how each letter looks written by hand, using a font called Playwrite NO.",
+   "start_s": 10.484,
+   "end_s": 16.22,
+   "start_f": 315,
+   "end_f": 487
+  },
+  {
+   "beat": "b4",
+   "text": "The TV wall used to show that handwriting once in every forty cards.",
+   "start_s": 16.52,
+   "end_s": 21.056,
+   "start_f": 496,
+   "end_f": 632
+  },
+  {
+   "beat": "b5",
+   "text": "Now every card for a young child shows it \u2014 one in forty became one in one.",
+   "start_s": 21.356,
+   "end_s": 26.348,
+   "start_f": 641,
+   "end_f": 790
+  }
+ ],
+ "total_s": 27.848,
+ "durationInFrames": 835,
+ "measured_track_s": 26.4,
+ "track": "/root/feature-demos/vo-b50/vo-b50.mp3"
+}
