@@ -21,7 +21,7 @@
       "name": "page",
       "url": "https://vitalii.no/features/the-live-visitor-badge-was-multiplying-sampled-days-by-10-now-it-shows-the-real--v38",
       "frames": 150,
-      "scroll": [[0, 0], [149, 420]],
+      "scroll": [[0, 0], [20, 420], [149, 420]],
       "mouse": [[0, 400, 150], [70, 700, 220], [149, 550, 180]]
     }
   ]

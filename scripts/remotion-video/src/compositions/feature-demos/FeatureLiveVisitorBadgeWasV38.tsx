@@ -319,7 +319,7 @@ export const FeatureLiveVisitorBadgeWasV38: React.FC = () => {
 
         {/* ════ Beat 2 — the ×10 spike, drawn (historical state) ════ */}
         <Group opacity={b2}>
-          <Panel x={340} y={110} w={600} h={300} tone="danger" opacity={1}>
+          <Panel x={340} y={190} w={600} h={300} tone="danger" opacity={1}>
             <div style={{ position: "absolute", left: 40, top: 28, fontSize: 17, fontWeight: 700, color: P.ink, fontFamily }}>
               a quiet Tuesday vs. the recorded number
             </div>
@@ -347,7 +347,7 @@ export const FeatureLiveVisitorBadgeWasV38: React.FC = () => {
             </div>
           </Panel>
           {hero(340, "10", "×", "SOME DAYS MULTIPLIED", P.danger, heroPop2)}
-          <StatPill x={340} y={424} emoji="🧮" text="double-counted Cloudflare's own sampling math" tone="danger" opacity={b2} />
+          <StatPill x={340} y={504} emoji="🧮" text="double-counted Cloudflare's own sampling math" tone="danger" opacity={b2} />
         </Group>
 
         {/* ════ Beat 3 — the Cloudflare worker, a real commit ════ */}

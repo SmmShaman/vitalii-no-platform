@@ -181,8 +181,8 @@ export const FeatureTelegramModeration: React.FC = () => {
           title="vitalii.no/features/…-p18"
           from={397}
           hold={202}
-          zoom={(t) => 1 + 0.08 * easeInOut(t)}
-          focus={{ x: 0.5, y: 0.35 }}
+          zoom={(t) => 2.2 + 0.4 * easeInOut(t)}
+          focus={{ x: 0.5, y: 0.88 }}
           opacity={b3}
           win={WIN_DEFAULT}
         />
