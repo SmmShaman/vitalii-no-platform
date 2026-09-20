@@ -1,0 +1,13 @@
+{
+  "id": "b51",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "detail", "url": "https://vitalii.no/features/the-tv-wall-now-teaches-from-this-weeks-curriculum-not-from-whats-already-finish-b51", "frames": 140,
+      "scroll": [[0, 200], [70, 700], [139, 1300]],
+      "mouse": [[0, 560, 220], [70, 560, 300], [139, 560, 260]] },
+    { "name": "hub", "url": "https://vitalii.no/features", "frames": 200,
+      "scroll": [[0, 0], [100, 900], [199, 1800]],
+      "mouse": [[0, 300, 200], [80, 650, 300], [150, 900, 260], [199, 500, 340]] }
+  ]
+}

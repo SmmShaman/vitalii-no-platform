@@ -200,6 +200,8 @@ import { FeatureVideoStagingRouletteKillingV27 } from "./compositions/feature-de
 import { FeatureCardExplainsIdeaBeforeB53 } from "./compositions/feature-demos/FeatureCardExplainsIdeaBeforeB53";
 import { FeatureLiveVisitorBadgeWasV38 } from "./compositions/feature-demos/FeatureLiveVisitorBadgeWasV38";
 import { FeatureWallCardStopsBeingB52 } from "./compositions/feature-demos/FeatureWallCardStopsBeingB52";
+import { FeatureTvWallTeachesWeeksB51 } from "./compositions/feature-demos/FeatureTvWallTeachesWeeksB51";
+import { FeatureTeachingLetterKidsActuallyB50 } from "./compositions/feature-demos/FeatureTeachingLetterKidsActuallyB50";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -1959,6 +1961,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureWallCardStopsBeingB52"
         component={FeatureWallCardStopsBeingB52}
         durationInFrames={910}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTvWallTeachesWeeksB51"
+        component={FeatureTvWallTeachesWeeksB51}
+        durationInFrames={836}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTeachingLetterKidsActuallyB50"
+        component={FeatureTeachingLetterKidsActuallyB50}
+        durationInFrames={835}
         fps={30}
         width={1280}
         height={720}
