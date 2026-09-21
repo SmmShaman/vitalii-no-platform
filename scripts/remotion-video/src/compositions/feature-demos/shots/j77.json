@@ -11,11 +11,11 @@
       "mouse": [[0, 560, 40], [40, 560, 40], [120, 700, 300], [199, 700, 300]]
     },
     {
-      "name": "page",
-      "url": "https://vitalii.no/features/knowing-the-platform-before-waking-the-agent-an-engine-level-cache-not-just-a-ho-j77",
-      "frames": 240,
-      "scroll": [[0, 0], [50, 0], [150, 500], [239, 900]],
-      "mouse": [[0, 560, 60], [50, 560, 60], [150, 500, 400], [239, 500, 400]]
+      "name": "checks",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commit/f28763ba53c825b571353ae904edfb2fde7157f6",
+      "frames": 220,
+      "scroll": [[0, 0], [45, 0], [130, 550], [219, 1050]],
+      "mouse": [[0, 560, 40], [45, 560, 40], [130, 700, 320], [219, 700, 320]]
     }
   ]
 }
