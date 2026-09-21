@@ -147,6 +147,37 @@ itself; a clip that fails gets one fix round (wave B2) and is then dropped for t
 Also from that review: the "never repeat the last two" rule for archetype/mood now reads
 the previous night's draws from the factory log, not only the same night's.
 
+## STEP 0e — The blind viewer (wave D) and what it needs from you (owner, 2026-09-21)
+
+Two agents that knew nothing about the project watched j77 (old and re-shot) from frames +
+transcript and scored clarity 5/10 and 3/10. Both understood the story from the WORDS and the
+stat cards; both failed on the EVIDENCE: the commits on screen were not the ones the sentence
+described, the diff was unreadable, a placeholder sat unchanged for 20 s, and nobody said what
+the product was. So the factory now runs **wave D**: after the self-review every clip is
+rendered again, a fresh agent (told to forget the project, given only the frames one per 2 s
+and the narration) scores `clarity` and `thesis` (does it answer its own YouTube title) plus
+the SEO tags as queries; **under 7 on either → one viewer-driven fix round → re-render →
+second viewer → still under → quarantine**. The verdict JSON lands in
+`out/factory/waveD<n>-<stamp>-<id>.done`.
+
+What the host now hands you in the wave B brief, per feature, and how to use it:
+- **Product line** (`Product: <name> — <one sentence>`): beat 1 carries it as a small plate.
+- **Commits with their messages and files**: a beat may show a commit only if its message says
+  what that beat's sentence says. Diffs only zoomed to ONE readable hunk (≤ 6 lines,
+  `zoom` 2.0–2.4, `focus` on the hunk). Otherwise draw the mechanism with the real names.
+- **Real log lines** of the product from the feature's day (journalctl / docker logs, secrets
+  scrubbed): stage them with **`LogWindow`** from `live-primitives.tsx` —
+  `<LogWindow lines={[{t:"02:14", text:"wake #4 → 0 sent", tone:"danger"}, …]}
+  title="jobbot-worker" from={599} every={14} opacity={b4} win={…} />`. 5–8 lines, revealed
+  one by one, `fontSize` ≥ 20. This is the "show it running" the viewers asked for. When the
+  brief says the project keeps no log on the VPS, build the lines from the feature's own
+  numbers (problem/solution/result) — never invent a number.
+- A one-line gloss for each tech term on screen; nothing unchanged on screen for more than one
+  beat; on github.com the recorder's mouse stays below y = 90 (the header opens menus).
+
+Test a finished clip by hand: `python3 /root/feature-demos/factory.py --viewer=<id> --mp4=<path>`
+prints the verdict and PASS/FAIL without rendering or publishing anything.
+
 ## STEP 1 — Learn the style (read each ONCE, never re-read)
 - `src/compositions/feature-demos/FeatureVideoFactoryV3.tsx` — the reference for the NEW
   art direction (archetype 7 "hero number", mood `violet`, 5 beats). Read it for HOW a clip wires a

@@ -13,6 +13,7 @@
 import React from "react";
 import { Freeze, OffthreadVideo, Sequence, staticFile, useCurrentFrame } from "remotion";
 import { BrowserWindow, Cursor, seg } from "./bright-primitives";
+import { usePalette } from "./bright-theme";
 
 export type ShotSpec = {
   /** [a-z0-9-], used in file names */
@@ -165,3 +166,80 @@ export const LiveWindow: React.FC<{
     <LiveShot win={win} {...rest} />
   </>
 );
+
+/* ────────────────────────────────────────────────────────────────────────
+ * LogWindow — the product "in action" when the product has no public page
+ * (owner decision 2026-09-21, after two blind viewers asked to see the bot
+ * running instead of an unreadable diff). A terminal-styled window that
+ * reveals REAL log lines one by one — the factory host hands the agent the
+ * lines (journalctl / docker logs of the feature's project, around the day
+ * the feature was made); when a project keeps no logs on the VPS, the lines
+ * are built from the numbers in the feature row, never invented.
+ *
+ * Text is large on purpose (fontSize 20 ≈ 22 px at 1280): every line must be
+ * readable in a 2-second glance. Show at most ~8 lines per beat.
+ * ──────────────────────────────────────────────────────────────────────── */
+export type LogLine = {
+  /** left column, e.g. a time stamp "02:14" or a step "#4" — optional */
+  t?: string;
+  text: string;
+  tone?: "ink" | "muted" | "danger" | "success" | "accent";
+};
+
+export const LogWindow: React.FC<{
+  lines: LogLine[];
+  title?: string;
+  /** first frame of the window; line i appears at from + i * every */
+  from: number;
+  every?: number;
+  opacity: number;
+  win?: Win;
+  fontSize?: number;
+}> = ({ lines, title = "worker log", from, every = 14, opacity, win = WIN_DEFAULT, fontSize = 20 }) => {
+  const frame = useCurrentFrame();
+  const B = usePalette();
+  if (opacity <= 0.004) return null;
+  const lineH = Math.round(fontSize * 1.75);
+  const fit = Math.max(1, Math.floor((win.h - WIN_BAR - 28) / lineH));
+  const shown = lines.filter((_, i) => frame >= from + i * every).slice(-fit);
+  const first = Math.max(0, lines.filter((_, i) => frame >= from + i * every).length - fit);
+  const color = (tone?: LogLine["tone"]) =>
+    tone === "danger" ? B.danger : tone === "success" ? B.success : tone === "accent" ? B.accent
+    : tone === "muted" ? B.muted : B.ink;
+  const caretOn = Math.floor(frame / 15) % 2 === 0;
+  return (
+    <BrowserWindow x={win.x} y={win.y} w={win.w} h={win.h} title={title} opacity={opacity}>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: WIN_BAR,
+          width: win.w,
+          height: win.h - WIN_BAR,
+          padding: "14px 22px",
+          fontFamily: '"JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace',
+          fontSize,
+          lineHeight: `${lineH}px`,
+          color: B.ink,
+          whiteSpace: "pre",
+          overflow: "hidden",
+        }}
+      >
+        {shown.map((l, i) => {
+          const idx = first + i;
+          const born = from + idx * every;
+          const a = seg(frame, born, born + 6);
+          return (
+            <div key={idx} style={{ opacity: a, transform: `translateY(${(1 - a) * 6}px)`, display: "flex", gap: 18 }}>
+              {l.t !== undefined ? <span style={{ color: B.muted, minWidth: fontSize * 3.2 }}>{l.t}</span> : null}
+              <span style={{ color: color(l.tone), fontWeight: l.tone === "danger" || l.tone === "success" ? 700 : 500 }}>
+                {l.text}
+              </span>
+            </div>
+          );
+        })}
+        <span style={{ display: "inline-block", width: fontSize * 0.55, height: lineH * 0.75, background: B.ink, opacity: caretOn ? 0.7 : 0, verticalAlign: "middle" }} />
+      </div>
+    </BrowserWindow>
+  );
+};
