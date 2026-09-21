@@ -120,6 +120,33 @@ Camera: `zoom` runs 1.0–1.2 at most, one direction per shot; `focus` picks wha
 screen. Text inside the recording is small — a zoom that crops the left edge of a sidebar
 mid-word is a defect just like a cropped caption.
 
+## STEP 0d — Four gates the factory host checks mechanically (owner review, 2026-09-21)
+
+The clips posted on 2026-09-20 (v27, j77) passed every sync check and still failed on
+sight: the drawn archetype was not the one on screen, the "hero number" was 112 px in a
+corner, three beats floated small panels in empty cream space, both ended on a scroll of
+the feature's own article page, and one used a ZWJ emoji. `factory.py` now checks these
+itself; a clip that fails gets one fix round (wave B2) and is then dropped for the night.
+
+1. **Archetype declared and obeyed.** The header comment must literally say
+   `archetype <N> <name>` with the number the factory drew. For archetype 7 the hero
+   figure must use `fontSize` ≥ 200 — a smaller number in a corner beside a browser
+   window is the retired layout wearing a badge.
+2. **The last beat is a result, not the feature's own page.** If the final `LiveWindow`
+   plays `vitalii.no/features/<slug>`, the clip fails. End on the hub, the commits list,
+   the Actions runs, the product, or a drawn result with several labelled objects. The
+   feature page may still be used in an earlier beat.
+3. **The frame is filled.** The host measures the review render: cells of an 8×6 grid
+   touched at each beat's midpoint (anything > 10/255 from the background). Under 31 of 48
+   is empty; the numbers go into the self-review brief, the clip is re-rendered, and one
+   that still has two or more empty beats is quarantined instead of published (re-shot
+   through wave B on a later night). Calibration: j77 beats 1–3 = 29–30, p61 = 32–45.
+4. **ZWJ emoji** are reduced to their first codepoint by the host (😵‍💫 → 😵). Pick a
+   single-codepoint emoji yourself so the picture is the one you meant.
+
+Also from that review: the "never repeat the last two" rule for archetype/mood now reads
+the previous night's draws from the factory log, not only the same night's.
+
 ## STEP 1 — Learn the style (read each ONCE, never re-read)
 - `src/compositions/feature-demos/FeatureVideoFactoryV3.tsx` — the reference for the NEW
   art direction (archetype 7 "hero number", mood `violet`, 5 beats). Read it for HOW a clip wires a
