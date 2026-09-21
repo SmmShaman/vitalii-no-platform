@@ -1,0 +1,21 @@
+{
+  "id": "b49",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/grammar-stops-being-typed-tap-exercises-killed-a-guessing-floor-in-one-day-b49",
+      "frames": 200,
+      "scroll": [[0, 0], [90, 420], [199, 900]],
+      "mouse": [[0, 560, 220], [100, 560, 380], [199, 560, 300]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 180,
+      "scroll": [[0, 0], [90, 700], [179, 1800]],
+      "mouse": [[0, 300, 200], [90, 700, 300], [179, 500, 250]]
+    }
+  ]
+}

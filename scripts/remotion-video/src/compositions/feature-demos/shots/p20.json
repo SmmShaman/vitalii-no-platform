@@ -1,0 +1,21 @@
+{
+  "id": "p20",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "commit",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/4b99fcc",
+      "frames": 90,
+      "scroll": [[0, 0], [45, 350], [89, 700]],
+      "mouse": [[0, 600, 240], [45, 600, 300], [89, 600, 360]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 168,
+      "scroll": [[0, 0], [80, 900], [167, 2100]],
+      "mouse": [[0, 300, 200], [80, 700, 300], [167, 500, 250]]
+    }
+  ]
+}
