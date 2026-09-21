@@ -29,7 +29,7 @@
 import React from "react";
 import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, cardShadow } from "./bright-theme";
-import { LightBg, Group, StatPill, FilterChip, CheckBadge, Panel, IconCard, seg, fontFamily } from "./bright-primitives";
+import { LightBg, Group, StatPill, FilterChip, CheckBadge, Panel, IconCard, SkeletonScroll, seg, fontFamily } from "./bright-primitives";
 import { LiveWindow } from "./live-primitives";
 import shots from "./shots/j77.json";
 
@@ -139,6 +139,7 @@ export const FeatureKnowingPlatformBeforeWakingJ77: React.FC = () => {
 
         {/* ════ Beat 1 — 17 wakes, 0 applications (left/chaos pane) ════ */}
         <Group opacity={b1}>
+          <FilterChip x={60} y={44} text="17 WAKES / NIGHT" icon="🌙" color={P.danger} />
           {bigNum("17", "NIGHTLY WAKES", 50, 150, P.danger, pop(30))}
           {bigNum("0", "APPLICATIONS SENT", 330, 150, P.danger, pop(45))}
           <div style={{ position: "absolute", left: 60, top: 300, width: 560, display: "flex", justifyContent: "space-between" }}>
@@ -151,10 +152,16 @@ export const FeatureKnowingPlatformBeforeWakingJ77: React.FC = () => {
           </div>
           <StatPill x={60} y={400} emoji="🌙" text="every log still said it ran" tone="danger" opacity={b1} />
           <PaneLabel x={60} y={470} w={560} kicker="JOB-APPLICATION BOT" title="It woke 17 times and applied nowhere." color={P.danger} />
+          <div style={{ position: "absolute", left: 60, top: 600, width: 560, borderRadius: 12, border: `1.5px solid ${P.dangerEdge}`, background: P.card, padding: "10px 16px", boxShadow: cardShadow }}>
+            {["02:14 → wake #4 → 0 sent", "03:41 → wake #9 → 0 sent", "05:02 → wake #14 → 0 sent"].map((line, i) => (
+              <div key={i} style={{ fontSize: 12.5, fontWeight: 600, color: P.muted, fontFamily, lineHeight: 1.7 }}>{line}</div>
+            ))}
+          </div>
         </Group>
 
         {/* ════ Beat 2 — new site, treated as a stranger (left/chaos pane) ════ */}
         <Group opacity={b2}>
+          <FilterChip x={60} y={44} text="NEW SITE, SAME PLATFORM" icon="🧩" color={P.danger} />
           <Panel x={60} y={210} w={250} h={170} tone="danger" />
           <Panel x={330} y={210} w={250} h={170} tone="danger" />
           <div style={{ position: "absolute", left: 60, top: 236, width: 250, textAlign: "center", fontSize: 32 }}>🧩</div>
@@ -169,10 +176,20 @@ export const FeatureKnowingPlatformBeforeWakingJ77: React.FC = () => {
             ❓
           </div>
           <PaneLabel x={60} y={410} w={560} kicker="SAME SOFTWARE, NEW ADDRESS" title="Same platform underneath — zero memory of it." color={P.danger} />
+          <div style={{ position: "absolute", left: 60, top: 604, width: 560 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.5, color: P.muted, fontFamily, marginBottom: 8 }}>
+              RECOGNITION CONFIDENCE
+            </div>
+            <div style={{ width: 560, height: 22, borderRadius: 11, background: P.dangerBg, border: `1.5px solid ${P.dangerEdge}`, overflow: "hidden" }}>
+              <div style={{ width: "3%", height: "100%", background: P.danger }} />
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: P.danger, marginTop: 6, fontFamily }}>0% — never seen this address before</div>
+          </div>
         </Group>
 
         {/* ════ Beat 3 — the Ford dealership metaphor (left/chaos pane) ════ */}
         <Group opacity={b3}>
+          <FilterChip x={60} y={44} text="ONE BRAND, MANY DOORS" icon="🏪" color={P.accent} />
           <Panel x={60} y={210} w={560} h={170} tone="card" />
           <div style={{ position: "absolute", left: 60, top: 230, width: 560, textAlign: "center", fontSize: 13, fontWeight: 700, color: P.muted, letterSpacing: 1, fontFamily }}>
             THREE DEALERSHIPS, ONE BRAND
@@ -187,11 +204,29 @@ export const FeatureKnowingPlatformBeforeWakingJ77: React.FC = () => {
             ))}
           </div>
           <PaneLabel x={60} y={430} w={560} kicker="THE ANALOGY" title="Like asking if every Ford dealer sells Fords." color={P.accent} />
+          <div style={{ position: "absolute", left: 60, top: 606, width: 560, display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ fontSize: 40, fontWeight: 800, color: P.danger, fontFamily }}>0 / 3</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: P.muted, fontFamily, lineHeight: 1.4 }}>
+              dealerships recognized as
+              <br />
+              the same underlying platform
+            </div>
+          </div>
         </Group>
 
-        {/* ════ Locked registry card — the right/order pane's foreshadow through beats 1-3 ════ */}
+        {/* ════ Locked registry card — the right/order pane's foreshadow through beats 1-3 (one tall panel fills the pane top-to-bottom) ════ */}
         <Group opacity={rightLockedOpacity}>
-          <IconCard x={710} y={260} w={340} emoji="🔒" title="Platform registry" sub="not built yet" tone="accent" opacity={rightLockedOpacity} />
+          <Panel x={680} y={70} w={580} h={580} tone="card" />
+          <div style={{ position: "absolute", left: 680, top: 96, width: 580, textAlign: "center", fontSize: 12, fontWeight: 800, letterSpacing: 2, color: P.muted, fontFamily }}>
+            COMING IN THIS FIX
+          </div>
+          <IconCard x={800} y={140} w={340} emoji="🔒" title="Platform registry" sub="not built yet" tone="accent" opacity={rightLockedOpacity} />
+          <div style={{ position: "absolute", left: 730, top: 410, width: 480, height: 160, borderRadius: 14, overflow: "hidden", border: `1.5px solid ${P.border}` }}>
+            <SkeletonScroll w={480} h={160} offset={frame * 0.5} />
+          </div>
+          <div style={{ position: "absolute", left: 680, top: 596, width: 580, textAlign: "center", fontSize: 14, fontWeight: 700, color: P.muted, fontFamily }}>
+            every unfamiliar site still looks unread
+          </div>
         </Group>
 
         {/* ════ Beat 4 — real commit, the platform registry unlocks (right/order pane) ════ */}
