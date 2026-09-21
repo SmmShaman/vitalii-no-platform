@@ -1,0 +1,56 @@
+{
+ "id": "c05",
+ "beat_durations": {
+  "b1": 5.304,
+  "b2": 6.312,
+  "b3": 3.6,
+  "b4": 4.368,
+  "b5": 8.448
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every time the bot broke, it just said 'processing error' \u2014 no matter what actually failed.",
+   "start_s": 0.5,
+   "end_s": 5.804,
+   "start_f": 15,
+   "end_f": 174
+  },
+  {
+   "beat": "b2",
+   "text": "That's exactly how a revoked API key sat unnoticed for four months, from April to August.",
+   "start_s": 6.104,
+   "end_s": 12.416,
+   "start_f": 183,
+   "end_f": 372
+  },
+  {
+   "beat": "b3",
+   "text": "The bot just looked like it was having a bad day, over and over.",
+   "start_s": 12.716,
+   "end_s": 16.316,
+   "start_f": 381,
+   "end_f": 489
+  },
+  {
+   "beat": "b4",
+   "text": "Now a classifier reads the raw error text before it reaches the user.",
+   "start_s": 16.616,
+   "end_s": 20.984,
+   "start_f": 498,
+   "end_f": 630
+  },
+  {
+   "beat": "b5",
+   "text": "Quota, dead key, retired model \u2014 three failures that used to look identical, now each names itself on the very first message.",
+   "start_s": 21.284,
+   "end_s": 29.732,
+   "start_f": 639,
+   "end_f": 892
+  }
+ ],
+ "total_s": 31.232,
+ "durationInFrames": 937,
+ "measured_track_s": 29.784,
+ "track": "/root/feature-demos/vo-c05/vo-c05.mp3"
+}

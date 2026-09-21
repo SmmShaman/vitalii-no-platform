@@ -1,0 +1,7 @@
+{"id": "c05", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every time the bot broke, it just said 'processing error' — no matter what actually failed."],
+ ["b2", "That's exactly how a revoked API key sat unnoticed for four months, from April to August."],
+ ["b3", "The bot just looked like it was having a bad day, over and over."],
+ ["b4", "Now a classifier reads the raw error text before it reaches the user."],
+ ["b5", "Quota, dead key, retired model — three failures that used to look identical, now each names itself on the very first message."]
+]}

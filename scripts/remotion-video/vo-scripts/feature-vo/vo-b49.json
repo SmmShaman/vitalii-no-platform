@@ -1,0 +1,56 @@
+{
+ "id": "b49",
+ "beat_durations": {
+  "b1": 5.064,
+  "b2": 5.688,
+  "b3": 3.432,
+  "b4": 8.088,
+  "b5": 6.792
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My son typed grammar answers on his phone \u2014 zero of eight right in one sitting.",
+   "start_s": 0.5,
+   "end_s": 5.564,
+   "start_f": 15,
+   "end_f": 167
+  },
+  {
+   "beat": "b2",
+   "text": "Three had the right word, killed by one stray typo. He gave up, started typing junk.",
+   "start_s": 5.864,
+   "end_s": 11.552,
+   "start_f": 176,
+   "end_f": 347
+  },
+  {
+   "beat": "b3",
+   "text": "A keyboard was punishing spelling, not testing grammar.",
+   "start_s": 11.852,
+   "end_s": 15.284,
+   "start_f": 356,
+   "end_f": 459
+  },
+  {
+   "beat": "b4",
+   "text": "I replaced typing with tapping \u2014 word chunks, shuffled with decoys, built in React. No keyboard, no typos.",
+   "start_s": 15.584,
+   "end_s": 23.672,
+   "start_f": 468,
+   "end_f": 710
+  },
+  {
+   "beat": "b5",
+   "text": "It even recovers old exercises with no saved answer: seventeen of thirty, fixed automatically.",
+   "start_s": 23.972,
+   "end_s": 30.764,
+   "start_f": 719,
+   "end_f": 923
+  }
+ ],
+ "total_s": 32.264,
+ "durationInFrames": 968,
+ "measured_track_s": 30.816,
+ "track": "/root/feature-demos/vo-b49/vo-b49.mp3"
+}
