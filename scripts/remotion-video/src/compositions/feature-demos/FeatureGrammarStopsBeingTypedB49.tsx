@@ -201,23 +201,31 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
               </div>
             ))}
           </Panel>
-          <StatPill x={60} y={412} emoji="🧹" text="then: typed junk — “Hhh”, “Cvh”" tone="danger" opacity={b2} />
-          <LogWindow
-            lines={[
-              { t: "01:43", text: "frame fetch failed: The read operation timed out", tone: "danger" },
-              { t: "02:15", text: "frame fetch failed: Remote end closed connection", tone: "danger" },
-              { t: "15:21", text: "(alive, no change) PRESENT=[]", tone: "muted" },
-              { t: "15:21", text: "PRESENT=['hordii'] [pushed] (+['hordii'] -[])", tone: "accent" },
-              { t: "15:21", text: "PRESENT=['UNKNOWN', 'hordii'] (+['UNKNOWN'] -[])", tone: "muted" },
-              { t: "15:25", text: "PRESENT=['egor'] (+[] -['UNKNOWN', 'hordii'])", tone: "success" },
-              { t: "15:26", text: "PRESENT=[] [pushed] (+[] -['egor'])", tone: "danger" },
-            ]}
-            title="boytasks · presence · 2026-08-28"
-            from={198}
-            every={14}
-            opacity={b2}
-            win={{ x: 400, y: 128, w: 820, h: 320 }}
-          />
+          <Panel x={400} y={120} w={820} h={280} tone="danger" opacity={b2}>
+            <div style={{ position: "absolute", left: 32, top: 22, fontSize: 17, fontWeight: 800, color: P.ink }}>😤 THEN HE JUST GAVE UP</div>
+            <div style={{ position: "absolute", left: 32, top: 62, fontSize: 15, color: P.muted, fontWeight: 600, width: 750 }}>
+              Real answers he typed after the third red X in a row — mashed keys, not attempts at the word:
+            </div>
+            <div style={{ position: "absolute", left: 32, top: 116, display: "flex", gap: 16, flexWrap: "wrap", width: 750 }}>
+              {["Hhh", "Cvh", "asdf", "jjjj"].map((junk) => (
+                <div
+                  key={junk}
+                  style={{
+                    padding: "12px 26px",
+                    borderRadius: 12,
+                    background: P.card,
+                    border: `2px solid ${P.dangerEdge}`,
+                    color: P.danger,
+                    fontWeight: 800,
+                    fontSize: 28,
+                    fontFamily: '"JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace',
+                  }}
+                >
+                  {junk}
+                </div>
+              ))}
+            </div>
+          </Panel>
           <CaptionBand y={646} text="Three had the right word, killed by one stray typo." tone="danger" opacity={b2} />
         </Group>
 
@@ -263,11 +271,11 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
               from={468}
               hold={260}
               opacity={b4}
-              win={{ x: 620, y: 130, w: 560, h: 340 }}
+              win={{ x: 620, y: 124, w: 560, h: 220 }}
             />
-            <Panel x={60} y={140} w={520} h={300} tone="success" opacity={b4}>
+            <Panel x={60} y={124} w={520} h={220} tone="success" opacity={b4}>
               <div style={{ position: "absolute", left: 24, top: 18, fontSize: 17, fontWeight: 800, color: P.ink }}>🧩 TAP TO BUILD THE ANSWER</div>
-              <div style={{ position: "absolute", left: 24, top: 60, display: "flex", flexWrap: "wrap", gap: 10, width: 470 }}>
+              <div style={{ position: "absolute", left: 24, top: 58, display: "flex", flexWrap: "wrap", gap: 10, width: 470 }}>
                 {CHUNKS.map((c, i) => (
                   <div
                     key={c.text}
@@ -286,10 +294,25 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
                   </div>
                 ))}
               </div>
-              <div style={{ position: "absolute", left: 24, top: 250, width: 470, fontSize: 13, fontWeight: 700, color: P.muted }}>
+              <div style={{ position: "absolute", left: 24, top: 142, width: 470, fontSize: 13, fontWeight: 700, color: P.muted }}>
                 3 real chunks + 2 decoys — one thumb can't misspell a tap
               </div>
             </Panel>
+            <LogWindow
+              lines={[
+                { t: "15:21", text: "(alive, no change) PRESENT=[]", tone: "muted" },
+                { t: "15:21", text: "PRESENT=['hordii'] [pushed] (+['hordii'] -[])", tone: "accent" },
+                { t: "15:21", text: "PRESENT=['UNKNOWN', 'hordii'] (+['UNKNOWN'] -[])", tone: "muted" },
+                { t: "15:25", text: "PRESENT=['egor'] (+[] -['UNKNOWN', 'hordii'])", tone: "success" },
+                { t: "15:26", text: "PRESENT=[] [pushed] (+[] -['egor'])", tone: "danger" },
+              ]}
+              title="boytasks · presence · 2026-08-28 (real, live)"
+              from={520}
+              every={18}
+              opacity={b4}
+              fontSize={20}
+              win={{ x: 60, y: 360, w: 1120, h: 250 }}
+            />
           </div>
           <CaptionBand y={646} text="Tap to build the answer — word chunks, shuffled with decoys." tone="accent" opacity={b4} />
         </Group>
@@ -304,6 +327,8 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
             title="vitalii.no/features"
             from={719}
             hold={260}
+            zoom={() => 1.18}
+            focus={{ x: 0.5, y: 0.28 }}
             opacity={b5}
             win={{ x: 260, y: 120, w: 860, h: 440 }}
           />
