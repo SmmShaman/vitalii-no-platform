@@ -132,10 +132,12 @@ itself; a clip that fails gets one fix round (wave B2) and is then dropped for t
    `archetype <N> <name>` with the number the factory drew. For archetype 7 the hero
    figure must use `fontSize` ≥ 200 — a smaller number in a corner beside a browser
    window is the retired layout wearing a badge.
-2. **The last beat is a result, not the feature's own page.** If the final `LiveWindow`
-   plays `vitalii.no/features/<slug>`, the clip fails. End on the hub, the commits list,
-   the Actions runs, the product, or a drawn result with several labelled objects. The
-   feature page may still be used in an earlier beat.
+2. **The last beat is a result, not the feature's own page and not the hub** (hub added
+   2026-09-22: every blind viewer of the first night flagged "a scroll past unrelated
+   features with their own numbers"). If the final `LiveWindow` plays
+   `vitalii.no/features/<slug>` or `vitalii.no/features`, the clip fails. End on THIS
+   feature's result: a `LogWindow` with its real lines, the product's own screen, or a drawn
+   result with several labelled objects. Either page may still be used in an earlier beat.
 3. **The frame is filled.** The host measures the review render: cells of an 8×6 grid
    touched at each beat's midpoint (anything > 10/255 from the background). Under 31 of 48
    is empty; the numbers go into the self-review brief, the clip is re-rendered, and one
