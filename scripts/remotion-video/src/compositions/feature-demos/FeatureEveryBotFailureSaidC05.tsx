@@ -169,11 +169,37 @@ const ChatBubble: React.FC<{ x: number; y: number; time: string }> = ({ x, y, ti
   );
 };
 
-const CodePill: React.FC<{ x: number; y: number; text: string }> = ({ x, y, text }) => (
-  <StatPill x={x} y={y} emoji="🔴" text={text} tone="danger" fontSize={15} />
+const CodePill: React.FC<{ x: number; y: number; text: string; opacity?: number }> = ({ x, y, text, opacity = 1 }) => (
+  <StatPill x={x} y={y} emoji="🔴" text={text} tone="danger" fontSize={15} opacity={opacity} />
 );
 
-const WIN4: Win = { x: 130, y: 200, w: 680, h: 330 };
+const CornerTag: React.FC<{ opacity: number }> = ({ opacity }) => {
+  const B = usePalette();
+  if (opacity <= 0.004) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        right: 60,
+        bottom: 46,
+        opacity,
+        fontFamily,
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        padding: "8px 14px",
+        borderRadius: 999,
+        background: B.card,
+        border: `1.5px solid ${B.border}`,
+      }}
+    >
+      <span style={{ fontSize: 16 }}>🗓️</span>
+      <span style={{ fontSize: 14, fontWeight: 700, color: B.muted }}>Calendar Telegram Bot</span>
+    </div>
+  );
+};
+
+const WIN4: Win = { x: 130, y: 200, w: 680, h: 300 };
 const WIN5: Win = { x: 250, y: 210, w: 880, h: 400 };
 
 export const FeatureEveryBotFailureSaidC05: React.FC = () => {
@@ -203,10 +229,23 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
     easing: Easing.out(Easing.cubic),
   });
 
+  // beat 3 internal reveal order: distinct codes first, then the funnel, then
+  // the collapsed output last — matching the narration's own arc ("looked
+  // like a bad day, over and over" -> the mechanism only explains itself by
+  // the end of the beat, instead of the whole diagram appearing at once).
+  const c3Codes = [0, 1, 2].map((i) => seg(frame, B3_S + 6 + i * 10, B3_S + 18 + i * 10));
+  const c3Arrow1 = seg(frame, B3_S + 40, B3_S + 58);
+  const c3Catch = seg(frame, B3_S + 52, B3_S + 64);
+  const c3Arrow2 = seg(frame, B3_S + 62, B3_S + 80);
+  const c3BotSays = seg(frame, B3_S + 76, B3_S + 90);
+
+  const cornerTag = seg(frame, B1_E, B1_E + FADE);
+
   return (
     <PaletteProvider value={MOODS.dawn}>
       <LightBg />
       <Ribbon frame={frame} />
+      <CornerTag opacity={cornerTag} />
 
       {/* beat 1 — the same message, no matter what actually broke */}
       <Group opacity={b1}>
@@ -250,23 +289,23 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
             RAW ERROR TEXT
           </div>
           <div style={{ padding: "0 16px" }}>
-            <CodePill x={0} y={0} text="429 quota exceeded" />
+            <CodePill x={0} y={0} text="429 quota exceeded" opacity={c3Codes[0]} />
           </div>
           <div style={{ padding: "50px 16px 0" }}>
-            <CodePill x={0} y={0} text="401 invalid key" />
+            <CodePill x={0} y={0} text="401 invalid key" opacity={c3Codes[1]} />
           </div>
           <div style={{ padding: "50px 16px 0" }}>
-            <CodePill x={0} y={0} text="404 model retired" />
+            <CodePill x={0} y={0} text="404 model retired" opacity={c3Codes[2]} />
           </div>
         </Panel>
-        <FlowArrow x={390} y={310} len={140} color={B.danger} />
-        <Panel x={550} y={260} w={170} h={100} tone="danger">
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: 20, fontWeight: 800, color: B.danger, fontFamily }}>
-            ✕ catch-all
+        <FlowArrow x={390} y={310} len={140} color={B.danger} progress={c3Arrow1} />
+        <Panel x={550} y={260} w={170} h={100} tone="danger" opacity={c3Catch}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: 18, fontWeight: 800, color: B.danger, fontFamily, textAlign: "center", padding: "0 8px" }}>
+            ✕ one fallback for everything
           </div>
         </Panel>
-        <FlowArrow x={740} y={310} len={110} color={B.border} progress={0.4} />
-        <Panel x={870} y={210} w={300} h={220} tone="card">
+        <FlowArrow x={740} y={310} len={110} color={B.border} progress={c3Arrow2 * 0.4} />
+        <Panel x={870} y={210} w={300} h={220} tone="card" opacity={c3BotSays}>
           <div style={{ padding: 16, fontFamily, fontSize: 15, fontWeight: 800, color: B.muted, letterSpacing: 1 }}>
             BOT SAYS
           </div>
@@ -282,7 +321,20 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
 
       {/* beat 4 — the fix, shown in the real commit history */}
       <Group opacity={b4} dy={b4EnterY}>
-        <LiveWindow file={shotsFile} shot="commits" title="github.com/SmmShaman/calendar-bot" from={B4_S} hold={B4_E - B4_S} win={WIN4} opacity={1} />
+        <LiveWindow
+          file={shotsFile}
+          shot="commits"
+          title="github.com/SmmShaman/calendar-bot"
+          from={B4_S}
+          hold={B4_E - B4_S}
+          win={WIN4}
+          opacity={1}
+          zoom={() => 2.2}
+          focus={{ x: 0.24, y: 0.2 }}
+        />
+        <div style={{ position: "absolute", left: WIN4.x, top: WIN4.y + WIN4.h + 8, width: WIN4.w, fontFamily, fontSize: 14, fontWeight: 700, color: B.muted, lineHeight: 1.3 }}>
+          the real commit that swapped the catch-all for a classifier
+        </div>
         <StatPill x={850} y={210} emoji="⏳" text="429 → Quota exceeded" tone="accent" />
         <StatPill x={850} y={258} emoji="🔑" text="401 → Key revoked" tone="accent" />
         <StatPill x={850} y={306} emoji="🧠" text="404 → Model retired" tone="accent" />
@@ -296,7 +348,17 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
       {/* beat 5 — proven on the live hub, three failures now named, holds to the end */}
       <Group opacity={b5}>
         <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, transform: `scale(${pushScale})`, transformOrigin: "50% 55%" }}>
-          <LiveWindow file={shotsFile} shot="hub" title="vitalii.no/features" from={B5_S} hold={END - B5_S} win={WIN5} opacity={1} />
+          <LiveWindow
+            file={shotsFile}
+            shot="hub"
+            title="vitalii.no/features"
+            from={B5_S}
+            hold={END - B5_S}
+            win={WIN5}
+            opacity={1}
+            zoom={() => 1.35}
+            focus={{ x: 0.5, y: 0.22 }}
+          />
         </div>
         <StatPill x={40} y={220} emoji="⏳" text="Quota exceeded" tone="success" />
         <StatPill x={40} y={268} emoji="🔑" text="Key revoked" tone="success" />
