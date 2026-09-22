@@ -1,0 +1,56 @@
+{
+ "id": "b47",
+ "beat_durations": {
+  "b1": 4.944,
+  "b2": 4.608,
+  "b3": 5.808,
+  "b4": 4.968,
+  "b5": 5.568
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One child's deck on the family kiosk had just twelve cards to his brothers' thirty.",
+   "start_s": 0.5,
+   "end_s": 5.444,
+   "start_f": 15,
+   "end_f": 163
+  },
+  {
+   "beat": "b2",
+   "text": "It also just looped the same cards, with no ladder and no due dates.",
+   "start_s": 5.744,
+   "end_s": 10.352,
+   "start_f": 172,
+   "end_f": 311
+  },
+  {
+   "beat": "b3",
+   "text": "Now spaced repetition puts every card on a schedule, and short decks got topped up to match.",
+   "start_s": 10.652,
+   "end_s": 16.46,
+   "start_f": 320,
+   "end_f": 494
+  },
+  {
+   "beat": "b4",
+   "text": "Reading gaps with no question before now pull fresh ones from his own stored work.",
+   "start_s": 16.76,
+   "end_s": 21.728,
+   "start_f": 503,
+   "end_f": 652
+  },
+  {
+   "beat": "b5",
+   "text": "He now keeps pace with his brothers all evening - throughput on the wall is up forty percent.",
+   "start_s": 22.028,
+   "end_s": 27.596,
+   "start_f": 661,
+   "end_f": 828
+  }
+ ],
+ "total_s": 29.096,
+ "durationInFrames": 873,
+ "measured_track_s": 27.648,
+ "track": "/root/feature-demos/vo-b47/vo-b47.mp3"
+}

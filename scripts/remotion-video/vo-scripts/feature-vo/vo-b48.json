@@ -1,0 +1,56 @@
+{
+ "id": "b48",
+ "beat_durations": {
+  "b1": 4.464,
+  "b2": 5.088,
+  "b3": 5.688,
+  "b4": 6.12,
+  "b5": 6.264
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A parent's dashboard said the child was acing grammar, week after week.",
+   "start_s": 0.5,
+   "end_s": 4.964,
+   "start_f": 15,
+   "end_f": 149
+  },
+  {
+   "beat": "b2",
+   "text": "But a failed round could just be retried until it passed, hiding the real score.",
+   "start_s": 5.264,
+   "end_s": 10.352,
+   "start_f": 158,
+   "end_f": 311
+  },
+  {
+   "beat": "b3",
+   "text": "On his actual first answers, grammar sat at fifty percent - the same as pure guessing.",
+   "start_s": 10.652,
+   "end_s": 16.34,
+   "start_f": 320,
+   "end_f": 490
+  },
+  {
+   "beat": "b4",
+   "text": "A single TypeScript rule now checks every answer the same way, and a wrong one gets a real second try.",
+   "start_s": 16.64,
+   "end_s": 22.76,
+   "start_f": 499,
+   "end_f": 683
+  },
+  {
+   "beat": "b5",
+   "text": "Maths mistakes now get corrected on retry sixty-five percent of the time, up from just sixteen.",
+   "start_s": 23.06,
+   "end_s": 29.324,
+   "start_f": 692,
+   "end_f": 880
+  }
+ ],
+ "total_s": 30.824,
+ "durationInFrames": 925,
+ "measured_track_s": 29.376,
+ "track": "/root/feature-demos/vo-b48/vo-b48.mp3"
+}
