@@ -60,17 +60,32 @@ const P = MOODS.sand;
 const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
 
 // ── The editorial queue board — fixed "world" layout for beats 1-3 ──
+// Sized and centered so the stuck ticket's center lands on the exact canvas
+// center (640,360) — every camera scale then fills the frame instead of
+// leaving empty sand around a small pile (the Wave C fill-measurement fix).
 const CARD_Y = 190;
-const CARD_W = 220;
-const CARD_H = 220;
+const CARD_W = 300;
+const CARD_H = 340;
 const CARDS = [
-  { x: 220, label: "Article #118" },
-  { x: 500, label: "Article #119" },
-  { x: 780, label: "Article #120" },
+  { x: 150, label: "Article #118" },
+  { x: 490, label: "Article #119" },
+  { x: 830, label: "Article #120" },
 ];
-const STUCK_X = 500;
-const STUCK_CX = STUCK_X + CARD_W / 2; // 610
-const STUCK_CY = CARD_Y + CARD_H / 2; // 300
+const STUCK_X = 490;
+const STUCK_CX = STUCK_X + CARD_W / 2; // 640 — canvas center
+const STUCK_CY = CARD_Y + CARD_H / 2; // 360 — canvas center
+
+// beat 2 checklist box + beat 3 pile box — both centered on (STUCK_CX,
+// STUCK_CY) so they stay screen-centered at any camera scale; kept clear of
+// the top-left hero's ~160px-tall footprint.
+const CHECK_W = 560;
+const CHECK_H = 260;
+const CHECK_LEFT = STUCK_CX - CHECK_W / 2;
+const CHECK_TOP = STUCK_CY - CHECK_H / 2;
+const PILE_W = 420;
+const PILE_H = 180;
+const PILE_LEFT = STUCK_CX - PILE_W / 2;
+const PILE_TOP = STUCK_CY - PILE_H / 2;
 
 // checklist steps shown per ticket — the four narrated actions of beat 2
 const STEPS = [
@@ -84,7 +99,7 @@ const STEPS = [
 // further into the repeated pile with no conveyor between steps (b3). Center
 // never moves once locked onto the stuck ticket, only the scale grows.
 const CAM_F = [15, 168, 210, 369, 400, 551];
-const CAM_S = [0.72, 0.72, 1.55, 1.55, 2.3, 2.3];
+const CAM_S = [0.95, 0.95, 1.5, 1.5, 2.2, 2.2];
 
 /** The hero number, top-left, leaving the centre of the frame to the product. */
 const hero = (value: string, unit: string | undefined, label: string, color: string, scale: number) => (
@@ -146,7 +161,7 @@ export const FeatureAutonomousPublishing: React.FC = () => {
 
   // beat 2: a cursor taps through the four steps in sequence
   const stepIdx = Math.max(0, Math.min(3, Math.floor((frame - 186) / 46)));
-  const stepY = CARD_Y + 56 + stepIdx * 40;
+  const stepY = CHECK_TOP + 30 + stepIdx * 62;
   const tapClick =
     seg(frame, 186 + stepIdx * 46 + 8, 186 + stepIdx * 46 + 20) *
     (1 - seg(frame, 186 + stepIdx * 46 + 30, 186 + stepIdx * 46 + 40));
@@ -211,14 +226,14 @@ export const FeatureAutonomousPublishing: React.FC = () => {
             );
           })}
 
-          {/* ── beat 2 : the stuck ticket, tapped through one step at a time ── */}
+          {/* ── beat 2 : the stuck ticket, tapped through one step at a time — centered on the camera's lock point, filling the frame ── */}
           <Group opacity={b2}>
             <div
               style={{
                 position: "absolute",
-                left: STUCK_X + CARD_W + 26,
-                top: CARD_Y,
-                width: 260,
+                left: CHECK_LEFT,
+                top: CHECK_TOP,
+                width: CHECK_W,
                 fontFamily,
               }}
             >
@@ -232,45 +247,46 @@ export const FeatureAutonomousPublishing: React.FC = () => {
                       marginTop: i === 0 ? 0 : 14,
                       display: "flex",
                       alignItems: "center",
-                      gap: 10,
-                      padding: "10px 14px",
-                      borderRadius: 12,
+                      gap: 14,
+                      padding: "12px 20px",
+                      borderRadius: 14,
                       background: P.card,
-                      border: `1.5px solid ${active ? P.accentEdge : P.border}`,
+                      border: `2px solid ${active ? P.accentEdge : P.border}`,
                       opacity: active ? 1 : done ? 0.55 : 0.85,
-                      boxShadow: active ? "0 6px 16px rgba(120,70,20,0.18)" : undefined,
+                      boxShadow: active ? "0 8px 18px rgba(120,70,20,0.2)" : undefined,
                     }}
                   >
-                    <span style={{ fontSize: 20 }}>{done ? "✅" : s.emoji}</span>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: P.ink }}>{s.label}</span>
+                    <span style={{ fontSize: 26 }}>{done ? "✅" : s.emoji}</span>
+                    <span style={{ fontSize: 19, fontWeight: 700, color: P.ink }}>{s.label}</span>
                   </div>
                 );
               })}
             </div>
-            <Cursor x={STUCK_X + CARD_W + 46} y={stepY} click={tapClick} />
+            <Cursor x={CHECK_LEFT + 45} y={stepY} click={tapClick} />
           </Group>
 
-          {/* ── beat 3 : the same checklist, piled — no conveyor between steps ── */}
+          {/* ── beat 3 : the same checklist, piled — no conveyor between steps — centered, filling the frame at the deepest zoom ── */}
           <Group opacity={b3}>
             {[0, 1, 2].map((row) => (
               <div
                 key={row}
                 style={{
                   position: "absolute",
-                  left: STUCK_X - 40 + row * 18,
-                  top: CARD_Y + CARD_H + 30 + row * 96,
-                  width: CARD_W + 80,
-                  padding: "12px 16px",
-                  borderRadius: 12,
+                  left: PILE_LEFT + row * 8,
+                  top: PILE_TOP + row * 62,
+                  width: PILE_W - row * 16,
+                  padding: "14px 20px",
+                  borderRadius: 14,
                   background: P.card,
-                  border: `1.5px dashed ${P.dangerEdge}`,
+                  border: `2px dashed ${P.dangerEdge}`,
                   display: "flex",
-                  gap: 10,
-                  opacity: 0.92 - row * 0.12,
+                  justifyContent: "space-between",
+                  gap: 12,
+                  opacity: 0.94 - row * 0.14,
                 }}
               >
                 {STEPS.map((s) => (
-                  <span key={s.label} style={{ fontSize: 20 }}>
+                  <span key={s.label} style={{ fontSize: 26 }}>
                     {s.emoji}
                   </span>
                 ))}
