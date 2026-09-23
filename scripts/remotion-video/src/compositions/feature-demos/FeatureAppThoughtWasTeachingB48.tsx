@@ -70,7 +70,7 @@ const WIN3: Win = { x: 374, y: 146, w: 806, h: 396 };
 const WIN5: Win = { x: 356, y: 150, w: 864, h: 414 };
 
 const LOG_LINES: LogLine[] = [
-  { t: "skills", text: "420 curriculum skills loaded (LK20)", tone: "accent" },
+  { t: "skills", text: "420 LK20 (Norway curriculum) skills loaded", tone: "accent" },
   { t: "check", text: "answerCheck(): \"2,35\" == 2.35 → true", tone: "muted" },
   { t: "grammar", text: "mode: recognition → typed correction", tone: "accent" },
   { t: "retry", text: "miss on first try → re-asked, multiple choice", tone: "muted" },
@@ -145,8 +145,8 @@ export const FeatureAppThoughtWasTeachingB48: React.FC = () => {
   // ---- the sidebar number: what it measures changes with the story ----
   const scoreRaw = interpolate(
     frame,
-    [0, 15, 60, 100, B1_E, B2_S, B2_E, B3_S, 340, 410, B3_E, B4_S, B4_E, B5_S, 720, 812, B5_E, END],
-    [71, 71, 71, 78, 85, 85, 85, 85, 85, 50, 50, 50, 50, 16, 16, 65, 65, 65],
+    [0, 15, 60, 100, B1_E, B2_S, B2_E, B3_S, 340, 410, B3_E, B4_S, B4_E, B5_S, B5_S + 1, 720, 812, B5_E, END],
+    [71, 71, 71, 78, 85, 85, 85, 85, 85, 50, 50, 50, 50, 50, 16, 16, 65, 65, 65],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
   const score = Math.round(scoreRaw);
@@ -200,7 +200,7 @@ export const FeatureAppThoughtWasTeachingB48: React.FC = () => {
 
   // ---- beat 4 : messy labels -> one validator ----
   const chipPop = pop(B4_S + 24);
-  const rowIn = (i: number) => seg(frame, B4_S + 60 + i * 16, B4_S + 60 + i * 16 + 12);
+  const rowIn = (i: number) => seg(frame, B4_S + 40 + i * 16, B4_S + 40 + i * 16 + 12);
   const arrowProgress = interpolate(frame, [B4_S + 10, B4_S + 55], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -233,7 +233,7 @@ export const FeatureAppThoughtWasTeachingB48: React.FC = () => {
           }}
         >
           <div style={{ position: "absolute", left: 32, top: 44, fontSize: 14, fontWeight: 800, letterSpacing: 2, color: P.muted }}>
-            🧒 GRAMMAR PRACTICE
+            🧒 BOYTASKS
           </div>
           <div
             style={{
@@ -320,9 +320,9 @@ export const FeatureAppThoughtWasTeachingB48: React.FC = () => {
             left: STAGE_X,
             top: 106,
             width: STAGE_W,
-            fontSize: 19,
-            fontWeight: 650,
-            color: P.muted,
+            fontSize: 21,
+            fontWeight: 750,
+            color: P.ink,
             opacity: b1,
           }}
         >
@@ -408,7 +408,7 @@ export const FeatureAppThoughtWasTeachingB48: React.FC = () => {
                 borderRadius: 8,
                 background: P.dangerBg,
                 border: `1.5px solid ${P.dangerEdge}`,
-                fontSize: 14.5,
+                fontSize: 16,
                 fontWeight: 700,
                 color: P.danger,
                 opacity: rowIn(i),
@@ -434,14 +434,27 @@ export const FeatureAppThoughtWasTeachingB48: React.FC = () => {
         />
         <Panel x={STAGE_X + 470} y={150} w={314} h={210} tone="card" opacity={b4}>
           <div style={{ position: "absolute", left: 20, top: 16, fontSize: 13, fontWeight: 800, letterSpacing: 1.2, color: P.muted }}>
-            answerCheck() — everywhere
+            answerCheck() — one rule, every subject
           </div>
-          <div style={{ position: "absolute", left: 20, top: 54, fontSize: 15.5, fontWeight: 700, color: P.success }}>✅ "2,35" = 2.35</div>
-          <div style={{ position: "absolute", left: 20, top: 90, fontSize: 15.5, fontWeight: 700, color: P.success }}>✅ "3/4" = "0,75"</div>
-          <div style={{ position: "absolute", left: 20, top: 126, fontSize: 15.5, fontWeight: 700, color: P.accent }}>↻ wrong → typed retry</div>
-          <div style={{ position: "absolute", left: 20, top: 162, fontSize: 15.5, fontWeight: 700, color: P.accent }}>↻ then multiple choice</div>
+          <div style={{ position: "absolute", left: 20, top: 54, fontSize: 16.5, fontWeight: 700, color: P.success }}>✅ "2,35" = 2.35</div>
+          <div style={{ position: "absolute", left: 20, top: 90, fontSize: 16.5, fontWeight: 700, color: P.success }}>✅ "3/4" = "0,75"</div>
+          <div style={{ position: "absolute", left: 20, top: 126, fontSize: 16.5, fontWeight: 700, color: P.accent }}>↻ wrong → typed retry</div>
+          <div style={{ position: "absolute", left: 20, top: 162, fontSize: 16.5, fontWeight: 700, color: P.accent }}>↻ then multiple choice</div>
         </Panel>
-        <StageCaption text="One function, checked the same way everywhere" opacity={b4} tone="accent" />
+        <div
+          style={{
+            position: "absolute",
+            left: STAGE_X + 20,
+            top: 128,
+            fontSize: 13,
+            fontWeight: 650,
+            color: P.muted,
+            opacity: b4 * Math.min(1, chipPop),
+          }}
+        >
+          the code language behind the fix
+        </div>
+        <StageCaption text="One rule now checks grammar AND maths the same way" opacity={b4} tone="accent" />
 
         {/* ================= beat 5 : it is already working (rise-in) ================= */}
         <div style={{ position: "absolute", inset: 0, opacity: b5, transform: `translateY(${b5dy}px)` }}>
@@ -449,6 +462,21 @@ export const FeatureAppThoughtWasTeachingB48: React.FC = () => {
           <LogWindow lines={LOG_LINES} title="boytasks — grading engine" from={B5_S + 14} every={26} opacity={1} win={WIN5} fontSize={21} />
           <CheckBadge x={1156} y={130} size={40} opacity={1} scale={Math.min(1, fixedStampPop)} />
           <StageCaption text="Maths retry-repair: 16% → 65%" opacity={1} tone="success" />
+          <div
+            style={{
+              position: "absolute",
+              left: STAGE_X,
+              top: 672,
+              width: STAGE_W,
+              textAlign: "center",
+              fontSize: 15,
+              fontWeight: 600,
+              color: P.muted,
+              opacity: seg(frame, B5_S + 40, B5_S + 56),
+            }}
+          >
+            The same rule now protects the grammar score too
+          </div>
         </div>
       </div>
     </PaletteProvider>
