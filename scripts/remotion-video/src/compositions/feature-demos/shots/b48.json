@@ -1,0 +1,14 @@
+{
+  "id": "b48",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-app-thought-it-was-teaching-measured-data-said-grammar-scored-at-the-guessin-b48",
+      "frames": 170,
+      "scroll": [[0, 0], [85, 480], [169, 860]],
+      "mouse": [[0, 560, 220], [85, 560, 400], [169, 560, 320]]
+    }
+  ]
+}
