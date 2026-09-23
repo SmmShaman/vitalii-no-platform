@@ -1,0 +1,56 @@
+{
+ "id": "g03",
+ "beat_durations": {
+  "b1": 7.344,
+  "b2": 6.36,
+  "b3": 4.224,
+  "b4": 4.68,
+  "b5": 5.208
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Practicing for a job interview, every hint and retry used to run up a bill \u2014 on two separate cloud accounts at once.",
+   "start_s": 0.5,
+   "end_s": 7.844,
+   "start_f": 15,
+   "end_f": 235
+  },
+  {
+   "beat": "b2",
+   "text": "Two providers meant two quotas, two failure modes, and two places pricing could quietly change.",
+   "start_s": 8.144,
+   "end_s": 14.504,
+   "start_f": 244,
+   "end_f": 435
+  },
+  {
+   "beat": "b3",
+   "text": "Now the coaching runs entirely on my own Claude subscription instead.",
+   "start_s": 14.804,
+   "end_s": 19.028,
+   "start_f": 444,
+   "end_f": 571
+  },
+  {
+   "beat": "b4",
+   "text": "Hit a limit, and it falls back automatically \u2014 the interview never stalls.",
+   "start_s": 19.328,
+   "end_s": 24.008,
+   "start_f": 580,
+   "end_f": 720
+  },
+  {
+   "beat": "b5",
+   "text": "One provider, one login, one place the pricing lives now \u2014 down from two.",
+   "start_s": 24.308,
+   "end_s": 29.516,
+   "start_f": 729,
+   "end_f": 885
+  }
+ ],
+ "total_s": 31.016,
+ "durationInFrames": 930,
+ "measured_track_s": 29.568,
+ "track": "/root/feature-demos/vo-g03/vo-g03.mp3"
+}

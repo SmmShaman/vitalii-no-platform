@@ -1,0 +1,7 @@
+{"id": "b46", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A first-grader's worksheets kept repeating — the same six colors, the same pig, three days running."],
+ ["b2", "The AI-written lessons repeated too: one topic ran fourteen days straight."],
+ ["b3", "Now every worksheet checks a rolling memory of what each child already saw, stored in Supabase."],
+ ["b4", "The AI's daily lessons follow the same rule now — no repeating recent words or topics."],
+ ["b5", "The review track now moves on after ten days, instead of stalling on the same step."]
+]}

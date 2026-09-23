@@ -1,0 +1,56 @@
+{
+ "id": "b46",
+ "beat_durations": {
+  "b1": 6.144,
+  "b2": 5.064,
+  "b3": 6.288,
+  "b4": 5.856,
+  "b5": 5.04
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A first-grader's worksheets kept repeating \u2014 the same six colors, the same pig, three days running.",
+   "start_s": 0.5,
+   "end_s": 6.644,
+   "start_f": 15,
+   "end_f": 199
+  },
+  {
+   "beat": "b2",
+   "text": "The AI-written lessons repeated too: one topic ran fourteen days straight.",
+   "start_s": 6.944,
+   "end_s": 12.008,
+   "start_f": 208,
+   "end_f": 360
+  },
+  {
+   "beat": "b3",
+   "text": "Now every worksheet checks a rolling memory of what each child already saw, stored in Supabase.",
+   "start_s": 12.308,
+   "end_s": 18.596,
+   "start_f": 369,
+   "end_f": 558
+  },
+  {
+   "beat": "b4",
+   "text": "The AI's daily lessons follow the same rule now \u2014 no repeating recent words or topics.",
+   "start_s": 18.896,
+   "end_s": 24.752,
+   "start_f": 567,
+   "end_f": 743
+  },
+  {
+   "beat": "b5",
+   "text": "The review track now moves on after ten days, instead of stalling on the same step.",
+   "start_s": 25.052,
+   "end_s": 30.092,
+   "start_f": 752,
+   "end_f": 903
+  }
+ ],
+ "total_s": 31.592,
+ "durationInFrames": 948,
+ "measured_track_s": 30.144,
+ "track": "/root/feature-demos/vo-b46/vo-b46.mp3"
+}
