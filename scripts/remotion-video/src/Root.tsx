@@ -207,6 +207,7 @@ import { FeatureEveryBotFailureSaidC05 } from "./compositions/feature-demos/Feat
 import { FeatureAppThoughtWasTeachingB48 } from "./compositions/feature-demos/FeatureAppThoughtWasTeachingB48";
 import { FeatureKioskWallStopsRecitingB47 } from "./compositions/feature-demos/FeatureKioskWallStopsRecitingB47";
 import { FeatureAppRemembersWhatAlreadyB46 } from "./compositions/feature-demos/FeatureAppRemembersWhatAlreadyB46";
+import { FeatureInterviewCoachRunsOwnG03 } from "./compositions/feature-demos/FeatureInterviewCoachRunsOwnG03";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2033,6 +2034,16 @@ export const RemotionRoot: React.FC = () => {
         width={1280}
         height={720}
       />
+
+      <Composition
+        id="FeatureInterviewCoachRunsOwnG03"
+        component={FeatureInterviewCoachRunsOwnG03}
+        durationInFrames={930}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
 
     </>
   );

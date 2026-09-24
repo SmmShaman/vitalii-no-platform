@@ -1,19 +1,21 @@
 /**
  * FeatureAppRemembersWhatAlreadyB46 — feature b46 — 1280x720, 948 frames @ 30fps, VOICE-SYNCED.
  *
- * ART DIRECTION: archetype 4 "flow map", mood "violet" (both handed down by
- * the orchestrating session). The dominant visual for almost the whole clip
- * is a flow map of three satellites — Worksheet, AI Lesson, Review Track —
- * around a central Memory hub. In beats 1-2 the satellites are disconnected
- * ghosts that spin off duplicate copies (the repeats); in beat 4 the hub
- * pops solid and every satellite gets a real spoke and a checkmark. Beat 3
- * is the one UI beat: per STEP 0c it scale-pushes in a recording of the
- * feature's own real page (shots/b46.json, shot "page") as proof that the
- * memory check is real and live, the same way FeatureEightTradingAgentsShareK01
- * (k01) and FeatureKioskWallStopsRecitingB47 (b47) push in their evidence.
- * Beat 5 does NOT play the feature page or the hub (gate 2): Boytasks keeps
- * no runtime log on the VPS, so it closes on a LogWindow built only from the
- * numbers already in the narration — never an invented metric.
+ * RE-SHOOT (2026-09-24): same narration, same beat windows, new picture.
+ * archetype 4 "flow map", mood "violet" (handed down, not re-drawn).
+ *
+ * The old cut staged a radial hub with three orbiting satellites. This cut
+ * stages the same idea as a literal horizontal pipeline: a wide "Memory
+ * Gate" bar sits dead-center of the frame; a Source card on the left feeds
+ * into it, an Output card on the right comes out of it. In beats 1-2 the
+ * gate is empty/dashed — there is no check yet, so duplicates pile up
+ * against it (a fan of ghost copies) instead of passing through. Beat 3 is
+ * the one UI beat (per STEP 0c): a LiveWindow recording of the feature's own
+ * real page scale-pushes in as proof the check is real. Beat 4 lights the
+ * gate solid — both the Worksheet and AI Lesson lanes now flow through it
+ * and come out the other side fresh, with the single tech chip (Supabase).
+ * Beat 5 does not play the feature page or the hub (gate 2): it closes on a
+ * LogWindow built only from the numbers already in the narration.
  *
  * Voice-synced beat table (narration windows, do not shift):
  *  b1  15-199  "A first-grader's worksheets kept repeating — the same six
@@ -34,7 +36,7 @@
 import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, cardShadow } from "./bright-theme";
-import { Headline, StatPill, FilterChip, CaptionBand, CheckBadge, seg, fontFamily } from "./bright-primitives";
+import { Headline, StatPill, FilterChip, CaptionBand, CheckBadge, FlowArrow, seg, fontFamily } from "./bright-primitives";
 import { LiveWindow, LogWindow, LogLine, Win } from "./live-primitives";
 import shots from "./shots/b46.json";
 
@@ -45,31 +47,20 @@ const B2_S = 208, B2_E = 360;
 const B3_S = 369, B3_E = 558;
 const B4_S = 567, B4_E = 743;
 const B5_S = 752, B5_E = 903;
-const END = 948;
 const FADE = 9;
-
-const HUB = { x: 640, y: 420 };
-const RX = 360;
-const RY = 220;
 
 const WIN3: Win = { x: 230, y: 150, w: 820, h: 430 };
 const WIN_LOG: Win = { x: 250, y: 150, w: 880, h: 420 };
 
-type NodeKey = "worksheet" | "ai" | "review";
+const GATE = { x: 560, y: 140, w: 160, h: 500 };
+const SOURCE_X = 60;
+const OUTPUT_X = 990;
+const CARD_W = 230;
+const CARD_H = 130;
+const LANE_Y = { worksheet: 165, ai: 335, review: 505 };
 
-const NODES: { key: NodeKey; angle: number; emoji: string; label: string }[] = [
-  { key: "worksheet", angle: -90, emoji: "📝", label: "Worksheet" },
-  { key: "ai", angle: 30, emoji: "🤖", label: "AI Lesson" },
-  { key: "review", angle: 150, emoji: "🔁", label: "Review Track" },
-];
-
-function nodePos(angleDeg: number): { x: number; y: number } {
-  const rad = (angleDeg * Math.PI) / 180;
-  return { x: HUB.x + RX * Math.cos(rad), y: HUB.y + RY * Math.sin(rad) };
-}
-
-/** One satellite card on the flow-map, with a small stat line under it. */
-const NodeCard: React.FC<{
+/** One rectangular lane card (source or output), top-left anchored. */
+const LaneCard: React.FC<{
   x: number;
   y: number;
   emoji: string;
@@ -86,10 +77,10 @@ const NodeCard: React.FC<{
     <div
       style={{
         position: "absolute",
-        left: x - 96,
-        top: y - 58,
-        width: 192,
-        height: 116,
+        left: x,
+        top: y,
+        width: CARD_W,
+        height: CARD_H,
         borderRadius: 18,
         background: P.card,
         border: `1.5px solid ${edge}`,
@@ -103,7 +94,7 @@ const NodeCard: React.FC<{
         fontFamily,
       }}
     >
-      <div style={{ fontSize: 30 }}>{emoji}</div>
+      <div style={{ fontSize: 28 }}>{emoji}</div>
       <div style={{ fontSize: 17, fontWeight: 800, color: P.ink }}>{label}</div>
       <div
         style={{
@@ -122,24 +113,26 @@ const NodeCard: React.FC<{
   );
 };
 
-/** Ghost duplicate trail behind a node — the visual for "it just repeats". */
-const GhostTrail: React.FC<{ x: number; y: number; opacity: number }> = ({ x, y, opacity }) => {
+/** Fan of ghost duplicates piling up against the closed gate — the "it just
+ * keeps repeating, nothing stops it" visual for beats 1-2. */
+const DuplicateStack: React.FC<{ laneY: number; opacity: number }> = ({ laneY, opacity }) => {
   if (opacity <= 0.004) return null;
+  const startX = SOURCE_X + CARD_W + 26;
   return (
     <>
-      {[1, 2].map((i) => (
+      {[0, 1, 2].map((i) => (
         <div
           key={i}
           style={{
             position: "absolute",
-            left: x - 96 + i * 10,
-            top: y - 58 + i * 10,
-            width: 192,
-            height: 116,
-            borderRadius: 18,
-            background: P.card,
+            left: startX + i * 78,
+            top: laneY + i * 16,
+            width: 150,
+            height: CARD_H - 20,
+            borderRadius: 16,
             border: `1.5px dashed ${P.dangerEdge}`,
-            opacity: opacity * (0.32 - i * 0.09),
+            background: "rgba(255,255,255,0.5)",
+            opacity: opacity * (0.5 - i * 0.13),
           }}
         />
       ))}
@@ -147,60 +140,33 @@ const GhostTrail: React.FC<{ x: number; y: number; opacity: number }> = ({ x, y,
   );
 };
 
-/** Faint tiled echo of the repeating item, flanking the hero card on both
- * sides — the visual for "it just keeps repeating", and what fills the wide
- * empty flanks while only one or two satellites are on screen (beats 1-2). */
+/** Faint grayscale tiling of the beat's own repeating icon, filling the
+ * canvas rows the active single lane does not reach. */
 const RepeatWallpaper: React.FC<{ opacity: number; emoji: string }> = ({ opacity, emoji }) => {
   if (opacity <= 0.004) return null;
-  const cellW = 130;
+  const cellW = 150;
   const cellH = 110;
-  const wings = [70, 820];
   return (
     <>
-      {wings.map((left, wi) => (
-        <div key={wi} style={{ position: "absolute", left, top: 150, opacity: opacity * 0.26 }}>
-          {[0, 1, 2].map((r) =>
-            [0, 1, 2].map((c) => (
-              <div
-                key={`${r}-${c}`}
-                style={{ position: "absolute", left: c * cellW, top: r * cellH, fontSize: 34, filter: "grayscale(1)" }}
-              >
-                {emoji}
-              </div>
-            ))
-          )}
-        </div>
-      ))}
+      <div style={{ position: "absolute", left: 60, top: 400, opacity: opacity * 0.24 }}>
+        {[0, 1].map((r) =>
+          [0, 1].map((c) => (
+            <div key={`l-${r}-${c}`} style={{ position: "absolute", left: c * cellW, top: r * cellH, fontSize: 32, filter: "grayscale(1)" }}>
+              {emoji}
+            </div>
+          ))
+        )}
+      </div>
+      <div style={{ position: "absolute", left: 760, top: 150, opacity: opacity * 0.24 }}>
+        {[0, 1, 2].map((r) =>
+          [0, 1, 2].map((c) => (
+            <div key={`r-${r}-${c}`} style={{ position: "absolute", left: c * cellW, top: r * cellH, fontSize: 32, filter: "grayscale(1)" }}>
+              {emoji}
+            </div>
+          ))
+        )}
+      </div>
     </>
-  );
-};
-
-/** Spoke line from the hub out to a satellite. */
-const Spoke: React.FC<{ to: { x: number; y: number }; opacity: number; solid: boolean }> = ({ to, opacity, solid }) => {
-  if (opacity <= 0.004) return null;
-  const dx = to.x - HUB.x;
-  const dy = to.y - HUB.y;
-  const full = Math.sqrt(dx * dx + dy * dy);
-  const len = Math.max(0, full - 150);
-  const angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI;
-  const startX = HUB.x + (dx / full) * 72;
-  const startY = HUB.y + (dy / full) * 72;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        left: startX,
-        top: startY,
-        width: len,
-        height: solid ? 4 : 2,
-        background: solid ? P.success : P.accentEdge,
-        opacity,
-        transform: `rotate(${angleDeg}deg)`,
-        transformOrigin: "0 50%",
-        borderRadius: 4,
-        borderTop: solid ? "none" : `2px dashed ${P.accentEdge}`,
-      }}
-    />
   );
 };
 
@@ -226,23 +192,10 @@ export const FeatureAppRemembersWhatAlreadyB46: React.FC = () => {
   const b4 = seg(frame, B4_S, B4_S + FADE) * (1 - seg(frame, B4_E, B4_E + FADE));
   const b5 = seg(frame, B5_S, B5_S + FADE); // holds through the tail — no fade-out
 
-  // ---- flow-map visibility per satellite (recedes for beat 3's live proof) ----
-  const worksheetShown = Math.max(b1, b2, b4);
-  const aiShown = Math.max(b2, b4);
-  const reviewShown = b4;
-  const hubGhost = 0.4 * Math.max(b1, b2);
-  const hubPop = Math.min(1, pop(B4_S));
-  const hubSolid = b4 * hubPop;
-
-  const worksheetTone: "danger" | "success" = b4 > 0.5 ? "success" : "danger";
-  const aiTone: "danger" | "success" = b4 > 0.5 ? "success" : "danger";
-
-  const posWorksheet = nodePos(NODES[0].angle);
-  const posAi = nodePos(NODES[1].angle);
-  const posReview = nodePos(NODES[2].angle);
-
-  const trailOpacity1 = b1;
-  const trailOpacity2 = b2;
+  const gatePop = Math.min(1, pop(B4_S));
+  const checkPop = Math.min(1, pop(B4_S + 30));
+  const gateGhost = Math.max(b1, b2) * 0.5;
+  const gateLit = b4 * gatePop;
 
   // ---- beat 3 : scale-push the real page in (non-crossfade transition) ----
   const pushScale = interpolate(frame, [B3_S, B3_S + 22], [0.92, 1], {
@@ -250,8 +203,7 @@ export const FeatureAppRemembersWhatAlreadyB46: React.FC = () => {
     extrapolateRight: "clamp",
   });
 
-  // ---- beat 4 : the checkmark pops per satellite ----
-  const checkPop = Math.min(1, pop(B4_S + 30));
+  const arrowIn = (start: number) => interpolate(frame, [start, start + 20], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   return (
     <PaletteProvider value={P}>
@@ -272,95 +224,67 @@ export const FeatureAppRemembersWhatAlreadyB46: React.FC = () => {
         <Headline y={42} text="The review track" accentText="moves on after 10 days." accentColor={P.success} opacity={b5} fontSize={30} />
 
         {/* ================= beat 1 : product line ================= */}
-        <div
-          style={{
-            position: "absolute",
-            left: 90,
-            top: 100,
-            fontSize: 20,
-            fontWeight: 750,
-            color: P.ink,
-            opacity: b1,
-          }}
-        >
+        <div style={{ position: "absolute", left: 90, top: 96, fontSize: 20, fontWeight: 750, color: P.ink, opacity: b1 }}>
           🧒 Boytasks — a family app for daily learning
         </div>
 
-        {/* ================= flow-map : dominant visual, beats 1-2 & 4 ================= */}
-        <RepeatWallpaper opacity={b1} emoji="🐷" />
-        <RepeatWallpaper opacity={b2} emoji="🤖" />
-        <Spoke to={posWorksheet} opacity={Math.max(hubGhost, hubSolid > 0.004 ? hubSolid : 0)} solid={hubSolid > 0.5} />
-        <Spoke to={posAi} opacity={Math.max(aiShown > 0.004 ? hubGhost : 0, hubSolid)} solid={hubSolid > 0.5} />
-        <Spoke to={posReview} opacity={hubSolid} solid={hubSolid > 0.5} />
-
-        {/* hub */}
+        {/* ================= the Memory Gate — dominant vertical bar, every beat ================= */}
         <div
           style={{
             position: "absolute",
-            left: HUB.x - 74 * Math.max(0.72, hubSolid || 1),
-            top: HUB.y - 74 * Math.max(0.72, hubSolid || 1),
-            width: 148 * Math.max(0.72, hubSolid || 1),
-            height: 148 * Math.max(0.72, hubSolid || 1),
-            borderRadius: "50%",
-            background: hubSolid > 0.15 ? P.accentBg : P.chipBg,
-            border: hubSolid > 0.15 ? `2.5px solid ${P.accent}` : `2px dashed ${P.border}`,
-            boxShadow: hubSolid > 0.15 ? cardShadow : "none",
+            left: GATE.x,
+            top: GATE.y,
+            width: GATE.w,
+            height: GATE.h,
+            borderRadius: 24,
+            background: gateLit > 0.15 ? P.accentBg : "rgba(255,255,255,0.4)",
+            border: gateLit > 0.15 ? `3px solid ${P.accent}` : `3px dashed ${P.border}`,
+            boxShadow: gateLit > 0.15 ? cardShadow : "none",
+            opacity: Math.max(gateGhost, gateLit, b3 * 0.6),
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: 4,
-            opacity: Math.max(hubGhost, hubSolid),
+            gap: 8,
           }}
         >
-          <div style={{ fontSize: 28 }}>🧠</div>
-          <div style={{ fontSize: 18, fontWeight: 800, color: hubSolid > 0.15 ? P.ink : P.muted }}>Memory</div>
+          <div style={{ fontSize: 34 }}>🧠</div>
+          <div style={{ fontSize: 17, fontWeight: 800, color: gateLit > 0.15 ? P.ink : P.muted, textAlign: "center" }}>
+            {gateLit > 0.15 ? "Memory Gate" : "no memory yet"}
+          </div>
         </div>
 
-        {/* worksheet satellite */}
-        <GhostTrail x={posWorksheet.x} y={posWorksheet.y} opacity={trailOpacity1} />
-        <NodeCard
-          x={posWorksheet.x}
-          y={posWorksheet.y}
-          emoji="📝"
-          label="Worksheet"
-          sub={b4 > 0.5 ? "new colors, new pig ✓" : "🎨🐷 — 3 days running"}
-          tone={worksheetTone}
-          opacity={worksheetShown}
-        />
-        {b4 > 0.5 ? <CheckBadge x={posWorksheet.x + 74} y={posWorksheet.y - 82} size={30} opacity={b4} scale={checkPop} /> : null}
+        {/* ================= beats 1-2 : single lane piling up against the closed gate ================= */}
+        <RepeatWallpaper opacity={b1} emoji="🐷" />
+        <RepeatWallpaper opacity={b2} emoji="🤖" />
 
-        {/* ai lesson satellite */}
-        <GhostTrail x={posAi.x} y={posAi.y} opacity={trailOpacity2} />
-        <NodeCard
-          x={posAi.x}
-          y={posAi.y}
-          emoji="🤖"
-          label="AI Lesson"
-          sub={b4 > 0.5 ? "no repeat window ✓" : "14-day streak"}
-          tone={aiTone}
-          opacity={aiShown}
-        />
-        {b4 > 0.5 ? <CheckBadge x={posAi.x + 74} y={posAi.y - 82} size={30} opacity={b4} scale={checkPop} /> : null}
+        <LaneCard x={SOURCE_X} y={LANE_Y.worksheet} emoji="📝" label="Worksheet" sub="🎨🐷 — 3 days" tone="danger" opacity={b1} />
+        <DuplicateStack laneY={LANE_Y.worksheet} opacity={b1} />
+        <StatPill x={90} y={LANE_Y.worksheet + CARD_H + 20} emoji="⚠" text="same 6 colors, same pig — 3 days" tone="danger" opacity={b1} />
 
-        {/* review track satellite — introduced fixed, in beat 4 */}
-        <NodeCard
-          x={posReview.x}
-          y={posReview.y}
-          emoji="🔁"
-          label="Review Track"
-          sub="moves on ✓"
-          tone="success"
-          opacity={reviewShown}
-        />
-        {b4 > 0.5 ? <CheckBadge x={posReview.x + 74} y={posReview.y - 82} size={30} opacity={b4} scale={checkPop} /> : null}
+        <LaneCard x={SOURCE_X} y={LANE_Y.ai} emoji="🤖" label="AI Lesson" sub="14-day streak" tone="danger" opacity={b2} />
+        <DuplicateStack laneY={LANE_Y.ai} opacity={b2} />
+        <StatPill x={90} y={LANE_Y.ai + CARD_H + 20} emoji="⚠" text="one topic — 14 days straight" tone="danger" opacity={b2} />
 
-        {/* ---- beat 1-2 stats (numbers are the heroes) ---- */}
-        <StatPill x={430} y={112} emoji="⚠" text="same 6 colors, same pig — 3 days" tone="danger" opacity={b1} />
-        <StatPill x={430} y={112} emoji="⚠" text="one topic — 14 days straight" tone="danger" opacity={b2} />
+        {/* ================= beat 4 : gate lights up, two lanes flow through, chip ================= */}
+        <FlowArrow x={SOURCE_X + CARD_W + 10} y={LANE_Y.worksheet + CARD_H / 2 - 3} len={GATE.x - (SOURCE_X + CARD_W + 10) - 10} progress={arrowIn(B4_S)} color={P.success} opacity={b4} />
+        <FlowArrow x={GATE.x + GATE.w + 10} y={LANE_Y.worksheet + CARD_H / 2 - 3} len={OUTPUT_X - (GATE.x + GATE.w + 10) - 10} progress={arrowIn(B4_S + 14)} color={P.success} opacity={b4} />
+        <LaneCard x={SOURCE_X} y={LANE_Y.worksheet} emoji="📝" label="Worksheet" sub="generator" tone="success" opacity={b4} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.worksheet} emoji="📝" label="Worksheet" sub="new colors, new pig ✓" tone="success" opacity={b4} />
+        <CheckBadge x={OUTPUT_X + CARD_W - 10} y={LANE_Y.worksheet - 6} size={30} opacity={b4} scale={checkPop} />
 
-        {/* ---- beat 4 : single tech chip ---- */}
-        <FilterChip x={528} y={112} text="Supabase" icon="🧠" color={P.accent} scale={Math.min(1, hubPop)} opacity={hubSolid} />
+        <FlowArrow x={SOURCE_X + CARD_W + 10} y={LANE_Y.ai + CARD_H / 2 - 3} len={GATE.x - (SOURCE_X + CARD_W + 10) - 10} progress={arrowIn(B4_S + 6)} color={P.success} opacity={b4} />
+        <FlowArrow x={GATE.x + GATE.w + 10} y={LANE_Y.ai + CARD_H / 2 - 3} len={OUTPUT_X - (GATE.x + GATE.w + 10) - 10} progress={arrowIn(B4_S + 20)} color={P.success} opacity={b4} />
+        <LaneCard x={SOURCE_X} y={LANE_Y.ai} emoji="🤖" label="AI Lesson" sub="daily writer" tone="success" opacity={b4} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.ai} emoji="🤖" label="AI Lesson" sub="no repeat window ✓" tone="success" opacity={b4} />
+        <CheckBadge x={OUTPUT_X + CARD_W - 10} y={LANE_Y.ai - 6} size={30} opacity={b4} scale={checkPop} />
+
+        <FlowArrow x={SOURCE_X + CARD_W + 10} y={LANE_Y.review + CARD_H / 2 - 3} len={GATE.x - (SOURCE_X + CARD_W + 10) - 10} progress={arrowIn(B4_S + 40)} color={P.accentEdge} opacity={b4 * 0.7} />
+        <FlowArrow x={GATE.x + GATE.w + 10} y={LANE_Y.review + CARD_H / 2 - 3} len={OUTPUT_X - (GATE.x + GATE.w + 10) - 10} progress={arrowIn(B4_S + 54)} color={P.accentEdge} opacity={b4 * 0.7} />
+        <LaneCard x={SOURCE_X} y={LANE_Y.review} emoji="🔁" label="Review Track" sub="step queue" tone="success" opacity={b4 * 0.7} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.review} emoji="🔁" label="Review Track" sub="moves on ✓" tone="success" opacity={b4 * 0.7} />
+
+        <FilterChip x={GATE.x - 20} y={GATE.y - 46} text="Supabase" icon="🧠" color={P.accent} scale={Math.min(1, gatePop)} opacity={gateLit} />
 
         {/* ================= per-beat captions ================= */}
         <CaptionBand text="Same colors, same pig, day after day." opacity={b1} tone="danger" />
@@ -390,7 +314,7 @@ export const FeatureAppRemembersWhatAlreadyB46: React.FC = () => {
           />
         </div>
 
-        {/* ================= beat 5 : the result, from real numbers only ================= */}
+        {/* ================= beat 5 : the result, from real numbers only (gate 2: never the feature page/hub) ================= */}
         <LogWindow lines={LOG_LINES} title="boytasks — memory check" from={B5_S + 10} every={26} opacity={b5} win={WIN_LOG} fontSize={21} />
         <CaptionBand text="Ten days, not stuck on the same step." opacity={b5} tone="success" />
       </div>
