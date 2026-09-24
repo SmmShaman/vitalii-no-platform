@@ -1,0 +1,7 @@
+{"id": "m21", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My app generated fine vocabulary lessons, but the grammar drills were just random irregular verbs."],
+ ["b2", "No connection to the textbook I studied from, and no one checking if the Norwegian was correct."],
+ ["b3", "Drills now follow that same textbook's syllabus, and Claude proofreads every one first."],
+ ["b4", "Blocks are reused instead of rewritten each time, one fix and it stays fixed."],
+ ["b5", "Verb drills now scale all the way up through B2 and C1 level."]
+]}

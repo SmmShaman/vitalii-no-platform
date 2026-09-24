@@ -1,0 +1,56 @@
+{
+ "id": "m20",
+ "beat_durations": {
+  "b1": 5.688,
+  "b2": 5.4,
+  "b3": 5.976,
+  "b4": 3.696,
+  "b5": 4.632
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I wanted to learn Norwegian by ear on the bus, but every app made me pick from ready-made lessons.",
+   "start_s": 0.5,
+   "end_s": 6.188,
+   "start_f": 15,
+   "end_f": 186
+  },
+  {
+   "beat": "b2",
+   "text": "I couldn't just say the word I needed, upload a textbook page, or snap a photo of a menu.",
+   "start_s": 6.488,
+   "end_s": 11.888,
+   "start_f": 195,
+   "end_f": 357
+  },
+  {
+   "beat": "b3",
+   "text": "Now a Cloudflare Worker turns any word, PDF, or photo into a narrated lesson.",
+   "start_s": 12.188,
+   "end_s": 18.164,
+   "start_f": 366,
+   "end_f": 545
+  },
+  {
+   "beat": "b4",
+   "text": "Less like borrowing someone's tapes, more like recording your own.",
+   "start_s": 18.464,
+   "end_s": 22.16,
+   "start_f": 554,
+   "end_f": 665
+  },
+  {
+   "beat": "b5",
+   "text": "Playback now starts in about a minute, not after the whole lesson renders.",
+   "start_s": 22.46,
+   "end_s": 27.092,
+   "start_f": 674,
+   "end_f": 813
+  }
+ ],
+ "total_s": 28.592,
+ "durationInFrames": 858,
+ "measured_track_s": 27.144,
+ "track": "/root/feature-demos/vo-m20/vo-m20.mp3"
+}

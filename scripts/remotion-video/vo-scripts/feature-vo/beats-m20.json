@@ -1,0 +1,7 @@
+{"id": "m20", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "I wanted to learn Norwegian by ear on the bus, but every app made me pick from ready-made lessons."],
+ ["b2", "I couldn't just say the word I needed, upload a textbook page, or snap a photo of a menu."],
+ ["b3", "Now a Cloudflare Worker turns any word, PDF, or photo into a narrated lesson."],
+ ["b4", "Less like borrowing someone's tapes, more like recording your own."],
+ ["b5", "Playback now starts in about a minute, not after the whole lesson renders."]
+]}

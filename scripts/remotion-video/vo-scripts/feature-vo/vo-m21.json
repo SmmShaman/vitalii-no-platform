@@ -1,0 +1,56 @@
+{
+ "id": "m21",
+ "beat_durations": {
+  "b1": 6.36,
+  "b2": 5.28,
+  "b3": 5.592,
+  "b4": 5.328,
+  "b5": 4.608
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My app generated fine vocabulary lessons, but the grammar drills were just random irregular verbs.",
+   "start_s": 0.5,
+   "end_s": 6.86,
+   "start_f": 15,
+   "end_f": 206
+  },
+  {
+   "beat": "b2",
+   "text": "No connection to the textbook I studied from, and no one checking if the Norwegian was correct.",
+   "start_s": 7.16,
+   "end_s": 12.44,
+   "start_f": 215,
+   "end_f": 373
+  },
+  {
+   "beat": "b3",
+   "text": "Drills now follow that same textbook's syllabus, and Claude proofreads every one first.",
+   "start_s": 12.74,
+   "end_s": 18.332,
+   "start_f": 382,
+   "end_f": 550
+  },
+  {
+   "beat": "b4",
+   "text": "Blocks are reused instead of rewritten each time, one fix and it stays fixed.",
+   "start_s": 18.632,
+   "end_s": 23.96,
+   "start_f": 559,
+   "end_f": 719
+  },
+  {
+   "beat": "b5",
+   "text": "Verb drills now scale all the way up through B2 and C1 level.",
+   "start_s": 24.26,
+   "end_s": 28.868,
+   "start_f": 728,
+   "end_f": 866
+  }
+ ],
+ "total_s": 30.368,
+ "durationInFrames": 911,
+ "measured_track_s": 28.92,
+ "track": "/root/feature-demos/vo-m21/vo-m21.mp3"
+}
