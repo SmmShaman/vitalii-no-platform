@@ -206,6 +206,7 @@ import { FeatureGrammarStopsBeingTypedB49 } from "./compositions/feature-demos/F
 import { FeatureEveryBotFailureSaidC05 } from "./compositions/feature-demos/FeatureEveryBotFailureSaidC05";
 import { FeatureAppThoughtWasTeachingB48 } from "./compositions/feature-demos/FeatureAppThoughtWasTeachingB48";
 import { FeatureKioskWallStopsRecitingB47 } from "./compositions/feature-demos/FeatureKioskWallStopsRecitingB47";
+import { FeatureAppRemembersWhatAlreadyB46 } from "./compositions/feature-demos/FeatureAppRemembersWhatAlreadyB46";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2019,6 +2020,15 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureKioskWallStopsRecitingB47"
         component={FeatureKioskWallStopsRecitingB47}
         durationInFrames={873}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureAppRemembersWhatAlreadyB46"
+        component={FeatureAppRemembersWhatAlreadyB46}
+        durationInFrames={948}
         fps={30}
         width={1280}
         height={720}
