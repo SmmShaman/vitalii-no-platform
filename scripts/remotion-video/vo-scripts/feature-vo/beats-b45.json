@@ -1,0 +1,7 @@
+{"id": "b45", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A week into school, my three kids were still on last year's grade — I'd forgotten to bump them."],
+ ["b2", "That one number decides their lessons — forget it, and a year goes to the wrong content."],
+ ["b3", "It's like forgetting to set the clocks forward — everything keeps running on old time."],
+ ["b4", "Now a nightly cron checks the date and bumps every child's grade automatically."],
+ ["b5", "All three boys jumped a grade the same day it shipped — next year needs zero manual steps."]
+]}

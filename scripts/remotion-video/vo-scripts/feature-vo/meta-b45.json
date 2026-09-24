@@ -1,0 +1,7 @@
+{
+  "id": "b45",
+  "file": "yt-feature-b45.mp4",
+  "title": "A Cron Job Remembers My Kids' Grades So I Don't | vitalii.no",
+  "description": "A week after Norwegian schools started on 2026-08-17, all three of my older boys were still set to last year's grade in the database. Moving them up was a manual step I'd simply forgotten to run.\n\nThat single grade field is the only switch that decides which curriculum unit, difficulty band and bonus tasks each child sees. Forget it, and the app silently serves a full year of the wrong content without ever throwing an error.\n\nA nightly cron job now checks a settings row for the school year's start date, and on the first run on or after that date it bumps every active child up one grade, re-fires their unstarted task sets at the new level, rolls the date forward a year, and logs what happened. Built on Cloudflare Workers and Supabase.\n\nAll three boys were bumped to grade 4/6/8 the same day this shipped. Next year's bump needs zero manual steps.\n\n🔗 Full write-up: https://vitalii.no/features/grades-now-bump-themselves-on-the-first-day-of-school-b45\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#automation #cronjobs #supabase #cloudflareworkers #parentingtech",
+  "tags": ["cron jobs", "supabase", "cloudflare workers", "automation", "parenting tech", "edge functions", "scheduled tasks", "home automation", "side projects", "devops", "personal software", "vitalii berbeha"]
+}

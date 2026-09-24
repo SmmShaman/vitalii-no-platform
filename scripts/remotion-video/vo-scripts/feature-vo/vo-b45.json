@@ -1,0 +1,56 @@
+{
+ "id": "b45",
+ "beat_durations": {
+  "b1": 5.568,
+  "b2": 5.568,
+  "b3": 4.44,
+  "b4": 5.208,
+  "b5": 5.592
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A week into school, my three kids were still on last year's grade \u2014 I'd forgotten to bump them.",
+   "start_s": 0.5,
+   "end_s": 6.068,
+   "start_f": 15,
+   "end_f": 182
+  },
+  {
+   "beat": "b2",
+   "text": "That one number decides their lessons \u2014 forget it, and a year goes to the wrong content.",
+   "start_s": 6.368,
+   "end_s": 11.936,
+   "start_f": 191,
+   "end_f": 358
+  },
+  {
+   "beat": "b3",
+   "text": "It's like forgetting to set the clocks forward \u2014 everything keeps running on old time.",
+   "start_s": 12.236,
+   "end_s": 16.676,
+   "start_f": 367,
+   "end_f": 500
+  },
+  {
+   "beat": "b4",
+   "text": "Now a nightly cron checks the date and bumps every child's grade automatically.",
+   "start_s": 16.976,
+   "end_s": 22.184,
+   "start_f": 509,
+   "end_f": 666
+  },
+  {
+   "beat": "b5",
+   "text": "All three boys jumped a grade the same day it shipped \u2014 next year needs zero manual steps.",
+   "start_s": 22.484,
+   "end_s": 28.076,
+   "start_f": 675,
+   "end_f": 842
+  }
+ ],
+ "total_s": 29.576,
+ "durationInFrames": 887,
+ "measured_track_s": 28.128,
+ "track": "/root/feature-demos/vo-b45/vo-b45.mp3"
+}
