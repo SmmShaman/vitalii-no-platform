@@ -194,6 +194,14 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
     easing: Easing.out(Easing.cubic),
   });
 
+  // beat 4: the shrinking chaos band still needs something in it, or the red
+  // wash reads as empty canvas — the old message fades out as the divider
+  // closes in, visually the fix pushing chaos off the frame.
+  const b4ChaosFade = interpolate(frame, [B4_S, B4_E], [0.7, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   // the divider is the persistent element: far right through the chaos beats,
   // slides to the middle as the fix lands (b4), recedes to a thin sliver once
   // order has won (b5) — literally "the divider slides to reveal the win".
@@ -253,14 +261,14 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
       <Group opacity={b1}>
         <StickyNote
           x={90}
-          y={92}
-          w={560}
+          y={90}
+          w={900}
           text="📅 Calendar Telegram Bot — one shared calendar bot for the kids' sports schedule"
         />
-        <ChatBubble x={90} y={228} time="Tue 09:14" />
-        <ChatBubble x={260} y={318} time="Thu 22:03" />
-        <ChatBubble x={90} y={408} time="Sun 06:41" />
-        <StatPill x={520} y={230} emoji="❓" text="Same message, every failure" tone="danger" />
+        <ChatBubble x={90} y={232} time="Tue 09:14" />
+        <ChatBubble x={460} y={332} time="Thu 22:03" />
+        <ChatBubble x={740} y={232} time="Sun 06:41" />
+        <StatPill x={460} y={462} emoji="❓" text="Same message, every failure" tone="danger" />
         <BeatLabel x={90} y={566} w={560} kicker="THE SYMPTOM" title="Every failure showed the same message" opacity={1} />
       </Group>
 
@@ -290,15 +298,9 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
           <div style={{ padding: 16, fontFamily, fontSize: 15, fontWeight: 800, color: B.muted, letterSpacing: 1 }}>
             RAW ERROR TEXT
           </div>
-          <div style={{ padding: "0 16px" }}>
-            <CodePill x={0} y={0} text="429 quota exceeded" opacity={c3Codes[0]} />
-          </div>
-          <div style={{ padding: "50px 16px 0" }}>
-            <CodePill x={0} y={0} text="401 invalid key" opacity={c3Codes[1]} />
-          </div>
-          <div style={{ padding: "50px 16px 0" }}>
-            <CodePill x={0} y={0} text="404 model retired" opacity={c3Codes[2]} />
-          </div>
+          <CodePill x={16} y={56} text="429 quota exceeded" opacity={c3Codes[0]} />
+          <CodePill x={16} y={106} text="401 invalid key" opacity={c3Codes[1]} />
+          <CodePill x={16} y={156} text="404 model retired" opacity={c3Codes[2]} />
         </Panel>
         <FlowArrow x={390} y={310} len={140} color={B.danger} progress={c3Arrow1} />
         <Panel x={550} y={260} w={170} h={100} tone="danger" opacity={c3Catch}>
@@ -335,6 +337,11 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
       </Group>
 
       {/* beat 4 — the fix, uncovered as the divider slides toward the middle */}
+      <Group opacity={b4}>
+        <StatPill x={60} y={210} emoji="⚠" text="Processing error" tone="danger" opacity={b4ChaosFade} />
+        <StatPill x={60} y={370} emoji="⚠" text="Processing error" tone="danger" opacity={b4ChaosFade * 0.75} />
+        <StatPill x={60} y={530} emoji="⚠" text="Processing error" tone="danger" opacity={b4ChaosFade * 0.5} />
+      </Group>
       <Group opacity={b4} dy={b4EnterY}>
         <LiveWindow
           file={shotsFile}

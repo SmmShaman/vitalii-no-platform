@@ -49,8 +49,8 @@ const END = 948;
 const FADE = 9;
 
 const HUB = { x: 640, y: 420 };
-const RX = 280;
-const RY = 170;
+const RX = 360;
+const RY = 220;
 
 const WIN3: Win = { x: 230, y: 150, w: 820, h: 430 };
 const WIN_LOG: Win = { x: 250, y: 150, w: 880, h: 420 };
@@ -142,6 +142,34 @@ const GhostTrail: React.FC<{ x: number; y: number; opacity: number }> = ({ x, y,
             opacity: opacity * (0.32 - i * 0.09),
           }}
         />
+      ))}
+    </>
+  );
+};
+
+/** Faint tiled echo of the repeating item, flanking the hero card on both
+ * sides — the visual for "it just keeps repeating", and what fills the wide
+ * empty flanks while only one or two satellites are on screen (beats 1-2). */
+const RepeatWallpaper: React.FC<{ opacity: number; emoji: string }> = ({ opacity, emoji }) => {
+  if (opacity <= 0.004) return null;
+  const cellW = 130;
+  const cellH = 110;
+  const wings = [70, 820];
+  return (
+    <>
+      {wings.map((left, wi) => (
+        <div key={wi} style={{ position: "absolute", left, top: 150, opacity: opacity * 0.26 }}>
+          {[0, 1, 2].map((r) =>
+            [0, 1, 2].map((c) => (
+              <div
+                key={`${r}-${c}`}
+                style={{ position: "absolute", left: c * cellW, top: r * cellH, fontSize: 34, filter: "grayscale(1)" }}
+              >
+                {emoji}
+              </div>
+            ))
+          )}
+        </div>
       ))}
     </>
   );
@@ -259,6 +287,8 @@ export const FeatureAppRemembersWhatAlreadyB46: React.FC = () => {
         </div>
 
         {/* ================= flow-map : dominant visual, beats 1-2 & 4 ================= */}
+        <RepeatWallpaper opacity={b1} emoji="🐷" />
+        <RepeatWallpaper opacity={b2} emoji="🤖" />
         <Spoke to={posWorksheet} opacity={Math.max(hubGhost, hubSolid > 0.004 ? hubSolid : 0)} solid={hubSolid > 0.5} />
         <Spoke to={posAi} opacity={Math.max(aiShown > 0.004 ? hubGhost : 0, hubSolid)} solid={hubSolid > 0.5} />
         <Spoke to={posReview} opacity={hubSolid} solid={hubSolid > 0.5} />
