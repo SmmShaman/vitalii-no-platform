@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Calendar, ArrowRight, User } from 'lucide-react'
 import { useTranslations } from '@/contexts/TranslationContext'
-import { getLatestNews, getLatestBlogPosts } from '@/integrations/supabase/client'
+import { getLatestNews, getLatestBlogPosts, getLatestFeatures } from '@/integrations/supabase/client'
 import { allFeatures, categories, getCategoryInfo } from '@/data/features'
+import type { Feature } from '@/data/features'
 
 interface SidebarProps {
   currentType: 'news' | 'blog'
@@ -16,20 +17,28 @@ export function Sidebar({ currentType, currentSlug }: SidebarProps) {
   const { t, currentLanguage } = useTranslations()
   const [news, setNews] = useState<any[]>([])
   const [blogs, setBlogs] = useState<any[]>([])
-  const latestFeatures = allFeatures.slice(0, 4)
+  const [latestFeatures, setLatestFeatures] = useState<Pick<Feature, 'id' | 'category' | 'techStack' | 'title'>[]>(allFeatures.slice(0, 4))
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true)
       try {
-        const [newsData, blogData] = await Promise.all([
+        const [newsData, blogData, featureRows] = await Promise.all([
           getLatestNews(5),
-          getLatestBlogPosts(5)
+          getLatestBlogPosts(5),
+          getLatestFeatures(4)
         ])
         setNews(newsData)
         setBlogs(blogData)
-        // Features loaded from static data
+        if (featureRows.length > 0) {
+          setLatestFeatures(featureRows.map((f) => ({
+            id: f.feature_id,
+            category: f.category,
+            techStack: f.tech_stack || [],
+            title: { en: f.title_en, no: f.title_no, ua: f.title_ua },
+          })))
+        }
       } catch (error) {
         console.error('Error loading sidebar data:', error)
       } finally {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronRight, ArrowLeft } from 'lucide-react'
@@ -9,6 +9,7 @@ import { sectionColors, projectColors } from './types'
 import { VerticalLabel } from './VerticalLabel'
 import type { TranslateFn } from './types'
 import NeoIconButton from '@/components/ui/NeoIconButton'
+import { useProjectsCarousel } from '@/hooks/useProjects'
 
 // Projects Explosion Overlay Component with Detail View
 const ProjectsExplosionOverlay = ({
@@ -222,7 +223,20 @@ export const MobileProjectsSection = ({ t, currentLanguage, sectionRef, isMounte
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(false)
   const touchStartRef = useRef<{ x: number; time: number } | null>(null)
 
-  const projectsList = translations[langKey].projects_list
+  // Projects come from feature_projects (same source as the desktop grid), so
+  // repos registered by the discovery task show up here without a code change.
+  // The static translations only fill in a cover image the DB row lacks.
+  const { carousel } = useProjectsCarousel(langKey)
+  const projectsList = useMemo(() => {
+    const staticList = translations[langKey].projects_list as { title: string; short?: string; image?: string }[]
+    if (carousel.length === 0) return staticList
+    return carousel.map(cp => ({
+      title: cp.title,
+      short: cp.short,
+      description: cp.full,
+      image: cp.image || staticList.find(tp => tp.title === cp.title)?.image,
+    }))
+  }, [carousel, langKey])
   const currentProject = projectsList[currentProjectIndex]
   const currentColor = projectColors[currentProjectIndex % projectColors.length]
 
@@ -320,7 +334,7 @@ export const MobileProjectsSection = ({ t, currentLanguage, sectionRef, isMounte
           <AnimatePresence>
             {isProjectsExpanded && (
               <ProjectsExplosionOverlay
-                projects={translations[langKey].projects_list}
+                projects={projectsList}
                 onClose={() => setIsProjectsExpanded(false)}
                 color={sectionColors.projects.icon}
               />

@@ -34,6 +34,7 @@ jobs:
           # Legacy mapping: repo name → project_id (preserve existing IDs)
           declare -A LEGACY_MAP=(
             ["vitalii_claude-code-in-browser"]="portfolio"
+            ["vitalii-no-platform"]="portfolio"  # repo renamed; without this it became a second project
             ["jobbot-norway"]="jobbot"
             ["eyeplus-camera-cloud"]="eyeplus"
             ["calendar-bot"]="calendar_bot"

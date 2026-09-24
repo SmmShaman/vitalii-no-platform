@@ -369,6 +369,27 @@ export const getFeatureBySlug = async (slug: string, language: 'en' | 'no' | 'ua
 };
 
 /**
+ * Get the newest published features, trimmed to what a sidebar list renders
+ */
+export const getLatestFeatures = async (limit: number = 4) => {
+  if (!isSupabaseConfigured()) return [];
+
+  const { data, error } = await supabase
+    .from('features')
+    .select('feature_id, category, tech_stack, title_en, title_no, title_ua')
+    .eq('status', 'published')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching latest features:', error);
+    return [];
+  }
+
+  return data || [];
+};
+
+/**
  * Get published features for the /features listing page
  */
 export const getFeaturesList = async () => {

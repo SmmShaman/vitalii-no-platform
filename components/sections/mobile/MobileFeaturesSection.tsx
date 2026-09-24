@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { allFeatures, categories, getCategoryInfo } from '@/data/features'
+import { categories, getCategoryInfo } from '@/data/features'
+import { useFeatures } from '@/hooks/useFeatures'
+import { useProjects } from '@/hooks/useProjects'
 import { FeatureModal } from '@/components/ui/FeatureModal'
 import { sectionColors } from './types'
 import { VerticalLabel } from './VerticalLabel'
@@ -18,6 +20,9 @@ interface MobileFeaturesSectionProps {
 
 export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: MobileFeaturesSectionProps) => {
   const langKey = currentLanguage.toLowerCase() as 'en' | 'no' | 'ua'
+  // Same DB-backed lists as the desktop grid; the static data is only the first-paint fallback
+  const allFeatures = useFeatures()
+  const allProjects = useProjects()
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false)
   const [selectedFeatureCategory, setSelectedFeatureCategory] = useState<FeatureCategory | undefined>(undefined)
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | undefined>(undefined)
@@ -122,6 +127,7 @@ export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: Mobile
         open={isFeaturesModalOpen}
         onOpenChange={handleModalOpenChange}
         features={allFeatures}
+        projects={allProjects}
         initialCategory={selectedFeatureCategory}
         initialFeatureId={selectedFeatureId}
         currentLanguage={langKey as 'en' | 'no' | 'ua'}
