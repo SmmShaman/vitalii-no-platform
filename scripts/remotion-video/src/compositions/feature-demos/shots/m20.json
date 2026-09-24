@@ -1,0 +1,21 @@
+{
+  "id": "m20",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 150,
+      "scroll": [[0, 0], [149, 650]],
+      "mouse": [[0, 300, 200], [45, 550, 300], [95, 380, 180], [149, 600, 260]]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/minivitaliino-turns-any-word-pdf-or-photo-into-a-narrated-norwegian-lesson-m20",
+      "frames": 160,
+      "scroll": [[0, 0], [159, 1300]],
+      "mouse": [[0, 300, 180], [55, 300, 420], [110, 300, 260], [159, 300, 380]]
+    }
+  ]
+}

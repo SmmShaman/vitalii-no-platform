@@ -208,6 +208,8 @@ import { FeatureAppThoughtWasTeachingB48 } from "./compositions/feature-demos/Fe
 import { FeatureKioskWallStopsRecitingB47 } from "./compositions/feature-demos/FeatureKioskWallStopsRecitingB47";
 import { FeatureAppRemembersWhatAlreadyB46 } from "./compositions/feature-demos/FeatureAppRemembersWhatAlreadyB46";
 import { FeatureInterviewCoachRunsOwnG03 } from "./compositions/feature-demos/FeatureInterviewCoachRunsOwnG03";
+import { FeatureGrammarDrillsNorwegianPwaM21 } from "./compositions/feature-demos/FeatureGrammarDrillsNorwegianPwaM21";
+import { FeatureMiniVitaliiNoTurnsM20 } from "./compositions/feature-demos/FeatureMiniVitaliiNoTurnsM20";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2044,6 +2046,23 @@ export const RemotionRoot: React.FC = () => {
         height={720}
       />
 
+      <Composition
+        id="FeatureGrammarDrillsNorwegianPwaM21"
+        component={FeatureGrammarDrillsNorwegianPwaM21}
+        durationInFrames={911}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureMiniVitaliiNoTurnsM20"
+        component={FeatureMiniVitaliiNoTurnsM20}
+        durationInFrames={858}
+        fps={30}
+        width={1280}
+        height={720}
+      />
 
     </>
   );
