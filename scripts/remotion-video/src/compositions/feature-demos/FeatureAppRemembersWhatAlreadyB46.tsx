@@ -66,13 +66,14 @@ const LaneCard: React.FC<{
   emoji: string;
   label: string;
   sub: string;
-  tone: "danger" | "success";
+  tone: "danger" | "success" | "idle";
   opacity: number;
-}> = ({ x, y, emoji, label, sub, tone, opacity }) => {
+  dashed?: boolean;
+}> = ({ x, y, emoji, label, sub, tone, opacity, dashed }) => {
   if (opacity <= 0.004) return null;
-  const bg = tone === "success" ? P.successBg : P.dangerBg;
-  const edge = tone === "success" ? P.successEdge : P.dangerEdge;
-  const subColor = tone === "success" ? P.success : P.danger;
+  const bg = tone === "success" ? P.successBg : tone === "danger" ? P.dangerBg : P.chipBg;
+  const edge = tone === "success" ? P.successEdge : tone === "danger" ? P.dangerEdge : P.border;
+  const subColor = tone === "success" ? P.success : tone === "danger" ? P.danger : P.muted;
   return (
     <div
       style={{
@@ -82,9 +83,9 @@ const LaneCard: React.FC<{
         width: CARD_W,
         height: CARD_H,
         borderRadius: 18,
-        background: P.card,
-        border: `1.5px solid ${edge}`,
-        boxShadow: cardShadow,
+        background: tone === "idle" ? "rgba(255,255,255,0.6)" : P.card,
+        border: `1.5px ${dashed ? "dashed" : "solid"} ${edge}`,
+        boxShadow: tone === "idle" ? "none" : cardShadow,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -94,8 +95,8 @@ const LaneCard: React.FC<{
         fontFamily,
       }}
     >
-      <div style={{ fontSize: 28 }}>{emoji}</div>
-      <div style={{ fontSize: 17, fontWeight: 800, color: P.ink }}>{label}</div>
+      <div style={{ fontSize: 28, filter: tone === "idle" ? "grayscale(0.6)" : undefined }}>{emoji}</div>
+      <div style={{ fontSize: 17, fontWeight: 800, color: tone === "idle" ? P.muted : P.ink }}>{label}</div>
       <div
         style={{
           fontSize: 13,
@@ -140,32 +141,36 @@ const DuplicateStack: React.FC<{ laneY: number; opacity: number }> = ({ laneY, o
   );
 };
 
-/** Faint grayscale tiling of the beat's own repeating icon, filling the
- * canvas rows the active single lane does not reach. */
+/** Faint grayscale tiling of the beat's own repeating icon — a full-canvas
+ * grid (not just corner clusters) so the single active lane still leaves the
+ * whole 1280x720 frame textured, not empty. Cards drawn afterward sit on top. */
 const RepeatWallpaper: React.FC<{ opacity: number; emoji: string }> = ({ opacity, emoji }) => {
   if (opacity <= 0.004) return null;
-  const cellW = 150;
-  const cellH = 110;
+  const cols = 7;
+  const rows = 4;
+  const stepX = 165;
+  const stepY = 128;
+  const startX = 44;
+  const startY = 156;
   return (
     <>
-      <div style={{ position: "absolute", left: 60, top: 400, opacity: opacity * 0.24 }}>
-        {[0, 1].map((r) =>
-          [0, 1].map((c) => (
-            <div key={`l-${r}-${c}`} style={{ position: "absolute", left: c * cellW, top: r * cellH, fontSize: 32, filter: "grayscale(1)" }}>
-              {emoji}
-            </div>
-          ))
-        )}
-      </div>
-      <div style={{ position: "absolute", left: 760, top: 150, opacity: opacity * 0.24 }}>
-        {[0, 1, 2].map((r) =>
-          [0, 1, 2].map((c) => (
-            <div key={`r-${r}-${c}`} style={{ position: "absolute", left: c * cellW, top: r * cellH, fontSize: 32, filter: "grayscale(1)" }}>
-              {emoji}
-            </div>
-          ))
-        )}
-      </div>
+      {Array.from({ length: rows }).map((_, r) =>
+        Array.from({ length: cols }).map((_, c) => (
+          <div
+            key={`w-${r}-${c}`}
+            style={{
+              position: "absolute",
+              left: startX + c * stepX,
+              top: startY + r * stepY,
+              fontSize: 30,
+              opacity: opacity * 0.16,
+              filter: "grayscale(1)",
+            }}
+          >
+            {emoji}
+          </div>
+        ))
+      )}
     </>
   );
 };
@@ -194,7 +199,7 @@ export const FeatureAppRemembersWhatAlreadyB46: React.FC = () => {
 
   const gatePop = Math.min(1, pop(B4_S));
   const checkPop = Math.min(1, pop(B4_S + 30));
-  const gateGhost = Math.max(b1, b2) * 0.5;
+  const gateGhost = Math.max(b1, b2) * 0.85;
   const gateLit = b4 * gatePop;
 
   // ---- beat 3 : scale-push the real page in (non-crossfade transition) ----
@@ -237,8 +242,8 @@ export const FeatureAppRemembersWhatAlreadyB46: React.FC = () => {
             width: GATE.w,
             height: GATE.h,
             borderRadius: 24,
-            background: gateLit > 0.15 ? P.accentBg : "rgba(255,255,255,0.4)",
-            border: gateLit > 0.15 ? `3px solid ${P.accent}` : `3px dashed ${P.border}`,
+            background: gateLit > 0.15 ? P.accentBg : P.chipBg,
+            border: gateLit > 0.15 ? `3px solid ${P.accent}` : `3px dashed ${P.accentEdge}`,
             boxShadow: gateLit > 0.15 ? cardShadow : "none",
             opacity: Math.max(gateGhost, gateLit, b3 * 0.6),
             display: "flex",
@@ -261,10 +266,20 @@ export const FeatureAppRemembersWhatAlreadyB46: React.FC = () => {
         <LaneCard x={SOURCE_X} y={LANE_Y.worksheet} emoji="📝" label="Worksheet" sub="🎨🐷 — 3 days" tone="danger" opacity={b1} />
         <DuplicateStack laneY={LANE_Y.worksheet} opacity={b1} />
         <StatPill x={90} y={LANE_Y.worksheet + CARD_H + 20} emoji="⚠" text="same 6 colors, same pig — 3 days" tone="danger" opacity={b1} />
+        <LaneCard x={SOURCE_X} y={LANE_Y.ai} emoji="🤖" label="AI Lesson" sub="14-day streak" tone="idle" dashed opacity={b1 * 0.55} />
+        <LaneCard x={SOURCE_X} y={LANE_Y.review} emoji="🔁" label="Review Track" sub="stalled" tone="idle" dashed opacity={b1 * 0.55} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.worksheet} emoji="📝" label="Worksheet" sub="waiting…" tone="idle" dashed opacity={b1 * 0.4} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.ai} emoji="🤖" label="AI Lesson" sub="waiting…" tone="idle" dashed opacity={b1 * 0.4} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.review} emoji="🔁" label="Review Track" sub="waiting…" tone="idle" dashed opacity={b1 * 0.4} />
 
         <LaneCard x={SOURCE_X} y={LANE_Y.ai} emoji="🤖" label="AI Lesson" sub="14-day streak" tone="danger" opacity={b2} />
         <DuplicateStack laneY={LANE_Y.ai} opacity={b2} />
         <StatPill x={90} y={LANE_Y.ai + CARD_H + 20} emoji="⚠" text="one topic — 14 days straight" tone="danger" opacity={b2} />
+        <LaneCard x={SOURCE_X} y={LANE_Y.worksheet} emoji="📝" label="Worksheet" sub="🎨🐷 — 3 days" tone="idle" dashed opacity={b2 * 0.55} />
+        <LaneCard x={SOURCE_X} y={LANE_Y.review} emoji="🔁" label="Review Track" sub="stalled" tone="idle" dashed opacity={b2 * 0.55} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.worksheet} emoji="📝" label="Worksheet" sub="waiting…" tone="idle" dashed opacity={b2 * 0.4} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.ai} emoji="🤖" label="AI Lesson" sub="waiting…" tone="idle" dashed opacity={b2 * 0.4} />
+        <LaneCard x={OUTPUT_X} y={LANE_Y.review} emoji="🔁" label="Review Track" sub="waiting…" tone="idle" dashed opacity={b2 * 0.4} />
 
         {/* ================= beat 4 : gate lights up, two lanes flow through, chip ================= */}
         <FlowArrow x={SOURCE_X + CARD_W + 10} y={LANE_Y.worksheet + CARD_H / 2 - 3} len={GATE.x - (SOURCE_X + CARD_W + 10) - 10} progress={arrowIn(B4_S)} color={P.success} opacity={b4} />
