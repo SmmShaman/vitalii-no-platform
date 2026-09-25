@@ -9,12 +9,22 @@
  * Both halves carry a persistent zone label ("🔀 RANDOM DRILLS" / "📗 TEXTBOOK
  * SYLLABUS") for the whole clip. No centered headline is used anywhere.
  *
- * UI beats play the real product: shots/m21.json has "hub" (vitalii.no/features)
- * and "page" (the feature's own page) — the only two URLs verified recordable
- * tonight. Beat 2 stages "hub" inside the shrinking chaos zone, beat 3 stages
- * "page" inside the growing order zone. Beat 5 never repeats either recording
- * (gate: last beat must not be the page or hub) — it closes on a LogWindow of
- * grounded facts from the feature row instead.
+ * UI beats play the real product: shots/m21.json has "page" (the feature's own
+ * page), staged in beat 3 inside the growing order zone at a 2.0-2.2x zoom so
+ * the "HOW IT WORKS" text and check badge are actually legible. Beat 2 no
+ * longer plays a recording — the earlier cut used a "hub" screenshot that
+ * didn't depict the stated problem, so beat 2 is now a drawn schematic
+ * (auto-generated drill → broken link → textbook → nobody checks) built from
+ * StatPill primitives, readable at a glance. Beat 5 never repeats either
+ * recording (gate: last beat must not be the page or hub) — it closes on a
+ * LogWindow of grounded facts from the feature row instead.
+ *
+ * Wave D1 fix (viewer verdict: clarity 6, thesis 7 — needed both at 7): two of
+ * beat 1's stickies now persist at low opacity through the rest of the clip so
+ * the left panel isn't a dead pink rectangle for two-thirds of the runtime;
+ * beat 3 gained one concrete drill example (gå → ___ → gikk ✓) so the video
+ * shows an actual exercise, not just dev dashboards; beat 4's panel title got a
+ * one-line plain-language gloss under the jargon.
  *
  * Voice-synced beat table (narration windows, do not shift):
  *  b1  15–206  "My app generated fine vocabulary lessons, but the grammar drills were just random irregular verbs."
@@ -45,7 +55,6 @@ import shots from "./shots/m21.json";
 
 const P = MOODS.dawn;
 const CARD_SHADOW = "0 10px 30px rgba(22,35,63,0.10)";
-const HUB_SHOT = "hub";
 const PAGE_SHOT = "page";
 
 const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
@@ -85,6 +94,10 @@ export const FeatureGrammarDrillsNorwegianPwaM21: React.FC = () => {
   const b3 = seg(frame, 382, 398) * (1 - seg(frame, 534, 550));
   const b4 = seg(frame, 559, 575) * (1 - seg(frame, 703, 719));
   const b5 = seg(frame, 728, 744); // holds through 911
+
+  // two beat-1 stickies fade to a dim, permanent presence so the chaos panel
+  // never goes empty once the beat ends
+  const chaosGhost = Math.max(b1, 0.22 * seg(frame, 190, 210));
 
   const dx = dividerX(frame);
   const chaosW = Math.max(0, dx - 40);
@@ -138,30 +151,23 @@ export const FeatureGrammarDrillsNorwegianPwaM21: React.FC = () => {
           >
             <span style={{ fontSize: 22 }}>🎧</span> Mini Elvarika — Norwegian by Ear
           </div>
-          <StickyNote x={40} y={110} w={170} rotate={-6} text="gi → ga → gitt" opacity={b1} />
           <StickyNote x={230} y={115} w={170} rotate={4} text="se → så → sett" opacity={b1} />
           <StickyNote x={600} y={165} w={190} rotate={-3} text="dra → dro → dratt" opacity={b1} />
-          <StickyNote x={60} y={500} w={170} rotate={5} text="ta → tok → tatt" opacity={b1} />
           <StickyNote x={300} y={505} w={180} rotate={-4} text="gå → gikk → gått" opacity={b1} />
           <CaptionBand tone="danger" opacity={b1} text="Vocabulary lessons were solid — grammar drills were just random verbs." />
         </Group>
 
-        {/* ---------------- beat 2 : the real hub, no link to a book ---------------- */}
+        {/* two chaos stickies stay dim for the rest of the clip — the panel never goes empty */}
+        <StickyNote x={40} y={110} w={170} rotate={-6} text="gi → ga → gitt" opacity={chaosGhost} />
+        <StickyNote x={60} y={500} w={170} rotate={5} text="ta → tok → tatt" opacity={chaosGhost} />
+
+        {/* ---------------- beat 2 : auto-generated drills, no link to the book, no check ---------------- */}
         <Group opacity={b2} dy={interpolate(frame, [215, 231], [30, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp", easing: Easing.out(Easing.cubic) })}>
-          <LiveWindow
-            file={shots}
-            shot={HUB_SHOT}
-            title="vitalii.no/features"
-            from={215}
-            hold={158}
-            zoom={(t) => 1 + 0.14 * easeInOut(t)}
-            focus={{ x: 0.5, y: 0.4 }}
-            opacity={b2}
-            win={{ x: 50, y: 140, w: 560, h: 380 }}
-          />
-          <div style={{ position: "absolute", left: 150, top: 534, fontSize: 36, opacity: b2 }}>📘</div>
-          <div style={{ position: "absolute", left: 330, top: 534, fontSize: 36, opacity: b2 }}>✕</div>
-          <div style={{ position: "absolute", left: 510, top: 534, fontSize: 36, opacity: b2 }}>🧩</div>
+          <StatPill x={60} y={170} emoji="🎲" text="Auto-generated drills" tone="danger" opacity={b2} />
+          <div style={{ position: "absolute", left: 150, top: 226, fontSize: 32, fontWeight: 800, color: P.danger, opacity: b2 }}>✕</div>
+          <StatPill x={60} y={276} emoji="📘" text="My textbook — no link" tone="danger" opacity={b2} />
+          <div style={{ position: "absolute", left: 150, top: 332, fontSize: 32, fontWeight: 800, color: P.danger, opacity: b2 }}>✕</div>
+          <StatPill x={60} y={382} emoji="🚫" text="Nobody checks the Norwegian" tone="danger" opacity={b2} />
           <CaptionBand tone="danger" opacity={b2} text="No link to the textbook, and nobody checking if the Norwegian was right." />
         </Group>
 
@@ -173,16 +179,15 @@ export const FeatureGrammarDrillsNorwegianPwaM21: React.FC = () => {
             title="vitalii.no/features/…-m21"
             from={382}
             hold={168}
-            zoom={(t) => 1 + 0.1 * easeInOut(t)}
+            zoom={(t) => 2.0 + 0.2 * easeInOut(t)}
             focus={{ x: 0.5, y: 0.35 }}
             opacity={b3}
             win={{ x: 750, y: 140, w: 460, h: 380 }}
           />
           <CheckBadge x={1170} y={118} size={42} opacity={b3} scale={checkPop} />
-          <FilterChip x={990} y={536} text="Claude" icon="🤖" color={P.accent} scale={chipPop} opacity={Math.min(1, chipPop)} />
-          <div style={{ position: "absolute", left: 850, top: 582, width: 320, textAlign: "center", fontSize: 13, fontWeight: 600, color: P.muted, opacity: b3 }}>
-            reads every drill before it's saved
-          </div>
+          <FilterChip x={760} y={532} text="Claude" icon="🤖" color={P.accent} scale={chipPop} opacity={Math.min(1, chipPop)} />
+          <div style={{ position: "absolute", left: 905, top: 540, fontSize: 19, fontWeight: 700, color: P.ink, opacity: b3 }}>gå → ___</div>
+          <StatPill x={1030} y={524} emoji="✓" text="gikk" tone="success" opacity={Math.min(1, chipPop)} fontSize={16} />
           <CaptionBand tone="accent" opacity={b3} text="Drills now follow that same textbook, and Claude checks each one first." />
         </Group>
 
@@ -191,6 +196,9 @@ export const FeatureGrammarDrillsNorwegianPwaM21: React.FC = () => {
           <Panel x={560} y={140} w={660} h={380} tone="card" opacity={b4}>
             <div style={{ position: "absolute", left: 28, top: 18, fontSize: 15, fontWeight: 800, letterSpacing: 1, color: P.muted }}>
               grammar_blocks — reused before regenerated
+            </div>
+            <div style={{ position: "absolute", left: 28, top: 40, fontSize: 13, fontWeight: 600, color: P.muted, opacity: 0.85 }}>
+              (the explanation behind each drill, written once)
             </div>
             {ROWS.map((r, i) => {
               const t = seg(frame, 575 + i * 14, 591 + i * 14);
