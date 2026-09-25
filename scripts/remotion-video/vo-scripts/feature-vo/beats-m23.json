@@ -1,0 +1,7 @@
+{"id": "m23", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Ask for a lesson on a tricky word, and it used to repeat the same point every section."],
+ ["b2", "Now it maps distinct angles first, like a teacher outlining chapters, then writes one angle per section."],
+ ["b3", "Every earlier section gets read back first, so no sentence repeats."],
+ ["b4", "The AI even checks its own work, and rewrites automatically if a word lesson runs thin."],
+ ["b5", "That target word now shows up in at least 10 of every 16 lines."]
+]}

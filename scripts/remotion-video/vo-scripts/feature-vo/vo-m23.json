@@ -1,0 +1,56 @@
+{
+ "id": "m23",
+ "beat_durations": {
+  "b1": 5.256,
+  "b2": 6.48,
+  "b3": 4.536,
+  "b4": 5.784,
+  "b5": 4.776
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Ask for a lesson on a tricky word, and it used to repeat the same point every section.",
+   "start_s": 0.5,
+   "end_s": 5.756,
+   "start_f": 15,
+   "end_f": 173
+  },
+  {
+   "beat": "b2",
+   "text": "Now it maps distinct angles first, like a teacher outlining chapters, then writes one angle per section.",
+   "start_s": 6.056,
+   "end_s": 12.536,
+   "start_f": 182,
+   "end_f": 376
+  },
+  {
+   "beat": "b3",
+   "text": "Every earlier section gets read back first, so no sentence repeats.",
+   "start_s": 12.836,
+   "end_s": 17.372,
+   "start_f": 385,
+   "end_f": 521
+  },
+  {
+   "beat": "b4",
+   "text": "The AI even checks its own work, and rewrites automatically if a word lesson runs thin.",
+   "start_s": 17.672,
+   "end_s": 23.456,
+   "start_f": 530,
+   "end_f": 704
+  },
+  {
+   "beat": "b5",
+   "text": "That target word now shows up in at least 10 of every 16 lines.",
+   "start_s": 23.756,
+   "end_s": 28.532,
+   "start_f": 713,
+   "end_f": 856
+  }
+ ],
+ "total_s": 30.032,
+ "durationInFrames": 901,
+ "measured_track_s": 28.584,
+ "track": "/root/feature-demos/vo-m23/vo-m23.mp3"
+}

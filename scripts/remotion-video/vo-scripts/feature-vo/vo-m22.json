@@ -1,0 +1,56 @@
+{
+ "id": "m22",
+ "beat_durations": {
+  "b1": 4.992,
+  "b2": 7.848,
+  "b3": 2.64,
+  "b4": 8.208,
+  "b5": 4.128
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A robotic voice reading your lesson breaks the mood before the lesson even starts.",
+   "start_s": 0.5,
+   "end_s": 5.492,
+   "start_f": 15,
+   "end_f": 165
+  },
+  {
+   "beat": "b2",
+   "text": "mini.vitalii.no's Norwegian narration now runs on Google's Chirp 3 voices, closer to a real newsreader.",
+   "start_s": 5.792,
+   "end_s": 13.64,
+   "start_f": 174,
+   "end_f": 409
+  },
+  {
+   "beat": "b3",
+   "text": "But free voice quotas run dry some months.",
+   "start_s": 13.94,
+   "end_s": 16.58,
+   "start_f": 418,
+   "end_f": 497
+  },
+  {
+   "beat": "b4",
+   "text": "So instead of failing, a busy month just quietly drops that clip back to the older voice, like a stand-in stepping onto the stage.",
+   "start_s": 16.88,
+   "end_s": 25.088,
+   "start_f": 506,
+   "end_f": 753
+  },
+  {
+   "beat": "b5",
+   "text": "The good voice plays by default, and a rough month never means dead air.",
+   "start_s": 25.388,
+   "end_s": 29.516,
+   "start_f": 762,
+   "end_f": 885
+  }
+ ],
+ "total_s": 31.016,
+ "durationInFrames": 930,
+ "measured_track_s": 29.568,
+ "track": "/root/feature-demos/vo-m22/vo-m22.mp3"
+}
