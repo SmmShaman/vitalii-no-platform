@@ -1,0 +1,14 @@
+{
+  "id": "m22",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 120,
+      "scroll": [[0, 0], [60, 450], [119, 950]],
+      "mouse": [[0, 300, 200], [40, 560, 280], [80, 400, 320], [119, 600, 240]]
+    }
+  ]
+}

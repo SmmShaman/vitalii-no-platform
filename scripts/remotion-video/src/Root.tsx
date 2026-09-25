@@ -210,6 +210,7 @@ import { FeatureAppRemembersWhatAlreadyB46 } from "./compositions/feature-demos/
 import { FeatureInterviewCoachRunsOwnG03 } from "./compositions/feature-demos/FeatureInterviewCoachRunsOwnG03";
 import { FeatureGrammarDrillsNorwegianPwaM21 } from "./compositions/feature-demos/FeatureGrammarDrillsNorwegianPwaM21";
 import { FeatureMiniVitaliiNoTurnsM20 } from "./compositions/feature-demos/FeatureMiniVitaliiNoTurnsM20";
+import { FeatureMiniVitaliiNoUpgradesM22 } from "./compositions/feature-demos/FeatureMiniVitaliiNoUpgradesM22";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2059,6 +2060,16 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureMiniVitaliiNoTurnsM20"
         component={FeatureMiniVitaliiNoTurnsM20}
         durationInFrames={858}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+
+      <Composition
+        id="FeatureMiniVitaliiNoUpgradesM22"
+        component={FeatureMiniVitaliiNoUpgradesM22}
+        durationInFrames={930}
         fps={30}
         width={1280}
         height={720}
