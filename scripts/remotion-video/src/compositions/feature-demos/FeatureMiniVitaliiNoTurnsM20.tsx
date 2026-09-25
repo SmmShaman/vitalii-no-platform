@@ -164,40 +164,39 @@ export const FeatureMiniVitaliiNoTurnsM20: React.FC = () => {
           {INPUTS.map((it, i) => {
             const s = pop(212 + i * 30);
             return (
-              <div
-                key={it.text}
-                style={{
-                  position: "absolute",
-                  left: 650,
-                  top: 150 + i * 110,
-                  width: 520,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 16,
-                  opacity: Math.min(1, s),
-                  transform: `translateX(${(1 - Math.min(1, s)) * 24}px)`,
-                }}
-              >
-                <div style={{ fontSize: 30 }}>{it.emoji}</div>
-                <div style={{ flex: 1, fontSize: 21, fontWeight: 650, color: P.ink }}>{it.text}</div>
+              <Panel key={it.text} x={610} y={96 + i * 172} w={610} h={152} tone="danger" opacity={Math.min(1, s)}>
                 <div
                   style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: "50%",
-                    background: P.dangerBg,
-                    border: `1.5px solid ${P.dangerEdge}`,
-                    color: P.danger,
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 17,
-                    fontWeight: 800,
+                    height: "100%",
+                    gap: 26,
+                    padding: "0 32px",
+                    transform: `translateX(${(1 - Math.min(1, s)) * 24}px)`,
                   }}
                 >
-                  ✕
+                  <div style={{ fontSize: 54 }}>{it.emoji}</div>
+                  <div style={{ flex: 1, fontSize: 26, fontWeight: 650, color: P.ink }}>{it.text}</div>
+                  <div
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: "50%",
+                      background: P.dangerBg,
+                      border: `2px solid ${P.dangerEdge}`,
+                      color: P.danger,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 24,
+                      fontWeight: 800,
+                      flexShrink: 0,
+                    }}
+                  >
+                    ✕
+                  </div>
                 </div>
-              </div>
+              </Panel>
             );
           })}
           <CaptionBand y={636} text="Only pick from the list — never type your own" tone="card" fontSize={20} opacity={seg(frame, 320, 342)} />
@@ -237,21 +236,22 @@ export const FeatureMiniVitaliiNoTurnsM20: React.FC = () => {
 
         {/* ════ Beat 4 — a metaphor, drawn, slides up (not a crossfade) ════ */}
         <Group opacity={b4} dy={b4dy}>
-          <Panel x={650} y={210} w={244} h={150} tone="card" opacity={Math.min(1, pop(566))}>
-            <div style={{ padding: "20px 22px", fontFamily }}>
-              <div style={{ fontSize: 30 }}>📼</div>
-              <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1.6, color: P.muted, marginTop: 10 }}>BORROWED</div>
-              <div style={{ fontSize: 18, fontWeight: 650, color: P.ink, marginTop: 4, lineHeight: 1.3 }}>someone else's tapes</div>
+          <Panel x={610} y={140} w={260} h={340} tone="card" opacity={Math.min(1, pop(566))}>
+            <div style={{ padding: "32px 26px", fontFamily }}>
+              <div style={{ fontSize: 64 }}>📼</div>
+              <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1.6, color: P.muted, marginTop: 18 }}>BORROWED</div>
+              <div style={{ fontSize: 24, fontWeight: 650, color: P.ink, marginTop: 8, lineHeight: 1.35 }}>someone else's tapes</div>
             </div>
           </Panel>
-          <div style={{ position: "absolute", left: 906, top: 268, fontSize: 30, fontWeight: 700, color: P.muted, opacity: Math.min(1, pop(586)) }}>→</div>
-          <Panel x={962} y={210} w={244} h={150} tone="success" opacity={Math.min(1, pop(596))}>
-            <div style={{ padding: "20px 22px", fontFamily }}>
-              <div style={{ fontSize: 30 }}>🎤</div>
-              <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: 1.6, color: P.muted, marginTop: 10 }}>YOUR OWN</div>
-              <div style={{ fontSize: 18, fontWeight: 650, color: P.success, marginTop: 4, lineHeight: 1.3 }}>recorded for this word</div>
+          <div style={{ position: "absolute", left: 875, top: 288, fontSize: 44, fontWeight: 700, color: P.muted, opacity: Math.min(1, pop(586)) }}>→</div>
+          <Panel x={940} y={140} w={260} h={340} tone="success" opacity={Math.min(1, pop(596))}>
+            <div style={{ padding: "32px 26px", fontFamily }}>
+              <div style={{ fontSize: 64 }}>🎤</div>
+              <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 1.6, color: P.muted, marginTop: 18 }}>YOUR OWN</div>
+              <div style={{ fontSize: 24, fontWeight: 650, color: P.success, marginTop: 8, lineHeight: 1.35 }}>recorded for this word</div>
             </div>
           </Panel>
+          <CaptionBand y={636} text="Borrowed recordings become your own voice, word by word" tone="card" fontSize={20} opacity={seg(frame, 610, 632)} />
         </Group>
 
         {/* ════ Beat 5 — the result, held to the end, never the page or the hub ════ */}

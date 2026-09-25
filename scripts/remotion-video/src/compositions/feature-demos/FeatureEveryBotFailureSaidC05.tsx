@@ -363,39 +363,39 @@ export const FeatureEveryBotFailureSaidC05: React.FC = () => {
 
       {/* beat 3 — three distinct causes, funneled into one output */}
       <Group opacity={b3} dy={b3ExitY}>
-        <Panel x={140} y={300} w={230} h={130} tone="card">
-          <div style={{ padding: 14, fontFamily, fontSize: 13, fontWeight: 800, color: B.muted, letterSpacing: 1 }}>
+        <Panel x={90} y={220} w={290} h={220} tone="card">
+          <div style={{ padding: 20, fontFamily, fontSize: 15, fontWeight: 800, color: B.muted, letterSpacing: 1 }}>
             RAW ERROR TEXT
           </div>
-          <div style={{ padding: "6px 14px", fontFamily, fontSize: 13, fontWeight: 600, color: B.muted }}>
+          <div style={{ padding: "8px 20px", fontFamily, fontSize: 16, fontWeight: 600, color: B.muted, lineHeight: 1.4 }}>
             three distinct codes, surfaced above
           </div>
         </Panel>
-        <FlowArrow x={390} y={355} len={130} color={B.danger} progress={c3Arrow1} />
-        <Panel x={540} y={330} w={170} h={90} tone="danger" opacity={c3Catch}>
+        <FlowArrow x={400} y={330} len={150} color={B.danger} progress={c3Arrow1} />
+        <Panel x={570} y={265} w={200} h={140} tone="danger" opacity={c3Catch}>
           <div
             style={{
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               height: "100%",
-              fontSize: 16,
+              fontSize: 19,
               fontWeight: 800,
               color: B.danger,
               fontFamily,
               textAlign: "center",
-              padding: "0 8px",
+              padding: "0 14px",
             }}
           >
             ✕ one fallback for everything
           </div>
         </Panel>
-        <FlowArrow x={730} y={365} len={90} color={B.border} progress={c3Arrow2 * 0.4} />
-        <Panel x={830} y={300} w={280} h={130} tone="card" opacity={c3BotSays}>
-          <div style={{ padding: 14, fontFamily, fontSize: 13, fontWeight: 800, color: B.muted, letterSpacing: 1 }}>
+        <FlowArrow x={790} y={330} len={110} color={B.border} progress={c3Arrow2 * 0.4} />
+        <Panel x={920} y={220} w={270} h={220} tone="card" opacity={c3BotSays}>
+          <div style={{ padding: 20, fontFamily, fontSize: 15, fontWeight: 800, color: B.muted, letterSpacing: 1 }}>
             BOT SAYS
           </div>
-          <div style={{ padding: "4px 14px", fontFamily, fontSize: 19, color: B.danger, fontWeight: 800 }}>
+          <div style={{ padding: "8px 20px", fontFamily, fontSize: 21, color: B.danger, fontWeight: 800, lineHeight: 1.35 }}>
             ⚠ Processing error — no matter which one
           </div>
         </Panel>
