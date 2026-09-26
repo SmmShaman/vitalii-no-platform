@@ -146,22 +146,15 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
       <div style={{ position: "absolute", inset: 0, fontFamily }}>
         <LightBg />
 
-        {/* ════ Persistent top-right wordmark — never fades, keeps the top row filled ════ */}
-        <div
-          style={{
-            position: "absolute",
-            left: 970,
-            top: 32,
-            width: 270,
-            textAlign: "right",
-            fontSize: 17,
-            fontWeight: 700,
-            letterSpacing: 1.8,
-            color: P.muted,
-            opacity: 0.85,
-          }}
-        >
-          🎧 MINI ELVARIKA
+        {/* ════ Persistent brand block — never fades, keeps the product identity on
+             screen the whole clip (a lone beat-1 plate was easy for a viewer to miss) ════ */}
+        <div style={{ position: "absolute", left: 900, top: 14, width: 340, textAlign: "right" }}>
+          <div style={{ fontSize: 17, fontWeight: 700, letterSpacing: 1.8, color: P.muted, opacity: 0.85 }}>
+            🎧 MINI ELVARIKA
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 600, color: P.accent, opacity: 0.8, marginTop: 2 }}>
+            Norwegian lessons, read aloud
+          </div>
         </div>
 
         {/* ════ THE DECK — archetype 3, alive for the whole clip ════ */}
@@ -202,12 +195,24 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
 
         {/* ════ Beat 1 — product plate + the real features hub, deck still a pile ════ */}
         <Group opacity={b1}>
-          <Panel x={40} y={30} w={320} h={116} tone="card" opacity={1}>
+          <Panel x={40} y={30} w={340} h={150} tone="card" opacity={1}>
             <div style={{ padding: "16px 20px", fontFamily }}>
               <div style={{ fontSize: 20, fontWeight: 800, color: P.ink }}>Mini Elvarika</div>
               <div style={{ fontSize: 15, fontWeight: 700, color: P.accent, marginTop: 2 }}>Norwegian by Ear</div>
               <div style={{ fontSize: 13.5, fontWeight: 500, color: P.muted, marginTop: 6, lineHeight: 1.35 }}>
                 A personal listening app — pick a word or topic, get a narrated lesson
+              </div>
+              <div
+                style={{
+                  fontSize: 12.5,
+                  fontStyle: "italic",
+                  color: P.ink,
+                  marginTop: 10,
+                  paddingTop: 8,
+                  borderTop: `1px solid ${P.border}`,
+                }}
+              >
+                🔇 today's lesson: "Jeg går til butikken." — read in the same flat voice every time
               </div>
             </div>
           </Panel>
@@ -222,7 +227,7 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
             opacity={1}
             win={{ x: 800, y: 340, w: 440, h: 310 }}
           />
-          <StatPill x={64} y={168} emoji="🤖" text="same robotic voice, every lesson" tone="danger" fontSize={16} opacity={seg(frame, 40, 62)} />
+          <StatPill x={64} y={198} emoji="🔇" text="same robotic voice, every lesson" tone="danger" fontSize={16} opacity={seg(frame, 40, 62)} />
           <CaptionBand y={664} text="A robotic voice broke the mood before the lesson even started" tone="card" fontSize={20} opacity={seg(frame, 60, 82)} />
         </Group>
 
@@ -233,7 +238,36 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
             style={{
               position: "absolute",
               left: 64,
-              top: 96,
+              top: 78,
+              fontSize: 13,
+              fontWeight: 600,
+              color: P.muted,
+              maxWidth: 420,
+              lineHeight: 1.3,
+              opacity: seg(frame, 220, 242),
+            }}
+          >
+            Chirp 3 = Google Cloud's studio-quality text-to-speech voices
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: 64,
+              top: 112,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: 0.8,
+              color: P.muted,
+              opacity: seg(frame, 236, 258),
+            }}
+          >
+            THE ACTUAL CODE CHANGE
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: 64,
+              top: 130,
               padding: "9px 16px",
               borderRadius: 10,
               background: P.chipBg,
@@ -276,19 +310,20 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
         <Group opacity={b4} dy={b4dy}>
           <Group opacity={logPhase}>
             <LogWindow
-              title="mini-elvarika-runner"
+              title="Mini Elvarika: voice fallback"
               lines={[
                 { text: "Chirp 3 quota check…", tone: "muted" },
                 { text: "month limit reached", tone: "danger" },
-                { text: "fallback → previous voice engine", tone: "accent" },
+                { text: "fallback → older voice", tone: "accent" },
+                { text: "(the voice before Chirp 3)", tone: "muted" },
                 { text: "clip rendered anyway", tone: "success" },
                 { text: "no failure, no dead air", tone: "success" },
               ]}
-              from={628}
-              every={20}
+              from={620}
+              every={18}
               opacity={1}
-              win={{ x: 900, y: 150, w: 340, h: 380 }}
-              fontSize={17}
+              win={{ x: 840, y: 130, w: 420, h: 400 }}
+              fontSize={20}
             />
           </Group>
           <CaptionBand y={664} text="A busy month drops that clip to the older voice, like a stand-in stepping on stage" tone="card" fontSize={20} opacity={seg(frame, 560, 582)} />
@@ -296,6 +331,7 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
 
         {/* ════ Beat 5 — deck settled: 4 green, 2 amber-but-checked, holds to the end ════ */}
         <Group opacity={b5}>
+          <StatPill x={64} y={40} emoji="🔊" text="Chirp 3 — plays automatically" tone="success" fontSize={17} opacity={seg(frame, 790, 812)} />
           <CaptionBand y={664} text="The good voice plays by default — a rough month never means dead air" tone="card" fontSize={20} opacity={seg(frame, 800, 822)} />
         </Group>
       </div>
