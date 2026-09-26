@@ -38,7 +38,7 @@
  * "previous voice" / "stand-in" stands in for it on purpose.
  */
 import React from "react";
-import { useCurrentFrame, interpolateColors } from "remotion";
+import { useCurrentFrame, interpolate, interpolateColors } from "remotion";
 import { MOODS, PaletteProvider } from "./bright-theme";
 import { LightBg, Group, Panel, StatPill, CheckBadge, CaptionBand, seg, fontFamily } from "./bright-primitives";
 import { LiveWindow, LogWindow } from "./live-primitives";
@@ -59,9 +59,9 @@ const CARD_W = 188;
 const CARD_H = 212;
 const GX = (col: number) => 316 + col * 230;
 const GY = (row: number) => 132 + row * 245;
-const PILE_X = (i: number) => 546 + (i - 2.5) * 10;
-const PILE_Y = (i: number) => 254 + (i - 2.5) * 8;
-const PILE_ROT = (i: number) => -14 + i * 5;
+const PILE_X = (i: number) => 546 + (i - 2.5) * 24;
+const PILE_Y = (i: number) => 254 + (i - 2.5) * 18;
+const PILE_ROT = (i: number) => -22 + i * 8;
 
 const SWAP_START = (i: number) => 540 + (i - 4) * 90; // only meaningful for i = 4, 5
 
@@ -91,6 +91,13 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
   const logPhase = Math.min(seg(frame, 590, 625), 1 - seg(frame, 715, 748));
   const deckShift = logPhase * -150;
   const deckScale = 1 - logPhase * 0.16;
+  // Beats 2-3 show the grid alone against empty margins — blow it up around its
+  // own center while nothing else is happening, back to 1 well before beat 4's
+  // shrink (590) or the swap dip (SWAP_START) ever begin.
+  const gridBoost = interpolate(frame, [178, 205, 480, 505], [1, 1.3, 1.3, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
 
   const baseBg = interpolateColors(frame, [165, 185], [P.dangerBg, P.successBg]);
   const baseEdge = interpolateColors(frame, [165, 185], [P.dangerEdge, P.successEdge]);
@@ -120,6 +127,10 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
     const swapT = affected ? seg(frame, swapStart, swapStart + 70) : 0;
     const dipY = affected ? Math.sin(Math.min(Math.max(swapT, 0), 1) * Math.PI) * 90 : 0;
     const dipScale = affected ? 1 - 0.06 * Math.sin(Math.min(Math.max(swapT, 0), 1) * Math.PI) : 1;
+    // While a card is still in the pile (t<1) it reads bigger — the deck is the
+    // archetype's object and must dominate beat 1's frame. Fades to 1 by the
+    // time it lands in the grid, so beats 2-5 are untouched.
+    const pileBoost = 1 + 0.3 * (1 - t);
 
     const bg = affected && frame >= 424 ? warnBg : baseBg;
     const edge = affected && frame >= 424 ? warnEdge : baseEdge;
@@ -127,7 +138,7 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
     const label = cardLabel(i);
     const checkOn = affected ? seg(frame, 770, 792) : 0;
 
-    return { i, x, y: y + dipY, rot, scale: dipScale, bg, edge, text, label, checkOn };
+    return { i, x, y: y + dipY, rot, scale: dipScale * pileBoost, bg, edge, text, label, checkOn };
   });
 
   return (
@@ -158,7 +169,7 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
           style={{
             position: "absolute",
             inset: 0,
-            transform: `translateX(${deckShift}px) scale(${deckScale})`,
+            transform: `translateX(${deckShift}px) scale(${deckScale * gridBoost})`,
             transformOrigin: "640px 360px",
           }}
         >
@@ -209,7 +220,7 @@ export const FeatureMiniVitaliiNoUpgradesM22: React.FC = () => {
             zoom={(t) => 1 + 0.1 * t}
             focus={{ x: 0.5, y: 0.35 }}
             opacity={1}
-            win={{ x: 830, y: 430, w: 400, h: 230 }}
+            win={{ x: 800, y: 340, w: 440, h: 310 }}
           />
           <StatPill x={64} y={168} emoji="🤖" text="same robotic voice, every lesson" tone="danger" fontSize={16} opacity={seg(frame, 40, 62)} />
           <CaptionBand y={664} text="A robotic voice broke the mood before the lesson even started" tone="card" fontSize={20} opacity={seg(frame, 60, 82)} />
