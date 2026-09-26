@@ -15,6 +15,18 @@ const nextConfig: NextConfig = {
       },
     ]
   },
+  async redirects() {
+    return [
+      {
+        // www.vitalii.no reaches the VPS through the same tunnel; send it to the apex
+        // (none of the Cloudflare tokens can edit Redirect Rules)
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.vitalii.no' }],
+        destination: 'https://vitalii.no/:path*',
+        permanent: true,
+      },
+    ]
+  },
   images: {
     // Optimized breakpoints for mobile-first responsive images
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
