@@ -653,11 +653,16 @@ brv status
 
 ## Deployment
 
-**Production:**
+**Production (since 2026-09-26 — VPS, not Netlify):**
 1. Push to `main` branch
-2. GitHub Actions runs `deploy.yml`
-3. Netlify builds and deploys
-4. If Edge Functions changed, `deploy-supabase.yml` runs
+2. GitHub Actions runs `deploy-vps.yml` → builds the Next.js standalone server → artifact `site-standalone`
+3. On the VPS `vitalii-site-deploy.timer` (every 2 min) pulls it into `/opt/vitalii-site/releases/<sha>`,
+   restarts `vitalii-site.service` (:3100), health-checks, rolls back on failure
+4. cloudflared tunnel `b5c0ecc5` serves `vitalii.no` + `www.vitalii.no` → `localhost:3100`
+5. If Edge Functions changed, `deploy-supabase.yml` runs
+
+Why: Netlify Free blocked the whole account on 2026-09-26 (function invocations exhausted by crawler SSR).
+`deploy.yml` (Netlify) is manual-only now. Details: `deploy/vps/README.md`.
 
 **Manual Deployment:**
 ```bash
