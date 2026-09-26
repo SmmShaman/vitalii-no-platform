@@ -1,19 +1,9 @@
 name: Deploy to Netlify
 
+# Retired 2026-09-26: the site moved to the VPS (deploy-vps.yml, deploy/vps/).
+# Netlify Free blocked the account for exhausted function invocations; kept for
+# a manual fallback only.
 on:
-  push:
-    branches:
-      - main
-    # The nightly feature-clip factory pushes 2-3 commits under scripts/ every
-    # night (2026-09-16: three site deploys for zero site changes). The site
-    # build does not read scripts/, so those pushes must not redeploy it.
-    paths-ignore:
-      - 'scripts/**'
-  pull_request:
-    branches:
-      - main
-    paths-ignore:
-      - 'scripts/**'
   workflow_dispatch:
 
 env:

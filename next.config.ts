@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
   },
   // Suppress hydration warnings from browser extensions
   reactStrictMode: true,
-  // Optimize for Netlify
+  // Standalone server: runs on the VPS as vitalii-site.service (deploy/vps/)
   output: 'standalone',
   // Remove X-Powered-By header
   poweredByHeader: false,

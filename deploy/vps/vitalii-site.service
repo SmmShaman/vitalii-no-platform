@@ -1,0 +1,20 @@
+[Unit]
+Description=vitalii.no Next.js site (standalone build)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=stuar
+WorkingDirectory=/opt/vitalii-site/current
+Environment=NODE_ENV=production
+Environment=PORT=3100
+Environment=HOSTNAME=127.0.0.1
+Environment=NEXT_TELEMETRY_DISABLED=1
+Environment=NODE_OPTIONS=--max-old-space-size=384
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+MemoryMax=700M
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+[Unit]
+Description=Pull the newest vitalii.no build from GitHub Actions
+
+[Service]
+Type=oneshot
+ExecStart=/opt/vitalii-site/deploy.sh
