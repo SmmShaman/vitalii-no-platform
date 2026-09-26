@@ -1,0 +1,7 @@
+{"id": "m24", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "The grammar lesson never matched what I'd just heard - it just came from wherever the textbook was."],
+  ["b2", "Worse, it explained the rule, then jumped to a question - I'd end up reading the answer, not recalling it."],
+  ["b3", "Now Claude builds the grammar break from the exact sentences I just heard."],
+  ["b4", "It names my actual mistake out loud, contrasts it with the right form, then pauses before the answer plays."],
+  ["b5", "That pause is a real 2.5 seconds - long enough to actually try to remember."]
+]}

@@ -1,0 +1,56 @@
+{
+ "id": "m25",
+ "beat_durations": {
+  "b1": 4.488,
+  "b2": 5.952,
+  "b3": 5.232,
+  "b4": 6.24,
+  "b5": 4.584
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I wanted to drill one word - but had to sit through an entire story to reach it.",
+   "start_s": 0.5,
+   "end_s": 4.988,
+   "start_f": 15,
+   "end_f": 150
+  },
+  {
+   "beat": "b2",
+   "text": "Every sentence buried it in a narrative, and uploading a document just read the whole file aloud.",
+   "start_s": 5.288,
+   "end_s": 11.24,
+   "start_f": 159,
+   "end_f": 337
+  },
+  {
+   "beat": "b3",
+   "text": "Now a new lesson format builds a pool of just the words that matter, using Claude.",
+   "start_s": 11.54,
+   "end_s": 16.772,
+   "start_f": 346,
+   "end_f": 503
+  },
+  {
+   "beat": "b4",
+   "text": "Like flashcards instead of a novel - each word stands alone, with its own checked sentences.",
+   "start_s": 17.072,
+   "end_s": 23.312,
+   "start_f": 512,
+   "end_f": 699
+  },
+  {
+   "beat": "b5",
+   "text": "Ask for the 20 most common adverbs, and that's exactly what you get to drill.",
+   "start_s": 23.612,
+   "end_s": 28.196,
+   "start_f": 708,
+   "end_f": 846
+  }
+ ],
+ "total_s": 29.696,
+ "durationInFrames": 891,
+ "measured_track_s": 28.248,
+ "track": "/root/feature-demos/vo-m25/vo-m25.mp3"
+}

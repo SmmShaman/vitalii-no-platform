@@ -1,0 +1,56 @@
+{
+ "id": "m24",
+ "beat_durations": {
+  "b1": 5.232,
+  "b2": 6.432,
+  "b3": 4.44,
+  "b4": 6.432,
+  "b5": 5.52
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "The grammar lesson never matched what I'd just heard - it just came from wherever the textbook was.",
+   "start_s": 0.5,
+   "end_s": 5.732,
+   "start_f": 15,
+   "end_f": 172
+  },
+  {
+   "beat": "b2",
+   "text": "Worse, it explained the rule, then jumped to a question - I'd end up reading the answer, not recalling it.",
+   "start_s": 6.032,
+   "end_s": 12.464,
+   "start_f": 181,
+   "end_f": 374
+  },
+  {
+   "beat": "b3",
+   "text": "Now Claude builds the grammar break from the exact sentences I just heard.",
+   "start_s": 12.764,
+   "end_s": 17.204,
+   "start_f": 383,
+   "end_f": 516
+  },
+  {
+   "beat": "b4",
+   "text": "It names my actual mistake out loud, contrasts it with the right form, then pauses before the answer plays.",
+   "start_s": 17.504,
+   "end_s": 23.936,
+   "start_f": 525,
+   "end_f": 718
+  },
+  {
+   "beat": "b5",
+   "text": "That pause is a real 2.5 seconds - long enough to actually try to remember.",
+   "start_s": 24.236,
+   "end_s": 29.756,
+   "start_f": 727,
+   "end_f": 893
+  }
+ ],
+ "total_s": 31.256,
+ "durationInFrames": 938,
+ "measured_track_s": 29.808,
+ "track": "/root/feature-demos/vo-m24/vo-m24.mp3"
+}
