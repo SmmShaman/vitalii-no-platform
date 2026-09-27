@@ -210,7 +210,9 @@ import { FeatureAppRemembersWhatAlreadyB46 } from "./compositions/feature-demos/
 import { FeatureInterviewCoachRunsOwnG03 } from "./compositions/feature-demos/FeatureInterviewCoachRunsOwnG03";
 import { FeatureGrammarDrillsNorwegianPwaM21 } from "./compositions/feature-demos/FeatureGrammarDrillsNorwegianPwaM21";
 import { FeatureMiniVitaliiNoTurnsM20 } from "./compositions/feature-demos/FeatureMiniVitaliiNoTurnsM20";
+import { FeatureNewLessonFormatTurnsM25 } from "./compositions/feature-demos/FeatureNewLessonFormatTurnsM25";
 import { FeatureMiniVitaliiNoUpgradesM22 } from "./compositions/feature-demos/FeatureMiniVitaliiNoUpgradesM22";
+import { FeatureGrammarDrillsTeachWordsM24 } from "./compositions/feature-demos/FeatureGrammarDrillsTeachWordsM24";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2039,6 +2041,15 @@ export const RemotionRoot: React.FC = () => {
       />
 
       <Composition
+        id="FeatureNewLessonFormatTurnsM25"
+        component={FeatureNewLessonFormatTurnsM25}
+        durationInFrames={891}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
         id="FeatureInterviewCoachRunsOwnG03"
         component={FeatureInterviewCoachRunsOwnG03}
         durationInFrames={930}
@@ -2070,6 +2081,15 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureMiniVitaliiNoUpgradesM22"
         component={FeatureMiniVitaliiNoUpgradesM22}
         durationInFrames={930}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureGrammarDrillsTeachWordsM24"
+        component={FeatureGrammarDrillsTeachWordsM24}
+        durationInFrames={938}
         fps={30}
         width={1280}
         height={720}
