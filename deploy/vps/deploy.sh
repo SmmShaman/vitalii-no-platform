@@ -62,5 +62,17 @@ fi
 
 echo "deployed $sha (run $run_id)"
 
+# Cloudflare caches HTML with a year-long stale-while-revalidate, so without a
+# purge visitors keep getting the previous build's page. Credentials live in a
+# root-only file on the VPS (CF_API_TOKEN, CF_ZONE_ID); skipped when absent.
+if [ -r /etc/vitalii-site/cf-purge.env ]; then
+  # shellcheck disable=SC1091
+  . /etc/vitalii-site/cf-purge.env
+  curl -fsS -X POST -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" \
+    "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+    -d '{"hosts":["vitalii.no","www.vitalii.no"]}' >/dev/null \
+    && echo "purged Cloudflare cache" || echo "Cloudflare purge failed (site is deployed)"
+fi
+
 # Keep the three newest releases (current is always the newest)
 ls -1dt "$BASE"/releases/*/ | tail -n +4 | xargs -r rm -rf
