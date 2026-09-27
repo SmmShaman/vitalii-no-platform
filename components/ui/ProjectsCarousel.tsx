@@ -360,8 +360,10 @@ export const ProjectsCarousel = ({ projects, onCardClick, backgroundText, onInde
                     {/* Content */}
                     <div className="relative h-full flex flex-col justify-end p-1.5 sm:p-2">
                       <h5
-                        className="font-bold text-white leading-tight line-clamp-2"
+                        className="font-bold leading-tight line-clamp-2"
                         style={{
+                          // Inline colour: the light theme remaps .text-white to dark text
+                          color: '#fff',
                           fontSize: 'clamp(0.6rem, 1.2vw, 0.85rem)',
                           textShadow: '0 1px 3px rgba(0, 0, 0, 0.9)',
                         }}
