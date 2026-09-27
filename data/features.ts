@@ -175,11 +175,11 @@ export const projects: ProjectInfo[] = [
     color: { bg: 'bg-red-500/20', text: 'text-red-400' },
   },
   {
-    id: 'project_23mai',
+    id: 'elvarika',
     name: {
-      en: 'Elvarika Language Learning',
-      no: 'Elvarika Språklæring',
-      ua: 'Elvarika Мовна Платформа',
+      en: 'Elvarika — Your Text Becomes a Language Lesson',
+      no: 'Elvarika — Teksten din blir en språktime',
+      ua: 'Elvarika — твій текст стає уроком мови',
     },
     description: {
       en: 'AI language learning platform for immigrants in Norway',
@@ -187,7 +187,7 @@ export const projects: ProjectInfo[] = [
       ua: 'AI-платформа вивчення мов для іммігрантів у Норвегії',
     },
     badge: 'E',
-    color: { bg: 'bg-yellow-500/20', text: 'text-yellow-400' },
+    color: { bg: 'bg-violet-500/20', text: 'text-violet-400' },
   },
   {
     id: 'boytasks',
