@@ -222,7 +222,7 @@ export const FeatureGrammarDrillsTeachWordsM24: React.FC = () => {
           <LiveWindow
             file={shots as any}
             shot={PAGE_SHOT}
-            title="vitalii.no/features"
+            title="vitalii.no/features/…-m24"
             from={45}
             hold={100}
             zoom={(t) => 1 + 0.1 * t}
