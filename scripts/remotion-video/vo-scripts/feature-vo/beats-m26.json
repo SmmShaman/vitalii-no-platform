@@ -1,0 +1,7 @@
+{"id": "m26", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every 15 seconds, all night, a process on my server asked: anything to do yet? Almost always, no."],
+ ["b2", "That habit burned CPU and filled logs on an already-busy machine."],
+ ["b3", "So instead of asking, it waits to be told. Cloudflare sends a quiet signal the moment real work shows up."],
+ ["b4", "Now it just waits — asleep until that signal, or up to 15 minutes, whichever comes first."],
+ ["b5", "An idle night used to mean thousands of requests. Now it's about 100."]
+]}

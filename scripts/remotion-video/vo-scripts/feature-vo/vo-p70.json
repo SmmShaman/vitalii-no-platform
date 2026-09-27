@@ -1,0 +1,56 @@
+{
+ "id": "p70",
+ "beat_durations": {
+  "b1": 5.232,
+  "b2": 6.96,
+  "b3": 4.632,
+  "b4": 5.4,
+  "b5": 5.424
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One morning the whole site vanished. My hosting account had been blocked, without warning.",
+   "start_s": 0.5,
+   "end_s": 5.732,
+   "start_f": 15,
+   "end_f": 172
+  },
+  {
+   "beat": "b2",
+   "text": "Netlify had cut me off. Crawlers indexing the site had quietly burned through the account's entire monthly quota.",
+   "start_s": 6.032,
+   "end_s": 12.992,
+   "start_f": 181,
+   "end_f": 390
+  },
+  {
+   "beat": "b3",
+   "text": "So I stopped renting space and moved the site onto a server I fully control.",
+   "start_s": 13.292,
+   "end_s": 17.924,
+   "start_f": 399,
+   "end_f": 538
+  },
+  {
+   "beat": "b4",
+   "text": "Now every push builds itself, tests itself healthy, and goes live on its own.",
+   "start_s": 18.224,
+   "end_s": 23.624,
+   "start_f": 547,
+   "end_f": 709
+  },
+  {
+   "beat": "b5",
+   "text": "If a release breaks, it rolls itself back \u2014 the whole thing redeploys in 2 minutes.",
+   "start_s": 23.924,
+   "end_s": 29.348,
+   "start_f": 718,
+   "end_f": 880
+  }
+ ],
+ "total_s": 30.848,
+ "durationInFrames": 925,
+ "measured_track_s": 29.4,
+ "track": "/root/feature-demos/vo-p70/vo-p70.mp3"
+}

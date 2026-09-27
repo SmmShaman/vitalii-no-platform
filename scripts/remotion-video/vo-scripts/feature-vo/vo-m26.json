@@ -1,0 +1,56 @@
+{
+ "id": "m26",
+ "beat_durations": {
+  "b1": 7.344,
+  "b2": 4.584,
+  "b3": 6.6,
+  "b4": 6.192,
+  "b5": 4.44
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every 15 seconds, all night, a process on my server asked: anything to do yet? Almost always, no.",
+   "start_s": 0.5,
+   "end_s": 7.844,
+   "start_f": 15,
+   "end_f": 235
+  },
+  {
+   "beat": "b2",
+   "text": "That habit burned CPU and filled logs on an already-busy machine.",
+   "start_s": 8.144,
+   "end_s": 12.728,
+   "start_f": 244,
+   "end_f": 382
+  },
+  {
+   "beat": "b3",
+   "text": "So instead of asking, it waits to be told. Cloudflare sends a quiet signal the moment real work shows up.",
+   "start_s": 13.028,
+   "end_s": 19.628,
+   "start_f": 391,
+   "end_f": 589
+  },
+  {
+   "beat": "b4",
+   "text": "Now it just waits \u2014 asleep until that signal, or up to 15 minutes, whichever comes first.",
+   "start_s": 19.928,
+   "end_s": 26.12,
+   "start_f": 598,
+   "end_f": 784
+  },
+  {
+   "beat": "b5",
+   "text": "An idle night used to mean thousands of requests. Now it's about 100.",
+   "start_s": 26.42,
+   "end_s": 30.86,
+   "start_f": 793,
+   "end_f": 926
+  }
+ ],
+ "total_s": 32.36,
+ "durationInFrames": 971,
+ "measured_track_s": 30.912,
+ "track": "/root/feature-demos/vo-m26/vo-m26.mp3"
+}

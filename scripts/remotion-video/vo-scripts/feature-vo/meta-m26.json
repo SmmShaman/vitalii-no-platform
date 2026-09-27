@@ -1,0 +1,7 @@
+{
+  "id": "m26",
+  "file": "yt-feature-m26.mp4",
+  "title": "The Runner Stopped Polling — Now It Waits for a Signal | vitalii.no",
+  "description": "A background process on my VPS checked a topics queue every 15 seconds, all night, every night, whether anyone was using the app or not — on a machine that already runs several other services sharing the same limited RAM and disk.\n\nWhen a topic is submitted now, a Cloudflare Worker sends a small request to an nginx endpoint on the media server, which checks a shared secret and forwards a wake signal to a tiny listener the Python runner keeps open in the background. The runner's main loop waits on that signal for up to 15 minutes instead of polling every 15 seconds, and if a claim attempt ever fails, it backs off exponentially instead of hammering the queue again right away.\n\nAn idle night now costs roughly 100 requests instead of thousands, while a real submission still gets an instant response through the wake signal.\n\n🔗 Full write-up: https://vitalii.no/features/the-runner-stopped-asking-every-15-seconds-now-it-waits-until-theres-actually-so-m26\n📚 All 293 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#python #cloudflareworkers #automation #devops #backend",
+  "tags": ["background job polling", "event driven architecture", "cloudflare workers", "python threading", "docker", "nginx", "resource efficiency", "exponential backoff", "wake signal", "server optimization", "vitalii berbeha"]
+}

@@ -1,0 +1,7 @@
+{"id": "p70", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "One morning the whole site vanished. My hosting account had been blocked, without warning."],
+ ["b2", "Netlify had cut me off. Crawlers indexing the site had quietly burned through the account's entire monthly quota."],
+ ["b3", "So I stopped renting space and moved the site onto a server I fully control."],
+ ["b4", "Now every push builds itself, tests itself healthy, and goes live on its own."],
+ ["b5", "If a release breaks, it rolls itself back — the whole thing redeploys in 2 minutes."]
+]}
