@@ -319,7 +319,7 @@ export const ProjectsCarousel = ({ projects, onCardClick, backgroundText, onInde
                     exit={{ opacity: 0, scale: 0.5 }}
                     transition={{
                       duration: 0.4,
-                      delay: index * 0.05,
+                      delay: index * 0.015,
                       ease: 'backOut'
                     }}
                     whileHover={{
@@ -349,21 +349,22 @@ export const ProjectsCarousel = ({ projects, onCardClick, backgroundText, onInde
                       />
                     )}
 
-                    {/* Gradient overlay — only at the bottom, just enough for title legibility */}
+                    {/* Dark bottom band — theme-independent, so the white title reads on any cover */}
                     <div
                       className="absolute inset-0"
                       style={{
-                        background: project.image
-                          ? `linear-gradient(to top, rgb(var(--accent-brand-dark) / 0.75) 0%, transparent 40%)`
-                          : `linear-gradient(to top, rgb(var(--accent-brand-dark) / 0.56) 0%, transparent 60%)`,
+                        background: `linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.55) 35%, transparent 65%)`,
                       }}
                     />
 
                     {/* Content */}
                     <div className="relative h-full flex flex-col justify-end p-1.5 sm:p-2">
                       <h5
-                        className="font-bold text-content leading-tight line-clamp-2 drop-shadow-md"
-                        style={{ fontSize: 'clamp(0.6rem, 1.2vw, 0.85rem)' }}
+                        className="font-bold text-white leading-tight line-clamp-2"
+                        style={{
+                          fontSize: 'clamp(0.6rem, 1.2vw, 0.85rem)',
+                          textShadow: '0 1px 3px rgba(0, 0, 0, 0.9)',
+                        }}
                       >
                         {project.title}
                       </h5>

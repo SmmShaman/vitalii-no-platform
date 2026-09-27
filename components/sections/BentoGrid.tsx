@@ -119,7 +119,6 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
   const cardRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
   const mouseLeaveTimeoutRef = useRef<number | null>(null);
-    const projectsHoverTimeoutRef = useRef<number | null>(null);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
 
   // Use the exported neonColors
@@ -851,18 +850,10 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
                           debugLog(`🐭 MOUSE ENTER: ${section.id}`);
                           startTransition(() => setHoveredSection(section.id));
 
-                          // Projects: Start 3-second timer for explosion animation
+                          // Projects: explode into the project grid immediately on hover
                           if (section.id === 'projects') {
-                            debugLog(`⏱️ PROJECTS: Запускаю таймер 3 секунди для explosion`);
-                            // Clear any existing timer
-                            if (projectsHoverTimeoutRef.current) {
-                              clearTimeout(projectsHoverTimeoutRef.current);
-                            }
-                            projectsHoverTimeoutRef.current = window.setTimeout(() => {
-                              debugLog(`💥 PROJECTS: 3 секунди минуло - explosion!`);
-                              setIsProjectsExploding(true);
-                              projectsHoverTimeoutRef.current = null;
-                            }, 3000);
+                            debugLog(`💥 PROJECTS: explosion on hover`);
+                            setIsProjectsExploding(true);
                           }
 
                           // Cancel collapse timeout ONLY if mouse returns to the SAME expanded window
@@ -897,13 +888,9 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
                           });
                           startTransition(() => setHoveredSection(null));
 
-                          // Projects: Cancel timer and return from explosion
+                          // Projects: return from explosion
                           if (section.id === 'projects') {
-                            debugLog(`⏹️ PROJECTS: Скасовую таймер та повертаю з explosion`);
-                            if (projectsHoverTimeoutRef.current) {
-                              clearTimeout(projectsHoverTimeoutRef.current);
-                              projectsHoverTimeoutRef.current = null;
-                            }
+                            debugLog(`⏹️ PROJECTS: повертаю з explosion`);
                             // Return from explosion state
                             if (isProjectsExploding) {
                               setIsProjectsExploding(false);
