@@ -168,6 +168,16 @@ export const ServicesDetail = ({ categories, isOpen, onClose }: ServicesDetailPr
     onClose();
   }, [onClose]);
 
+  // Escape closes the panel
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isOpen, handleClose]);
+
   if (!isOpen) return null;
 
   const currentService = flatServices[activeGlobalIndex];
@@ -214,12 +224,16 @@ export const ServicesDetail = ({ categories, isOpen, onClose }: ServicesDetailPr
         <style>{FONT_IMPORT}</style>
 
         {/* Close button */}
+        {/* Colours are inline: the light theme remaps .text-white / .bg-white/* to dark tokens,
+            which made this button invisible on the fixed #131313 panel */}
         <button
           onClick={handleClose}
-          className="absolute top-6 right-6 z-50 rounded-full p-3 bg-white/10 hover:bg-white/20 transition-colors"
+          className="absolute top-6 right-6 z-50 rounded-full p-3 shadow-lg transition-transform hover:scale-110"
+          style={{ backgroundColor: '#ffffff', color: '#131313' }}
           aria-label="Close"
+          title="Close (Esc)"
         >
-          <X className="w-6 h-6 text-white" />
+          <X className="w-6 h-6" strokeWidth={2.5} />
         </button>
 
         {/* Main content */}

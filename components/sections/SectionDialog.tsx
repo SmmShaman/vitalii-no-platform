@@ -80,10 +80,11 @@ export const SectionDialog = ({
                 </Dialog.Title>
                 <Dialog.Close asChild>
                   <button
-                    className="absolute top-6 right-6 rounded-full p-2 bg-white/10 hover:bg-white/20 transition-colors"
+                    className="absolute top-6 right-6 rounded-full p-2 shadow-lg transition-transform hover:scale-110"
+                    style={{ backgroundColor: '#ffffff', color: '#131313' }}
                     aria-label="Close"
                   >
-                    <X className="w-6 h-6 text-white" />
+                    <X className="w-6 h-6" strokeWidth={2.5} />
                   </button>
                 </Dialog.Close>
               </div>
