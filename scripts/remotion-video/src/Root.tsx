@@ -213,6 +213,9 @@ import { FeatureMiniVitaliiNoTurnsM20 } from "./compositions/feature-demos/Featu
 import { FeatureNewLessonFormatTurnsM25 } from "./compositions/feature-demos/FeatureNewLessonFormatTurnsM25";
 import { FeatureMiniVitaliiNoUpgradesM22 } from "./compositions/feature-demos/FeatureMiniVitaliiNoUpgradesM22";
 import { FeatureGrammarDrillsTeachWordsM24 } from "./compositions/feature-demos/FeatureGrammarDrillsTeachWordsM24";
+import { FeatureNetlifyBlockedAccountOverP70 } from "./compositions/feature-demos/FeatureNetlifyBlockedAccountOverP70";
+import { FeatureRunnerStoppedAskingEveryM26 } from "./compositions/feature-demos/FeatureRunnerStoppedAskingEveryM26";
+import { FeatureNetlifyBlockedWholeAccountJ78 } from "./compositions/feature-demos/FeatureNetlifyBlockedWholeAccountJ78";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2090,6 +2093,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureGrammarDrillsTeachWordsM24"
         component={FeatureGrammarDrillsTeachWordsM24}
         durationInFrames={938}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNetlifyBlockedAccountOverP70"
+        component={FeatureNetlifyBlockedAccountOverP70}
+        durationInFrames={925}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureRunnerStoppedAskingEveryM26"
+        component={FeatureRunnerStoppedAskingEveryM26}
+        durationInFrames={971}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNetlifyBlockedWholeAccountJ78"
+        component={FeatureNetlifyBlockedWholeAccountJ78}
+        durationInFrames={962}
         fps={30}
         width={1280}
         height={720}
