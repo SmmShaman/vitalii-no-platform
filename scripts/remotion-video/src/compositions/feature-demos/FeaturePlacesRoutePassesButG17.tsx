@@ -296,6 +296,12 @@ const FrameInner: React.FC<{
           </div>
         </div>
         <StatPill x={90} y={380} emoji="🔇" text="Not enough written — this place stays permanently silent" tone="danger" />
+        <div style={{ position: "absolute", left: 820, top: 230, fontFamily, display: "flex", alignItems: "baseline", gap: 10 }}>
+          <span style={{ fontSize: 110, fontWeight: 800, color: B.danger, letterSpacing: -3 }}>0/3</span>
+        </div>
+        <div style={{ position: "absolute", left: 824, top: 356, width: 300, fontFamily, fontSize: 18, fontWeight: 700, color: B.muted }}>
+          SOURCES FOUND FOR THIS PLACE
+        </div>
         <BeatLabel x={90} y={560} w={620} kicker="THE PROBLEM" title="Some places never got a story" opacity={1} />
       </Group>
       {/* beat 2 — stayed skipped forever, reconstructed as a log */}
@@ -343,6 +349,28 @@ const FrameInner: React.FC<{
           }}
         >
           fd66bbf · research deeper sources for skipped places on the daily route
+        </div>
+        <div style={{ position: "absolute", left: 760, top: 216, display: "flex", flexDirection: "column", gap: 18 }}>
+          {STOPS.map((s, i) => (
+            <div key={s.x} style={{ opacity: c3Codes[i], display: "flex", alignItems: "center", gap: 14 }}>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: "50%",
+                  background: B.successBg,
+                  border: `2px solid ${B.success}`,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 20,
+                }}
+              >
+                {s.after}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: B.ink, fontFamily }}>{s.afterLabel}</div>
+            </div>
+          ))}
         </div>
         <BeatLabel x={90} y={560} w={700} kicker="THE PASS" title="Old newspapers, local-history archives, forgotten books" opacity={1} />
       </Group>

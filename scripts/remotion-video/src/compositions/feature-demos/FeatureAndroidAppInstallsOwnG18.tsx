@@ -302,6 +302,28 @@ const FrameInner: React.FC<{
               <FilterChip x={0} y={0} text="DriveService.java" icon="🚗" color={B.accent} scale={1} opacity={1} />
             </div>
           </div>
+
+          {/* ── beat 4 : verifies, then installs — PackageInstaller (the one tech name) ── */}
+          <div style={{ position: "absolute", left: 30, top: 80, width: Math.max(0, orderWidth - 60), opacity: b4 }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: B.ink }}>VERIFY, THEN INSTALL</div>
+            <div style={{ marginTop: 26, display: "flex", alignItems: "center", gap: 18 }}>
+              <CheckBadge x={0} y={0} scale={check1} opacity={check1} size={44} />
+              <div style={{ fontSize: 19, fontWeight: 650, color: B.ink }}>verify package name</div>
+            </div>
+            <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 18 }}>
+              <CheckBadge x={0} y={0} scale={check2} opacity={check2} size={44} />
+              <div style={{ fontSize: 19, fontWeight: 650, color: B.ink }}>verify version</div>
+            </div>
+            <div style={{ marginTop: 36, opacity: Math.min(1, installPop) }}>
+              <FilterChip x={0} y={0} text="PackageInstaller" icon="📲" color={B.accent} scale={Math.min(1, installPop)} opacity={Math.min(1, installPop)} />
+              <div style={{ marginTop: 14, fontSize: 15.5, fontWeight: 550, color: B.muted, maxWidth: Math.max(0, orderWidth - 60) }}>
+                Android's own silent installer — no confirmation prompt, no tap
+              </div>
+            </div>
+            <div style={{ marginTop: 32, opacity: Math.min(1, installPop) }}>
+              <StatPill x={0} y={0} emoji="🔕" text="0 taps needed" tone="success" opacity={1} fontSize={16} />
+            </div>
+          </div>
         </div>
       ) : null}
 
@@ -319,27 +341,6 @@ const FrameInner: React.FC<{
             boxShadow: "0 0 14px rgba(0,0,0,0.18)",
           }}
         />
-      ) : null}
-
-      {/* ════ beat 4 : verifies, then installs — PackageInstaller (the one tech name) ════ */}
-      {b4 > 0.004 ? (
-        <div style={{ position: "absolute", left: 730, top: PANEL_Y + 20, width: 470, opacity: b4 }}>
-          <div style={{ fontSize: 22, fontWeight: 800, color: B.ink }}>VERIFY, THEN INSTALL</div>
-          <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 14 }}>
-            <CheckBadge x={0} y={0} scale={check1} opacity={check1} size={38} />
-            <div style={{ fontSize: 16, fontWeight: 650, color: B.ink }}>verify package name</div>
-          </div>
-          <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 14 }}>
-            <CheckBadge x={0} y={0} scale={check2} opacity={check2} size={38} />
-            <div style={{ fontSize: 16, fontWeight: 650, color: B.ink }}>verify version</div>
-          </div>
-          <div style={{ marginTop: 24, opacity: Math.min(1, installPop) }}>
-            <FilterChip x={0} y={0} text="PackageInstaller" icon="📲" color={B.accent} scale={Math.min(1, installPop)} opacity={Math.min(1, installPop)} />
-            <div style={{ marginTop: 10, fontSize: 13, fontWeight: 550, color: B.muted, maxWidth: 420 }}>
-              Android's own silent installer — no confirmation prompt, no tap
-            </div>
-          </div>
-        </div>
       ) : null}
 
       {/* ════ beat 5 : the result — constructed from the feature's own numbers ════ */}

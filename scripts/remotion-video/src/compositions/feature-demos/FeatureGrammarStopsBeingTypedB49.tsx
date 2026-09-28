@@ -234,7 +234,8 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
             <span style={{ fontSize: 24 }}>🎯</span>
             8 grammar questions, one sitting
           </div>
-          <StatPill x={1030} y={240} emoji="📱" text="on his phone" tone="danger" opacity={b1} />
+          <StatPill x={40} y={70} emoji="📉" text="0% correct" tone="danger" opacity={b1} />
+          <StatPill x={1000} y={70} emoji="📱" text="on his phone" tone="danger" opacity={b1} />
           <div style={{ position: "absolute", left: 0, top: 520, width: 1280 }}>
             {Array.from({ length: 8 }, (_, i) => {
               const s = boxPop(i);
@@ -321,6 +322,8 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
 
         {/* ---------------- beat 3 : a keyboard punishes spelling, not grammar ---------------- */}
         <Group opacity={b3}>
+          <StatPill x={40} y={70} emoji="⌨️" text="one wrong key" tone="danger" opacity={b3} fontSize={16} />
+          <StatPill x={980} y={70} emoji="✅" text="meaning intact" tone="success" opacity={b3} fontSize={16} />
           <IconCard x={70} y={370} w={320} emoji="🔤" title="Typing tests spelling" sub="one slipped key = wrong" tone="danger" opacity={b3} scale={Math.min(1, pop(B3_IN + 10))} />
           <IconCard x={890} y={370} w={320} emoji="👆" title="Tapping tests grammar" sub="meaning still gets through" tone="success" opacity={b3} scale={Math.min(1, pop(B3_IN + 25))} />
           <FlowArrow x={410} y={425} len={470} color={P.accent} progress={seg(frame, B3_IN + 40, B3_IN + 65)} opacity={b3} />
