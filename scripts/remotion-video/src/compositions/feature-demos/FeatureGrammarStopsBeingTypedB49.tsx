@@ -53,6 +53,7 @@ import {
   FilterChip,
   CaptionBand,
   CheckBadge,
+  StatPill,
   seg,
   fontFamily,
 } from "./bright-primitives";
@@ -216,7 +217,10 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
               position: "absolute",
               left: 470,
               top: 395,
+              width: 660,
               display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               gap: 10,
               padding: "9px 18px",
               borderRadius: 999,
@@ -230,6 +234,7 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
             <span style={{ fontSize: 24 }}>🎯</span>
             8 grammar questions, one sitting
           </div>
+          <StatPill x={1030} y={240} emoji="📱" text="on his phone" tone="danger" opacity={b1} />
           <div style={{ position: "absolute", left: 0, top: 520, width: 1280 }}>
             {Array.from({ length: 8 }, (_, i) => {
               const s = boxPop(i);
@@ -316,9 +321,27 @@ export const FeatureGrammarStopsBeingTypedB49: React.FC = () => {
 
         {/* ---------------- beat 3 : a keyboard punishes spelling, not grammar ---------------- */}
         <Group opacity={b3}>
-          <IconCard x={150} y={380} w={300} emoji="🔤" title="Typing tests spelling" tone="danger" opacity={b3} scale={Math.min(1, pop(B3_IN + 10))} />
-          <IconCard x={830} y={380} w={300} emoji="👆" title="Tapping tests grammar" tone="success" opacity={b3} scale={Math.min(1, pop(B3_IN + 25))} />
-          <FlowArrow x={460} y={430} len={360} color={P.accent} progress={seg(frame, B3_IN + 40, B3_IN + 65)} opacity={b3} />
+          <IconCard x={70} y={370} w={320} emoji="🔤" title="Typing tests spelling" sub="one slipped key = wrong" tone="danger" opacity={b3} scale={Math.min(1, pop(B3_IN + 10))} />
+          <IconCard x={890} y={370} w={320} emoji="👆" title="Tapping tests grammar" sub="meaning still gets through" tone="success" opacity={b3} scale={Math.min(1, pop(B3_IN + 25))} />
+          <FlowArrow x={410} y={425} len={470} color={P.accent} progress={seg(frame, B3_IN + 40, B3_IN + 65)} opacity={b3} />
+          <Panel x={150} y={575} w={980} h={62} tone="accent" opacity={b3}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+                padding: "0 24px",
+                fontFamily,
+                fontSize: 17,
+                fontWeight: 700,
+                color: P.accent,
+                textAlign: "center",
+              }}
+            >
+              Same grammar question — one input method scored it wrong, the other didn't
+            </div>
+          </Panel>
           <CaptionBand y={646} text="A keyboard was punishing spelling, not testing grammar." tone="accent" opacity={b3} />
         </Group>
 

@@ -240,9 +240,26 @@ export const FeatureNetlifyBlockedWholeAccountJ78: React.FC = () => {
 
       {/* beat 2 — the whole account blocked, two sites down at once */}
       <Group opacity={b2}>
-        <IconCard x={300} y={230} w={220} emoji="🚫" title="job.vitalii.no" sub="offline" tone="danger" />
-        <IconCard x={620} y={230} w={220} emoji="🚫" title="promo subdomain" sub="offline" tone="danger" />
-        <StatPill x={900} y={280} emoji="🚫" text="One block, both sites down at once" tone="danger" />
+        <IconCard x={130} y={195} w={260} emoji="🚫" title="job.vitalii.no" sub="offline" tone="danger" />
+        <IconCard x={560} y={195} w={260} emoji="🚫" title="promo subdomain" sub="offline" tone="danger" />
+        <StatPill x={900} y={240} emoji="🚫" text="One block, both sites down at once" tone="danger" />
+        <Panel x={90} y={430} w={1100} h={90} tone="danger">
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              height: "100%",
+              padding: "0 28px",
+              fontFamily,
+              fontSize: 19,
+              fontWeight: 700,
+              color: B.danger,
+              lineHeight: 1.3,
+            }}
+          >
+            🚫 Netlify suspended the whole account — every site under it went dark at once
+          </div>
+        </Panel>
         <BeatLabel x={70} y={560} w={680} kicker="THE BLOCK" title="The whole account blocked overnight, taking two sites down" opacity={1} />
       </Group>
 
