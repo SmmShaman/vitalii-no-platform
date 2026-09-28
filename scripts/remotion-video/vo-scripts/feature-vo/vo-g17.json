@@ -1,0 +1,56 @@
+{
+ "id": "g17",
+ "beat_durations": {
+  "b1": 5.184,
+  "b2": 4.536,
+  "b3": 7.32,
+  "b4": 6.696,
+  "b5": 5.784
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Some places along the route stayed silent forever \u2014 there just wasn't enough written about them.",
+   "start_s": 0.5,
+   "end_s": 5.684,
+   "start_f": 15,
+   "end_f": 171
+  },
+  {
+   "beat": "b2",
+   "text": "Once skipped, a place stayed skipped \u2014 nothing ever came back to look harder.",
+   "start_s": 5.984,
+   "end_s": 10.52,
+   "start_f": 180,
+   "end_f": 316
+  },
+  {
+   "beat": "b3",
+   "text": "Now a separate nightly process digs deeper \u2014 old newspapers, local-history archives, forgotten books.",
+   "start_s": 10.82,
+   "end_s": 18.14,
+   "start_f": 325,
+   "end_f": 544
+  },
+  {
+   "beat": "b4",
+   "text": "It even scans nearby Wikidata records, promoting forgotten spots like old mills and dairies into the route.",
+   "start_s": 18.44,
+   "end_s": 25.136,
+   "start_f": 553,
+   "end_f": 754
+  },
+  {
+   "beat": "b5",
+   "text": "So every silent place gets a second look through five more real sources before it's given up on.",
+   "start_s": 25.436,
+   "end_s": 31.22,
+   "start_f": 763,
+   "end_f": 937
+  }
+ ],
+ "total_s": 32.72,
+ "durationInFrames": 982,
+ "measured_track_s": 31.272,
+ "track": "/root/feature-demos/vo-g17/vo-g17.mp3"
+}

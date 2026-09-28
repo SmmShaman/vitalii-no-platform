@@ -1,0 +1,7 @@
+{"id": "g18", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A new update for the app would sit on the phone every night, waiting for a tap that never came."],
+ ["b2", "So the app quietly fell behind, missing whatever each update had fixed."],
+ ["b3", "Now it checks for a newer build itself, after every drive, and downloads it."],
+ ["b4", "It verifies the version, then installs through Android's PackageInstaller — no tap needed."],
+ ["b5", "It never interrupts a drive — closing a gap that once ran two versions deep."]
+]}

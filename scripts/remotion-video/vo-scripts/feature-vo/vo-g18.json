@@ -1,0 +1,56 @@
+{
+ "id": "g18",
+ "beat_durations": {
+  "b1": 5.52,
+  "b2": 4.608,
+  "b3": 4.728,
+  "b4": 5.616,
+  "b5": 4.92
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A new update for the app would sit on the phone every night, waiting for a tap that never came.",
+   "start_s": 0.5,
+   "end_s": 6.02,
+   "start_f": 15,
+   "end_f": 181
+  },
+  {
+   "beat": "b2",
+   "text": "So the app quietly fell behind, missing whatever each update had fixed.",
+   "start_s": 6.32,
+   "end_s": 10.928,
+   "start_f": 190,
+   "end_f": 328
+  },
+  {
+   "beat": "b3",
+   "text": "Now it checks for a newer build itself, after every drive, and downloads it.",
+   "start_s": 11.228,
+   "end_s": 15.956,
+   "start_f": 337,
+   "end_f": 479
+  },
+  {
+   "beat": "b4",
+   "text": "It verifies the version, then installs through Android's PackageInstaller \u2014 no tap needed.",
+   "start_s": 16.256,
+   "end_s": 21.872,
+   "start_f": 488,
+   "end_f": 656
+  },
+  {
+   "beat": "b5",
+   "text": "It never interrupts a drive \u2014 closing a gap that once ran two versions deep.",
+   "start_s": 22.172,
+   "end_s": 27.092,
+   "start_f": 665,
+   "end_f": 813
+  }
+ ],
+ "total_s": 28.592,
+ "durationInFrames": 858,
+ "measured_track_s": 27.144,
+ "track": "/root/feature-demos/vo-g18/vo-g18.mp3"
+}
