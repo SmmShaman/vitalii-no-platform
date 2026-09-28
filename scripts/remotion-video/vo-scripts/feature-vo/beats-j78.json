@@ -1,0 +1,8 @@
+{"id": "j78", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "One morning, a website just vanished — no warning, no error."],
+ ["b2", "The hosting provider blocked the whole account overnight, taking two sites down with it."],
+ ["b3", "Trusting someone else's goodwill wasn't a plan — like a landlord who could lock the door."],
+ ["b4", "So the site moved onto its own server, deploying straight from GitHub on every push."],
+ ["b5", "A broken deploy rolls itself back instead of leaving the site down."],
+ ["b6", "Back online in a day, deploys landing in two minutes, every time."]
+]}

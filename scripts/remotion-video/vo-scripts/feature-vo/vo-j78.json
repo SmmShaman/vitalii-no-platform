@@ -1,0 +1,65 @@
+{
+ "id": "j78",
+ "beat_durations": {
+  "b1": 4.44,
+  "b2": 4.992,
+  "b3": 5.232,
+  "b4": 5.328,
+  "b5": 4.104,
+  "b6": 4.464
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One morning, a website just vanished \u2014 no warning, no error.",
+   "start_s": 0.5,
+   "end_s": 4.94,
+   "start_f": 15,
+   "end_f": 148
+  },
+  {
+   "beat": "b2",
+   "text": "The hosting provider blocked the whole account overnight, taking two sites down with it.",
+   "start_s": 5.24,
+   "end_s": 10.232,
+   "start_f": 157,
+   "end_f": 307
+  },
+  {
+   "beat": "b3",
+   "text": "Trusting someone else's goodwill wasn't a plan \u2014 like a landlord who could lock the door.",
+   "start_s": 10.532,
+   "end_s": 15.764,
+   "start_f": 316,
+   "end_f": 473
+  },
+  {
+   "beat": "b4",
+   "text": "So the site moved onto its own server, deploying straight from GitHub on every push.",
+   "start_s": 16.064,
+   "end_s": 21.392,
+   "start_f": 482,
+   "end_f": 642
+  },
+  {
+   "beat": "b5",
+   "text": "A broken deploy rolls itself back instead of leaving the site down.",
+   "start_s": 21.692,
+   "end_s": 25.796,
+   "start_f": 651,
+   "end_f": 774
+  },
+  {
+   "beat": "b6",
+   "text": "Back online in a day, deploys landing in two minutes, every time.",
+   "start_s": 26.096,
+   "end_s": 30.56,
+   "start_f": 783,
+   "end_f": 917
+  }
+ ],
+ "total_s": 32.06,
+ "durationInFrames": 962,
+ "measured_track_s": 30.624,
+ "track": "/root/feature-demos/vo-j78/vo-j78.mp3"
+}
