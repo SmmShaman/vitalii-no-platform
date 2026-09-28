@@ -1,0 +1,21 @@
+{
+  "id": "g18",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-android-app-now-installs-its-own-updates-instead-of-waiting-for-a-manual-tap-g18",
+      "frames": 140,
+      "scroll": [[0, 0], [70, 340], [139, 660]],
+      "mouse": [[0, 560, 210], [70, 560, 330], [139, 560, 280]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 120,
+      "scroll": [[0, 0], [60, 240], [119, 500]],
+      "mouse": [[0, 560, 200], [60, 560, 300], [119, 560, 260]]
+    }
+  ]
+}
