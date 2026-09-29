@@ -149,6 +149,7 @@ export const FeatureHomeAgentSurvivesOwnG15: React.FC = () => {
   // beat 3: the stark "nobody noticed" reveal
   const bellShake = Math.sin((frame - B3_S) * 0.5) * (frame > B3_S && frame < B3_S + 40 ? 4 : 0);
   const phonePop = pop(B3_S + 30);
+  const bellCardPop = pop(B3_S + 50);
   const alertPop = pop(B3_S + 70);
 
   // beat 4: scale-push the real evidence in
@@ -274,19 +275,20 @@ export const FeatureHomeAgentSurvivesOwnG15: React.FC = () => {
           style={{
             position: "absolute",
             left: 0,
-            top: 200,
+            top: 96,
             width: 1280,
             textAlign: "center",
-            fontSize: 44,
+            fontSize: 84,
             transform: `rotate(${bellShake}deg)`,
             opacity: b3,
           }}
         >
           🔕
         </div>
-        <IconCard x={190} y={300} w={300} emoji="📱" title="Kid's phone" sub="suddenly unblocked" tone="danger" opacity={b3} scale={Math.min(1, phonePop)} />
-        <IconCard x={790} y={300} w={300} emoji="🚨" title="0 alerts sent" sub="nobody was told" tone="danger" opacity={b3} scale={Math.min(1, alertPop)} />
-        <StatPill x={490} y={430} emoji="🤷" text="found out by accident, hours later" tone="danger" opacity={b3 * Math.min(1, alertPop)} />
+        <IconCard x={50} y={230} w={330} emoji="📱" title="Kid's phone" sub="suddenly unblocked" tone="danger" opacity={b3} scale={Math.min(1, phonePop)} />
+        <IconCard x={475} y={230} w={330} emoji="😴" title="Nobody watching" sub="no one checked in" tone="danger" opacity={b3} scale={Math.min(1, bellCardPop)} />
+        <IconCard x={900} y={230} w={330} emoji="🚨" title="0 alerts sent" sub="nobody was told" tone="danger" opacity={b3} scale={Math.min(1, alertPop)} />
+        <StatPill x={370} y={470} emoji="🤷" text="found out by accident, hours later" tone="danger" fontSize={24} opacity={b3 * Math.min(1, alertPop)} />
 
         {/* per-beat caption band */}
         <CaptionBand text="Polling and enforcement both lived on one machine" opacity={b1} tone="card" />
@@ -321,12 +323,13 @@ export const FeatureHomeAgentSurvivesOwnG15: React.FC = () => {
 
         {/* ================= beat 5: leader/standby schematic (drawn, slide-in) ================= */}
         <div style={{ position: "absolute", inset: 0, opacity: b5, transform: `translateX(${b5dx}px)` }}>
-          <IconCard x={90} y={230} w={310} emoji="🖥" title="Leader" sub="home PC — enforcing now" tone="accent" opacity={1} />
-          <FlowArrow x={420} y={280} len={220} progress={arrowProgress} color={P.accent} opacity={1} />
-          <IconCard x={880} y={230} w={310} emoji="📱" title="Standby" sub="always-on phone — watching" tone="card" opacity={1} />
+          <StatPill x={340} y={140} emoji="🔁" text="control moves to the other machine — automatically" tone="accent" fontSize={22} opacity={1} />
+          <IconCard x={70} y={220} w={340} emoji="🖥" title="Leader" sub="home PC — enforcing now" tone="accent" opacity={1} scale={1.15} />
+          <FlowArrow x={440} y={280} len={400} progress={arrowProgress} color={P.accent} opacity={1} />
+          <IconCard x={870} y={220} w={340} emoji="📱" title="Standby" sub="always-on phone — watching" tone="card" opacity={1} scale={1.15} />
           <FilterChip
             x={520}
-            y={360}
+            y={450}
             text="Cloudflare Worker"
             icon="⚡"
             color={P.accent}
@@ -337,7 +340,7 @@ export const FeatureHomeAgentSurvivesOwnG15: React.FC = () => {
             style={{
               position: "absolute",
               left: 440,
-              top: 420,
+              top: 510,
               width: 400,
               textAlign: "center",
               fontSize: 15,

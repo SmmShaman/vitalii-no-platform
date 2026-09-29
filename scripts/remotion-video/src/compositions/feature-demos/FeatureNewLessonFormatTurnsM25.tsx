@@ -58,9 +58,9 @@ const FADE = 9;
 const WIN3: Win = { x: 230, y: 150, w: 820, h: 430 };
 const WIN_LOG: Win = { x: 250, y: 150, w: 880, h: 420 };
 
-const SOURCE = { x: 60, y: 300, w: 200, h: 120 };
+const SOURCE = { x: 60, y: 290, w: 210, h: 150 };
 const HUB = { x: 540, y: 260, w: 200, h: 200 };
-const LANE_Y = 320, LANE_H = 90, LANE_X1 = 280, LANE_X2 = 960;
+const LANE_Y = 320, LANE_H = 110, LANE_X1 = 280, LANE_X2 = 960;
 const OUT_X = 980, OUT_W = 230, OUT_H = 110;
 const OUT_Y = [40, 190, 340, 490];
 
@@ -134,7 +134,7 @@ const StoryLane: React.FC<{ opacity: number; markerText: string; markerAt: numbe
  * whole 1280x720 frame textured (frame-fill gate), not empty. */
 const RepeatWallpaper: React.FC<{ opacity: number; emoji: string }> = ({ opacity, emoji }) => {
   if (opacity <= 0.004) return null;
-  const cols = 7, rows = 4, stepX = 165, stepY = 128, startX = 44, startY = 500;
+  const cols = 7, rows = 5, stepX = 165, stepY = 145, startX = 44, startY = 15;
   return (
     <>
       {Array.from({ length: rows }).map((_, r) =>
@@ -144,9 +144,9 @@ const RepeatWallpaper: React.FC<{ opacity: number; emoji: string }> = ({ opacity
             style={{
               position: "absolute",
               left: startX + c * stepX,
-              top: startY + r * stepY - 380,
-              fontSize: 26,
-              opacity: opacity * 0.14,
+              top: startY + r * stepY,
+              fontSize: 30,
+              opacity: opacity * 0.24,
               filter: "grayscale(1)",
             }}
           >
@@ -322,7 +322,7 @@ export const FeatureNewLessonFormatTurnsM25: React.FC = () => {
   const b4 = seg(frame, B4_S, B4_S + FADE) * (1 - seg(frame, B4_E, B4_E + FADE));
   const b5 = seg(frame, B5_S, B5_S + FADE); // holds through the tail — no fade-out
 
-  const hubGhost = Math.max(b1, b2) * 0.3;
+  const hubGhost = Math.max(b1, b2) * 0.42;
   const hubPop = Math.min(1, pop(B3_S));
   const hubOpen = Math.max(b3, b4) * hubPop;
   const hubTail = b5 * 0.15;
@@ -364,8 +364,8 @@ export const FeatureNewLessonFormatTurnsM25: React.FC = () => {
         <Headline y={42} text="Like flashcards," accentText="not a novel." accentColor={P.success} opacity={b4} fontSize={32} />
         <Headline y={42} text="Ask for 20 adverbs —" accentText="that's exactly what you drill." accentColor={P.success} opacity={b5} fontSize={28} />
 
-        {/* ================= beat 1 : product line plate ================= */}
-        <div style={{ position: "absolute", left: 90, top: 96, fontSize: 19, fontWeight: 750, color: P.ink, opacity: b1 }}>
+        {/* ================= beats 1-2 : product line plate ================= */}
+        <div style={{ position: "absolute", left: 90, top: 96, fontSize: 19, fontWeight: 750, color: P.ink, opacity: Math.max(b1, b2) }}>
           🎧 Mini Elvarika — Norwegian by Ear, a personal listening app
         </div>
 
@@ -448,10 +448,10 @@ export const FeatureNewLessonFormatTurnsM25: React.FC = () => {
           );
         })}
 
-        <IdleOutput y={OUT_Y[0]} opacity={Math.max(b1, b2) * 0.35} />
-        <IdleOutput y={OUT_Y[1]} opacity={Math.max(b1, b2, b3) * 0.35} />
-        <IdleOutput y={OUT_Y[2]} opacity={Math.max(b1, b2, b3) * 0.35} />
-        <IdleOutput y={OUT_Y[3]} opacity={Math.max(b1, b2, b3) * 0.35} />
+        <IdleOutput y={OUT_Y[0]} opacity={Math.max(b1, b2) * 0.55} />
+        <IdleOutput y={OUT_Y[1]} opacity={Math.max(b1, b2, b3) * 0.55} />
+        <IdleOutput y={OUT_Y[2]} opacity={Math.max(b1, b2, b3) * 0.55} />
+        <IdleOutput y={OUT_Y[3]} opacity={Math.max(b1, b2, b3) * 0.55} />
 
         {WORDS.map((wd, i) => (
           <WordCard key={wd.w} y={OUT_Y[i]} word={wd.w} gloss={wd.gloss} opacity={b4} checkPop={checkPop} />
