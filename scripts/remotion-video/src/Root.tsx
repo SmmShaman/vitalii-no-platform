@@ -218,6 +218,8 @@ import { FeatureRunnerStoppedAskingEveryM26 } from "./compositions/feature-demos
 import { FeatureNetlifyBlockedWholeAccountJ78 } from "./compositions/feature-demos/FeatureNetlifyBlockedWholeAccountJ78";
 import { FeatureAndroidAppInstallsOwnG18 } from "./compositions/feature-demos/FeatureAndroidAppInstallsOwnG18";
 import { FeaturePlacesRoutePassesButG17 } from "./compositions/feature-demos/FeaturePlacesRoutePassesButG17";
+import { FeaturePlacesNightlyRouteStopG16 } from "./compositions/feature-demos/FeaturePlacesNightlyRouteStopG16";
+import { FeatureHomeAgentSurvivesOwnG15 } from "./compositions/feature-demos/FeatureHomeAgentSurvivesOwnG15";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2140,6 +2142,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeaturePlacesRoutePassesButG17"
         component={FeaturePlacesRoutePassesButG17}
         durationInFrames={982}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeaturePlacesNightlyRouteStopG16"
+        component={FeaturePlacesNightlyRouteStopG16}
+        durationInFrames={941}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureHomeAgentSurvivesOwnG15"
+        component={FeatureHomeAgentSurvivesOwnG15}
+        durationInFrames={932}
         fps={30}
         width={1280}
         height={720}

@@ -1,7 +1,8 @@
 /**
  * FeatureNewLessonFormatTurnsM25 — feature m25 — 1280x720, 891 frames @ 30fps, VOICE-SYNCED.
  *
- * archetype 4 "flow map", mood "mint" (handed down, not re-drawn).
+ * archetype 4 "flow map", mood "slate" (handed down, not re-drawn; re-shoot
+ * from mood "mint" — same beats, same narration, cooler graphite/cyan skin).
  *
  * The old format forced every requested word through ONE linear story: a
  * single unbranching lane from request to a buried word, or — for an
@@ -45,7 +46,7 @@ import { Headline, StatPill, FilterChip, CaptionBand, CheckBadge, seg, fontFamil
 import { LiveWindow, LogWindow, LogLine, Win } from "./live-primitives";
 import shots from "./shots/m25.json";
 
-const P = MOODS.mint;
+const P = MOODS.slate;
 
 const B1_S = 15, B1_E = 150;
 const B2_S = 159, B2_E = 337;
