@@ -1,0 +1,56 @@
+{
+ "id": "g16",
+ "beat_durations": {
+  "b1": 4.752,
+  "b2": 6.768,
+  "b3": 4.848,
+  "b4": 5.52,
+  "b5": 6.288
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Some places along the route told the exact same story, night after night.",
+   "start_s": 0.5,
+   "end_s": 5.252,
+   "start_f": 15,
+   "end_f": 158
+  },
+  {
+   "beat": "b2",
+   "text": "A farm or an old church finished its one story \u2014 then just repeated it, forever, like a broken record.",
+   "start_s": 5.552,
+   "end_s": 12.32,
+   "start_f": 167,
+   "end_f": 370
+  },
+  {
+   "beat": "b3",
+   "text": "Now a D1 database remembers exactly what each place has already told you.",
+   "start_s": 12.62,
+   "end_s": 17.468,
+   "start_f": 379,
+   "end_f": 524
+  },
+  {
+   "beat": "b4",
+   "text": "Every night it drafts the next chapter, built only from facts never mentioned before.",
+   "start_s": 17.768,
+   "end_s": 23.288,
+   "start_f": 533,
+   "end_f": 699
+  },
+  {
+   "beat": "b5",
+   "text": "It keeps going deeper, then quietly stops when there's nothing left \u2014 up to six chapters per place.",
+   "start_s": 23.588,
+   "end_s": 29.876,
+   "start_f": 708,
+   "end_f": 896
+  }
+ ],
+ "total_s": 31.376,
+ "durationInFrames": 941,
+ "measured_track_s": 29.928,
+ "track": "/root/feature-demos/vo-g16/vo-g16.mp3"
+}

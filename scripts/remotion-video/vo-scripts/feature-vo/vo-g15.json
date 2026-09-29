@@ -1,0 +1,65 @@
+{
+ "id": "g15",
+ "beat_durations": {
+  "b1": 4.128,
+  "b2": 4.992,
+  "b3": 3.648,
+  "b4": 4.152,
+  "b5": 5.136,
+  "b6": 5.52
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One machine polled the router and enforced every block for the whole family.",
+   "start_s": 0.5,
+   "end_s": 4.628,
+   "start_f": 15,
+   "end_f": 139
+  },
+  {
+   "beat": "b2",
+   "text": "If it rebooted, lost Wi-Fi, or crashed, the blocks silently stopped.",
+   "start_s": 4.928,
+   "end_s": 9.92,
+   "start_f": 148,
+   "end_f": 298
+  },
+  {
+   "beat": "b3",
+   "text": "Nobody knew \u2014 until a kid's phone was suddenly unblocked.",
+   "start_s": 10.22,
+   "end_s": 13.868,
+   "start_f": 307,
+   "end_f": 416
+  },
+  {
+   "beat": "b4",
+   "text": "Now a second machine, a phone that's always home, watches too.",
+   "start_s": 14.168,
+   "end_s": 18.32,
+   "start_f": 425,
+   "end_f": 550
+  },
+  {
+   "beat": "b5",
+   "text": "If the leader goes quiet, a Cloudflare Worker hands control to the other automatically.",
+   "start_s": 18.62,
+   "end_s": 23.756,
+   "start_f": 559,
+   "end_f": 713
+  },
+  {
+   "beat": "b6",
+   "text": "No alert, no restart \u2014 blocking survives even when one machine goes down.",
+   "start_s": 24.056,
+   "end_s": 29.576,
+   "start_f": 722,
+   "end_f": 887
+  }
+ ],
+ "total_s": 31.076,
+ "durationInFrames": 932,
+ "measured_track_s": 29.64,
+ "track": "/root/feature-demos/vo-g15/vo-g15.mp3"
+}

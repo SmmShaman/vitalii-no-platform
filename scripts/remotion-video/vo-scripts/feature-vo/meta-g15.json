@@ -1,0 +1,7 @@
+{
+  "id": "g15",
+  "file": "yt-feature-g15.mp4",
+  "title": "The Home Agent That Survives a PC Going Offline | vitalii.no",
+  "description": "The whole family's device-blocking system depended on a single machine quietly polling the router and enforcing every rule. If that machine rebooted for a Windows update, lost Wi-Fi, or simply crashed, every block silently stopped working — and nobody found out until a kid mentioned their device was suddenly unblocked.\n\nThe agent was reworked into a leader/standby pair. The home PC and an always-on phone now run the exact same script, with a Cloudflare Worker verifying which one is currently in charge. If the leader stops reporting, the standby takes over polling and enforcement automatically, then hands leadership back the moment the original machine returns — no manual restart, no dashboard alert to act on.\n\nThe single point of failure is gone: enforcement no longer breaks whenever one machine goes down, closing a gap that used to mean an entire unmonitored evening.\n\n🔗 Full write-up: https://vitalii.no/features/the-home-agent-now-survives-its-own-pc-going-offline-g15\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#homeautomation #failover #cloudflareworkers #parentalcontrols #highavailability",
+  "tags": ["home automation", "parental controls", "failover system", "cloudflare workers", "leader election", "self healing systems", "python automation", "network monitoring", "high availability", "vitalii berbeha"]
+}

@@ -1,0 +1,8 @@
+{"id": "g15", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "One machine polled the router and enforced every block for the whole family."],
+ ["b2", "If it rebooted, lost Wi-Fi, or crashed, the blocks silently stopped."],
+ ["b3", "Nobody knew — until a kid's phone was suddenly unblocked."],
+ ["b4", "Now a second machine, a phone that's always home, watches too."],
+ ["b5", "If the leader goes quiet, a Cloudflare Worker hands control to the other automatically."],
+ ["b6", "No alert, no restart — blocking survives even when one machine goes down."]
+]}
