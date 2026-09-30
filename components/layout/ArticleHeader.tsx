@@ -67,7 +67,7 @@ export function ArticleHeader({ backHref = '/', backLabel }: ArticleHeaderProps)
           href={backHref}
           className="flex items-center gap-2 sm:gap-3 text-content-muted hover:text-content transition-colors group"
         >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="w-4 h-4 shrink-0 group-hover:-translate-x-1 transition-transform" />
           <span className="font-bold text-amber-500 whitespace-nowrap" style={{ fontSize: 'clamp(0.9rem, 4.2vw, 1.125rem)' }}>Vitalii Berbeha</span>
           <span className="hidden sm:inline text-content-faint">|</span>
           <span className="hidden sm:inline text-sm text-content-muted">{getBackLabel()}</span>

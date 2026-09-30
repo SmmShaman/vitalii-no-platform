@@ -477,6 +477,7 @@ h4, h5, .text-xl, .text-2xl {
   :where(nav[aria-label="Breadcrumb"]) a {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
   }
 }
 
