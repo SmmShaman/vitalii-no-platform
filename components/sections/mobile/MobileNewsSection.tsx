@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { optimizedImageUrl } from '@/utils/coverUrl'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Calendar, Eye, ChevronRight, Loader2, Newspaper } from 'lucide-react'
@@ -145,7 +146,7 @@ const NewsListOverlay = ({
                   {(item.processed_image_url || item.image_url) && (
                     <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                       <img
-                        src={item.processed_image_url || item.image_url}
+                        src={optimizedImageUrl(item.processed_image_url || item.image_url, 128)}
                         alt={getLocalizedField(item, 'title')}
                         loading="lazy"
                         className="w-full h-full object-cover"
@@ -279,7 +280,7 @@ export const MobileNewsSection = ({
                       >
                         {(item.processed_image_url || item.image_url) ? (
                           <img
-                            src={item.processed_image_url || item.image_url}
+                            src={optimizedImageUrl(item.processed_image_url || item.image_url, 384)}
                             alt={getLocalizedField(item, 'title')}
                             loading="lazy"
                             className="w-full h-full object-cover"

@@ -42,44 +42,39 @@ export interface CarouselProject {
 
 const pick = (v: Localized | undefined, lang: 'en' | 'no' | 'ua') => v?.[lang] || v?.en || v?.no || v?.ua || ''
 
-export function useProjects(): ProjectInfo[] {
+// One /api/projects request per page load, shared by every hook instance
+let projectsPromise: Promise<ProjectWithFeatureCount[] | null> | null = null
+
+function loadProjects(): Promise<ProjectWithFeatureCount[] | null> {
+  projectsPromise ||= fetch('/api/projects')
+    .then(res => res.json())
+    .then(data => (data.projects?.length > 0 ? data.projects as ProjectWithFeatureCount[] : null))
+    .catch(err => {
+      console.warn('⚠️ useProjects: API fetch failed, using static fallback:', err.message || err)
+      projectsPromise = null
+      return null
+    })
+  return projectsPromise
+}
+
+function useProjectRows(): ProjectWithFeatureCount[] {
   const [projects, setProjects] = useState<ProjectWithFeatureCount[]>(staticProjects)
 
   useEffect(() => {
     let cancelled = false
-    fetch('/api/projects')
-      .then(res => res.json())
-      .then(data => {
-        if (!cancelled && data.projects?.length > 0) {
-          setProjects(data.projects)
-        }
-      })
-      .catch((err) => {
-        console.warn('⚠️ useProjects: API fetch failed, using static fallback:', err.message || err)
-      })
+    loadProjects().then(list => { if (!cancelled && list) setProjects(list) })
     return () => { cancelled = true }
   }, [])
 
   return projects
 }
 
-export function useProjectsCarousel(lang: 'en' | 'no' | 'ua'): { carousel: CarouselProject[]; projects: ProjectWithFeatureCount[] } {
-  const [projects, setProjects] = useState<ProjectWithFeatureCount[]>(staticProjects)
+export function useProjects(): ProjectInfo[] {
+  return useProjectRows()
+}
 
-  useEffect(() => {
-    let cancelled = false
-    fetch('/api/projects')
-      .then(res => res.json())
-      .then(data => {
-        if (!cancelled && data.projects?.length > 0) {
-          setProjects(data.projects)
-        }
-      })
-      .catch((err) => {
-        console.warn('⚠️ useProjectsCarousel: API fetch failed, using static fallback:', err.message || err)
-      })
-    return () => { cancelled = true }
-  }, [])
+export function useProjectsCarousel(lang: 'en' | 'no' | 'ua'): { carousel: CarouselProject[]; projects: ProjectWithFeatureCount[] } {
+  const projects = useProjectRows()
 
   const carousel = useMemo(() => {
     return projects.map(p => {

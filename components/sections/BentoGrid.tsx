@@ -7,6 +7,7 @@ import { SectionDialog } from '@/components/sections/SectionDialog';
 import { TypewriterText } from '@/components/ui/TypewriterText';
 import { ProjectsCarousel } from '@/components/ui/ProjectsCarousel';
 import { ProjectsModal } from '@/components/ui/ProjectsModal';
+import { coverUrl } from '@/utils/coverUrl';
 import { ServicesAnimation } from '@/components/ui/ServicesAnimation';
 import { FeaturesPreview } from '@/components/ui/FeaturesPreview';
 import { FeatureModal } from '@/components/ui/FeatureModal';
@@ -86,7 +87,6 @@ export { sectionNeonColors, heroContrastColors, oppositeSections } from './color
 
 export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoGridProps = {}) => {
   const { t, currentLanguage } = useTranslations();
-  const allFeatures = useFeatures();
   const allProjects = useProjects();
   const lang = currentLanguage.toLowerCase() as 'en' | 'no' | 'ua';
   const { carousel: carouselProjects } = useProjectsCarousel(lang);
@@ -104,6 +104,8 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
   const [blogHeight, setBlogHeight] = useState<number>(0);
   const [featuresNormalHeight, setFeaturesNormalHeight] = useState<number>(0);
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false);
+  // Light list for the tile; full texts only once the features window has been opened
+  const allFeatures = useFeatures(isFeaturesModalOpen);
   const [selectedFeatureCategory, setSelectedFeatureCategory] = useState<FeatureCategory | undefined>(undefined);
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | undefined>(undefined);
   const [blogNormalHeight, setBlogNormalHeight] = useState<number>(0);
@@ -982,7 +984,7 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
                             <div
                               className="absolute inset-0 bg-no-repeat bg-right transition-all duration-500 z-10"
                               style={{
-                                backgroundImage: `url(${currentProjectImage})`,
+                                backgroundImage: `url(${coverUrl(currentProjectImage)})`,
                                 backgroundSize: '70%',
                                 opacity: isProjectsExploding ? 0 : 1,
                               }}

@@ -21,9 +21,10 @@ interface MobileFeaturesSectionProps {
 export const MobileFeaturesSection = ({ t, currentLanguage, sectionRef }: MobileFeaturesSectionProps) => {
   const langKey = currentLanguage.toLowerCase() as 'en' | 'no' | 'ua'
   // Same DB-backed lists as the desktop grid; the static data is only the first-paint fallback
-  const allFeatures = useFeatures()
   const allProjects = useProjects()
   const [isFeaturesModalOpen, setIsFeaturesModalOpen] = useState(false)
+  // Light list for the tile; full texts only once the features window has been opened
+  const allFeatures = useFeatures(isFeaturesModalOpen)
   const [selectedFeatureCategory, setSelectedFeatureCategory] = useState<FeatureCategory | undefined>(undefined)
   const [selectedFeatureId, setSelectedFeatureId] = useState<string | undefined>(undefined)
 
