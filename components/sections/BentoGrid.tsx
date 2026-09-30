@@ -536,7 +536,21 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
     }, 600);
   };
 
+  const [projectsFrame, setProjectsFrame] = useState<{ top: number; left: number; width: number; height: number } | null>(null);
+  const measureProjectsFrame = () => {
+    const r = gridContainerRef.current?.getBoundingClientRect();
+    setProjectsFrame(r ? { top: r.top, left: r.left, width: r.width, height: r.height } : null);
+  };
+
+  // Keep the projects window on the grid when the viewport changes while it is open
+  useEffect(() => {
+    if (!isProjectsModalOpen) return;
+    window.addEventListener('resize', measureProjectsFrame);
+    return () => window.removeEventListener('resize', measureProjectsFrame);
+  }, [isProjectsModalOpen]);
+
   const handleProjectsCardClick = (activeIndex: number) => {
+    measureProjectsFrame();
     // Track projects section click for analytics
     trackSectionClick('projects');
     setActiveProjectIndex(activeIndex);
@@ -1104,6 +1118,7 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
         projects={effectiveProjects}
         activeProjectIndex={activeProjectIndex}
         lang={lang}
+        frame={projectsFrame}
       />
 
       {/* Features Modal */}

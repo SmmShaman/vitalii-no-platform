@@ -25,9 +25,14 @@ interface ProjectsModalProps {
   projects: Project[];
   activeProjectIndex: number;
   lang: 'en' | 'no' | 'ua';
+  // Screen rectangle of the bento grid; both views fill it, like the expanded Services window
+  frame?: { top: number; left: number; width: number; height: number } | null;
 }
 
-export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex, lang }: ProjectsModalProps) => {
+export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex, lang, frame }: ProjectsModalProps) => {
+  const frameStyle: React.CSSProperties = frame
+    ? { top: frame.top, left: frame.left, width: frame.width, height: frame.height }
+    : { top: 16, left: 16, right: 16, bottom: 16 };
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
 
@@ -47,7 +52,7 @@ export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex
       <Dialog.Root open={open && !isDetailOpen} onOpenChange={onOpenChange}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 animate-in fade-in" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-6xl max-h-[90vh] bg-surface-darker/95 backdrop-blur-md rounded-2xl shadow-2xl border border-surface-border z-50 overflow-hidden">
+          <Dialog.Content style={frameStyle} className="fixed flex flex-col bg-surface-darker/95 backdrop-blur-md rounded-[2rem] shadow-2xl border border-surface-border z-50 overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-surface-border">
               <Dialog.Title className="text-2xl sm:text-3xl font-bold text-content">
@@ -59,8 +64,8 @@ export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex
             </div>
 
             {/* Projects Grid */}
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="p-6 overflow-y-auto flex-1 min-h-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {projects.map((project, index) => {
                   const isActive = index === activeProjectIndex;
 
@@ -121,7 +126,7 @@ export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex
       }}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] animate-in fade-in" />
-          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95vw] max-w-4xl max-h-[90vh] bg-surface-darker/95 backdrop-blur-md rounded-2xl shadow-2xl border border-surface-border z-[60] overflow-hidden">
+          <Dialog.Content style={frameStyle} className="fixed flex flex-col bg-surface-darker/95 backdrop-blur-md rounded-[2rem] shadow-2xl border border-surface-border z-[60] overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-surface-border">
               <Dialog.Title className="text-2xl sm:text-3xl font-bold text-content">
@@ -135,21 +140,20 @@ export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex
               </button>
             </div>
 
-            {/* Project Details */}
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-100px)]">
-              {/* Cover Image — fills the full width/height of the frame */}
+            {/* Project Details: cover on the left, write-up and features scroll on the right */}
+            <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
               {selectedProject?.image && (
-                <div className="mb-6 overflow-hidden rounded-xl">
+                <div className="relative shrink-0 h-48 lg:h-auto lg:w-2/5">
                   <Image
                     src={selectedProject.image}
                     alt={selectedProject.title}
-                    width={900}
-                    height={400}
-                    className="w-full h-[280px] sm:h-[360px] object-cover rounded-xl"
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                    className="object-cover"
                   />
                 </div>
               )}
-
+              <div className="flex-1 min-h-0 overflow-y-auto p-6 lg:p-8">
               {/* Full write-up */}
               <div className="max-w-none">
                 <p className="text-base sm:text-lg text-content-secondary leading-relaxed whitespace-pre-line">
@@ -175,6 +179,7 @@ export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex
                 >
                   Back to Projects
                 </button>
+              </div>
               </div>
             </div>
           </Dialog.Content>
