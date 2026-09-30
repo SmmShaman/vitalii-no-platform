@@ -1,0 +1,6 @@
+{"id": "g19", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "A driving guide narrates places you pass — but a spot that got a short, thin story early on stayed that way forever, even on roads you drive nightly."],
+  ["b2", "Now it checks which places you've actually driven past most in the last three weeks, and rewrites those first."],
+  ["b3", "It also matches Wikidata place names smarter, so the same farm spelled two ways on two maps stops duplicating."],
+  ["b4", "Your most-driven roads now get up to 10 sentences instead of 6."]
+]}

@@ -1,0 +1,47 @@
+{
+ "id": "m27",
+ "beat_durations": {
+  "b1": 8.4,
+  "b2": 8.976,
+  "b3": 7.368,
+  "b4": 3.336
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every lesson in a language app was written by one shared AI subscription \u2014 burn its quota, and every other project sharing it stalled too.",
+   "start_s": 0.5,
+   "end_s": 8.9,
+   "start_f": 15,
+   "end_f": 267
+  },
+  {
+   "beat": "b2",
+   "text": "Now a button copies the lesson prompt, so any outside AI can answer instead \u2014 like hiring any freelancer, not just the one under contract.",
+   "start_s": 9.2,
+   "end_s": 18.176,
+   "start_f": 276,
+   "end_f": 545
+  },
+  {
+   "beat": "b3",
+   "text": "A Cloudflare Worker reads that pasted answer straight into vocabulary words and dialogue lines, not a generic text dump.",
+   "start_s": 18.476,
+   "end_s": 25.844,
+   "start_f": 554,
+   "end_f": 775
+  },
+  {
+   "beat": "b4",
+   "text": "It only trusts that paste once it counts at least 3.",
+   "start_s": 26.144,
+   "end_s": 29.48,
+   "start_f": 784,
+   "end_f": 884
+  }
+ ],
+ "total_s": 30.98,
+ "durationInFrames": 929,
+ "measured_track_s": 29.544,
+ "track": "/root/feature-demos/vo-m27/vo-m27.mp3"
+}

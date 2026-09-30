@@ -1,0 +1,47 @@
+{
+ "id": "g19",
+ "beat_durations": {
+  "b1": 9.24,
+  "b2": 6.336,
+  "b3": 7.104,
+  "b4": 4.32
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A driving guide narrates places you pass \u2014 but a spot that got a short, thin story early on stayed that way forever, even on roads you drive nightly.",
+   "start_s": 0.5,
+   "end_s": 9.74,
+   "start_f": 15,
+   "end_f": 292
+  },
+  {
+   "beat": "b2",
+   "text": "Now it checks which places you've actually driven past most in the last three weeks, and rewrites those first.",
+   "start_s": 10.04,
+   "end_s": 16.376,
+   "start_f": 301,
+   "end_f": 491
+  },
+  {
+   "beat": "b3",
+   "text": "It also matches Wikidata place names smarter, so the same farm spelled two ways on two maps stops duplicating.",
+   "start_s": 16.676,
+   "end_s": 23.78,
+   "start_f": 500,
+   "end_f": 713
+  },
+  {
+   "beat": "b4",
+   "text": "Your most-driven roads now get up to 10 sentences instead of 6.",
+   "start_s": 24.08,
+   "end_s": 28.4,
+   "start_f": 722,
+   "end_f": 852
+  }
+ ],
+ "total_s": 29.9,
+ "durationInFrames": 897,
+ "measured_track_s": 28.464,
+ "track": "/root/feature-demos/vo-g19/vo-g19.mp3"
+}

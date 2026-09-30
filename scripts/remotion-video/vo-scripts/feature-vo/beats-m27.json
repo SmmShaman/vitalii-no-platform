@@ -1,0 +1,6 @@
+{"id": "m27", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every lesson in a language app was written by one shared AI subscription — burn its quota, and every other project sharing it stalled too."],
+  ["b2", "Now a button copies the lesson prompt, so any outside AI can answer instead — like hiring any freelancer, not just the one under contract."],
+  ["b3", "A Cloudflare Worker reads that pasted answer straight into vocabulary words and dialogue lines, not a generic text dump."],
+  ["b4", "It only trusts that paste once it counts at least 3."]
+]}
