@@ -88,10 +88,10 @@ export function TopArticlesStrip({ kind, initialItems, initialPeriod = 30 }: Top
               key={p}
               onClick={() => switchPeriod(p)}
               aria-pressed={period === p}
-              className={`px-2 py-0.5 rounded-md text-[11px] font-medium transition-colors ${
+              className={`px-2.5 py-1.5 sm:px-2 sm:py-0.5 rounded-md text-xs sm:text-[11px] font-medium transition-colors ${
                 period === p
                   ? 'bg-brand text-white'
-                  : 'bg-[#2E2E34] text-[#B0B0B8] hover:bg-[#38383E]'
+                  : 'bg-[rgb(var(--surface-listing-elevated))] text-[rgb(var(--text-listing-secondary))] hover:bg-[rgb(var(--surface-listing-hover))]'
               }`}
             >
               {label(p)}
@@ -106,8 +106,12 @@ export function TopArticlesStrip({ kind, initialItems, initialPeriod = 30 }: Top
           const title = item[`title_${lang}`] || item.title_en || ''
           const slug = item[`slug_${lang}`] || item.slug_en || item.id
           return (
-            <li key={item.id} className="flex items-baseline gap-2 min-w-0 text-xs">
-              <span className="font-mono font-semibold text-[#8A8A94] w-4 flex-shrink-0">{index + 1}</span>
+            <li
+              key={item.id}
+              // Phones get the top 5 with a finger-sized row; the full top 10 from sm up
+              className={`${index >= 5 ? 'hidden sm:flex' : 'flex'} items-baseline gap-2 min-w-0 text-sm sm:text-xs py-1.5 sm:py-0`}
+            >
+              <span className="font-mono font-semibold text-[rgb(var(--text-listing-muted))] w-4 flex-shrink-0">{index + 1}</span>
               <Link
                 href={`/${kind}/${slug}`}
                 className="truncate text-content-secondary hover:text-brand-light transition-colors"
@@ -115,7 +119,7 @@ export function TopArticlesStrip({ kind, initialItems, initialPeriod = 30 }: Top
               >
                 {title}
               </Link>
-              <span className="flex items-center gap-2 ml-auto flex-shrink-0 text-[#8A8A94] font-mono">
+              <span className="flex items-center gap-2 ml-auto flex-shrink-0 text-[rgb(var(--text-listing-muted))] font-mono">
                 <span className="flex items-center gap-0.5">
                   <Eye className="w-3 h-3" />
                   {compact(item.views)}

@@ -147,7 +147,7 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
   if (isMobile) {
     return (
       <header className="w-full">
-        <div className="flex items-center justify-between">
+        <div className="relative flex items-center justify-between">
           <div className="flex-1">
             <h1
               className="font-bold text-red-500 font-comfortaa"
@@ -173,7 +173,7 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
           {/* Search + compact language buttons */}
           <div className="flex items-center gap-1 flex-shrink-0">
             {/* Search — before lang buttons, expands right */}
-            <div className="relative z-20">
+            <div className="z-20">
               <NeoIconButton
                 onClick={handleSearchToggle}
                 effect="shine"
@@ -191,11 +191,11 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
               <AnimatePresence>
                 {searchOpen && (
                   <motion.div
-                    initial={{ scaleX: 0, opacity: 0 }}
-                    animate={{ scaleX: 1, opacity: 1 }}
-                    exit={{ scaleX: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: 'easeOut' }}
-                    className="absolute left-8 top-1/2 -translate-y-1/2 w-40 origin-left"
+                    initial={{ scaleY: 0.6, opacity: 0 }}
+                    animate={{ scaleY: 1, opacity: 1 }}
+                    exit={{ scaleY: 0.6, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                    className="absolute left-0 right-0 top-full mt-2 z-30 origin-top"
                   >
                     <input
                       ref={searchInputRef}
@@ -205,7 +205,7 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
                       onBlur={handleSearchBlur}
                       onKeyDown={handleSearchKeyDown}
                       placeholder={t('search_placeholder_short') as string}
-                      className="w-full px-2 py-1 rounded-lg bg-surface text-content text-xs placeholder-content-faint border border-surface-border shadow-lg backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-brand-light"
+                      className="w-full px-3 py-2 rounded-lg bg-surface text-content text-base placeholder-content-faint border border-surface-border shadow-lg backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-brand-light"
                     />
                   </motion.div>
                 )}

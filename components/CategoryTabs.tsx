@@ -67,7 +67,9 @@ export function CategoryTabs({ tags, activeTag, onTagChange }: CategoryTabsProps
   const isOtherActive = activeTag === '__other__'
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2">
+    <div className="flex items-center gap-2 md:justify-center">
+      {/* Mobile: one swipeable row so the sticky header stays short; desktop wraps */}
+      <div className="flex flex-1 md:flex-initial items-center gap-2 overflow-x-auto md:overflow-visible md:flex-wrap md:justify-center scrollbar-hide -my-1 py-1">
       {/* Visible tag tabs — each with its own color */}
       {visibleTags.map((tag, index) => {
         const color = getCategoryColor(index)
@@ -81,7 +83,7 @@ export function CategoryTabs({ tags, activeTag, onTagChange }: CategoryTabsProps
               ? { backgroundColor: color.activeBg, color: '#fff' }
               : { backgroundColor: color.pillBg, color: color.text }
             }
-            className="px-3 py-1.5 rounded-full text-sm font-medium transition-all hover:opacity-80 shadow-sm"
+            className="flex-shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-all hover:opacity-80 shadow-sm"
           >
             {tag.tag_name}
             <span className="ml-1 text-xs opacity-60">{tag.article_count}</span>
@@ -97,28 +99,30 @@ export function CategoryTabs({ tags, activeTag, onTagChange }: CategoryTabsProps
             ? { backgroundColor: OTHER_COLOR.activeBg, color: '#fff' }
             : { backgroundColor: OTHER_COLOR.pillBg, color: OTHER_COLOR.text }
           }
-          className="px-3 py-1.5 rounded-full text-sm font-medium transition-all hover:opacity-80 shadow-sm"
+          className="flex-shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-sm font-medium transition-all hover:opacity-80 shadow-sm"
         >
           {t('category_other')}
         </button>
       )}
+      </div>
 
       {/* Dropdown for hidden tags on mobile */}
       {isMobile && hiddenTags.length > 0 && (
-        <div className="relative" ref={dropdownRef}>
+        <div className="relative flex-shrink-0" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1 ${
+            aria-label={t('category_other')}
+            className={`min-w-[36px] min-h-[36px] justify-center px-2 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1 ${
               hiddenTags.some(t => t.tag_name === activeTag)
                 ? 'bg-brand text-white'
-                : 'bg-[#38383E] text-[#B0B0B8] hover:bg-[#48484E]'
+                : 'bg-[rgb(var(--surface-listing-hover))] text-[rgb(var(--text-listing-secondary))] hover:bg-[rgb(var(--surface-listing-border))]'
             }`}
           >
             <ChevronDown className={`w-4 h-4 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {dropdownOpen && (
-            <div className="absolute top-full mt-1 right-0 z-50 bg-[#242428] border border-[#3C3C44] rounded-xl shadow-xl py-1 min-w-[160px] max-h-[240px] overflow-y-auto">
+            <div className="absolute top-full mt-1 right-0 z-50 bg-[rgb(var(--surface-listing))] border border-[rgb(var(--surface-listing-border))] rounded-xl shadow-xl py-1 min-w-[160px] max-h-[240px] overflow-y-auto">
               {hiddenTags.map((tag) => (
                 <button
                   key={tag.tag_name}
@@ -129,7 +133,7 @@ export function CategoryTabs({ tags, activeTag, onTagChange }: CategoryTabsProps
                   className={`w-full text-left px-3 py-2 text-sm transition-colors ${
                     activeTag === tag.tag_name
                       ? 'bg-brand/20 text-brand-light'
-                      : 'text-[#B0B0B8] hover:bg-[#38383E]'
+                      : 'text-[rgb(var(--text-listing-secondary))] hover:bg-[rgb(var(--surface-listing-hover))]'
                   }`}
                 >
                   {tag.tag_name}

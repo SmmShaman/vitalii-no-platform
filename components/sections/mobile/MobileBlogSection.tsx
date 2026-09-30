@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Calendar, Eye, ChevronRight, Loader2 } from 'lucide-react'
+import { Calendar, Eye, ChevronRight, Loader2, BookOpen } from 'lucide-react'
 import { getAllBlogPosts } from '@/integrations/supabase/client'
 import { sectionColors } from './types'
 import { VerticalLabel } from './VerticalLabel'
@@ -237,7 +237,7 @@ export const MobileBlogSection = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.blog.gradient} shadow-sm relative h-48 overflow-hidden`}
+          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.blog.gradient} shadow-sm relative overflow-hidden`}
         >
           {/* Vertical Label */}
           <VerticalLabel text={t('blog_title') as string} color={sectionColors.blog.icon} />
@@ -246,7 +246,7 @@ export const MobileBlogSection = ({
           <div className="flex justify-end mb-2">
             <button
               onClick={() => setIsBlogListOpen(true)}
-              className="text-xs font-medium flex items-center gap-1"
+              className="text-xs font-medium flex items-center gap-1 min-h-[36px] px-2 -mr-2 -my-2"
               style={{ color: sectionColors.blog.icon }}
             >
               {t('view_all' as any) || 'View all'}
@@ -273,17 +273,24 @@ export const MobileBlogSection = ({
                       whileTap={{ scale: 0.98 }}
                       className="w-44 flex-shrink-0 bg-surface/80 rounded-xl overflow-hidden shadow-sm"
                     >
-                      {(item.processed_image_url || item.image_url || item.cover_image_url) && (
-                        <div className="h-24 overflow-hidden">
+                      {/* Fixed image slot keeps every card the same height; tinted placeholder when there is no image */}
+                      <div
+                        className="h-24 overflow-hidden flex items-center justify-center"
+                        style={{ backgroundColor: `${sectionColors.blog.icon}1f` }}
+                      >
+                        {(item.processed_image_url || item.image_url || item.cover_image_url) ? (
                           <img
                             src={item.processed_image_url || item.image_url || item.cover_image_url}
                             alt={getLocalizedField(item, 'title')}
+                            loading="lazy"
                             className="w-full h-full object-cover"
                           />
-                        </div>
-                      )}
+                        ) : (
+                          <BookOpen className="w-7 h-7 opacity-60" style={{ color: sectionColors.blog.icon }} />
+                        )}
+                      </div>
                       <div className="p-2.5">
-                        <h4 className="font-semibold text-content text-xs line-clamp-2">
+                        <h4 className="font-semibold text-content text-xs line-clamp-2 min-h-[2rem]">
                           {getLocalizedField(item, 'title')}
                         </h4>
                         <div className="flex items-center gap-2 mt-1.5 text-xs text-content-muted">

@@ -42,10 +42,12 @@ function compact(n: number): string {
 
 interface LiveStatsBadgeProps {
   className?: string
+  /** Show at most this many flags and a "+N" counter (phones: the row must fit one screen width) */
+  maxFlags?: number
   style?: React.CSSProperties
 }
 
-export function LiveStatsBadge({ className = '', style }: LiveStatsBadgeProps) {
+export function LiveStatsBadge({ className = '', style, maxFlags }: LiveStatsBadgeProps) {
   const { t } = useTranslations()
   const [stats, setStats] = useState<LiveStats | null>(null)
 
@@ -95,9 +97,12 @@ export function LiveStatsBadge({ className = '', style }: LiveStatsBadgeProps) {
         <span className="opacity-70">{t('live_now' as any)}</span>
         {flags.length > 0 && (
           <span className="flex items-center gap-[1px] leading-none" aria-label={flags.join(' ')}>
-            {flags.map((code, i) => (
+            {(maxFlags ? flags.slice(0, maxFlags) : flags).map((code, i) => (
               <span key={`${code}-${i}`} title={code}>{flagOf(code)}</span>
             ))}
+            {maxFlags && flags.length > maxFlags && (
+              <span className="ml-0.5 opacity-70">+{flags.length - maxFlags}</span>
+            )}
           </span>
         )}
       </span>

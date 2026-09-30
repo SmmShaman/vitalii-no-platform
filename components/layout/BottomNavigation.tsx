@@ -59,13 +59,16 @@ export const BottomNavigation = ({ activeSection, onSectionChange }: BottomNavig
         <div className="flex items-center justify-around px-2 py-2">
           {navItems.map((item) => {
             const Icon = item.icon
-            const isActive = activeSection === item.id
+            // Features live under Projects, so the Projects tab stays lit while scrolling through them
+            const isActive = activeSection === item.id || (item.id === 'projects' && activeSection === 'features')
             const color = navColors[item.id]
 
             return (
               <motion.button
                 key={item.id}
                 onClick={() => onSectionChange(item.id)}
+                aria-label={t(item.labelKey as any) || item.id}
+                aria-current={isActive ? 'page' : undefined}
                 className="relative flex flex-col items-center justify-center px-3 py-2 rounded-xl transition-all"
                 whileTap={{ scale: 0.9 }}
                 style={{

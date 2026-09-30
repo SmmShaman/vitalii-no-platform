@@ -155,11 +155,11 @@ function NewsListingInner({
         <TagParamSync onChange={setTagParam} />
       </Suspense>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))]/95 backdrop-blur-sm border-b border-[#3C3C44]">
+      <header className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))]/95 backdrop-blur-sm border-b border-[rgb(var(--surface-listing-border))]">
         <div className="px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3">
           <Link
             href="/"
-            className="flex items-center gap-2 text-[#B0B0B8] hover:text-content transition-colors group flex-shrink-0"
+            className="flex items-center gap-2 text-[rgb(var(--text-listing-secondary))] hover:text-content transition-colors group flex-shrink-0"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span className="font-bold text-amber-500 text-lg hidden sm:inline">Vitalii Berbeha</span>
@@ -178,7 +178,7 @@ function NewsListingInner({
                 className={`px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
                   currentLanguage === lang
                     ? 'bg-brand text-white'
-                    : 'bg-[#2E2E34] text-[#B0B0B8] hover:bg-[#38383E]'
+                    : 'bg-[rgb(var(--surface-listing-elevated))] text-[rgb(var(--text-listing-secondary))] hover:bg-[rgb(var(--surface-listing-hover))]'
                 }`}
               >
                 {lang}
@@ -189,7 +189,7 @@ function NewsListingInner({
 
         {/* Category tabs */}
         {tags.length > 0 && (
-          <div className="px-4 sm:px-6 lg:px-8 py-2 border-t border-[#3C3C44]/50">
+          <div className="px-4 sm:px-6 lg:px-8 py-2 border-t border-[rgb(var(--surface-listing-border))]/50">
             <CategoryTabs
               tags={tags}
               activeTag={activeTag}
@@ -208,13 +208,13 @@ function NewsListingInner({
           </div>
         ) : results.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <SearchX className="w-12 h-12 text-[#8A8A94] mb-4" />
-            <p className="text-lg font-medium text-[#B0B0B8]">{t('listing_no_articles')}</p>
+            <SearchX className="w-12 h-12 text-[rgb(var(--text-listing-muted))] mb-4" />
+            <p className="text-lg font-medium text-[rgb(var(--text-listing-secondary))]">{t('listing_no_articles')}</p>
           </div>
         ) : (
           <>
             {/* Count */}
-            <div className="mb-3 text-xs text-[#8A8A94]">
+            <div className="mb-3 text-xs text-[rgb(var(--text-listing-muted))]">
               {totalCount} {t('search_results_count')}
             </div>
 
@@ -237,7 +237,7 @@ function NewsListingInner({
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="px-6 py-2.5 rounded-full text-sm font-medium bg-[#2E2E34] text-content-secondary hover:bg-[#38383E] disabled:opacity-50 transition-all flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-full text-sm font-medium bg-[rgb(var(--surface-listing-elevated))] text-content-secondary hover:bg-[rgb(var(--surface-listing-hover))] disabled:opacity-50 transition-all flex items-center gap-2"
                 >
                   {loadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
                   {t('listing_load_more')}

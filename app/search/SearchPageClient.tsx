@@ -197,31 +197,32 @@ function SearchPageInner() {
   return (
     <div className="min-h-screen bg-[rgb(var(--surface-listing))] flex flex-col" style={{ backgroundImage: pageBgTint !== 'transparent' ? `linear-gradient(${pageBgTint}, ${pageBgTint})` : undefined }}>
       {/* Compact Sticky Header — 2 rows */}
-      <header className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))]/95 backdrop-blur-sm border-b border-[#3C3C44]">
+      <header className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))]/95 backdrop-blur-sm border-b border-[rgb(var(--surface-listing-border))]">
         {/* Row 1: Brand + Search Input + Language */}
-        <div className="px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3">
+        <div className="px-4 sm:px-6 lg:px-8 py-2.5 flex flex-wrap sm:flex-nowrap items-center gap-x-2 gap-y-2 sm:gap-3">
           <Link
             href="/"
-            className="flex items-center gap-2 text-[#B0B0B8] hover:text-content transition-colors group flex-shrink-0"
+            className="flex items-center gap-2 text-[rgb(var(--text-listing-secondary))] hover:text-content transition-colors group flex-shrink-0"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span className="font-bold text-amber-500 text-lg hidden sm:inline">Vitalii Berbeha</span>
           </Link>
 
           {/* Search input — flexible width */}
-          <div className="relative flex-1 max-w-2xl">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8A8A94]" />
+          {/* Mobile: the input takes its own full-width line below tabs + languages */}
+          <div className="relative order-last sm:order-none basis-full sm:basis-auto flex-1 min-w-0 max-w-2xl">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-listing-muted))]" />
             <input
               type="text"
               value={localQuery}
               onChange={(e) => handleQueryChange(e.target.value)}
               placeholder={t('search_articles_placeholder')}
-              className="w-full pl-9 pr-9 py-2 rounded-lg border border-[#3C3C44] bg-[#2E2E34] text-sm text-content placeholder-[#8A8A94] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-[#6366F1] transition-all"
+              className="w-full pl-9 pr-9 py-2 rounded-lg border border-[rgb(var(--surface-listing-border))] bg-[rgb(var(--surface-listing-elevated))] text-sm text-content placeholder-[rgb(var(--text-listing-muted))] focus:outline-none focus:ring-2 focus:ring-brand/30 focus:border-[#6366F1] transition-all"
             />
             {localQuery && (
               <button
                 onClick={() => { setLocalQuery(''); updateFilters({ q: '' }) }}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[#38383E] text-[#8A8A94] hover:text-[#B0B0B8] transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-[rgb(var(--surface-listing-hover))] text-[rgb(var(--text-listing-muted))] hover:text-[rgb(var(--text-listing-secondary))] transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -234,10 +235,10 @@ function SearchPageInner() {
               <button
                 key={tab.key}
                 onClick={() => updateFilters({ type: tab.key, tag: '' })}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                className={`px-2.5 sm:px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   typeParam === tab.key
                     ? 'bg-brand text-white shadow-sm'
-                    : 'bg-[#38383E] text-[#B0B0B8] hover:bg-[#3C3C44]'
+                    : 'bg-[rgb(var(--surface-listing-hover))] text-[rgb(var(--text-listing-secondary))] hover:bg-[rgb(var(--surface-listing-border))]'
                 }`}
               >
                 {tab.label}
@@ -254,7 +255,7 @@ function SearchPageInner() {
                 className={`px-2.5 py-1.5 rounded-md text-xs font-semibold transition-all ${
                   currentLanguage === lang
                     ? 'bg-brand text-white'
-                    : 'bg-[#2E2E34] text-[#B0B0B8] hover:bg-[#38383E]'
+                    : 'bg-[rgb(var(--surface-listing-elevated))] text-[rgb(var(--text-listing-secondary))] hover:bg-[rgb(var(--surface-listing-hover))]'
                 }`}
                 aria-label={`Switch to ${lang}`}
               >
@@ -265,7 +266,7 @@ function SearchPageInner() {
         </div>
 
         {/* Row 2: Categories + Count */}
-        <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-2 border-t border-[#3C3C44]/50">
+        <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-2 border-t border-[rgb(var(--surface-listing-border))]/50">
           <div className="flex-1 min-w-0">
             <CategoryTabs
               tags={categoryTags}
@@ -279,8 +280,8 @@ function SearchPageInner() {
             onClick={() => setShowDateFilters(!showDateFilters)}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs transition-all flex-shrink-0 ${
               showDateFilters || dateFromParam || dateToParam
-                ? 'bg-[#38383E] text-brand-light'
-                : 'bg-[#38383E] text-[#B0B0B8] hover:bg-[#3C3C44]'
+                ? 'bg-[rgb(var(--surface-listing-hover))] text-brand-light'
+                : 'bg-[rgb(var(--surface-listing-hover))] text-[rgb(var(--text-listing-secondary))] hover:bg-[rgb(var(--surface-listing-border))]'
             }`}
           >
             <Calendar className="w-3 h-3" />
@@ -289,7 +290,7 @@ function SearchPageInner() {
 
           {/* Result count */}
           {totalCount > 0 && (
-            <span className="text-xs text-[#8A8A94] flex-shrink-0">
+            <span className="text-xs text-[rgb(var(--text-listing-muted))] flex-shrink-0">
               {totalCount} {t('search_results_count')}
             </span>
           )}
@@ -297,23 +298,23 @@ function SearchPageInner() {
 
         {/* Expandable date range (not a permanent row) */}
         {showDateFilters && (
-          <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-3 flex-wrap border-t border-[#3C3C44]/30">
+          <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-3 flex-wrap border-t border-[rgb(var(--surface-listing-border))]/30">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#B0B0B8]">{t('search_date_from')}:</span>
+              <span className="text-xs text-[rgb(var(--text-listing-secondary))]">{t('search_date_from')}:</span>
               <input
                 type="date"
                 value={dateFromParam}
                 onChange={(e) => updateFilters({ dateFrom: e.target.value })}
-                className="px-2.5 py-1 rounded-lg border border-[#3C3C44] bg-[#2E2E34] text-xs text-content-secondary focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-[#6366F1]"
+                className="px-2.5 py-1 rounded-lg border border-[rgb(var(--surface-listing-border))] bg-[rgb(var(--surface-listing-elevated))] text-xs text-content-secondary focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-[#6366F1]"
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#B0B0B8]">{t('search_date_to')}:</span>
+              <span className="text-xs text-[rgb(var(--text-listing-secondary))]">{t('search_date_to')}:</span>
               <input
                 type="date"
                 value={dateToParam}
                 onChange={(e) => updateFilters({ dateTo: e.target.value })}
-                className="px-2.5 py-1 rounded-lg border border-[#3C3C44] bg-[#2E2E34] text-xs text-content-secondary focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-[#6366F1]"
+                className="px-2.5 py-1 rounded-lg border border-[rgb(var(--surface-listing-border))] bg-[rgb(var(--surface-listing-elevated))] text-xs text-content-secondary focus:outline-none focus:ring-2 focus:ring-brand/20 focus:border-[#6366F1]"
               />
             </div>
             {(dateFromParam || dateToParam) && (
@@ -337,9 +338,9 @@ function SearchPageInner() {
           </div>
         ) : results.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <SearchX className="w-12 h-12 text-[#8A8A94] mb-4" />
-            <p className="text-lg font-medium text-[#B0B0B8]">{t('search_no_results')}</p>
-            <p className="text-sm text-[#8A8A94] mt-1">{t('search_no_results_hint')}</p>
+            <SearchX className="w-12 h-12 text-[rgb(var(--text-listing-muted))] mb-4" />
+            <p className="text-lg font-medium text-[rgb(var(--text-listing-secondary))]">{t('search_no_results')}</p>
+            <p className="text-sm text-[rgb(var(--text-listing-muted))] mt-1">{t('search_no_results_hint')}</p>
             {(tagParam || queryParam || dateFromParam || dateToParam) && (
               <button
                 onClick={() => router.replace('/search')}
@@ -370,7 +371,7 @@ function SearchPageInner() {
                 <button
                   onClick={handleLoadMore}
                   disabled={loadingMore}
-                  className="px-6 py-2.5 rounded-full text-sm font-medium bg-[#2E2E34] text-content-secondary hover:bg-[#38383E] disabled:opacity-50 transition-all flex items-center gap-2"
+                  className="px-6 py-2.5 rounded-full text-sm font-medium bg-[rgb(var(--surface-listing-elevated))] text-content-secondary hover:bg-[rgb(var(--surface-listing-hover))] disabled:opacity-50 transition-all flex items-center gap-2"
                 >
                   {loadingMore && <Loader2 className="w-4 h-4 animate-spin" />}
                   {t('search_load_more')}
@@ -393,31 +394,31 @@ function SearchPageInner() {
 function SearchSkeleton() {
   return (
     <div className="min-h-screen bg-[rgb(var(--surface-listing))] flex flex-col">
-      <div className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))] border-b border-[#3C3C44]">
+      <div className="sticky top-0 z-50 bg-[rgb(var(--surface-listing))] border-b border-[rgb(var(--surface-listing-border))]">
         <div className="px-4 sm:px-6 lg:px-8 py-2.5 flex items-center gap-3">
-          <div className="h-6 w-36 bg-[#38383E] rounded animate-pulse" />
-          <div className="flex-1 max-w-2xl h-9 bg-[#38383E] rounded-lg animate-pulse" />
+          <div className="h-6 w-36 bg-[rgb(var(--surface-listing-hover))] rounded animate-pulse" />
+          <div className="flex-1 max-w-2xl h-9 bg-[rgb(var(--surface-listing-hover))] rounded-lg animate-pulse" />
           <div className="flex gap-1">
-            <div className="h-7 w-8 bg-[#38383E] rounded animate-pulse" />
-            <div className="h-7 w-8 bg-[#38383E] rounded animate-pulse" />
-            <div className="h-7 w-8 bg-[#38383E] rounded animate-pulse" />
+            <div className="h-7 w-8 bg-[rgb(var(--surface-listing-hover))] rounded animate-pulse" />
+            <div className="h-7 w-8 bg-[rgb(var(--surface-listing-hover))] rounded animate-pulse" />
+            <div className="h-7 w-8 bg-[rgb(var(--surface-listing-hover))] rounded animate-pulse" />
           </div>
         </div>
         <div className="px-4 sm:px-6 lg:px-8 py-2 flex items-center gap-2">
-          <div className="h-6 w-14 bg-[#38383E] rounded-full animate-pulse" />
-          <div className="h-6 w-16 bg-[#38383E] rounded-full animate-pulse" />
-          <div className="h-6 w-14 bg-[#38383E] rounded-full animate-pulse" />
+          <div className="h-6 w-14 bg-[rgb(var(--surface-listing-hover))] rounded-full animate-pulse" />
+          <div className="h-6 w-16 bg-[rgb(var(--surface-listing-hover))] rounded-full animate-pulse" />
+          <div className="h-6 w-14 bg-[rgb(var(--surface-listing-hover))] rounded-full animate-pulse" />
         </div>
       </div>
       <main className="flex-1 px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="bg-[#2E2E34] rounded-xl overflow-hidden border border-[#3C3C44]">
-              <div className="w-full aspect-video bg-[#38383E] animate-pulse" />
+            <div key={i} className="bg-[rgb(var(--surface-listing-elevated))] rounded-xl overflow-hidden border border-[rgb(var(--surface-listing-border))]">
+              <div className="w-full aspect-video bg-[rgb(var(--surface-listing-hover))] animate-pulse" />
               <div className="p-4">
-                <div className="h-5 w-full bg-[#38383E] rounded mb-2 animate-pulse" />
-                <div className="h-5 w-3/4 bg-[#38383E] rounded mb-3 animate-pulse" />
-                <div className="h-3 w-24 bg-[#38383E] rounded animate-pulse" />
+                <div className="h-5 w-full bg-[rgb(var(--surface-listing-hover))] rounded mb-2 animate-pulse" />
+                <div className="h-5 w-3/4 bg-[rgb(var(--surface-listing-hover))] rounded mb-3 animate-pulse" />
+                <div className="h-3 w-24 bg-[rgb(var(--surface-listing-hover))] rounded animate-pulse" />
               </div>
             </div>
           ))}

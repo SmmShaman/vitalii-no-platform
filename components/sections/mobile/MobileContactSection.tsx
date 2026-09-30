@@ -39,9 +39,9 @@ const socialLinks: SocialLink[] = [
   { icon: Send, href: 'https://t.me/smmshaman', label: 'Telegram', username: '@SmmShaman', color: '#0088cc' },
   { icon: Facebook, href: 'https://facebook.com/smm.shaman', label: 'Facebook', username: 'smm.shaman', color: '#1877F2' },
   { icon: Linkedin, href: 'https://linkedin.com/in/smmshaman', label: 'LinkedIn', username: 'smmshaman', color: '#0A66C2' },
-  { icon: Github, href: 'https://github.com/SmmShaman', label: 'GitHub', username: 'SmmShaman', color: '#333' },
-  { icon: Twitter, href: 'https://twitter.com/SmmShaman', label: 'Twitter/X', username: '@SmmShaman', color: '#000' },
-  { icon: TikTokIcon, href: 'https://tiktok.com/@stuardbmw', label: 'TikTok', username: '@stuardbmw', color: '#000' },
+  { icon: Github, href: 'https://github.com/SmmShaman', label: 'GitHub', username: 'SmmShaman', color: '#333333' },
+  { icon: Twitter, href: 'https://twitter.com/SmmShaman', label: 'Twitter/X', username: '@SmmShaman', color: '#000000' },
+  { icon: TikTokIcon, href: 'https://tiktok.com/@stuardbmw', label: 'TikTok', username: '@stuardbmw', color: '#000000' },
 ]
 
 // Contacts Overlay Component with QR codes and email form

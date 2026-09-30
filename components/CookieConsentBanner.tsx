@@ -34,12 +34,16 @@ export function CookieConsentBanner() {
           className="fixed bottom-0 left-0 right-0 md:bottom-4 md:left-1/2 md:-translate-x-1/2 md:right-auto md:w-auto z-[9999] px-2 pb-2 md:px-0 md:pb-0"
           style={{ paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))' }}
         >
-          <div className="flex flex-wrap md:flex-nowrap items-center gap-x-3 gap-y-2 rounded-xl border border-white/10 bg-[#1C1C22]/95 px-3 py-2 shadow-lg backdrop-blur-md">
-            <p className="text-[11px] leading-snug text-white/75 flex-1 min-w-[190px]">
+          {/* Always-dark bar: colors are inline because light mode repaints .text-white/* and .border-white/* via globals.css */}
+          <div
+            className="flex flex-wrap md:flex-nowrap items-center gap-x-3 gap-y-2 rounded-xl border px-3 py-2 shadow-lg backdrop-blur-md"
+            style={{ backgroundColor: 'rgba(28, 28, 34, 0.95)', borderColor: 'rgba(255, 255, 255, 0.1)' }}
+          >
+            <p className="text-xs md:text-[11px] leading-snug flex-1 min-w-0 basis-full md:basis-auto" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
               {t('cookie_bar_text')}{' '}
               <Link
                 href="/informasjonskapsler"
-                className="underline underline-offset-2 text-white/55 hover:text-white/90 transition-colors"
+                className="underline underline-offset-2 opacity-75 hover:opacity-100 transition-opacity"
               >
                 {t('cookie_read_more')}
               </Link>
@@ -47,13 +51,15 @@ export function CookieConsentBanner() {
             <div className="flex items-center gap-2 flex-shrink-0 ml-auto">
               <button
                 onClick={() => updateConsent(false)}
-                className="px-3 py-1.5 rounded-lg text-[11px] font-medium text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                className="min-h-[40px] md:min-h-0 px-3 py-1.5 rounded-lg text-xs md:text-[11px] font-medium opacity-80 hover:opacity-100 transition-opacity"
+                style={{ color: '#ffffff' }}
               >
                 {t('cookie_only_necessary')}
               </button>
               <button
                 onClick={() => updateConsent(true)}
-                className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-white/90 text-[#1C1C22] hover:bg-white transition-colors"
+                className="min-h-[40px] md:min-h-0 px-3 py-1.5 rounded-lg text-xs md:text-[11px] font-semibold transition-opacity hover:opacity-90"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.92)', color: '#1C1C22' }}
               >
                 {t('cookie_accept_all')}
               </button>

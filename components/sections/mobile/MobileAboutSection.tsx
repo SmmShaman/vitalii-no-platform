@@ -139,18 +139,23 @@ export const MobileAboutSection = ({ t, currentLanguage, sectionRef, isMounted }
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           onClick={() => setIsAboutExpanded(true)}
-          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.home.gradient} shadow-sm relative h-48 cursor-pointer active:scale-[0.98] transition-transform`}
+          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.home.gradient} shadow-sm relative h-48 flex flex-col cursor-pointer active:scale-[0.98] transition-transform`}
         >
           {/* Vertical Label */}
           <VerticalLabel text={t('about_title') as string} color={sectionColors.home.icon} />
 
           {/* Hint to tap */}
-          <div className="absolute top-3 right-3 text-xs font-medium opacity-60" style={{ color: sectionColors.home.icon }}>
+          {/* Own row, so the typed text never runs underneath it */}
+          <div className="flex justify-end -mt-1 mb-1 text-xs font-medium opacity-60 flex-shrink-0" style={{ color: sectionColors.home.icon }}>
             {t('tap_to_expand' as any) || 'Tap to expand'}
           </div>
 
-          {/* Scrollable text container with auto-scroll */}
-          <div ref={aboutTextRef} className="h-full overflow-y-auto pr-2 scrollbar-thin scroll-smooth">
+          {/* Scrollable text container with auto-scroll; top edge fades instead of cutting glyphs */}
+          <div
+            ref={aboutTextRef}
+            className="flex-1 min-h-0 overflow-y-auto pr-2 scrollbar-thin scroll-smooth"
+            style={{ maskImage: 'linear-gradient(to bottom, transparent 0, black 1.25rem)', WebkitMaskImage: 'linear-gradient(to bottom, transparent 0, black 1.25rem)' }}
+          >
             <p className="text-base leading-relaxed text-content-secondary whitespace-pre-line">
               {typedText}
               {isTyping && (

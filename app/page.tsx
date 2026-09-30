@@ -78,7 +78,7 @@ export default function HomePage() {
           <>
             <div className="flex-shrink-0 relative z-20 p-3 pb-2">
               <Header hoveredSection={hoveredSection} />
-              <LiveStatsBadge className="mt-1 text-[0.65rem] text-content-secondary overflow-x-auto" />
+              <LiveStatsBadge maxFlags={5} className="mt-1 text-[0.7rem] text-content-secondary overflow-x-auto scrollbar-hide" />
             </div>
             <main className="relative z-10 flex-1 min-h-0 px-2">
               <BentoGridMobile onHoveredSectionChange={handleSectionChange} />
