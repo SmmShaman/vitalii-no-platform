@@ -1,28 +1,35 @@
 /**
  * FeatureHomeAgentSurvivesOwnG15 — feature g15 — 1280x720, 932 frames @ 30fps, VOICE-SYNCED.
  *
- * ART DIRECTION: archetype 5 "ledger", mood "dawn" (both handed down by the
- * orchestrating session, not re-rolled). One receipt-style ledger card is the
- * recurring element across beats 1 and 2: a single enforcer line is itemised,
- * then a "IF THIS MACHINE STOPS" section is appended below it (all danger
- * rows) — the same non-crossfade append move as the b47/k02 ledger siblings.
- * Beat 3 drops the card entirely for a stark "nobody noticed" reveal (a muted
- * bell + a suddenly-unblocked phone). Beat 4 scale-pushes the real feature
- * page in as the substantiated claim ("a second machine … watches too").
- * Beat 5 is a drawn leader/standby schematic (the second non-crossfade move —
- * a slide-in), with the clip's one tech chip, "Cloudflare Worker", and a
- * plain-English gloss under it. Beat 6 rises in on a LogWindow (the third
- * non-crossfade move) and holds flat to the final frame.
+ * RE-SHOOT (2026-09-30): same narration, new picture. Archetype 5 "ledger",
+ * mood "sand" (both handed down). The whole clip is one thermal-paper
+ * enforcement receipt: rows print in black/green when things work, in red
+ * when they don't, and the payoff literally follows the archetype's own
+ * definition — "the same ledger rewritten in green with the total struck
+ * through" — as the closing image of beat 6.
  *
- * Beats 1 and 2 (single-machine ledger) and beat 3 (nobody-noticed reveal)
- * are metaphor/plumbing, so they stay drawn per STEP 0c. Beat 4 is the
- * substantiated claim, so it plays a recording of the real feature page
- * (shots/g15.json, shot "page"). Beat 6 does NOT play the feature page or
- * the hub (gate 2): it closes on a LogWindow built from this feature's own
- * numbers — there is no runtime log on the VPS for this agent, so these
- * lines are assembled from the feature row and its commits, never invented.
- * The "300 packets / 30s" activity threshold is the real number from commit
- * a94dba0 and is the only figure used anywhere in the clip.
+ * b1 15-139: product plate (Guard — Family Network Guard) + the receipt
+ *   prints its first two lines (router polling / block rules, both green)
+ *   + a 4-up row of the actual devices the product watches (Android TV
+ *   stick, PlayStation, laptop, phone) — the literal "whole family".
+ * b2 148-298: the SAME receipt (non-crossfade append, no crossfade — it
+ *   just grows downward) prints a second section in red ink: reboot / wifi
+ *   drop / crash, each one zeroing enforcement, ending on a red total
+ *   "ENFORCEMENT: 0%".
+ * b3 307-416: the receipt tears off and falls away (rotate + translateY,
+ *   not a crossfade) — replaced by the stark "nobody was watching" reveal:
+ *   a muted bell, a kid's phone, an empty inbox of alerts.
+ * b4 425-550: scale-push transition into a recording of the real feature
+ *   page (shots/g15.json, shot "page") — the substantiated claim, "a second
+ *   machine watches too" — with a small torn-off receipt stub confirming a
+ *   new line was just added to the ledger.
+ * b5 559-713: non-crossfade slide-in into a drawn leader/standby schematic,
+ *   the clip's one tech caption ("Cloudflare Worker") with a plain gloss.
+ * b6 722-932 (holds to end, no fade-out): rise-in on the archetype's payoff —
+ *   the ledger rewritten in green, its old red total struck through — next
+ *   to a LogWindow built only from this feature's own real numbers (no
+ *   runtime log exists for this product). Never plays the feature page or
+ *   the hub (gate 2).
  *
  * Voice-synced beat table (narration windows, do not shift):
  *  b1  15-139  "One machine polled the router and enforced every block for
@@ -38,17 +45,29 @@
  *              machine goes down." — holds to 932.
  *
  * Single tech name in the whole clip: Cloudflare Worker (beat 5 chip only).
- * All numbers on screen (the 300 packets / 30s activity threshold) are the
- * real value from the feature's commits — nothing here is invented.
+ * The only number anywhere is the real "300 packets / 30s" activity
+ * threshold from commit a94dba0 (beat 6 log) — nothing here is invented.
  */
 import React from "react";
-import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
-import { MOODS, PaletteProvider } from "./bright-theme";
-import { LightBg, Panel, Headline, CaptionBand, StatPill, IconCard, FilterChip, FlowArrow, CheckBadge, seg, fontFamily } from "./bright-primitives";
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { MOODS, PaletteProvider, cardShadow } from "./bright-theme";
+import {
+  LightBg,
+  Headline,
+  Panel,
+  CaptionBand,
+  StatPill,
+  IconCard,
+  FilterChip,
+  FlowArrow,
+  CheckBadge,
+  seg,
+  fontFamily,
+} from "./bright-primitives";
 import { LiveWindow, LogWindow, LogLine, Win } from "./live-primitives";
 import shots from "./shots/g15.json";
 
-const P = MOODS.dawn;
+const P = MOODS.sand;
 
 const B1_S = 15, B1_E = 139;
 const B2_S = 148, B2_E = 298;
@@ -59,334 +78,287 @@ const B6_S = 722, B6_E = 887;
 const END = 932;
 const FADE = 9;
 
-const CARD_X = 340;
-const CARD_Y = 132;
-const CARD_W = 600;
-const CARD_H = 372;
-const PAD = 28;
+const RECEIPT_X = 380;
+const RECEIPT_Y = 104;
+const RECEIPT_W = 520;
+const H1 = 178;
+const H2 = 430;
 
 const WIN4: Win = { x: 374, y: 146, w: 806, h: 396 };
-const WIN_LOG: Win = { x: 280, y: 150, w: 880, h: 414 };
+const WIN_LOG: Win = { x: 660, y: 150, w: 540, h: 420 };
 
-/** One ledger line: label, dotted leader, value. */
-const LedgerRow: React.FC<{
+const MONO = 'ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace';
+
+const pop = (frame: number, start: number, fps: number, damping = 11) =>
+  spring({ frame: Math.max(0, frame - start), fps, from: 0, to: 1, config: { damping } });
+
+/** One printed line on the receipt: label, dotted leader, value. */
+const ReceiptRow: React.FC<{
   y: number;
   label: string;
   value: string;
-  tone: "danger" | "success" | "ink";
-  opacity?: number;
-}> = ({ y, label, value, tone, opacity = 1 }) => {
+  tone?: "ink" | "danger" | "success";
+  opacity: number;
+  strike?: boolean;
+  bold?: boolean;
+}> = ({ y, label, value, tone = "ink", opacity, strike, bold }) => {
   if (opacity <= 0.004) return null;
-  const c = tone === "danger" ? P.danger : tone === "success" ? P.success : P.ink;
+  const color = tone === "danger" ? P.danger : tone === "success" ? P.success : P.ink;
   return (
     <div
       style={{
         position: "absolute",
-        left: CARD_X + PAD,
+        left: 26,
         top: y,
-        width: CARD_W - PAD * 2,
+        width: RECEIPT_W - 52,
         display: "flex",
         alignItems: "baseline",
         gap: 8,
         opacity,
-        fontFamily,
+        fontFamily: MONO,
+        fontSize: 18.5,
       }}
     >
-      <span style={{ fontSize: 18, fontWeight: 650, color: P.ink, whiteSpace: "nowrap" }}>{label}</span>
-      <span style={{ flex: 1, borderBottom: `2px dotted ${P.border}`, marginBottom: 5 }} />
-      <span style={{ fontSize: 18, fontWeight: 800, color: c, whiteSpace: "nowrap" }}>{value}</span>
+      <span style={{ color: P.ink, fontWeight: 600, whiteSpace: "nowrap" }}>{label}</span>
+      <span style={{ flex: 1, borderBottom: `2px dotted ${P.border}`, transform: "translateY(-5px)" }} />
+      <span
+        style={{
+          color,
+          fontWeight: bold ? 800 : 700,
+          whiteSpace: "nowrap",
+          textDecoration: strike ? "line-through" : undefined,
+        }}
+      >
+        {value}
+      </span>
     </div>
   );
 };
 
-const Dash: React.FC<{ y: number; opacity?: number }> = ({ y, opacity = 1 }) => (
-  <div
-    style={{
-      position: "absolute",
-      left: CARD_X + PAD,
-      top: y,
-      width: CARD_W - PAD * 2,
-      borderBottom: `1.5px dashed ${P.border}`,
-      opacity,
-    }}
-  />
-);
+/** The receipt tape itself: white card with a torn-paper strip top + bottom. */
+const ReceiptCard: React.FC<{
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  opacity: number;
+  rotate?: number;
+  dy?: number;
+  children?: React.ReactNode;
+}> = ({ x, y, w, h, opacity, rotate = 0, dy = 0, children }) => {
+  if (opacity <= 0.004) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x,
+        top: y,
+        width: w,
+        height: h,
+        opacity,
+        transform: `translateY(${dy}px) rotate(${rotate}deg)`,
+        transformOrigin: "50% 0%",
+        fontFamily,
+      }}
+    >
+      <div style={{ position: "absolute", inset: 0, background: P.card, border: `1.5px solid ${P.border}`, borderRadius: 6, boxShadow: cardShadow }} />
+      <div style={{ position: "absolute", left: 10, right: 10, top: 0, height: 5, backgroundImage: `repeating-linear-gradient(90deg, ${P.border} 0 6px, transparent 6px 13px)` }} />
+      <div style={{ position: "absolute", left: 10, right: 10, bottom: 0, height: 5, backgroundImage: `repeating-linear-gradient(90deg, ${P.border} 0 6px, transparent 6px 13px)` }} />
+      {children}
+    </div>
+  );
+};
+
+const LOG_LINES: LogLine[] = [
+  { t: "leader", text: "home-pc: heartbeat missed", tone: "danger" },
+  { t: "check", text: "activity check: under 300 packets / 30s", tone: "muted" },
+  { t: "worker", text: "cloudflare worker: leader timeout confirmed", tone: "accent" },
+  { t: "standby", text: "phone: promoted to leader", tone: "success" },
+  { t: "enforce", text: "router polling + blocking: resumed", tone: "success" },
+  { t: "result", text: "family devices: still enforced, 0 manual restarts", tone: "success" },
+];
 
 export const FeatureHomeAgentSurvivesOwnG15: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const pop = (start: number, damping = 11) =>
-    frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-
-  // ---- transient headline/caption per beat (fade in AND out) ----
   const b1 = seg(frame, B1_S, B1_S + FADE) * (1 - seg(frame, B1_E, B1_E + FADE));
-  const b2 = seg(frame, B2_S, B2_S + FADE) * (1 - seg(frame, B2_E, B2_E + FADE));
+  const b2only = seg(frame, B2_S, B2_S + FADE) * (1 - seg(frame, B2_E, B2_E + FADE));
   const b3 = seg(frame, B3_S, B3_S + FADE) * (1 - seg(frame, B3_E, B3_E + FADE));
   const b4 = seg(frame, B4_S, B4_S + FADE) * (1 - seg(frame, B4_E, B4_E + FADE));
   const b5 = seg(frame, B5_S, B5_S + FADE) * (1 - seg(frame, B5_E, B5_E + FADE));
-  const b6 = seg(frame, B6_S, B6_S + FADE); // holds through the tail — no fade-out
+  const b6 = seg(frame, B6_S, B6_S + FADE);
 
-  // ---- the ledger card: alive for beats 1-2 only ----
-  const cardOp = seg(frame, B1_S, B1_S + FADE) * (1 - seg(frame, B2_E, B2_E + FADE));
-  const cardScale = 0.94 + cardOp * 0.06;
+  // The receipt: alive across beats 1+2, tears off at the end of beat 2.
+  const cardIn = seg(frame, B1_S, B1_S + FADE);
+  const cardOut = seg(frame, B2_E, B2_E + FADE);
+  const cardOp = cardIn * (1 - cardOut);
+  const growT = interpolate(frame, [B2_S, B2_S + 26], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const cardH = H1 + (H2 - H1) * growT;
+  const cardRot = cardOut * -7;
+  const cardDy = cardOut * 60;
 
-  // beat 1: single-enforcer rows appear one by one
-  const row0In = seg(frame, B1_S + 20, B1_S + 32);
-  const row1In = seg(frame, B1_S + 40, B1_S + 52);
-  const row2In = seg(frame, B1_S + 60, B1_S + 72);
-  const totalIn = seg(frame, B1_S + 90, B1_S + 106);
-  const sideIn1 = pop(B1_S + 26);
+  const row1 = seg(frame, B1_S + 6, B1_S + 16) * cardIn;
+  const row2 = seg(frame, B1_S + 24, B1_S + 34) * cardIn;
 
-  // beat 2: failure-mode section appended below the same card
-  const dividerOp = seg(frame, B2_S + 8, B2_S + 20);
-  const sectionTitleOp = seg(frame, B2_S + 14, B2_S + 26);
-  const row3In = seg(frame, B2_S + 30, B2_S + 42);
-  const row4In = seg(frame, B2_S + 50, B2_S + 62);
-  const row5In = seg(frame, B2_S + 70, B2_S + 82);
-  const sideIn2 = pop(B2_S + 20);
+  const sec = seg(frame, B2_S + 8, B2_S + 18) * cardOp;
+  const rowReboot = seg(frame, B2_S + 24, B2_S + 34) * cardOp;
+  const rowWifi = seg(frame, B2_S + 42, B2_S + 52) * cardOp;
+  const rowCrash = seg(frame, B2_S + 60, B2_S + 70) * cardOp;
+  const rowTotal = seg(frame, B2_S + 82, B2_S + 92) * cardOp;
 
-  // beat 3: the stark "nobody noticed" reveal
-  const bellShake = Math.sin((frame - B3_S) * 0.5) * (frame > B3_S && frame < B3_S + 40 ? 4 : 0);
-  const phonePop = pop(B3_S + 30);
-  const bellCardPop = pop(B3_S + 50);
-  const alertPop = pop(B3_S + 70);
+  // Beat 4: scale-push entrance for the live feature page.
+  const pushT = seg(frame, B4_S, B4_S + 16);
+  const pushScale = 0.86 + 0.14 * pushT;
 
-  // beat 4: scale-push the real evidence in
-  const pushScale = interpolate(frame, [B4_S, B4_S + 22], [0.93, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
+  // Beat 5: slide-in schematic.
+  const slideT = seg(frame, B5_S, B5_S + 16);
+  const slideX = (1 - slideT) * 90;
 
-  // beat 5: leader/standby schematic slides in (non-crossfade move #2)
-  const b5dx = interpolate(frame, [B5_S, B5_S + 24], [70, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
-  const arrowProgress = interpolate(frame, [B5_S + 40, B5_S + 90], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const chipPop = pop(B5_S + 100);
-  const glossOp = seg(frame, B5_S + 116, B5_S + 130);
+  // Beat 6: rise-in.
+  const riseT = seg(frame, B6_S, B6_S + 16);
+  const riseDy = (1 - riseT) * 40;
 
-  // beat 6: rise-in on the log window (non-crossfade move #3)
-  const b6dy = interpolate(frame, [B6_S, B6_S + 26], [40, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.out(Easing.cubic),
-  });
-  const statPop = pop(B6_S + 10);
-  const checkPop = pop(B6_S + 150);
-  const LOG_LINES: LogLine[] = [
-    { t: "leader", text: "home-pc: heartbeat missed", tone: "danger" },
-    { t: "check", text: "activity check: under 300 packets / 30s", tone: "muted" },
-    { t: "worker", text: "cloudflare worker: leader timeout confirmed", tone: "accent" },
-    { t: "standby", text: "phone: promoted to leader", tone: "success" },
-    { t: "enforce", text: "router polling + blocking: resumed", tone: "success" },
-    { t: "result", text: "family devices: still enforced, 0 manual restarts", tone: "success" },
-  ];
+  const bellShake = Math.sin(frame / 3) * (1 - seg(frame, B3_S + 40, B3_S + 70)) * 6;
 
   return (
     <PaletteProvider value={P}>
-      <div style={{ position: "absolute", inset: 0, fontFamily }}>
-        <LightBg />
+      <LightBg />
 
-        {/* ================= per-beat headline ================= */}
-        <Headline y={26} text="One machine enforced every block, alone." opacity={b1} fontSize={30} />
-        <Headline y={26} text="When it stopped, the blocks stopped with it." opacity={b2} fontSize={30} />
-        <Headline y={26} text="Nobody found out until a phone was already free." opacity={b3} fontSize={30} />
-        <Headline y={26} text="Now a second machine watches the same rules." opacity={b4} fontSize={30} />
-        <Headline y={26} text="The other one takes over on its own." opacity={b5} fontSize={30} />
-
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 76,
-            width: 1280,
-            textAlign: "center",
-            fontSize: 19,
-            fontWeight: 650,
-            color: P.muted,
-            opacity: b1,
-            fontFamily,
-          }}
-        >
-          🔒 Guard — a family network guard that sees every device on the home Wi-Fi
-        </div>
-
-        {/* ================= the ledger (archetype 5) — beats 1 and 2 ================= */}
-        <div
-          style={{
-            position: "absolute",
-            left: CARD_X,
-            top: CARD_Y,
-            width: CARD_W,
-            height: CARD_H,
-            borderRadius: 18,
-            background: P.card,
-            border: `1.5px solid ${P.border}`,
-            boxShadow: "0 16px 40px rgba(22,35,63,0.16)",
-            opacity: cardOp,
-            transform: `scale(${cardScale})`,
-            transformOrigin: "center",
-          }}
-        >
-          <div style={{ position: "absolute", left: PAD, top: 22, fontSize: 14, fontWeight: 700, letterSpacing: 2, color: P.muted }}>
-            🖥 WHO ENFORCES THE BLOCKS
-          </div>
-        </div>
-        <Dash y={CARD_Y + 52} opacity={cardOp} />
-
-        {/* beat 1 rows: the one machine doing everything */}
-        <LedgerRow y={CARD_Y + 70} label="Polls the router" value="home PC" tone="ink" opacity={row0In * b1} />
-        <LedgerRow y={CARD_Y + 106} label="Enforces every block" value="same PC" tone="ink" opacity={row1In * b1} />
-        <LedgerRow y={CARD_Y + 142} label="Covers" value="whole family" tone="ink" opacity={row2In * b1} />
-        <Dash y={CARD_Y + 172} opacity={totalIn * b1} />
-        <div style={{ position: "absolute", left: CARD_X + PAD, top: CARD_Y + 184, fontSize: 13, fontWeight: 700, letterSpacing: 2, color: P.muted, opacity: totalIn * b1 }}>
-          SINGLE POINT OF FAILURE
-        </div>
-        <div style={{ position: "absolute", left: CARD_X + PAD, top: CARD_Y + 204, fontSize: 26, fontWeight: 800, color: P.danger, opacity: totalIn * b1 }}>
-          1 machine only
-        </div>
-
-        {/* beat 2: failure-mode section appended below */}
-        <Dash y={CARD_Y + 246} opacity={dividerOp * b2} />
-        <div style={{ position: "absolute", left: CARD_X + PAD, top: CARD_Y + 260, fontSize: 13, fontWeight: 700, letterSpacing: 2, color: P.muted, opacity: sectionTitleOp * b2 }}>
-          IF THIS MACHINE STOPS
-        </div>
-        <LedgerRow y={CARD_Y + 286} label="Windows update reboot" value="blocks OFF" tone="danger" opacity={row3In * b2} />
-        <LedgerRow y={CARD_Y + 316} label="Wi-Fi drops" value="blocks OFF" tone="danger" opacity={row4In * b2} />
-        <LedgerRow y={CARD_Y + 346} label="Crash" value="blocks OFF" tone="danger" opacity={row5In * b2} />
-
-        {/* side flanking tiles — beat 1 */}
-        <IconCard x={40} y={280} w={250} emoji="👪" title="Whole family" sub="one enforcer covers all" tone="card" opacity={b1} scale={Math.min(1, sideIn1)} />
-        <IconCard x={990} y={280} w={250} emoji="🖥" title="Home PC" sub="polls + enforces alone" tone="accent" opacity={b1} scale={Math.min(1, sideIn1)} />
-
-        {/* side flanking tiles — beat 2 */}
-        <IconCard x={40} y={280} w={250} emoji="🔌" title="Reboots, drops, crashes" sub="all silent failures" tone="danger" opacity={b2} scale={Math.min(1, sideIn2)} />
-        <IconCard x={990} y={280} w={250} emoji="🙈" title="No warning" sub="nothing tells anyone" tone="danger" opacity={b2} scale={Math.min(1, sideIn2)} />
-
-        {/* ================= beat 3: nobody noticed ================= */}
-        <div
-          style={{
-            position: "absolute",
-            left: 0,
-            top: 96,
-            width: 1280,
-            textAlign: "center",
-            fontSize: 84,
-            transform: `rotate(${bellShake}deg)`,
-            opacity: b3,
-          }}
-        >
-          🔕
-        </div>
-        <IconCard x={50} y={230} w={330} emoji="📱" title="Kid's phone" sub="suddenly unblocked" tone="danger" opacity={b3} scale={Math.min(1, phonePop)} />
-        <IconCard x={475} y={230} w={330} emoji="😴" title="Nobody watching" sub="no one checked in" tone="danger" opacity={b3} scale={Math.min(1, bellCardPop)} />
-        <IconCard x={900} y={230} w={330} emoji="🚨" title="0 alerts sent" sub="nobody was told" tone="danger" opacity={b3} scale={Math.min(1, alertPop)} />
-        <StatPill x={370} y={470} emoji="🤷" text="found out by accident, hours later" tone="danger" fontSize={24} opacity={b3 * Math.min(1, alertPop)} />
-
-        {/* per-beat caption band */}
-        <CaptionBand text="Polling and enforcement both lived on one machine" opacity={b1} tone="card" />
-        <CaptionBand text="A reboot, a dropped Wi-Fi link, a crash — all silent" opacity={b2} tone="danger" />
-        <CaptionBand text="An evening could pass with every device unblocked" opacity={b3} tone="danger" />
-        <CaptionBand text="The same script now runs on a phone that's always home" opacity={b4} tone="accent" />
-        <CaptionBand text="Leadership hands back the moment the PC returns" opacity={b5} tone="accent" />
-
-        {/* ================= beat 4: the real page, as the substantiated claim ================= */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            opacity: b4,
-            transform: `scale(${pushScale})`,
-            transformOrigin: `${WIN4.x + WIN4.w / 2}px ${WIN4.y + WIN4.h / 2}px`,
-          }}
-        >
-          <LiveWindow
-            file={shots as any}
-            shot="page"
-            title="vitalii.no/features/…-g15"
-            win={WIN4}
-            from={B4_S}
-            hold={B4_E - B4_S}
-            zoom={(t) => 1 + 0.1 * (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2)}
-            focus={{ x: 0.5, y: 0.35 }}
-            opacity={1}
-          />
-        </div>
-        <StatPill x={40} y={300} emoji="📶" text="an always-on phone runs the exact same script" tone="success" opacity={b4} />
-
-        {/* ================= beat 5: leader/standby schematic (drawn, slide-in) ================= */}
-        <div style={{ position: "absolute", inset: 0, opacity: b5, transform: `translateX(${b5dx}px)` }}>
-          <StatPill x={340} y={140} emoji="🔁" text="control moves to the other machine — automatically" tone="accent" fontSize={22} opacity={1} />
-          <IconCard x={70} y={220} w={340} emoji="🖥" title="Leader" sub="home PC — enforcing now" tone="accent" opacity={1} scale={1.15} />
-          <FlowArrow x={440} y={280} len={400} progress={arrowProgress} color={P.accent} opacity={1} />
-          <IconCard x={870} y={220} w={340} emoji="📱" title="Standby" sub="always-on phone — watching" tone="card" opacity={1} scale={1.15} />
-          <FilterChip
-            x={520}
-            y={450}
-            text="Cloudflare Worker"
-            icon="⚡"
-            color={P.accent}
-            scale={Math.min(1, chipPop)}
-            opacity={Math.min(1, chipPop)}
-          />
-          <div
-            style={{
-              position: "absolute",
-              left: 440,
-              top: 510,
-              width: 400,
-              textAlign: "center",
-              fontSize: 15,
-              fontWeight: 600,
-              color: P.muted,
-              opacity: glossOp,
-              fontFamily,
-            }}
-          >
-            (a tiny script that checks who is still reporting in)
-          </div>
-        </div>
-
-        {/* ================= beat 6: it is already working (rise-in, LogWindow) ================= */}
-        <div style={{ position: "absolute", inset: 0, opacity: b6, transform: `translateY(${b6dy}px)` }}>
-          <div
-            style={{
-              position: "absolute",
-              left: 200,
-              top: 60,
-              width: 1000,
-              textAlign: "center",
-              fontSize: 29,
-              fontWeight: 800,
-              color: P.ink,
-              letterSpacing: -0.2,
-              fontFamily,
-            }}
-          >
-            Enforcement never stops now.
-          </div>
-          <Panel x={40} y={150} w={210} h={170} tone="success" opacity={Math.min(1, statPop)}>
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
-              <div style={{ fontSize: 30 }}>🛡</div>
-              <div style={{ fontSize: 40, fontWeight: 800, color: P.success, textAlign: "center", lineHeight: 1.1 }}>ALWAYS ON</div>
-              <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, color: P.muted, textAlign: "center", lineHeight: 1.3 }}>
-                NO MANUAL
-                <br />
-                RESTART
-              </div>
+      {/* ───────── beat 1: product plate + receipt opens + the family's devices ───────── */}
+      <Panel x={260} y={16} w={760} h={94} tone="card" opacity={b1}>
+        <div style={{ position: "absolute", left: 24, top: 14, display: "flex", alignItems: "flex-start", gap: 14 }}>
+          <div style={{ fontSize: 34 }}>🛡</div>
+          <div>
+            <div style={{ fontSize: 23, fontWeight: 800, color: P.ink }}>
+              Guard <span style={{ color: P.accent, fontWeight: 700 }}>— Family Network Guard</span>
             </div>
-          </Panel>
-          <LogWindow lines={LOG_LINES} title="guard — leader election" from={B6_S + 14} every={26} opacity={1} win={WIN_LOG} fontSize={21} />
-          <CheckBadge x={1156} y={130} size={40} opacity={1} scale={Math.min(1, checkPop)} />
+            <div style={{ fontSize: 14, fontWeight: 600, color: P.muted, marginTop: 5, maxWidth: 690, lineHeight: 1.35 }}>
+              A private family-network guard that sees every device on the home Wi-Fi, the Android
+              TV stick, and the PlayStation, and lets a parent name, time-limit, and block each one.
+            </div>
+          </div>
         </div>
-        <CaptionBand text="No alert, no restart — blocking survives a machine going down" opacity={b6} tone="success" />
+      </Panel>
+      <StatPill x={22} y={34} emoji="🔁" text="24/7" tone="accent" opacity={b1} fontSize={15} scale={0.85} />
+      <StatPill x={1078} y={34} emoji="🖥" text="1 machine" tone="accent" opacity={b1} fontSize={15} scale={0.85} />
+
+      <IconCard x={40} y={160} w={150} emoji="👪" title="Whole family" tone="accent" opacity={b1} scale={pop(frame, B1_S + 10, fps)} />
+      <IconCard x={1090} y={160} w={150} emoji="🖥" title="One machine" tone="accent" opacity={b1} scale={pop(frame, B1_S + 18, fps)} />
+
+      {[
+        { x: 85, e: "📺", t: "TV stick" },
+        { x: 405, e: "🎮", t: "PlayStation" },
+        { x: 725, e: "💻", t: "Laptop" },
+        { x: 1045, e: "📱", t: "Phone" },
+      ].map((d, i) => (
+        <IconCard key={d.t} x={d.x} y={368} w={150} emoji={d.e} title={d.t} tone="card" opacity={b1} scale={pop(frame, B1_S + 30 + i * 8, fps)} />
+      ))}
+      <StatPill x={58} y={508} emoji="⏱" text="since boot" tone="card" opacity={b1} fontSize={14.5} scale={0.85} />
+      <StatPill x={1000} y={508} emoji="📶" text="wifi ok" tone="success" opacity={b1} fontSize={14.5} scale={0.85} />
+
+      <CaptionBand text="One machine enforces every block for the whole family" opacity={b1} tone="accent" />
+
+      {/* ───────── beats 1+2: the receipt tape (one physical object, grows down) ───────── */}
+      <ReceiptCard x={RECEIPT_X} y={RECEIPT_Y} w={RECEIPT_W} h={cardH} opacity={cardOp} rotate={cardRot} dy={cardDy}>
+        <div style={{ position: "absolute", left: 26, top: 14, fontSize: 19, fontWeight: 800, color: P.ink, display: "flex", alignItems: "center", gap: 8 }}>
+          🧾 ENFORCEMENT LEDGER
+        </div>
+        <div style={{ position: "absolute", left: 26, top: 42, fontSize: 13, fontWeight: 600, color: P.muted }}>home-pc · router polling</div>
+        <ReceiptRow y={76} label="router polling" value="ON" tone="success" opacity={row1} />
+        <ReceiptRow y={104} label="block rules · all devices" value="ON" tone="success" opacity={row2} />
+
+        <div style={{ position: "absolute", left: 26, top: 152, width: RECEIPT_W - 52, height: 0, borderTop: `2px dashed ${P.border}`, opacity: sec }} />
+        <div style={{ position: "absolute", left: 26, top: 166, fontSize: 15.5, fontWeight: 800, color: P.danger, opacity: sec, letterSpacing: 0.3 }}>
+          IF THIS MACHINE STOPS:
+        </div>
+        <ReceiptRow y={198} label="reboot" value="blocking OFF" tone="danger" opacity={rowReboot} />
+        <ReceiptRow y={230} label="wifi drop" value="blocking OFF" tone="danger" opacity={rowWifi} />
+        <ReceiptRow y={262} label="crash" value="blocking OFF" tone="danger" opacity={rowCrash} />
+        <div style={{ position: "absolute", left: 26, top: 300, width: RECEIPT_W - 52, height: 0, borderTop: `1.5px solid ${P.border}`, opacity: rowTotal }} />
+        <ReceiptRow y={312} label="ENFORCEMENT" value="0%" tone="danger" opacity={rowTotal} bold />
+      </ReceiptCard>
+
+      <IconCard x={40} y={480} w={150} emoji="🔌" title="Reboots, drops, crashes" tone="danger" opacity={b2only} scale={pop(frame, B2_S + 10, fps)} />
+      <IconCard x={1090} y={480} w={150} emoji="🔕" title="No warning" tone="danger" opacity={b2only} scale={pop(frame, B2_S + 18, fps)} />
+      <StatPill x={22} y={34} emoji="🔌" text="outage" tone="danger" opacity={b2only} fontSize={15} scale={0.85} />
+      <StatPill x={1090} y={34} emoji="🔕" text="silent" tone="danger" opacity={b2only} fontSize={15} scale={0.85} />
+      <CaptionBand text="Every outage silently cancels every rule" opacity={b2only} tone="danger" />
+
+      {/* ───────── beat 3: nobody was watching ───────── */}
+      <div style={{ position: "absolute", left: 565, top: 96, opacity: b3, transform: `rotate(${bellShake}deg)`, transformOrigin: "50% 0%" }}>
+        <IconCard x={0} y={0} w={150} emoji="🔕" title="Silent outage" tone="danger" opacity={1} />
+      </div>
+      {[
+        { x: 120, e: "📱", t: "Kid's phone", s: "suddenly unblocked" },
+        { x: 565, e: "🙈", t: "Nobody watching", s: "no dashboard, no check" },
+        { x: 1010, e: "📭", t: "0 alerts sent", s: "no message, no call" },
+      ].map((d, i) => (
+        <IconCard key={d.t} x={d.x} y={320} w={150} emoji={d.e} title={d.t} sub={d.s} tone="danger" opacity={b3} scale={pop(frame, B3_S + 16 + i * 10, fps)} />
+      ))}
+      <StatPill x={430} y={540} emoji="🤷" text="found out by accident, hours later" tone="danger" opacity={b3} />
+      <StatPill x={24} y={34} emoji="🚨" text="no alert" tone="danger" opacity={b3} fontSize={15} scale={0.85} />
+      <StatPill x={1050} y={34} emoji="🚨" text="no restart" tone="danger" opacity={b3} fontSize={15} scale={0.85} />
+      <CaptionBand text="Nobody knew — until a kid's phone was suddenly unblocked" opacity={b3} tone="danger" />
+
+      {/* ───────── beat 4: the real feature page — a second machine watches too ───────── */}
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, opacity: b4, transform: `scale(${pushScale})`, transformOrigin: "50% 45%" }}>
+        <LiveWindow
+          file={shots as any}
+          shot="page"
+          title="vitalii.no/features/the-home-agent-now-survives-its-own-pc-going-offline-g15"
+          win={WIN4}
+          from={B4_S}
+          hold={B4_E - B4_S}
+          zoom={(t) => 1 + 0.08 * t}
+          focus={{ x: 0.5, y: 0.35 }}
+          opacity={1}
+        />
+      </div>
+      <IconCard x={40} y={300} w={150} emoji="📱" title="Always-on standby" tone="success" opacity={b4} scale={pop(frame, B4_S + 12, fps)} />
+      <div style={{ position: "absolute", left: 1080, top: 130, opacity: b4 * seg(frame, B4_S + 10, B4_S + 24) }}>
+        <div style={{ width: 150, padding: "10px 12px", background: P.card, border: `1.5px dashed ${P.successEdge}`, borderRadius: 6, fontFamily: MONO, fontSize: 13, color: P.success, fontWeight: 700, boxShadow: cardShadow }}>
+          🧾 +1 line
+          <div style={{ fontSize: 12, fontWeight: 600, color: P.muted, marginTop: 2 }}>phone: standby added</div>
+        </div>
+      </div>
+      <CaptionBand text="A phone that's always on the network starts polling too" opacity={b4} tone="success" />
+
+      {/* ───────── beat 5: leader / standby schematic ───────── */}
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, opacity: b5, transform: `translateX(${slideX}px)` }}>
+        <IconCard x={220} y={150} w={200} emoji="🖥" title="Leader" sub="home-pc, normally" tone="accent" opacity={1} scale={pop(frame, B5_S + 8, fps)} />
+        <IconCard x={860} y={150} w={200} emoji="📱" title="Standby" sub="always-home phone" tone="accent" opacity={1} scale={pop(frame, B5_S + 16, fps)} />
+        <FlowArrow x={470} y={200} len={340} progress={seg(frame, B5_S + 24, B5_S + 50)} color={P.accent} opacity={1} />
+        <FilterChip x={498} y={360} text="Cloudflare Worker" icon="⚙" opacity={seg(frame, B5_S + 40, B5_S + 54)} scale={pop(frame, B5_S + 40, fps)} />
+        <div style={{ position: "absolute", left: 398, top: 414, width: 480, textAlign: "center", fontSize: 15, fontWeight: 600, color: P.muted, opacity: seg(frame, B5_S + 50, B5_S + 64) }}>
+          (a tiny script that checks who is still reporting in)
+        </div>
+        <div style={{ position: "absolute", left: 560, top: 470, opacity: seg(frame, B5_S + 60, B5_S + 74) }}>
+          <div style={{ width: 160, padding: "8px 12px", background: P.card, border: `1.5px dashed ${P.border}`, borderRadius: 6, fontFamily: MONO, fontSize: 13, color: P.ink, fontWeight: 700, textAlign: "center", boxShadow: cardShadow }}>
+            🧾 ledger continues
+          </div>
+        </div>
+      </div>
+      <CaptionBand text="If the leader goes quiet, the worker hands control to the other" opacity={b5} tone="accent" />
+
+      {/* ───────── beat 6: archetype payoff — the ledger rewritten in green ───────── */}
+      <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, opacity: b6, transform: `translateY(${riseDy}px)` }}>
+        <Headline y={32} text="Enforcement never stops now." opacity={1} fontSize={30} />
+        <ReceiptCard x={80} y={128} w={480} h={430} opacity={1}>
+          <div style={{ position: "absolute", left: 26, top: 14, fontSize: 18, fontWeight: 800, color: P.success, display: "flex", alignItems: "center", gap: 8 }}>
+            🧾 ENFORCEMENT LEDGER — rewritten
+          </div>
+          <div style={{ position: "absolute", left: 26, top: 42, fontSize: 13, fontWeight: 600, color: P.muted }}>home-pc + phone · shared</div>
+          <ReceiptRow y={78} label="reboot" value="still enforced ✓" tone="success" opacity={seg(frame, B6_S + 8, B6_S + 18)} />
+          <ReceiptRow y={108} label="wifi drop" value="still enforced ✓" tone="success" opacity={seg(frame, B6_S + 18, B6_S + 28)} />
+          <ReceiptRow y={138} label="crash" value="still enforced ✓" tone="success" opacity={seg(frame, B6_S + 28, B6_S + 38)} />
+          <div style={{ position: "absolute", left: 26, top: 178, width: 480 - 52, height: 0, borderTop: `1.5px solid ${P.border}` }} />
+          <ReceiptRow y={196} label="old total" value="0%" tone="danger" opacity={seg(frame, B6_S + 38, B6_S + 48)} strike />
+          <ReceiptRow y={228} label="ENFORCEMENT" value="100% · ALWAYS" tone="success" opacity={seg(frame, B6_S + 48, B6_S + 60)} bold />
+          <CheckBadge x={400} y={340} scale={pop(frame, B6_S + 55, fps)} opacity={1} />
+        </ReceiptCard>
+        <LogWindow lines={LOG_LINES} title="watchdog log" win={WIN_LOG} from={B6_S + 14} every={16} opacity={1} fontSize={18.5} />
+        <CaptionBand text="No alert, no restart — blocking survives a machine going down" opacity={1} tone="success" />
       </div>
     </PaletteProvider>
   );

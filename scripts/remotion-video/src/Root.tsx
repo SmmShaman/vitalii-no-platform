@@ -220,6 +220,8 @@ import { FeatureAndroidAppInstallsOwnG18 } from "./compositions/feature-demos/Fe
 import { FeaturePlacesRoutePassesButG17 } from "./compositions/feature-demos/FeaturePlacesRoutePassesButG17";
 import { FeaturePlacesNightlyRouteStopG16 } from "./compositions/feature-demos/FeaturePlacesNightlyRouteStopG16";
 import { FeatureHomeAgentSurvivesOwnG15 } from "./compositions/feature-demos/FeatureHomeAgentSurvivesOwnG15";
+import { FeatureCopyPromptPasteOutsideM27 } from "./compositions/feature-demos/FeatureCopyPromptPasteOutsideM27";
+import { FeatureGuideRewritesPlacesStoryG19 } from "./compositions/feature-demos/FeatureGuideRewritesPlacesStoryG19";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2160,6 +2162,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureHomeAgentSurvivesOwnG15"
         component={FeatureHomeAgentSurvivesOwnG15}
         durationInFrames={932}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureCopyPromptPasteOutsideM27"
+        component={FeatureCopyPromptPasteOutsideM27}
+        durationInFrames={929}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureGuideRewritesPlacesStoryG19"
+        component={FeatureGuideRewritesPlacesStoryG19}
+        durationInFrames={897}
         fps={30}
         width={1280}
         height={720}
