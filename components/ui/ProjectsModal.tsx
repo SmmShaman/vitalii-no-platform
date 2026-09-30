@@ -4,7 +4,7 @@ import { useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import { coverUrl } from '@/utils/coverUrl';
 import { ProjectFeaturesBlock } from '@/components/ui/ProjectFeaturesBlock';
 import type { ProjectFeatureLink } from '@/hooks/useProjects';
 
@@ -85,11 +85,10 @@ export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex
                       <h3 className="text-lg font-bold text-content mb-2 flex items-center justify-between">
                         <span className="flex items-center gap-2">
                           {project.image && (
-                            <Image
-                              src={project.image}
-                              alt={project.title}
-                              width={40}
-                              height={40}
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={coverUrl(project.image)}
+                              alt=""
                               className="rounded-md object-cover w-10 h-10 flex-shrink-0"
                             />
                           )}
@@ -144,12 +143,11 @@ export const ProjectsModal = ({ open, onOpenChange, projects, activeProjectIndex
             <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
               {selectedProject?.image && (
                 <div className="relative shrink-0 h-48 lg:h-auto lg:w-2/5">
-                  <Image
-                    src={selectedProject.image}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={coverUrl(selectedProject.image)}
                     alt={selectedProject.title}
-                    fill
-                    sizes="(min-width: 1024px) 40vw, 100vw"
-                    className="object-cover"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                 </div>
               )}

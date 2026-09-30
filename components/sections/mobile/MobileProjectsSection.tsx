@@ -12,6 +12,7 @@ import NeoIconButton from '@/components/ui/NeoIconButton'
 import { useProjectsCarousel } from '@/hooks/useProjects'
 import type { ProjectFeatureLink } from '@/hooks/useProjects'
 import { ProjectFeaturesBlock } from '@/components/ui/ProjectFeaturesBlock'
+import { coverUrl } from '@/utils/coverUrl'
 
 // Projects Explosion Overlay Component with Detail View
 interface MobileProject {
@@ -86,7 +87,7 @@ const ProjectsExplosionOverlay = ({
           {/* Hero image */}
           {project.image && (
             <div className="h-56 overflow-hidden relative">
-              <img src={project.image} alt={project.title} loading="lazy" className="w-full h-full object-cover" />
+              <img src={coverUrl(project.image)} alt={project.title} loading="lazy" className="w-full h-full object-cover" />
               <div
                 className="absolute inset-0"
                 style={{
@@ -199,7 +200,7 @@ const ProjectsExplosionOverlay = ({
                 {/* Project image */}
                 {project.image && (
                   <img
-                    src={project.image}
+                    src={coverUrl(project.image)}
                     alt={project.title}
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover opacity-60"
@@ -334,7 +335,7 @@ export const MobileProjectsSection = ({ t, currentLanguage, sectionRef, isMounte
               >
                 {currentProject?.image && (
                   <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
-                    <img src={currentProject.image} alt={currentProject.title} loading="lazy" className="w-full h-full object-cover" />
+                    <img src={coverUrl(currentProject.image)} alt={currentProject.title} loading="lazy" className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div className="flex-1 min-w-0">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react';
+import { coverUrl } from '@/utils/coverUrl';
 import gsap from 'gsap';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -342,7 +343,7 @@ export const ProjectsCarousel = ({ projects, onCardClick, backgroundText, onInde
                       <div
                         className="absolute inset-0"
                         style={{
-                          backgroundImage: `url(${project.image})`,
+                          backgroundImage: `url(${coverUrl(project.image)})`,
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                         }}
