@@ -584,7 +584,8 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
       );
       return {
         ...cp,
-        intro: ((tp as Record<string, unknown>)?.intro as string) || '',
+        // The modal shows intro || full; the DB description (full) is the plain, current text
+        intro: '',
         highlights: ((tp as Record<string, unknown>)?.highlights as Array<{emoji: string; title: string; desc: string}>) || [],
       };
     });
