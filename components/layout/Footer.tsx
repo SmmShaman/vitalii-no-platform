@@ -239,29 +239,36 @@ export const Footer = () => {
               ) : error ? (
                 <div className={`${textSecondary} text-xs sm:text-sm flex items-center`} style={!isMobile ? { color: dSecondary } : undefined}>{error}</div>
               ) : (
-                <div className="flex items-center gap-3 flex-wrap justify-center">
-                  {/* Weather text */}
-                  {weather && userLocation && (
+                (() => {
+                  // One short line: "☁️ +13° Kirkenær · 90 km". The full sentence stays in the tooltip
+                  // and for screen readers, so nothing is lost while nothing wraps.
+                  const temp = weather ? `${weather.temperature > 0 ? '+' : ''}${weather.temperature}°` : '';
+                  const showDistance = distance !== null && distance >= 5;
+                  const fullText = [
+                    weather && userLocation
+                      ? `${t('footer_weather_in' as any)} ${userLocation.city} ${temp}C, ${weather.description}.`
+                      : '',
+                    showDistance ? `${distance!.toLocaleString()} ${t('footer_distance_from_me' as any)}` : '',
+                  ].filter(Boolean).join(' ');
+                  if (!fullText) return null;
+                  return (
                     <div
-                      className={`${textAccent} text-center flex items-center`}
+                      className={`${textAccent} min-w-0 max-w-full truncate whitespace-nowrap text-center`}
                       style={{ fontSize: 'clamp(0.7rem, 1.2vw, 0.9rem)', ...(!isMobile && { color: dAccent }) }}
+                      title={fullText}
+                      aria-label={fullText}
                     >
-                      {t('footer_weather_in' as any)} <span className="font-semibold ml-1">{userLocation.city}</span>{' '}
-                      {weather.temperature > 0 ? '+' : ''}
-                      {weather.temperature}°C, {weather.description} {weather.emoji}
+                      {weather && userLocation && (
+                        <>
+                          <span aria-hidden="true">{weather.emoji}</span> {temp}{' '}
+                          <span className="font-semibold">{userLocation.city}</span>
+                        </>
+                      )}
+                      {weather && userLocation && showDistance && <span className="opacity-60"> · </span>}
+                      {showDistance && <span>{distance!.toLocaleString()} km</span>}
                     </div>
-                  )}
-
-                  {/* Distance */}
-                  {distance !== null && (
-                    <div
-                      className={`${textAccent} flex items-center`}
-                      style={{ fontSize: 'clamp(0.7rem, 1.2vw, 0.9rem)', ...(!isMobile && { color: dAccent }) }}
-                    >
-                      {distance.toLocaleString()} {t('footer_distance_from_me' as any)}
-                    </div>
-                  )}
-                </div>
+                  );
+                })()
               )}
             </motion.div>
 
