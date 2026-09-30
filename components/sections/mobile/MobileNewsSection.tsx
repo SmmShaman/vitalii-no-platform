@@ -231,12 +231,12 @@ export const MobileNewsSection = ({
 
   return (
     <>
-      <section ref={sectionRef} className="mb-3">
+      <section ref={sectionRef} className="mb-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.news.gradient} shadow-sm relative overflow-hidden`}
+          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.news.gradient} border border-surface-border shadow-[0_6px_18px_-6px_rgba(0,0,0,0.18)] relative overflow-hidden`}
         >
           {/* Vertical Label */}
           <VerticalLabel text={t('news_title') as string} color={sectionColors.news.icon} />

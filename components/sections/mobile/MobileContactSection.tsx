@@ -486,7 +486,7 @@ export const MobileContactSection = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
           onClick={() => setIsContactsOpen(true)}
-          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.contact.gradient} shadow-sm relative h-40 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform`}
+          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.contact.gradient} border border-surface-border shadow-[0_6px_18px_-6px_rgba(0,0,0,0.18)] relative h-40 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform`}
         >
           {/* Vertical Label */}
           <VerticalLabel text={t('contact_title' as any) || 'Contact'} color={sectionColors.contact.icon} />

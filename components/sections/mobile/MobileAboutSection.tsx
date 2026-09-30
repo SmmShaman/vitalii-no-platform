@@ -139,7 +139,7 @@ export const MobileAboutSection = ({ t, currentLanguage, sectionRef, isMounted }
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           onClick={() => setIsAboutExpanded(true)}
-          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.home.gradient} shadow-sm relative h-48 flex flex-col cursor-pointer active:scale-[0.98] transition-transform`}
+          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.home.gradient} border border-surface-border shadow-[0_6px_18px_-6px_rgba(0,0,0,0.18)] relative h-48 flex flex-col cursor-pointer active:scale-[0.98] transition-transform`}
         >
           {/* Vertical Label */}
           <VerticalLabel text={t('about_title') as string} color={sectionColors.home.icon} />

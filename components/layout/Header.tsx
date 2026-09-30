@@ -148,11 +148,12 @@ export const Header = ({ isCompact = false, hoveredSection = null }: HeaderProps
     return (
       <header className="w-full">
         <div className="relative flex items-center justify-between">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <h1
-              className="font-bold text-red-500 font-comfortaa"
+              className="font-bold text-red-500 font-comfortaa whitespace-nowrap"
               style={{
-                fontSize: '1.25rem',
+                // Cyrillic Comfortaa is wider: shrink the UA name so it stays on one line at 360 px
+                fontSize: currentLanguage === 'UA' ? 'clamp(0.95rem, 4.4vw, 1.25rem)' : '1.25rem',
                 textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)',
                 lineHeight: '1.3'
               }}

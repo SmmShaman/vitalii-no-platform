@@ -9,14 +9,14 @@ export interface SectionColorConfig {
 
 // Section colors (same as desktop)
 export const sectionColors: { [key: string]: SectionColorConfig } = {
-  home: { bg: 'bg-surface-darker', text: 'text-content', icon: '#AF601A', gradient: 'from-surface to-surface-darker' },
-  about: { bg: 'bg-surface-deep', text: 'text-content', icon: '#AF601A', gradient: 'from-surface to-surface-deep' },
-  services: { bg: 'bg-surface-deep', text: 'text-content', icon: '#EC008C', gradient: 'from-surface to-surface-deep' },
-  projects: { bg: 'bg-surface-darker', text: 'text-content', icon: '#009B77', gradient: 'from-surface-deep to-surface-darker' },
-  features: { bg: 'bg-surface-deep', text: 'text-content', icon: '#F5A0C0', gradient: 'from-surface to-surface-deep' },
-  news: { bg: 'bg-surface-darker', text: 'text-content', icon: '#88B04B', gradient: 'from-surface-deep to-surface-darker' },
-  blog: { bg: 'bg-surface-deep', text: 'text-content', icon: '#0F4C81', gradient: 'from-surface to-surface-deep' },
-  contact: { bg: 'bg-surface-darker', text: 'text-content', icon: '#764BB0', gradient: 'from-surface-deep to-surface-darker' },
+  home: { bg: 'bg-surface-darker', text: 'text-content', icon: '#AF601A', gradient: 'from-surface-elevated to-surface-deep' },
+  about: { bg: 'bg-surface-deep', text: 'text-content', icon: '#AF601A', gradient: 'from-surface-elevated to-surface-deep' },
+  services: { bg: 'bg-surface-deep', text: 'text-content', icon: '#EC008C', gradient: 'from-surface-elevated to-surface-deep' },
+  projects: { bg: 'bg-surface-darker', text: 'text-content', icon: '#009B77', gradient: 'from-surface-elevated to-surface-deep' },
+  features: { bg: 'bg-surface-deep', text: 'text-content', icon: '#F5A0C0', gradient: 'from-surface-elevated to-surface-deep' },
+  news: { bg: 'bg-surface-darker', text: 'text-content', icon: '#88B04B', gradient: 'from-surface-elevated to-surface-deep' },
+  blog: { bg: 'bg-surface-deep', text: 'text-content', icon: '#0F4C81', gradient: 'from-surface-elevated to-surface-deep' },
+  contact: { bg: 'bg-surface-darker', text: 'text-content', icon: '#764BB0', gradient: 'from-surface-elevated to-surface-deep' },
 }
 
 // Project gradient colors (matching desktop)

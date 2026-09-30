@@ -138,13 +138,13 @@ export const MobileServicesSection = ({ t, currentLanguage, sectionRef, isMounte
 
   return (
     <>
-      <section ref={sectionRef} className="mb-3">
+      <section ref={sectionRef} className="mb-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           onClick={() => setIsServicesExpanded(true)}
-          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.services.gradient} shadow-sm relative h-40 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform`}
+          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.services.gradient} border border-surface-border shadow-[0_6px_18px_-6px_rgba(0,0,0,0.18)] relative h-40 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform`}
         >
           {/* Vertical Label */}
           <VerticalLabel text={t('services_title') as string} color={sectionColors.services.icon} />

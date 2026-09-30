@@ -190,13 +190,17 @@ html[data-mode="light"] .shadow-2xl {
    Effects: --press (default), --lift, --ring, --shine, --3d. State: .is-pressed.
    Used via components/ui/NeoIconButton.tsx.
    ═══════════════════════════════════════════════════ */
+/* Zero specificity: this file is loaded after the Tailwind utilities, so a plain
+   `position: relative` here overrode `absolute` on close buttons and pushed them off-screen. */
+:where(.neo-btn) {
+  position: relative;
+}
 /* Plain CSS on purpose (not @layer): the effect classes are built at runtime
    (`neo-btn--${effect}`) and Tailwind would purge them from a layer. */
 .neo-btn {
   --neo-base: var(--surface-dark);
   --neo-d: 6px;
   --neo-b: 14px;
-  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;

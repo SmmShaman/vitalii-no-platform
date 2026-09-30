@@ -237,7 +237,7 @@ export const MobileBlogSection = ({
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.blog.gradient} shadow-sm relative overflow-hidden`}
+          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.blog.gradient} border border-surface-border shadow-[0_6px_18px_-6px_rgba(0,0,0,0.18)] relative overflow-hidden`}
         >
           {/* Vertical Label */}
           <VerticalLabel text={t('blog_title') as string} color={sectionColors.blog.icon} />

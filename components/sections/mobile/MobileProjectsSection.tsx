@@ -277,7 +277,7 @@ export const MobileProjectsSection = ({ t, currentLanguage, sectionRef, isMounte
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.15 }}
           onClick={() => setIsProjectsExpanded(true)}
-          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.projects.gradient} shadow-sm relative h-44 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform`}
+          className={`rounded-2xl p-4 pl-8 bg-gradient-to-br ${sectionColors.projects.gradient} border border-surface-border shadow-[0_6px_18px_-6px_rgba(0,0,0,0.18)] relative h-44 overflow-hidden cursor-pointer active:scale-[0.98] transition-transform`}
         >
           {/* Vertical Label */}
           <VerticalLabel text={t('projects_title') as string} color={sectionColors.projects.icon} />
