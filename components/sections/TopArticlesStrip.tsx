@@ -108,13 +108,13 @@ export function TopArticlesStrip({ kind, initialItems, initialPeriod = 30 }: Top
           return (
             <li
               key={item.id}
-              // Phones get the top 5 with a finger-sized row; the full top 10 from sm up
-              className={`${index >= 5 ? 'hidden sm:flex' : 'flex'} items-baseline gap-2 min-w-0 text-sm sm:text-xs py-1.5 sm:py-0`}
+              // Phones get the top 5 (rows are 44 px via the global touch-target rule); the full top 10 from sm up
+              className={`${index >= 5 ? 'hidden sm:flex' : 'flex'} items-center sm:items-baseline gap-2 min-w-0 text-sm sm:text-xs`}
             >
               <span className="font-mono font-semibold text-[rgb(var(--text-listing-muted))] w-4 flex-shrink-0">{index + 1}</span>
               <Link
                 href={`/${kind}/${slug}`}
-                className="truncate text-content-secondary hover:text-brand-light transition-colors"
+                className="truncate flex items-center sm:block text-content-secondary hover:text-brand-light transition-colors"
                 title={title}
               >
                 {title}
