@@ -88,15 +88,15 @@ export function Sidebar({ currentType, currentSlug }: SidebarProps) {
             </div>
             <div>
               <h3 className="font-bold text-content">Vitalii Berbeha</h3>
-              <p className="text-sm text-content-muted">Marketing & Analytics Expert</p>
+              <p className="text-sm text-content-muted">{currentLanguage === 'UA' ? 'Автоматизація для малих фірм' : currentLanguage === 'NO' ? 'Automatisering for små bedrifter' : 'Automation for small businesses'}</p>
             </div>
           </div>
           <p className="text-sm text-content-muted leading-relaxed mb-4">
             {currentLanguage === 'UA'
-              ? 'Допомагаю організаціям зростати через дані, автоматизацію та AI. Творець Elvarika.'
+              ? 'Допомагаю малим фірмам автоматизувати те, що щотижня забирає години. BERBEHA, Лена.'
               : currentLanguage === 'NO'
-              ? 'Jeg hjelper organisasjoner med å vokse gjennom data, automatisering og AI. Skaper av Elvarika.'
-              : 'I help organisations grow through data, automation, and AI. Creator of Elvarika.'}
+              ? 'Jeg hjelper små bedrifter med å automatisere det som tar tid hver uke. BERBEHA, Lena.'
+              : 'I help small businesses automate the work that takes hours every week. BERBEHA, Lena, Norway.'}
           </p>
           <Link
             href="/"

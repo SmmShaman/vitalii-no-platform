@@ -41,11 +41,11 @@ async function getServerPalette(): Promise<{ palette: string; mode: string }> {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Vitalii Berbeha - E-commerce, Marketing & AI Expert',
+    default: 'Vitalii Berbeha — Automation for small businesses in Norway',
     template: '%s | Vitalii Berbeha',
   },
-  description: 'Professional portfolio of Vitalii Berbeha - AI project leader and entrepreneur specializing in e-commerce, marketing, and EdTech solutions.',
-  keywords: ['e-commerce', 'marketing', 'AI', 'EdTech', 'portfolio', 'React', 'TypeScript', 'Next.js'],
+  description: 'Vitalii Berbeha (BERBEHA, Lena) helps small businesses in Innlandet automate quotes, customer follow-up and repeating routines — built with AI tools.',
+  keywords: ['automation', 'small business', 'automatisering', 'små bedrifter', 'AI', 'Innlandet', 'Lena', 'Østre Toten', 'n8n', 'Claude Code'],
   authors: [{ name: 'Vitalii Berbeha', url: siteUrl }],
   creator: 'Vitalii Berbeha',
   publisher: 'Vitalii Berbeha',
@@ -55,8 +55,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
-    title: 'Vitalii Berbeha - E-commerce, Marketing & AI Expert',
-    description: 'Professional portfolio of Vitalii Berbeha - AI project leader and entrepreneur',
+    title: 'Vitalii Berbeha — Automation for small businesses in Norway',
+    description: 'Automation for small businesses in Innlandet: quotes, customer follow-up and repeating routines.',
     type: 'website',
     locale: 'en_US',
     alternateLocale: ['nb_NO', 'uk_UA'],
@@ -66,8 +66,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Vitalii Berbeha - E-commerce, Marketing & AI Expert',
-    description: 'Professional portfolio of Vitalii Berbeha - AI project leader and entrepreneur',
+    title: 'Vitalii Berbeha — Automation for small businesses in Norway',
+    description: 'Automation for small businesses in Innlandet: quotes, customer follow-up and repeating routines.',
     creator: '@vitalii_berbeha',
   },
   robots: {

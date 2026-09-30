@@ -12,8 +12,8 @@ export const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://vitalii-ber
 export const AUTHOR = {
   name: 'Vitalii Berbeha',
   url: BASE_URL,
-  jobTitle: 'E-commerce & Marketing Expert',
-  description: 'AI project leader and entrepreneur specializing in e-commerce, marketing, and EdTech solutions',
+  jobTitle: 'Automation for small businesses',
+  description: 'Runs BERBEHA (Lena, Norway) and helps small businesses automate quotes, customer follow-up and repeating routines with AI tools',
 }
 
 // Site information
