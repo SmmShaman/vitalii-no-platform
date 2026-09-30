@@ -10,16 +10,32 @@ import { VerticalLabel } from './VerticalLabel'
 import type { TranslateFn } from './types'
 import NeoIconButton from '@/components/ui/NeoIconButton'
 import { useProjectsCarousel } from '@/hooks/useProjects'
+import type { ProjectFeatureLink } from '@/hooks/useProjects'
+import { ProjectFeaturesBlock } from '@/components/ui/ProjectFeaturesBlock'
 
 // Projects Explosion Overlay Component with Detail View
+interface MobileProject {
+  title: string
+  short?: string
+  description?: string
+  image?: string
+  link?: string
+  projectId?: string
+  featureCount?: number
+  techTags?: string[]
+  features?: ProjectFeatureLink[]
+}
+
 const ProjectsExplosionOverlay = ({
   projects,
   onClose,
   color,
+  lang,
 }: {
-  projects: { title: string; short?: string; description?: string; image?: string; link?: string }[]
+  projects: MobileProject[]
   onClose: () => void
   color: string
+  lang: 'en' | 'no' | 'ua'
 }) => {
   const [selectedProject, setSelectedProject] = useState<number | null>(null)
 
@@ -92,28 +108,27 @@ const ProjectsExplosionOverlay = ({
               {project.title}
             </motion.h2>
 
-            {/* Short description */}
-            {project.short && (
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.15 }}
-                className="text-content-muted text-base mb-6 italic"
-              >
-                {project.short}
-              </motion.p>
-            )}
-
             {/* Full description */}
             {project.description && (
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="text-content-secondary text-base leading-relaxed mb-6"
+                className="text-content-secondary text-base leading-relaxed mb-6 whitespace-pre-line"
               >
                 {project.description}
               </motion.p>
+            )}
+
+            {project.projectId && (
+              <ProjectFeaturesBlock
+                projectId={project.projectId}
+                techTags={project.techTags || []}
+                features={project.features || []}
+                featureCount={project.featureCount || 0}
+                lang={lang}
+                accent={colorSet.to}
+              />
             )}
 
             {/* Link button */}
@@ -235,6 +250,10 @@ export const MobileProjectsSection = ({ t, currentLanguage, sectionRef, isMounte
       short: cp.short,
       description: cp.full,
       image: cp.image || staticList.find(tp => tp.title === cp.title)?.image,
+      projectId: cp.projectId,
+      featureCount: cp.featureCount,
+      techTags: cp.techTags,
+      features: cp.features,
     }))
   }, [carousel, langKey])
   const currentProject = projectsList[currentProjectIndex]
@@ -337,6 +356,7 @@ export const MobileProjectsSection = ({ t, currentLanguage, sectionRef, isMounte
                 projects={projectsList}
                 onClose={() => setIsProjectsExpanded(false)}
                 color={sectionColors.projects.icon}
+                lang={langKey}
               />
             )}
           </AnimatePresence>,

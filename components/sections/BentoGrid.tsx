@@ -573,23 +573,8 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
     }
   };
 
-  // Get current project image — merge DB data (featureCount) with translations (highlights)
-  const translationProjects = translations[lang].projects_list;
-  const effectiveProjects = useMemo(() => {
-    if (carouselProjects.length === 0) return translationProjects;
-    return carouselProjects.map(cp => {
-      // Match by projectId for language-independent matching (not by title)
-      const tp = translationProjects.find((t: Record<string, unknown>) =>
-        (t as Record<string, unknown>).projectId === cp.projectId || (t as Record<string, unknown>).title === cp.title
-      );
-      return {
-        ...cp,
-        // The modal shows intro || full; the DB description (full) is the plain, current text
-        intro: '',
-        highlights: ((tp as Record<string, unknown>)?.highlights as Array<{emoji: string; title: string; desc: string}>) || [],
-      };
-    });
-  }, [carouselProjects, translationProjects, lang]);
+  // DB projects carry the full write-up, tech tags and newest features; the static list is the offline fallback
+  const effectiveProjects = carouselProjects.length > 0 ? carouselProjects : translations[lang].projects_list;
   const currentProjectImage = effectiveProjects[currentProjectIndex]?.image || sections.find(s => s.id === 'projects')?.image;
 
   return (
@@ -1118,12 +1103,7 @@ export const BentoGrid = ({ onFullscreenChange, onHoveredSectionChange }: BentoG
         onOpenChange={setIsProjectsModalOpen}
         projects={effectiveProjects}
         activeProjectIndex={activeProjectIndex}
-        onViewFeatures={(projectId) => {
-          setIsProjectsModalOpen(false);
-          setSelectedFeatureCategory(undefined);
-          setSelectedFeatureId(undefined);
-          setIsFeaturesModalOpen(true);
-        }}
+        lang={lang}
       />
 
       {/* Features Modal */}

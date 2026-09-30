@@ -1,12 +1,9 @@
 name: Deploy Supabase Edge Functions
 
+# Manual only. The managed Supabase project this targets was removed ("Resource has been
+# removed" on link), so every push under supabase/** failed. Live functions are deployed by
+# portfolio-functions-deploy.timer on the VPS (self-hosted stack); migrations are applied with psql.
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'supabase/functions/**'
-      - 'supabase/migrations/**'
   workflow_dispatch:
     inputs:
       function_name:
