@@ -114,7 +114,7 @@ export function TopArticlesStrip({ kind, initialItems, initialPeriod = 30 }: Top
               <span className="font-mono font-semibold text-[rgb(var(--text-listing-muted))] w-4 flex-shrink-0">{index + 1}</span>
               <Link
                 href={`/${kind}/${slug}`}
-                className="truncate flex items-center sm:block text-content-secondary hover:text-brand-light transition-colors"
+                className="truncate leading-[44px] sm:leading-normal text-content-secondary hover:text-brand-light transition-colors"
                 title={title}
               >
                 {title}
