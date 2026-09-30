@@ -199,7 +199,7 @@ export const Footer = () => {
   return (
     <footer className="h-full w-full flex items-center overflow-y-auto">
       <div
-        className={`max-w-6xl mx-auto rounded-xl sm:rounded-2xl w-full ${
+        className={`max-w-7xl mx-auto rounded-xl sm:rounded-2xl w-full ${
           isMobile ? 'border-black/10' : ''
         }`}
         style={isMobile ? {
@@ -275,7 +275,7 @@ export const Footer = () => {
             {/* Right: Contact label + Email + Social Icons */}
             <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
               {/* Contact label */}
-              <span className={`${textSecondary} text-xs mr-1 hidden md:inline`} style={!isMobile ? { color: dSecondary } : undefined}>
+              <span className={`${textSecondary} text-xs mr-1 hidden 2xl:inline`} style={!isMobile ? { color: dSecondary } : undefined}>
                 {t('footer_contact_me')}
               </span>
               {/* Email Button */}
