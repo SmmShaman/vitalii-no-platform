@@ -147,7 +147,7 @@ export const MobileAboutSection = ({ t, currentLanguage, sectionRef, isMounted }
           {/* Hint to tap */}
           {/* Own row, so the typed text never runs underneath it */}
           <div className="flex justify-end -mt-1 mb-1 text-xs font-medium opacity-60 flex-shrink-0" style={{ color: sectionColors.home.icon }}>
-            {t('tap_to_expand' as any) || 'Tap to expand'}
+            {t('tap_to_expand')}
           </div>
 
           {/* Scrollable text container with auto-scroll; top edge fades instead of cutting glyphs */}

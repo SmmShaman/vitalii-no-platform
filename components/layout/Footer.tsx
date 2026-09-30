@@ -354,16 +354,16 @@ export const Footer = () => {
           {/* Business info & cookie links */}
           <div className="flex items-center justify-center mt-1">
             <div
-              className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-xs"
+              className="flex flex-wrap items-center justify-center gap-x-1.5 max-w-full px-4 sm:px-3 py-1 sm:py-0.5 rounded-2xl sm:rounded-full text-xs"
               style={{
                 background: 'rgb(var(--surface-elevated) / 0.9)',
                 color: 'rgb(var(--text-secondary))',
               }}
             >
-              <span className="tracking-wide">
+              <span className="tracking-wide text-center basis-full sm:basis-auto">
                 BERBEHA · 932 905 736 · Hagegata 8, Lena
               </span>
-              <span style={{ color: 'rgb(var(--text-faint))' }}>|</span>
+              <span className="hidden sm:inline" style={{ color: 'rgb(var(--text-faint))' }}>|</span>
               <button
                 onClick={handleOpenCookieSettings}
                 className="hover:underline transition-colors cursor-pointer bg-transparent border-none text-xs focus:outline-none focus:ring-1 focus:ring-brand-light rounded"
@@ -376,7 +376,7 @@ export const Footer = () => {
               <span style={{ color: 'rgb(var(--text-faint))' }}>|</span>
               <a
                 href="/informasjonskapsler"
-                className="hover:underline transition-colors text-xs focus:outline-none focus:ring-1 focus:ring-brand-light rounded"
+                className="inline-flex items-center hover:underline transition-colors text-xs focus:outline-none focus:ring-1 focus:ring-brand-light rounded"
                 style={{ color: 'rgb(var(--text-muted))' }}
                 onMouseEnter={(e) => e.currentTarget.style.color = 'rgb(var(--text-primary))'}
                 onMouseLeave={(e) => e.currentTarget.style.color = 'rgb(var(--text-muted))'}

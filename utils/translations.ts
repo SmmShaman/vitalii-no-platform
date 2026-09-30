@@ -373,6 +373,7 @@ export const translations = {
     nav_contact: "Contact",
     view_all: "View all",
     read_more: "Read more",
+    tap_to_expand: "Tap to expand",
 
     // Cookie consent
     cookie_banner_title: "This website uses cookies",
@@ -763,6 +764,7 @@ export const translations = {
     nav_contact: "Kontakt",
     view_all: "Se alle",
     read_more: "Les mer",
+    tap_to_expand: "Trykk for å utvide",
 
     // Cookie consent
     cookie_banner_title: "Vi bruker informasjonskapsler (cookies)",
@@ -1072,6 +1074,7 @@ export const translations = {
     nav_contact: "Контакт",
     view_all: "Дивитись все",
     read_more: "Читати далі",
+    tap_to_expand: "Натисніть, щоб розгорнути",
 
     // Cookie consent
     cookie_banner_title: "Цей вебсайт використовує файли cookie",

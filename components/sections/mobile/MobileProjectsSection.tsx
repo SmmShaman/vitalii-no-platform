@@ -287,7 +287,7 @@ export const MobileProjectsSection = ({ t, currentLanguage, sectionRef, isMounte
             className="absolute top-3 right-3 text-xs font-medium opacity-60"
             style={{ color: sectionColors.projects.icon }}
           >
-            {t('tap_to_expand' as any) || 'Tap to expand'}
+            {t('tap_to_expand')}
           </div>
 
           {/* Carousel view */}

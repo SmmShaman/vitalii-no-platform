@@ -473,6 +473,11 @@ h4, h5, .text-xl, .text-2xl {
     min-height: 44px;
     min-width: 44px;
   }
+  /* Taller tap boxes pin plain links to the top of the row; keep their text centred */
+  :where(nav[aria-label="Breadcrumb"]) a {
+    display: inline-flex;
+    align-items: center;
+  }
 }
 
 /* Scrollbar Styling */
