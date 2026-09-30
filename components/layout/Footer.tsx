@@ -361,7 +361,7 @@ export const Footer = () => {
               }}
             >
               <span className="tracking-wide text-center basis-full sm:basis-auto">
-                BERBEHA · 932 905 736 · Hagegata 8, Lena
+                BERBEHA · 932 838 982 · Hagegata 8, Lena
               </span>
               <span className="hidden sm:inline" style={{ color: 'rgb(var(--text-faint))' }}>|</span>
               <button
