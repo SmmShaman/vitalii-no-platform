@@ -1,0 +1,56 @@
+{
+ "id": "p72",
+ "beat_durations": {
+  "b1": 6.648,
+  "b2": 4.824,
+  "b3": 6.264,
+  "b4": 6.0,
+  "b5": 7.128
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Click into one of my projects, and you'd see a few hardcoded sentences I wrote once \u2014 nothing about the work since.",
+   "start_s": 0.5,
+   "end_s": 7.148,
+   "start_f": 15,
+   "end_f": 214
+  },
+  {
+   "beat": "b2",
+   "text": "It's like a shop window that's never restocked, no matter how much changes inside.",
+   "start_s": 7.448,
+   "end_s": 12.272,
+   "start_f": 223,
+   "end_f": 368
+  },
+  {
+   "beat": "b3",
+   "text": "Now a Supabase-backed endpoint reads each project's real tech stack and newest work automatically.",
+   "start_s": 12.572,
+   "end_s": 18.836,
+   "start_f": 377,
+   "end_f": 565
+  },
+  {
+   "beat": "b4",
+   "text": "Every project page refreshes itself, on desktop and mobile, without me touching a thing.",
+   "start_s": 19.136,
+   "end_s": 25.136,
+   "start_f": 574,
+   "end_f": 754
+  },
+  {
+   "beat": "b5",
+   "text": "All 13 projects now show up to 8 tech tags and their 6 newest features, updated every 10 minutes.",
+   "start_s": 25.436,
+   "end_s": 32.564,
+   "start_f": 763,
+   "end_f": 977
+  }
+ ],
+ "total_s": 34.064,
+ "durationInFrames": 1022,
+ "measured_track_s": 32.616,
+ "track": "/root/feature-demos/vo-p72/vo-p72.mp3"
+}

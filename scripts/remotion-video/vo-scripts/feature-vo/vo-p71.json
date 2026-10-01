@@ -1,0 +1,56 @@
+{
+ "id": "p71",
+ "beat_durations": {
+  "b1": 6.6,
+  "b2": 4.944,
+  "b3": 5.544,
+  "b4": 5.856,
+  "b5": 4.584
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Clicking a project tile popped open a box centered on screen, disconnected from the tile you'd just clicked.",
+   "start_s": 0.5,
+   "end_s": 7.1,
+   "start_f": 15,
+   "end_f": 213
+  },
+  {
+   "beat": "b2",
+   "text": "It's like opening one drawer and having a totally different one slide out across the room.",
+   "start_s": 7.4,
+   "end_s": 12.344,
+   "start_f": 222,
+   "end_f": 370
+  },
+  {
+   "beat": "b3",
+   "text": "Now, built with Radix UI, the window expands straight out of the exact tile you clicked.",
+   "start_s": 12.644,
+   "end_s": 18.188,
+   "start_f": 379,
+   "end_f": 546
+  },
+  {
+   "beat": "b4",
+   "text": "Inside, the cover image stays fixed while the write-up and features scroll past it on their own.",
+   "start_s": 18.488,
+   "end_s": 24.344,
+   "start_f": 555,
+   "end_f": 730
+  },
+  {
+   "beat": "b5",
+   "text": "The Projects window finally behaves the way the rest of the site always has.",
+   "start_s": 24.644,
+   "end_s": 29.228,
+   "start_f": 739,
+   "end_f": 877
+  }
+ ],
+ "total_s": 30.728,
+ "durationInFrames": 922,
+ "measured_track_s": 29.28,
+ "track": "/root/feature-demos/vo-p71/vo-p71.mp3"
+}

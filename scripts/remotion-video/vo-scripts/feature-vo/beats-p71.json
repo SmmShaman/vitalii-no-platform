@@ -1,0 +1,7 @@
+{"id": "p71", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Clicking a project tile popped open a box centered on screen, disconnected from the tile you'd just clicked."],
+  ["b2", "It's like opening one drawer and having a totally different one slide out across the room."],
+  ["b3", "Now, built with Radix UI, the window expands straight out of the exact tile you clicked."],
+  ["b4", "Inside, the cover image stays fixed while the write-up and features scroll past it on their own."],
+  ["b5", "The Projects window finally behaves the way the rest of the site always has."]
+]}

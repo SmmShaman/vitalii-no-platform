@@ -1,0 +1,7 @@
+{"id": "p72", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Click into one of my projects, and you'd see a few hardcoded sentences I wrote once — nothing about the work since."],
+  ["b2", "It's like a shop window that's never restocked, no matter how much changes inside."],
+  ["b3", "Now a Supabase-backed endpoint reads each project's real tech stack and newest work automatically."],
+  ["b4", "Every project page refreshes itself, on desktop and mobile, without me touching a thing."],
+  ["b5", "All 13 projects now show up to 8 tech tags and their 6 newest features, updated every 10 minutes."]
+]}
