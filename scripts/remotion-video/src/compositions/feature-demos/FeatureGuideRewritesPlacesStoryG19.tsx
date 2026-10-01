@@ -53,6 +53,7 @@ import {
   StatPill,
   FilterChip,
   CheckBadge,
+  CaptionBand,
   seg,
   fontFamily,
 } from "./bright-primitives";
@@ -174,15 +175,19 @@ const OtherStops: React.FC<{ opacity: number }> = ({ opacity }) => {
             key={i}
             style={{
               position: "absolute",
-              left: x - 24,
-              top: RIBBON_Y + 14,
-              opacity: opacity * 0.7,
+              left: x - 32,
+              top: RIBBON_Y + 10,
+              opacity: opacity * 0.85,
               textAlign: "center",
               fontFamily,
+              background: P.card,
+              border: `1px solid ${P.border}`,
+              borderRadius: 12,
+              padding: "6px 10px",
             }}
           >
-            <div style={{ fontSize: 20 }}>{s.emoji}</div>
-            <div style={{ fontSize: 12, color: P.muted, marginTop: 2 }}>
+            <div style={{ fontSize: 26 }}>{s.emoji}</div>
+            <div style={{ fontSize: 13, color: P.muted, marginTop: 2 }}>
               {s.label}
             </div>
           </div>
@@ -334,7 +339,7 @@ const LogWindowG19: React.FC<{ opacity: number }> = ({ opacity }) => {
       <div
         style={{
           position: "absolute",
-          left: 190,
+          left: 100,
           top: 60,
           fontFamily,
           fontSize: 14,
@@ -344,19 +349,27 @@ const LogWindowG19: React.FC<{ opacity: number }> = ({ opacity }) => {
       >
         Guide — Stories on the Road · nightly research pass
       </div>
+      <StatPill
+        x={980}
+        y={50}
+        emoji="🌙"
+        text="runs every night"
+        tone="accent"
+        opacity={1}
+      />
       <LogWindow
         title="guide-research · nightly pass"
         from={B4_S + 8}
         every={24}
         fontSize={21}
-        win={{ x: 190, y: 150, w: 900, h: 330 }}
+        win={{ x: 100, y: 140, w: 1080, h: 340 }}
         opacity={1}
         lines={lines}
       />
       <div
         style={{
           position: "absolute",
-          left: 190,
+          left: 90,
           top: 522,
           display: "flex",
           alignItems: "center",
@@ -367,13 +380,18 @@ const LogWindowG19: React.FC<{ opacity: number }> = ({ opacity }) => {
         <div style={{ fontFamily, fontSize: 90, fontWeight: 800, color: P.success }}>
           10
         </div>
-        <div style={{ fontFamily, fontSize: 18, color: P.muted, maxWidth: 420, lineHeight: 1.35 }}>
+        <div style={{ fontFamily, fontSize: 18, color: P.muted, maxWidth: 480, lineHeight: 1.35 }}>
           sentences on your most-driven roads
           <br />
           (was 6 — thin, and never revisited)
         </div>
-        <CheckBadge x={560} y={40} scale={0.9} opacity={1} size={60} />
+        <CheckBadge x={1060} y={30} scale={0.9} opacity={1} size={60} />
       </div>
+      <CaptionBand
+        text="same drive, a richer story — every single night"
+        tone="success"
+        opacity={seg(frame, B4_S + 155, B4_S + 155 + FADE)}
+      />
     </div>
   );
 };
@@ -463,7 +481,7 @@ const FrameInner: React.FC<{
         <div
           style={{
             position: "absolute",
-            left: 900,
+            left: 1030,
             top: 34,
             textAlign: "right",
             fontFamily,
@@ -489,7 +507,7 @@ const FrameInner: React.FC<{
         <QueueRow
           x={150}
           y={290}
-          w={700}
+          w={880}
           emoji="🌙"
           text="skipped — too few facts"
           tag="re-queue"
@@ -499,7 +517,7 @@ const FrameInner: React.FC<{
         <QueueRow
           x={150}
           y={390}
-          w={700}
+          w={880}
           emoji="🔁"
           text='"ready" but stale (gen 1)'
           tag="STORY_GEN=3"
@@ -509,7 +527,7 @@ const FrameInner: React.FC<{
         <div
           style={{
             position: "absolute",
-            left: 900,
+            left: 1030,
             top: 290,
             opacity: seg(frame, B2_S + 95, B2_S + 95 + FADE),
             fontFamily,
@@ -523,7 +541,7 @@ const FrameInner: React.FC<{
         <div
           style={{
             position: "absolute",
-            left: 900,
+            left: 1030,
             top: 390,
             opacity: seg(frame, B2_S + 110, B2_S + 110 + FADE),
             fontFamily,
@@ -539,7 +557,7 @@ const FrameInner: React.FC<{
             position: "absolute",
             left: 150,
             top: 500,
-            width: 1000,
+            width: 1050,
             height: 10,
             borderRadius: 5,
             background: P.border,
@@ -568,6 +586,10 @@ const FrameInner: React.FC<{
         >
           most-driven-first ordering of the requeue list
         </div>
+        <CaptionBand
+          text="scored every night — the most-driven roads reach the front of the queue"
+          opacity={seg(frame, B2_S + 60, B2_S + 60 + FADE)}
+        />
       </Group>
 
       {/* Beat 3: Wikidata duplicate merge, enters sliding down from above */}
@@ -586,19 +608,6 @@ const FrameInner: React.FC<{
         >
           Wikidata place matching — before
         </div>
-        <div
-          style={{
-            position: "absolute",
-            left: 900,
-            top: 34,
-            textAlign: "right",
-            fontFamily,
-            opacity: seg(frame, B3_S + 150, B3_S + 150 + FADE),
-          }}
-        >
-          <div style={{ fontSize: 34, fontWeight: 800, color: P.success }}>2 → 1</div>
-          <div style={{ fontSize: 13, color: P.muted }}>names merged</div>
-        </div>
         <BeatLabel
           x={60}
           y={600}
@@ -607,44 +616,21 @@ const FrameInner: React.FC<{
           opacity={1}
         />
         <NamePin
-          x={200}
+          x={150}
           y={230}
           text="Stabo nedre"
           opacity={1 - seg(frame, B3_S + 90, B3_S + 90 + 30)}
           merged={false}
         />
         <NamePin
-          x={760}
+          x={840}
           y={230}
           text="Nedre Stabu"
           opacity={1 - seg(frame, B3_S + 90, B3_S + 90 + 30)}
           merged={false}
         />
         <div style={{ opacity: seg(frame, B3_S + 100, B3_S + 100 + FADE) }}>
-          <NamePin x={470} y={230} text="Stabo nedre" opacity={1} merged />
-        </div>
-        <FilterChip
-          x={870}
-          y={480}
-          text="Wikidata"
-          icon="🧩"
-          color={P.accent}
-          scale={1}
-          opacity={seg(frame, B3_S + 40, B3_S + 40 + FADE)}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: 870,
-            top: 522,
-            fontFamily,
-            fontSize: 15,
-            color: P.muted,
-            maxWidth: 260,
-            opacity: seg(frame, B3_S + 40, B3_S + 40 + FADE),
-          }}
-        >
-          a free structured database of facts
+          <NamePin x={480} y={230} text="Stabo nedre" opacity={1} merged />
         </div>
         <div
           style={{
@@ -654,7 +640,7 @@ const FrameInner: React.FC<{
             fontFamily,
             fontSize: 17,
             color: P.ink,
-            maxWidth: 560,
+            maxWidth: 680,
             lineHeight: 1.4,
             opacity: seg(frame, B3_S + 60, B3_S + 60 + FADE),
           }}
@@ -669,7 +655,7 @@ const FrameInner: React.FC<{
             fontFamily,
             fontSize: 17,
             color: P.ink,
-            maxWidth: 560,
+            maxWidth: 680,
             lineHeight: 1.4,
             opacity: seg(frame, B3_S + 130, B3_S + 130 + FADE),
           }}
@@ -690,6 +676,53 @@ const FrameInner: React.FC<{
         >
           ✅ one pin on the map, not two
         </div>
+        <Panel
+          x={890}
+          y={150}
+          w={300}
+          h={380}
+          tone="accent"
+          opacity={seg(frame, B3_S + 40, B3_S + 40 + FADE)}
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: 24,
+              top: 20,
+              opacity: seg(frame, B3_S + 150, B3_S + 150 + FADE),
+            }}
+          >
+            <div style={{ fontSize: 34, fontWeight: 800, color: P.success }}>2 → 1</div>
+            <div style={{ fontSize: 13, color: P.muted }}>names merged</div>
+          </div>
+          <FilterChip
+            x={24}
+            y={150}
+            text="Wikidata"
+            icon="🧩"
+            color={P.accent}
+            scale={1}
+            opacity={1}
+          />
+          <div
+            style={{
+              position: "absolute",
+              left: 24,
+              top: 220,
+              fontFamily,
+              fontSize: 15,
+              color: P.muted,
+              maxWidth: 250,
+              lineHeight: 1.4,
+            }}
+          >
+            a free structured database of facts
+          </div>
+        </Panel>
+        <CaptionBand
+          text="Wikidata recognizes the two spellings as the same place — one pin, not two"
+          opacity={seg(frame, B3_S + 170, B3_S + 170 + FADE)}
+        />
       </Group>
 
       {/* Beat 4: hand-inlined LogWindow, holds to END, no fade-out */}

@@ -384,8 +384,9 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
         {/* ================= beat 3 : the parsing diagram (slide-in, no crossfade) ================= */}
         <div style={{ position: "absolute", inset: 0, opacity: b3, transform: `translateX(${b3dx}px)` }}>
           <StageHeading text="A Cloudflare Worker reads it structured." opacity={1} />
-          <Panel x={STAGE_X} y={150} w={230} h={220} tone="card" opacity={1}>
-            <div style={{ position: "absolute", left: 16, top: 14, fontSize: 12, fontWeight: 800, letterSpacing: 1.5, color: P.muted }}>
+          <Panel x={STAGE_X} y={130} w={STAGE_W} h={460} tone="card" opacity={0.55} />
+          <Panel x={STAGE_X + 16} y={160} w={240} h={400} tone="card" opacity={1}>
+            <div style={{ position: "absolute", left: 18, top: 16, fontSize: 13, fontWeight: 800, letterSpacing: 1.5, color: P.muted }}>
               PASTED ANSWER
             </div>
             {PASTE_LINES.map((l, i) => (
@@ -393,10 +394,10 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
                 key={l}
                 style={{
                   position: "absolute",
-                  left: 16,
-                  top: 44 + i * 30,
-                  width: 200,
-                  fontSize: 11.5,
+                  left: 18,
+                  top: 56 + i * 56,
+                  width: 204,
+                  fontSize: 13.5,
                   fontWeight: 600,
                   color: P.ink,
                   opacity: lineIn(i),
@@ -410,34 +411,39 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
               </div>
             ))}
           </Panel>
-          <div style={{ position: "absolute", left: STAGE_X + 240, top: 250 }}>
-            <FlowArrow x={0} y={0} len={100} progress={arrow1} color={P.accent} opacity={1} />
+          <div style={{ position: "absolute", left: STAGE_X + 266, top: 350 }}>
+            <FlowArrow x={0} y={0} len={70} progress={arrow1} color={P.accent} opacity={1} />
           </div>
-          <FilterChip
-            x={STAGE_X + 360}
-            y={200}
-            text="Cloudflare Worker"
-            icon="⚡"
-            color={P.accent}
-            scale={Math.min(1, chipPop)}
-            opacity={Math.min(1, chipPop)}
-          />
-          <div style={{ position: "absolute", left: STAGE_X + 360, top: 250, width: 240, fontSize: 13, fontWeight: 600, color: P.muted, opacity: Math.min(1, chipPop) }}>
-            (a small serverless function)
-          </div>
-          <div style={{ position: "absolute", left: STAGE_X + 620, top: 250 }}>
-            <FlowArrow x={0} y={0} len={100} progress={arrow2} color={P.success} opacity={1} />
-          </div>
-          <Panel x={STAGE_X + 726} y={150} w={138} h={100} tone="success" opacity={Math.min(1, outPop)}>
-            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, transform: `scale(${Math.min(1, outPop)})` }}>
-              <div style={{ fontSize: 24, fontWeight: 800, color: P.ink }}>7</div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: P.muted, textAlign: "center" }}>vocab words</div>
+          <Panel x={STAGE_X + 360} y={160} w={240} h={400} tone="accent" opacity={1}>
+            <FilterChip
+              x={15}
+              y={108}
+              text="Cloudflare Worker"
+              icon="⚡"
+              color={P.accent}
+              scale={Math.min(1, chipPop)}
+              opacity={Math.min(1, chipPop)}
+            />
+            <div style={{ position: "absolute", left: 16, top: 188, width: 208, textAlign: "center", fontSize: 14, fontWeight: 600, color: P.muted, opacity: Math.min(1, chipPop) }}>
+              a small serverless function
+            </div>
+            <div style={{ position: "absolute", left: 16, top: 250, width: 208, textAlign: "center", fontSize: 15, fontWeight: 700, color: P.ink, opacity: Math.min(1, chipPop) }}>
+              reads the paste, not a generic text dump
             </div>
           </Panel>
-          <Panel x={STAGE_X + 726} y={260} w={138} h={100} tone="success" opacity={Math.min(1, outPop)}>
+          <div style={{ position: "absolute", left: STAGE_X + 610, top: 350 }}>
+            <FlowArrow x={0} y={0} len={70} progress={arrow2} color={P.success} opacity={1} />
+          </div>
+          <Panel x={STAGE_X + 704} y={160} w={144} h={190} tone="success" opacity={Math.min(1, outPop)}>
             <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, transform: `scale(${Math.min(1, outPop)})` }}>
-              <div style={{ fontSize: 24, fontWeight: 800, color: P.ink }}>16</div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: P.muted, textAlign: "center" }}>dialogue lines</div>
+              <div style={{ fontSize: 30, fontWeight: 800, color: P.ink }}>7</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: P.muted, textAlign: "center" }}>vocab words</div>
+            </div>
+          </Panel>
+          <Panel x={STAGE_X + 704} y={370} w={144} h={190} tone="success" opacity={Math.min(1, outPop)}>
+            <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, transform: `scale(${Math.min(1, outPop)})` }}>
+              <div style={{ fontSize: 30, fontWeight: 800, color: P.ink }}>16</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: P.muted, textAlign: "center" }}>dialogue lines</div>
             </div>
           </Panel>
           <StageCaption text="Not a generic text dump" opacity={1} tone="accent" />

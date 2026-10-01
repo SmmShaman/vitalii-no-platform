@@ -326,14 +326,16 @@ export const FeatureHomeAgentSurvivesOwnG15: React.FC = () => {
 
       {/* ───────── beat 5: leader / standby schematic ───────── */}
       <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, opacity: b5, transform: `translateX(${slideX}px)` }}>
-        <IconCard x={220} y={150} w={200} emoji="🖥" title="Leader" sub="home-pc, normally" tone="accent" opacity={1} scale={pop(frame, B5_S + 8, fps)} />
-        <IconCard x={860} y={150} w={200} emoji="📱" title="Standby" sub="always-home phone" tone="accent" opacity={1} scale={pop(frame, B5_S + 16, fps)} />
-        <FlowArrow x={470} y={200} len={340} progress={seg(frame, B5_S + 24, B5_S + 50)} color={P.accent} opacity={1} />
-        <FilterChip x={498} y={360} text="Cloudflare Worker" icon="⚙" opacity={seg(frame, B5_S + 40, B5_S + 54)} scale={pop(frame, B5_S + 40, fps)} />
-        <div style={{ position: "absolute", left: 398, top: 414, width: 480, textAlign: "center", fontSize: 15, fontWeight: 600, color: P.muted, opacity: seg(frame, B5_S + 50, B5_S + 64) }}>
+        <StatPill x={24} y={34} emoji="🖥" text="leader" tone="accent" opacity={1} fontSize={15} scale={0.85} />
+        <StatPill x={1060} y={34} emoji="📱" text="standby" tone="accent" opacity={1} fontSize={15} scale={0.85} />
+        <IconCard x={50} y={150} w={200} emoji="🖥" title="Leader" sub="home-pc, normally" tone="accent" opacity={1} scale={pop(frame, B5_S + 8, fps)} />
+        <IconCard x={1030} y={150} w={200} emoji="📱" title="Standby" sub="always-home phone" tone="accent" opacity={1} scale={pop(frame, B5_S + 16, fps)} />
+        <FlowArrow x={280} y={200} len={730} progress={seg(frame, B5_S + 24, B5_S + 50)} color={P.accent} opacity={1} />
+        <FilterChip x={560} y={360} text="Cloudflare Worker" icon="⚙" opacity={seg(frame, B5_S + 40, B5_S + 54)} scale={pop(frame, B5_S + 40, fps)} />
+        <div style={{ position: "absolute", left: 340, top: 414, width: 600, textAlign: "center", fontSize: 15, fontWeight: 600, color: P.muted, opacity: seg(frame, B5_S + 50, B5_S + 64) }}>
           (a tiny script that checks who is still reporting in)
         </div>
-        <div style={{ position: "absolute", left: 560, top: 470, opacity: seg(frame, B5_S + 60, B5_S + 74) }}>
+        <div style={{ position: "absolute", left: 560, top: 495, opacity: seg(frame, B5_S + 60, B5_S + 74) }}>
           <div style={{ width: 160, padding: "8px 12px", background: P.card, border: `1.5px dashed ${P.border}`, borderRadius: 6, fontFamily: MONO, fontSize: 13, color: P.ink, fontWeight: 700, textAlign: "center", boxShadow: cardShadow }}>
             🧾 ledger continues
           </div>
