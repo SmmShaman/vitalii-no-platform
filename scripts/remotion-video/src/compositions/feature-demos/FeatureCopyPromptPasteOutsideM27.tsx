@@ -67,15 +67,19 @@ const B3_S = 554, B3_E = 775;
 const B4_S = 784, B4_E = 884;
 const END = 929;
 const FADE = 9;
-const CROSS = 864; // the frame the parsed-line count jumps to the minimum of 3
+// three evenly-spaced, generously-held transitions (~39 frames/1.3s each —
+// wider than a single log-line tick) so the big sidebar digit is never one
+// glance away from looking "stuck": 0->1 at 800, 1->2 at 839, 2->3 at 878.
+const T1 = 800, T2 = 839, T3 = 878;
+const CROSS = T3; // the frame the parsed-line count reaches the minimum of 3
 
 const WIN1: Win = { x: STAGE_X, y: 216, w: STAGE_W, h: 348 };
 const WIN4: Win = { x: 372, y: 150, w: 820, h: 340 };
 
 const AIS = [
-  { label: "Outside AI #1", x: STAGE_X + 20 },
-  { label: "Outside AI #2", x: STAGE_X + 312 },
-  { label: "Outside AI #3", x: STAGE_X + 604 },
+  { label: "ChatGPT", x: STAGE_X + 20 },
+  { label: "Gemini", x: STAGE_X + 312 },
+  { label: "Perplexity", x: STAGE_X + 604 },
 ];
 
 const PASTE_LINES = [
@@ -150,15 +154,19 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
   const b4 = seg(frame, B4_S, B4_S + FADE); // holds through the tail — no fade-out
 
   // ---- the sidebar counter: the one element that survives every beat ----
+  // Idle before beat 4 (no paste has happened yet) — shown as a dash, not a
+  // "stuck" zero. Counting only starts once the worker actually receives a
+  // paste, in beat 4's LogWindow.
+  const idle = frame < B4_S;
   const countRaw = interpolate(
     frame,
-    [0, 815, 816, 839, 840, 863, 864, END],
+    [0, T1 - 1, T1, T2 - 1, T2, T3 - 1, T3, END],
     [0, 0, 1, 1, 2, 2, 3, 3],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
   const count = Math.round(countRaw);
   const acceptedOn = seg(frame, CROSS, CROSS + 16);
-  const numberColor = interpolateColors(frame, [0, 839, 863, CROSS, CROSS + 16], [
+  const numberColor = interpolateColors(frame, [0, T2, T3 - 1, CROSS, CROSS + 16], [
     P.ink,
     P.ink,
     P.accent,
@@ -167,6 +175,10 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
   ] as any);
   const barFill = Math.min(1, count / 3);
   const stampPop = frame < CROSS ? 0 : spring({ frame: frame - CROSS, fps, config: { damping: 10, mass: 0.7 } });
+  // a brief scale/glow pulse right at each digit change, so a single still
+  // frame near a transition reads unmistakably as "mid-change", not frozen.
+  const sinceChange = idle ? 999 : Math.min(...[T1, T2, T3].filter((t) => frame >= t).map((t) => frame - t), 999);
+  const changePulse = Math.max(0, 1 - sinceChange / 18);
 
   // ---- beat 1 : product plate, then the real page ----
   const plateIn = seg(frame, B1_S + 4, B1_S + 20);
@@ -236,6 +248,9 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
           >
             <span>📋</span> any outside answer
           </div>
+          <div style={{ position: "absolute", left: 34, top: 112, fontSize: 12.5, fontWeight: 650, color: P.muted }}>
+            for Mini Elvarika — Norwegian by Ear
+          </div>
 
           <div
             style={{
@@ -245,17 +260,20 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
               fontSize: 132,
               fontWeight: 800,
               letterSpacing: -3,
-              color: numberColor as unknown as string,
+              color: idle ? P.muted : (numberColor as unknown as string),
               fontVariantNumeric: "tabular-nums",
               lineHeight: 1,
+              transform: `scale(${1 + 0.22 * changePulse})`,
+              transformOrigin: "left center",
+              textShadow: changePulse > 0.03 ? `0 0 ${28 * changePulse}px ${P.accent}` : "none",
             }}
           >
-            {count}
+            {idle ? "–" : count}
           </div>
           <div style={{ position: "absolute", left: 34, top: 344, width: 250, fontSize: 15.5, fontWeight: 700, letterSpacing: 1, color: P.muted, lineHeight: 1.35 }}>
-            {acceptedOn > 0.5 ? "MINIMUM MET" : "LINES PARSED"}
+            {idle ? "NO PASTE YET" : acceptedOn > 0.5 ? "MINIMUM MET" : "LINES PARSED"}
             <br />
-            {acceptedOn > 0.5 ? "— ACCEPTED" : "SO FAR"}
+            {idle ? "— WAITING" : acceptedOn > 0.5 ? "— ACCEPTED" : "SO FAR"}
           </div>
 
           <div style={{ position: "absolute", left: 32, top: 410, width: 256, height: 10, borderRadius: 6, background: P.chipBg, overflow: "hidden" }}>
@@ -274,13 +292,16 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
           <div style={{ position: "absolute", left: 32, top: 430, fontSize: 13, fontWeight: 700, letterSpacing: 1, color: P.muted }}>
             MINIMUM TO TRUST → 3 LINES
           </div>
+          <div style={{ position: "absolute", left: 32, top: 450, width: 256, fontSize: 12, fontWeight: 600, color: P.muted, lineHeight: 1.35 }}>
+            (a vocab line + a 2-line exchange — enough to be a real scene, not noise)
+          </div>
 
           {stampPop > 0.02 ? (
             <div
               style={{
                 position: "absolute",
                 left: 32,
-                top: 490,
+                top: 505,
                 padding: "10px 18px",
                 borderRadius: 12,
                 background: P.successBg,
@@ -326,7 +347,7 @@ export const FeatureCopyPromptPasteOutsideM27: React.FC = () => {
         <LiveWindow
           file={shots as any}
           shot="page"
-          title="vitalii.no/features/…-m27"
+          title="Mini Elvarika — feature page"
           win={WIN1}
           from={B1_S}
           hold={B1_E - B1_S}
@@ -488,7 +509,7 @@ const LogWindowM27: React.FC<{ win: Win; opacity: number; from: number }> = ({ w
     { t: "check", text: "counting parsed lines… 1", tone: "muted" },
     { t: "check", text: "counting parsed lines… 2", tone: "muted" },
     { t: "check", text: "counting parsed lines… 3 — minimum met", tone: "success" },
-    { t: "parse", text: "parse_ready(): 7 vocab words, 16 lines", tone: "accent" },
+    { t: "parse", text: "found 7 vocab words, 16 dialogue lines", tone: "accent" },
     { t: "result", text: "✅ accepted — lesson ready, no fallback needed", tone: "success" },
   ];
   const every = 24;
@@ -524,7 +545,7 @@ const LogWindowM27: React.FC<{ win: Win; opacity: number; from: number }> = ({ w
         {["#FF5F57", "#FEBC2E", "#28C840"].map((c) => (
           <div key={c} style={{ width: 11, height: 11, borderRadius: "50%", background: c }} />
         ))}
-        <div style={{ marginLeft: 12, fontSize: 13, fontWeight: 700, color: P.muted }}>worker · parse_ready()</div>
+        <div style={{ marginLeft: 12, fontSize: 13, fontWeight: 700, color: P.muted }}>worker · reading the paste</div>
       </div>
       <div
         style={{
