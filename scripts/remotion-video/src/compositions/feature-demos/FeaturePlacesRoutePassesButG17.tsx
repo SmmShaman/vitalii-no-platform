@@ -322,19 +322,22 @@ const FrameInner: React.FC<{
         >
           fd66bbf · research deeper sources for skipped places on the daily route
         </div>
-        {SOURCES.map((s, i) => (
-          <IconCard
-            key={s.label}
-            x={150 + i * 370}
-            y={380}
-            w={300}
-            emoji={s.emoji}
-            title={s.label}
-            sub="real source found"
-            tone="success"
-            opacity={c3[i]}
-          />
-        ))}
+        <Panel x={WIN_MAIN.x} y={WIN_MAIN.y} w={WIN_MAIN.w} h={WIN_MAIN.h} tone="card" opacity={1}>
+          {SOURCES.map((s, i) => (
+            <IconCard
+              key={s.label}
+              x={40 + i * 370}
+              y={55}
+              w={300}
+              emoji={s.emoji}
+              title={s.label}
+              sub="real source found"
+              tone="success"
+              opacity={c3[i]}
+              scale={1.15}
+            />
+          ))}
+        </Panel>
         <BeatLabel x={90} y={636} w={1100} kicker="THE PASS" title="Old newspapers, local-history archives, forgotten books" opacity={1} />
       </Group>
 
