@@ -222,6 +222,8 @@ import { FeaturePlacesNightlyRouteStopG16 } from "./compositions/feature-demos/F
 import { FeatureHomeAgentSurvivesOwnG15 } from "./compositions/feature-demos/FeatureHomeAgentSurvivesOwnG15";
 import { FeatureCopyPromptPasteOutsideM27 } from "./compositions/feature-demos/FeatureCopyPromptPasteOutsideM27";
 import { FeatureGuideRewritesPlacesStoryG19 } from "./compositions/feature-demos/FeatureGuideRewritesPlacesStoryG19";
+import { FeatureClickProjectSeeNewestP72 } from "./compositions/feature-demos/FeatureClickProjectSeeNewestP72";
+import { FeatureProjectsWindowFinallyFillsP71 } from "./compositions/feature-demos/FeatureProjectsWindowFinallyFillsP71";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2185,7 +2187,23 @@ export const RemotionRoot: React.FC = () => {
         height={720}
       />
 
+      <Composition
+        id="FeatureClickProjectSeeNewestP72"
+        component={FeatureClickProjectSeeNewestP72}
+        durationInFrames={1022}
+        fps={30}
+        width={1280}
+        height={720}
+      />
 
+      <Composition
+        id="FeatureProjectsWindowFinallyFillsP71"
+        component={FeatureProjectsWindowFinallyFillsP71}
+        durationInFrames={922}
+        fps={30}
+        width={1280}
+        height={720}
+      />
 
     </>
   );
