@@ -7,7 +7,7 @@
       "name": "page",
       "url": "https://vitalii.no/features/click-a-project-see-its-6-newest-features-not-just-a-blurb-p72",
       "frames": 140,
-      "scroll": [[0, 0], [70, 480], [139, 920]],
+      "scroll": [[0, 0], [139, 0]],
       "mouse": [[0, 560, 200], [60, 620, 300], [139, 560, 260]]
     }
   ]

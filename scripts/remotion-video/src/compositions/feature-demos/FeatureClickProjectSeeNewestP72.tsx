@@ -606,15 +606,15 @@ const FrameInner: React.FC<{
         >
           the real page — every visit
         </div>
-        <BeatLabel x={60} y={620} kicker="every visit" title="refreshes itself — no edits from me" opacity={1} />
+        <BeatLabel x={60} y={600} kicker="every visit" title="refreshes itself — no edits from me" opacity={1} />
         <LiveWindow
           file={shotsFile as any}
           shot="page"
           title="vitalii.no/features/click-a-project-see…"
           from={B4_S + 20}
-          hold={B4_E - (B4_S + 20) - 10}
-          zoom={() => 1.05}
-          focus={{ x: 0.5, y: 0.4 }}
+          hold={B4_E - (B4_S + 20)}
+          zoom={() => 2.2}
+          focus={{ x: 0.5, y: 0.3 }}
           opacity={1}
           win={{ x: 150, y: 140, w: 980, h: 420 }}
         />
