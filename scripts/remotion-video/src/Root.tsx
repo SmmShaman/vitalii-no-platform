@@ -224,6 +224,8 @@ import { FeatureCopyPromptPasteOutsideM27 } from "./compositions/feature-demos/F
 import { FeatureGuideRewritesPlacesStoryG19 } from "./compositions/feature-demos/FeatureGuideRewritesPlacesStoryG19";
 import { FeatureClickProjectSeeNewestP72 } from "./compositions/feature-demos/FeatureClickProjectSeeNewestP72";
 import { FeatureProjectsWindowFinallyFillsP71 } from "./compositions/feature-demos/FeatureProjectsWindowFinallyFillsP71";
+import { FeatureNothingNewRoadGuideG24 } from "./compositions/feature-demos/FeatureNothingNewRoadGuideG24";
+import { FeatureKartverketsPlaceNamesAlongG23 } from "./compositions/feature-demos/FeatureKartverketsPlaceNamesAlongG23";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2200,6 +2202,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureProjectsWindowFinallyFillsP71"
         component={FeatureProjectsWindowFinallyFillsP71}
         durationInFrames={922}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNothingNewRoadGuideG24"
+        component={FeatureNothingNewRoadGuideG24}
+        durationInFrames={879}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureKartverketsPlaceNamesAlongG23"
+        component={FeatureKartverketsPlaceNamesAlongG23}
+        durationInFrames={891}
         fps={30}
         width={1280}
         height={720}

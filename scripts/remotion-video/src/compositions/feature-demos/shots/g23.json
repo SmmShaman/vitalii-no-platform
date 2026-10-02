@@ -1,0 +1,14 @@
+{
+  "id": "g23",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/kartverkets-place-names-along-the-road-turn-into-stops-of-their-own-g23",
+      "frames": 200,
+      "scroll": [[0, 0], [100, 440], [199, 880]],
+      "mouse": [[0, 320, 200], [60, 560, 280], [130, 460, 360], [199, 620, 240]]
+    }
+  ]
+}

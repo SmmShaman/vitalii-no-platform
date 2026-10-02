@@ -1,22 +1,27 @@
 /**
  * FeaturePlacesRoutePassesButG17 — feature g17 — 1280x720, 982 frames @ 30fps, VOICE-SYNCED.
  *
- * RE-SHOOT (wave B, 2026-10-02). Same narration, same five beat windows as
- * every earlier cut — only the picture changes. This cut is **archetype 7
- * hero-number, mood mint**.
+ * RE-SHOOT (wave B, 2026-10-02, second pass). Same narration, same five beat
+ * windows as every earlier cut — only the picture changes again. This cut is
+ * **archetype 7 hero-number, mood slate**.
  *
- * Why this redraw: two blind viewers scored the last cut 5/10 and asked for
- * three things it did not have — a product name up front, a picture of what
- * the places/route actually ARE (not a scroll of an unrelated features
- * list), and a smooth handoff between the hero number's four metrics instead
- * of a hard text-swap that read as a glitch when paused. All three are fixed
- * below without inventing anything: this product is a native Android app
- * with no public interface to record, so the only verified URL used is the
- * feature's OWN article page (swapped in for the generic features hub the
- * last cut used), and a drawn route-with-pins motif stands in for the actual
- * map/places the narration is about, carried through every beat.
+ * What moved from the mint cut: every persistent element changed its spot on
+ * the frame so this reads as a genuinely different shot, not a recolor.
+ *   - The hero figure moved from a left column to dead CENTER-TOP, so its
+ *     230px number is the first and biggest thing the eye lands on.
+ *   - The route-with-pins motif moved from a narrow top-right band to a
+ *     FULL-WIDTH strip along the BOTTOM — it now reads as an actual road
+ *     running the length of the frame, with the hero sitting above it like a
+ *     signpost.
+ *   - The kicker/title pair moved from a bar spanning the bottom (which would
+ *     now collide with the route) to a small label in the TOP-LEFT corner.
+ *   - The one non-crossfade transition (beat3 -> beat4) changed from a
+ *     vertical slide to a HORIZONTAL slide.
+ *   - The beat-1 LiveWindow title was corrected: it plays the feature's own
+ *     article page, not the generic features hub, so the title now names
+ *     that page instead of "vitalii.no/features".
  *
- * ONE persistent hero figure (fontSize 230, left column, alive frame 15 to
+ * ONE persistent hero figure (fontSize 230, centered top, alive frame 15 to
  * 982) owns the frame for the whole clip. Its value/label/color CROSSFADE
  * between the four metrics (a dissolve across the ~9-frame gap between
  * beats, not a hard swap) so no frame reads as broken:
@@ -26,13 +31,13 @@
  *   b4  "N"    accent→success, climbing as Wikidata promotes forgotten spots
  *   b5  "5"    success  REAL SOURCES PER PLACE (final payoff, holds to 982)
  *
- * A second persistent element — a small drawn ROUTE with three named place
- * pins (Old chapel, Old mill 🏚, Old dairy 🥛) sitting top-right beside the
- * hero — carries the literal "places along the route" through every beat,
- * changing state each time: silent/gray (b1) → unchanged + a stale-day tally
- * ticking up (b2, visualizing "nothing ever came back") → pins light up one
- * by one as sources are read (b3) → mill & dairy turn green/promoted (b4) →
- * all three resolved, story-ready (b5).
+ * A second persistent element — a full-width drawn ROAD with three named
+ * place pins (Old chapel, Old mill 🏚, Old dairy 🥛) running along the
+ * bottom of the frame — carries the literal "places along the route" through
+ * every beat, changing state each time: silent/gray (b1) → unchanged + a
+ * stale-day tally ticking up above the hero (b2, visualizing "nothing ever
+ * came back") → pins light up one by one as sources are read (b3) → mill &
+ * dairy turn green/promoted (b4) → all three resolved, story-ready (b5).
  *
  * Voice-synced beat table (identical frame windows to every earlier cut):
  *  b1  15-171  "Some places along the route stayed silent forever — there
@@ -69,8 +74,9 @@
  *              a LogWindow built from the feature's own real numbers
  *              contrasting old vs new. Holds to 982, no fade-out.
  *
- * Non-crossfade transition: beat3 -> beat4 vertical slide (content exits up,
- * enters from below) — unchanged from every earlier cut.
+ * Non-crossfade transition: beat3 -> beat4 HORIZONTAL slide (content exits
+ * left, enters from the right) — changed from the vertical slide used in the
+ * mint cut, so the two cuts never move the same way at the same beat.
  * Single tech-credibility caption in the whole clip: "Wikidata" (beat 4),
  * with a 4-word plain gloss. Real data only: the three named sources, the
  * 21-day window, the 150m radius and the "5 sources" total all come from the
@@ -92,7 +98,7 @@ import {
 import { LiveWindow, LogWindow, Win } from "./live-primitives";
 import shotsData from "./shots/g17.json";
 
-const P = MOODS.mint;
+const P = MOODS.slate;
 
 const B1_S = 15, B1_E = 171;
 const B2_S = 180, B2_E = 316;
@@ -102,13 +108,12 @@ const B5_S = 763, B5_E = 937;
 const END = 982;
 const FADE = 9;
 
-// Leaves the top band to the hero figure (left) and the route motif (right),
-// this wide strip is whatever is the beat's own evidence.
-const WIN_MAIN: Win = { x: 90, y: 330, w: 1100, h: 290 };
-const WIN_PAGE: Win = { x: 610, y: 330, w: 580, h: 290 };
+// Full-width evidence band, below the centered hero and above the road.
+const WIN_MAIN: Win = { x: 90, y: 342, w: 1100, h: 250 };
+const WIN_PAGE: Win = { x: 630, y: 342, w: 560, h: 250 };
 
-const HERO_X = 90;
-const HERO_Y = 40;
+const HERO_X = 400;
+const HERO_Y = 64;
 
 type Source = { short: string; emoji: string; label: string };
 const SOURCES: Source[] = [
@@ -129,10 +134,10 @@ const BeatLabel: React.FC<{ x: number; y: number; w: number; kicker: string; tit
   if (opacity <= 0.004) return null;
   return (
     <div style={{ position: "absolute", left: x, top: y, width: w, opacity, fontFamily }}>
-      <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 3, color: B.accent, textTransform: "uppercase" }}>
+      <div style={{ fontSize: 12.5, fontWeight: 800, letterSpacing: 2.6, color: B.accent, textTransform: "uppercase" }}>
         {kicker}
       </div>
-      <div style={{ fontSize: 30, fontWeight: 800, color: B.ink, marginTop: 8, lineHeight: 1.2 }}>{title}</div>
+      <div style={{ fontSize: 19, fontWeight: 800, color: B.ink, marginTop: 4, lineHeight: 1.2 }}>{title}</div>
     </div>
   );
 };
@@ -146,7 +151,17 @@ const HeroLayer: React.FC<{ value: string; label: string; color: string; weight:
 }) => {
   if (weight <= 0.004) return null;
   return (
-    <div style={{ position: "absolute", left: 0, top: 0, width: 480, opacity: weight, fontFamily }}>
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 0,
+        width: 480,
+        textAlign: "center",
+        opacity: weight,
+        fontFamily,
+      }}
+    >
       <div
         style={{
           fontSize: 230,
@@ -159,12 +174,12 @@ const HeroLayer: React.FC<{ value: string; label: string; color: string; weight:
       >
         {value}
       </div>
-      <div style={{ marginTop: 18, fontSize: 22, fontWeight: 800, letterSpacing: 1.6, color }}>{label}</div>
+      <div style={{ marginTop: 10, fontSize: 21, fontWeight: 800, letterSpacing: 1.6, color }}>{label}</div>
     </div>
   );
 };
 
-/** The one hero figure that owns the frame for the whole clip — a dissolve between metrics. */
+/** The one hero figure that owns the frame for the whole clip — centered top, a dissolve between metrics. */
 const Hero: React.FC<{
   opacity: number;
   w1: number;
@@ -178,7 +193,7 @@ const Hero: React.FC<{
 }> = ({ opacity, w1, w2, w3, w4, w5, n3, n4, colors }) => {
   if (opacity <= 0.004) return null;
   return (
-    <div style={{ position: "absolute", left: HERO_X, top: HERO_Y, width: 480, height: 300, opacity }}>
+    <div style={{ position: "absolute", left: HERO_X, top: HERO_Y, width: 480, height: 260, opacity }}>
       <HeroLayer value="0/3" label="SOURCES FOUND FOR THIS PLACE" color={colors.danger} weight={w1} />
       <HeroLayer value="2/21" label="DAYS SKIPPED, NO SECOND LOOK" color={colors.danger} weight={w2} />
       <HeroLayer
@@ -257,34 +272,33 @@ const RoutePin: React.FC<{ x: number; name: string; icon: string; state: PinStat
   );
 };
 
-/** The route motif: three named places strung along a dashed road, top-right, alive the whole clip. */
+/** The route motif: three named places strung along a full-width dashed road, bottom of the frame, alive the whole clip. */
 const RouteStrip: React.FC<{
   opacity: number;
   chapelState: PinState;
   millState: PinState;
   dairyState: PinState;
   readIcon: [string, string, string];
-  readOn: [number, number, number];
   promotedOn: number;
-}> = ({ opacity, chapelState, millState, dairyState, readIcon, readOn, promotedOn }) => {
+}> = ({ opacity, chapelState, millState, dairyState, readIcon, promotedOn }) => {
   const B = usePalette();
   if (opacity <= 0.004) return null;
-  const roadY = 112;
+  const roadY = 18;
   return (
-    <div style={{ position: "absolute", left: 620, top: 40, width: 570, height: 150, opacity, fontFamily }}>
+    <div style={{ position: "absolute", left: 90, top: 612, width: 1100, height: 90, opacity, fontFamily }}>
       <div
         style={{
           position: "absolute",
-          left: 20,
+          left: 0,
           top: roadY,
-          width: 530,
+          width: 1100,
           height: 0,
           borderTop: `3px dashed ${B.border}`,
         }}
       />
-      <RoutePin x={62} name="Old chapel" icon={readIcon[0]} state={chapelState} glowOpacity={promotedOn} />
-      <RoutePin x={285} name="Old mill" icon={readIcon[1]} state={millState} glowOpacity={promotedOn} />
-      <RoutePin x={508} name="Old dairy" icon={readIcon[2]} state={dairyState} glowOpacity={promotedOn} />
+      <RoutePin x={170} name="Old chapel" icon={readIcon[0]} state={chapelState} glowOpacity={promotedOn} />
+      <RoutePin x={550} name="Old mill" icon={readIcon[1]} state={millState} glowOpacity={promotedOn} />
+      <RoutePin x={930} name="Old dairy" icon={readIcon[2]} state={dairyState} glowOpacity={promotedOn} />
     </div>
   );
 };
@@ -302,21 +316,21 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
   const heroOn = seg(frame, B1_S, B1_S + FADE); // the hero fades in once and never fades out
 
   // Hero's four metrics dissolve into each other across the ~9-frame gap
-  // between beats instead of hard-swapping (the fix for the "glitch" the
-  // viewer flagged).
+  // between beats instead of hard-swapping.
   const w1 = 1 - seg(frame, B2_S, B2_S + FADE);
   const w2 = seg(frame, B2_S, B2_S + FADE) * (1 - seg(frame, B3_S, B3_S + FADE));
   const w3 = seg(frame, B3_S, B3_S + FADE) * (1 - seg(frame, B4_S, B4_S + FADE));
   const w4 = seg(frame, B4_S, B4_S + FADE) * (1 - seg(frame, B5_S, B5_S + FADE));
   const w5 = seg(frame, B5_S, B5_S + FADE);
 
-  // beat3 -> beat4 is a slide, not a crossfade.
-  const b3ExitY = interpolate(frame, [B3_E, B3_E + FADE], [0, -34], {
+  // beat3 -> beat4 is a HORIZONTAL slide (changed from the vertical slide of
+  // the mint cut): beat 3 exits to the left, beat 4 enters from the right.
+  const b3ExitX = interpolate(frame, [B3_E, B3_E + FADE], [0, -60], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.in(Easing.cubic),
   });
-  const b4EnterY = interpolate(frame, [B4_S, B4_S + FADE], [34, 0], {
+  const b4EnterX = interpolate(frame, [B4_S, B4_S + FADE], [60, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
@@ -344,7 +358,6 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
   let millState: PinState = "silent";
   let dairyState: PinState = "silent";
   const readIcon: [string, string, string] = ["📰", "📚", "📖"];
-  const readOn: [number, number, number] = [c3[0], c3[1], c3[2]];
   if (frame >= B3_S) {
     chapelState = c3[0] >= 0.5 ? "reading" : "silent";
     millState = c3[1] >= 0.5 ? "reading" : "silent";
@@ -374,18 +387,18 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
           millState={millState}
           dairyState={dairyState}
           readIcon={readIcon}
-          readOn={readOn}
           promotedOn={promotedOn}
         />
 
         {/* beat 1 — the product, the problem, and proof the page is real */}
         <Group opacity={b1}>
+          <BeatLabel x={60} y={24} w={360} kicker="THE PROBLEM" title="Some places never got a story" opacity={1} />
           <div
             style={{
               position: "absolute",
               left: WIN_MAIN.x,
               top: WIN_MAIN.y,
-              width: 460,
+              width: 500,
               padding: "14px 18px",
               borderRadius: 14,
               background: B.card,
@@ -409,17 +422,17 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
           <LiveWindow
             file={shotsData}
             shot="page"
-            title="vitalii.no/features"
+            title="vitalii.no/features/places-the-route-passes-but…-g17"
             from={B1_S + 8}
             hold={150}
             opacity={1}
             win={WIN_PAGE}
           />
-          <BeatLabel x={90} y={636} w={1100} kicker="THE PROBLEM" title="Some places never got a story" opacity={1} />
         </Group>
 
         {/* beat 2 — stayed skipped forever, reconstructed as a log (no verified URL shows this) */}
         <Group opacity={b2}>
+          <BeatLabel x={60} y={24} w={360} kicker="THE GAP" title="Once skipped, a place stayed skipped" opacity={1} />
           <LogWindow
             title="guide-research · nightly pass"
             from={B2_S + 10}
@@ -435,134 +448,122 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
               { t: "day 21", text: "2 of 21 days skipped — given up for good", tone: "danger" },
             ]}
           />
-          <div
-            style={{
-              position: "absolute",
-              left: 870,
-              top: 200,
-              width: 180,
-              textAlign: "center",
-              fontFamily,
-            }}
-          >
-            <div style={{ fontSize: 13, fontWeight: 800, color: B.danger, letterSpacing: 1 }}>⏳ STILL SILENT</div>
-            <div style={{ fontSize: 34, fontWeight: 800, color: B.danger, marginTop: 2, fontVariantNumeric: "tabular-nums" }}>
-              {staleDays} days
+        </Group>
+
+        {/* beat 3 — the nightly process digs deeper; the real matching commit. exits to the left. */}
+        <Group opacity={b3}>
+          <div style={{ position: "absolute", inset: 0, transform: `translateX(${b3ExitX}px)` }}>
+            <BeatLabel
+              x={60}
+              y={24}
+              w={360}
+              kicker="THE PASS"
+              title="Old newspapers, local-history archives, forgotten books"
+              opacity={1}
+            />
+            <StatPill x={WIN_MAIN.x} y={WIN_MAIN.y} emoji="🌙" text="A separate nightly process digs deeper" tone="accent" />
+            <div
+              style={{
+                position: "absolute",
+                left: WIN_MAIN.x + 520,
+                top: WIN_MAIN.y + 2,
+                padding: "10px 16px",
+                borderRadius: 10,
+                background: B.chipBg,
+                border: `1px solid ${B.border}`,
+                fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+                fontSize: 13.5,
+                color: B.muted,
+                maxWidth: 300,
+              }}
+            >
+              fd66bbf · research deeper sources for skipped places
+            </div>
+            <Panel x={WIN_MAIN.x} y={WIN_MAIN.y + 64} w={WIN_MAIN.w} h={WIN_MAIN.h - 64} tone="card" opacity={1}>
+              {SOURCES.map((s, i) => (
+                <IconCard
+                  key={s.label}
+                  x={30 + i * 350}
+                  y={48}
+                  w={310}
+                  emoji={s.emoji}
+                  title={s.label}
+                  sub="real source found"
+                  tone="success"
+                  opacity={c3[i]}
+                  scale={1.1}
+                />
+              ))}
+            </Panel>
+          </div>
+        </Group>
+
+        {/* beat 4 — the Wikidata check, promoting forgotten spots. enters from the right. */}
+        <Group opacity={b4}>
+          <div style={{ position: "absolute", inset: 0, transform: `translateX(${b4EnterX}px)` }}>
+            <BeatLabel
+              x={60}
+              y={24}
+              w={360}
+              kicker="THE PROMOTION"
+              title="Forgotten spots become new places on the route"
+              opacity={1}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 480,
+                top: 372,
+                width: 200,
+                height: 200,
+                borderRadius: "50%",
+                border: `3px solid ${B.accent}`,
+                background: B.accentBg,
+                transform: `scale(${radiusPulse})`,
+              }}
+            />
+            <div style={{ position: "absolute", left: 480, top: 460, width: 200, textAlign: "center", fontFamily }}>
+              <div style={{ fontSize: 30 }}>📍</div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: B.ink, marginTop: 2 }}>Wikidata within 150m</div>
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                left: 340 + mill * 180,
+                top: 420 - mill * 40,
+                fontSize: 30,
+                opacity: mill,
+              }}
+            >
+              🏚
+            </div>
+            <div
+              style={{
+                position: "absolute",
+                left: 740 - dairy * 180,
+                top: 420 - dairy * 40,
+                fontSize: 30,
+                opacity: dairy,
+              }}
+            >
+              🥛
+            </div>
+            <FilterChip x={760} y={400} text="Wikidata" icon="🧩" color={B.accent} scale={1} opacity={1} />
+            <div style={{ position: "absolute", left: 760, top: 448, width: 300, fontSize: 12.5, fontWeight: 550, color: B.muted }}>
+              a free facts database
             </div>
           </div>
-          <BeatLabel x={90} y={636} w={1100} kicker="THE GAP" title="Once skipped, a place stayed skipped" opacity={1} />
-        </Group>
-
-        {/* beat 3 — the nightly process digs deeper; the real matching commit */}
-        <Group opacity={b3} dy={b3ExitY}>
-          <StatPill x={870} y={168} emoji="🌙" text="A separate nightly process digs deeper" tone="accent" />
-          <div
-            style={{
-              position: "absolute",
-              left: 870,
-              top: 236,
-              padding: "10px 16px",
-              borderRadius: 10,
-              background: B.chipBg,
-              border: `1px solid ${B.border}`,
-              fontFamily: '"JetBrains Mono", "Fira Code", monospace',
-              fontSize: 13.5,
-              color: B.muted,
-              maxWidth: 300,
-            }}
-          >
-            fd66bbf · research deeper sources for skipped places
-          </div>
-          <Panel x={WIN_MAIN.x} y={WIN_MAIN.y} w={820} h={WIN_MAIN.h} tone="card" opacity={1}>
-            {SOURCES.map((s, i) => (
-              <IconCard
-                key={s.label}
-                x={30 + i * 260}
-                y={55}
-                w={230}
-                emoji={s.emoji}
-                title={s.label}
-                sub="real source found"
-                tone="success"
-                opacity={c3[i]}
-                scale={1.1}
-              />
-            ))}
-          </Panel>
-          <BeatLabel
-            x={90}
-            y={636}
-            w={1100}
-            kicker="THE PASS"
-            title="Old newspapers, local-history archives, forgotten books"
-            opacity={1}
-          />
-        </Group>
-
-        {/* beat 4 — the Wikidata check, promoting forgotten spots. slides in from below. */}
-        <Group opacity={b4} dy={b4EnterY}>
-          <div
-            style={{
-              position: "absolute",
-              left: 400,
-              top: 400,
-              width: 220,
-              height: 220,
-              borderRadius: "50%",
-              border: `3px solid ${B.accent}`,
-              background: B.accentBg,
-              transform: `scale(${radiusPulse})`,
-            }}
-          />
-          <div style={{ position: "absolute", left: 400, top: 495, width: 220, textAlign: "center", fontFamily }}>
-            <div style={{ fontSize: 32 }}>📍</div>
-            <div style={{ fontSize: 13, fontWeight: 800, color: B.ink, marginTop: 2 }}>Wikidata within 150m</div>
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              left: 300 + mill * 180,
-              top: 300 + mill * 60,
-              fontSize: 30,
-              opacity: mill,
-              transition: "none",
-            }}
-          >
-            🏚
-          </div>
-          <div
-            style={{
-              position: "absolute",
-              left: 740 - dairy * 180,
-              top: 300 + dairy * 60,
-              fontSize: 30,
-              opacity: dairy,
-            }}
-          >
-            🥛
-          </div>
-          <FilterChip x={760} y={400} text="Wikidata" icon="🧩" color={B.accent} scale={1} opacity={1} />
-          <div style={{ position: "absolute", left: 760, top: 448, width: 300, fontSize: 12.5, fontWeight: 550, color: B.muted }}>
-            a free facts database
-          </div>
-          <BeatLabel
-            x={90}
-            y={636}
-            w={1100}
-            kicker="THE PROMOTION"
-            title="Forgotten spots become new places on the route"
-            opacity={1}
-          />
         </Group>
 
         {/* beat 5 — the result, in the product's own log, plus the route fully resolved. holds to the end, no page or hub (gate 2). */}
         <Group opacity={b5}>
+          <BeatLabel x={60} y={24} w={360} kicker="THE RESULT" title="Every silent place gets a second, deeper look" opacity={1} />
           <LogWindow
             title="guide-research · second pass"
             from={B5_S + 10}
             every={26}
             fontSize={20}
-            win={{ x: WIN_MAIN.x, y: WIN_MAIN.y, w: 740, h: WIN_MAIN.h }}
+            win={{ x: WIN_MAIN.x, y: WIN_MAIN.y, w: 700, h: WIN_MAIN.h }}
             opacity={1}
             lines={[
               { t: "OLD", text: "skipped ≥2 of 21 days → given up forever", tone: "danger" },
@@ -571,7 +572,7 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
               { t: "NEW", text: "every silent place gets a second look", tone: "success" },
             ]}
           />
-          <Panel x={860} y={WIN_MAIN.y} w={330} h={WIN_MAIN.h} tone="success" opacity={1}>
+          <Panel x={810} y={WIN_MAIN.y} w={380} h={WIN_MAIN.h} tone="success" opacity={1}>
             <div style={{ padding: "20px 24px", fontFamily }}>
               <div style={{ fontSize: 13, fontWeight: 800, color: B.success, letterSpacing: 1 }}>THE ROUTE NOW</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: B.ink, marginTop: 10 }}>🔇 Old chapel → 📖</div>
@@ -579,7 +580,6 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
               <div style={{ fontSize: 16, fontWeight: 700, color: B.ink, marginTop: 6 }}>🥛 Old dairy → 📖</div>
             </div>
           </Panel>
-          <BeatLabel x={90} y={636} w={1100} kicker="THE RESULT" title="Every silent place gets a second, deeper look" opacity={1} />
         </Group>
       </div>
     </PaletteProvider>
