@@ -245,7 +245,7 @@ const FrameInner: React.FC<{
     easing: Easing.out(Easing.cubic),
   });
 
-  const growT = seg(frame, B3_S + 50, B3_S + 95);
+  const growT = seg(frame, B3_S + 35, B3_S + 65);
   const tileRect = { x: 860, y: 260, w: 150, h: 110 };
   const modalRect = { x: 650, y: 140, w: 480, h: 380 };
   const gx = tileRect.x + (modalRect.x - tileRect.x) * growT;
@@ -449,7 +449,7 @@ const FrameInner: React.FC<{
             overflow: "hidden",
           }}
         >
-          <div style={{ padding: 24, opacity: seg(frame, B3_S + 100, B3_S + 100 + FADE) }}>
+          <div style={{ padding: 24, opacity: seg(frame, B3_S + 68, B3_S + 68 + FADE) }}>
             <div style={{ fontFamily, fontSize: 20, fontWeight: 800, color: P.ink }}>Project title</div>
             <div style={{ fontFamily, fontSize: 14, color: P.muted, marginTop: 8 }}>
               opens from right here, every time
@@ -458,7 +458,7 @@ const FrameInner: React.FC<{
         </div>
         <CaptionBand
           text="now, built with Radix UI, the window expands straight out of the exact tile you clicked"
-          opacity={seg(frame, B3_S + 145, B3_S + 145 + FADE)}
+          opacity={seg(frame, B3_S + 65, B3_S + 65 + FADE)}
         />
       </Group>
 

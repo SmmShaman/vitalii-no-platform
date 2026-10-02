@@ -505,7 +505,7 @@ const FrameInner: React.FC<{
           a Supabase-backed endpoint — reads automatically
         </div>
         <BeatLabel x={60} y={600} kicker="now, automatic" title="the endpoint reads it for you" opacity={1} />
-        <FilterChip x={150} y={130} text="Supabase" icon="🗄" color={P.accent} opacity={seg(frame, B3_S + 20, B3_S + 20 + FADE)} />
+        <FilterChip x={150} y={130} text="Supabase" icon="🗄" color={P.accent} opacity={seg(frame, B3_S + 12, B3_S + 12 + FADE)} />
         <div
           style={{
             position: "absolute",
@@ -516,12 +516,12 @@ const FrameInner: React.FC<{
             color: P.muted,
             maxWidth: 260,
             lineHeight: 1.4,
-            opacity: seg(frame, B3_S + 30, B3_S + 30 + FADE),
+            opacity: seg(frame, B3_S + 18, B3_S + 18 + FADE),
           }}
         >
           a hosted database + instant API
         </div>
-        <FlowArrow x={340} y={140} len={120} progress={seg(frame, B3_S + 40, B3_S + 40 + FADE)} />
+        <FlowArrow x={340} y={140} len={120} progress={seg(frame, B3_S + 24, B3_S + 24 + FADE)} />
         <div
           style={{
             position: "absolute",
@@ -535,13 +535,13 @@ const FrameInner: React.FC<{
             border: `1.5px solid ${P.border}`,
             borderRadius: 10,
             padding: "8px 14px",
-            opacity: seg(frame, B3_S + 55, B3_S + 55 + FADE),
+            opacity: seg(frame, B3_S + 30, B3_S + 30 + FADE),
           }}
         >
           /api/projects/[slug]
         </div>
-        <FlowArrow x={720} y={140} len={120} progress={seg(frame, B3_S + 70, B3_S + 70 + FADE)} />
-        <Panel x={860} y={100} w={280} h={170} tone="accent" opacity={seg(frame, B3_S + 85, B3_S + 85 + FADE)}>
+        <FlowArrow x={720} y={140} len={120} progress={seg(frame, B3_S + 36, B3_S + 36 + FADE)} />
+        <Panel x={860} y={100} w={280} h={170} tone="accent" opacity={seg(frame, B3_S + 42, B3_S + 42 + FADE)}>
           <div style={{ position: "absolute", left: 18, top: 14, fontFamily, fontSize: 13, color: P.muted, letterSpacing: 1 }}>
             TECH TAGS
           </div>
@@ -567,7 +567,7 @@ const FrameInner: React.FC<{
                 border: `1px solid ${P.accentEdge}`,
                 borderRadius: 999,
                 padding: "6px 14px",
-                opacity: seg(frame, B3_S + 90 + i * 8, B3_S + 90 + i * 8 + FADE),
+                opacity: seg(frame, B3_S + 48 + Math.floor(i / 4) * 8, B3_S + 48 + Math.floor(i / 4) * 8 + FADE),
               }}
             >
               🏷 {tag}
@@ -582,11 +582,11 @@ const FrameInner: React.FC<{
           text='"projects window fills the bento grid like Services"'
           tag="f8efc7b"
           tone="success"
-          opacity={seg(frame, B3_S + 150, B3_S + 150 + FADE)}
+          opacity={seg(frame, B3_S + 64, B3_S + 64 + FADE)}
         />
         <CaptionBand
           text="a Supabase-backed endpoint reads each project's real tech stack and newest work — automatically"
-          opacity={seg(frame, B3_S + 165, B3_S + 165 + FADE)}
+          opacity={seg(frame, B3_S + 74, B3_S + 74 + FADE)}
         />
       </Group>
 
