@@ -1,0 +1,47 @@
+{
+ "id": "g23",
+ "beat_durations": {
+  "b1": 7.248,
+  "b2": 5.064,
+  "b3": 8.208,
+  "b4": 6.264
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Driving past Hoff, a small place on the daily route, the guide stayed silent \u2014 it only knew spots added by hand.",
+   "start_s": 0.5,
+   "end_s": 7.748,
+   "start_f": 15,
+   "end_f": 232
+  },
+  {
+   "beat": "b2",
+   "text": "Now it pulls straight from Kartverket, Norway's own official register of place names.",
+   "start_s": 8.048,
+   "end_s": 13.112,
+   "start_f": 241,
+   "end_f": 393
+  },
+  {
+   "beat": "b3",
+   "text": "It keeps real farms, holdings and hamlets near the road, skips plain addresses, and looks up a local wiki page to back each name.",
+   "start_s": 13.412,
+   "end_s": 21.62,
+   "start_f": 402,
+   "end_f": 649
+  },
+  {
+   "beat": "b4",
+   "text": "Each name even gets translated into Ukrainian \u2014 as long as it sits within five hundred meters of the road.",
+   "start_s": 21.92,
+   "end_s": 28.184,
+   "start_f": 658,
+   "end_f": 846
+  }
+ ],
+ "total_s": 29.684,
+ "durationInFrames": 891,
+ "measured_track_s": 28.248,
+ "track": "/root/feature-demos/vo-g23/vo-g23.mp3"
+}

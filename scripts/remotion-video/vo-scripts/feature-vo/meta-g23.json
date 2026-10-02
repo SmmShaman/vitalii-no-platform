@@ -1,0 +1,7 @@
+{
+  "id": "g23",
+  "file": "yt-feature-g23.mp4",
+  "title": "Norway's Official Place Names Finally Speak Up | vitalii.no",
+  "description": "Driving past Hoff, a small settlement right on the route, the guide used to say nothing — it only recognized places someone had entered by hand, like farms, churches and museums, so Norway's own official register of place names sitting right next to the road was invisible to it.\n\nresearch.py now pulls names straight from Kartverket's Geonorge place-name service, keeping real farms, holdings and hamlets near the road while filtering out plain street addresses and administrative boundaries. Each new name is stored as its own place and matched against local-history wiki articles so the guide has something to say about it, with the text translated into Ukrainian.\n\nThe filter keeps names within 100 meters of the road, widened to 500 meters for proper settlements — close enough to stay relevant, wide enough to catch places like Hoff that sit just off the asphalt.\n\n🔗 Full write-up: https://vitalii.no/features/kartverkets-place-names-along-the-road-turn-into-stops-of-their-own-g23\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#norway #openmapdata #geolocation #python #automation",
+  "tags": ["norway place names", "kartverket", "geonorge", "open data", "geolocation", "python", "local history", "driving app", "road trip tech", "personal project", "vitalii berbeha"]
+}

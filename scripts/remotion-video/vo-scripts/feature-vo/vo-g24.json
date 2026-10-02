@@ -1,0 +1,47 @@
+{
+ "id": "g24",
+ "beat_durations": {
+  "b1": 5.328,
+  "b2": 6.84,
+  "b3": 6.792,
+  "b4": 7.44
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "On roads I drive almost every day, the guide runs out of new places and goes quiet.",
+   "start_s": 0.5,
+   "end_s": 5.828,
+   "start_f": 15,
+   "end_f": 175
+  },
+  {
+   "beat": "b2",
+   "text": "Now it replays a story from an earlier drive instead \u2014 like a guide repeating a tale rather than falling silent.",
+   "start_s": 6.128,
+   "end_s": 12.968,
+   "start_f": 184,
+   "end_f": 389
+  },
+  {
+   "beat": "b3",
+   "text": "A place only replays after sixteen hours of quiet, and a genuinely new spot always jumps ahead of it.",
+   "start_s": 13.268,
+   "end_s": 20.06,
+   "start_f": 398,
+   "end_f": 602
+  },
+  {
+   "beat": "b4",
+   "text": "A separate fix also stopped town-wide stories from starting two point five kilometers early \u2014 now they wait until I'm actually there.",
+   "start_s": 20.36,
+   "end_s": 27.8,
+   "start_f": 611,
+   "end_f": 834
+  }
+ ],
+ "total_s": 29.3,
+ "durationInFrames": 879,
+ "measured_track_s": 27.864,
+ "track": "/root/feature-demos/vo-g24/vo-g24.mp3"
+}

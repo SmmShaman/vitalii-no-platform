@@ -1,0 +1,7 @@
+{
+  "id": "g24",
+  "file": "yt-feature-g24.mp4",
+  "title": "The Guide Replays an Old Story Instead of Going Silent | vitalii.no",
+  "description": "On roads driven almost every day, eventually every nearby place has already been mentioned — and when nothing new is left to flash, a driving guide app just went silent, turning minutes of a familiar commute into dead air.\n\nDriveService.java now adds a replay mechanism: once a place has been quiet for long enough, it becomes eligible to be replayed from an earlier drive instead of leaving the guide silent, while a genuinely new place along the route always takes priority over a repeat. A second fix capped how far from a town's center a multi-part \"road episode\" is allowed to start.\n\nReplays only trigger after 16 hours of silence on a given place. A separate bug that let an area-wide episode start playing up to 2.5 kilometers before the actual town is now fixed too — it waits until the car is almost there.\n\n🔗 Full write-up: https://vitalii.no/features/nothing-new-by-the-road-the-guide-replays-a-place-from-an-earlier-drive-instead--g24\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#drivingapp #android #locationtech #personalproject #automation",
+  "tags": ["driving guide app", "android development", "replay logic", "location awareness", "geolocation", "road trip tech", "dead air fix", "content pacing", "java", "personal project", "vitalii berbeha"]
+}
