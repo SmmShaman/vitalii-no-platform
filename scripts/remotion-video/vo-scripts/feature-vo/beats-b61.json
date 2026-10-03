@@ -1,0 +1,7 @@
+{"id": "b61", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A call rings silent, or a notification never shows — it looks like the app is broken."],
+ ["b2", "Often it isn't broken. Android itself quietly denied the camera, microphone or full-screen call permission."],
+ ["b3", "There was no single place to see which permission was missing, or what build was even running."],
+ ["b4", "Now a settings screen lists every permission and the build hash, with a tap straight to the fix."],
+ ["b5", "Troubleshooting a device, instead of guessing over text, now comes down to one screen."]
+]}

@@ -1,0 +1,56 @@
+{
+ "id": "b61",
+ "beat_durations": {
+  "b1": 5.4,
+  "b2": 6.816,
+  "b3": 4.752,
+  "b4": 5.712,
+  "b5": 5.376
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A call rings silent, or a notification never shows \u2014 it looks like the app is broken.",
+   "start_s": 0.5,
+   "end_s": 5.9,
+   "start_f": 15,
+   "end_f": 177
+  },
+  {
+   "beat": "b2",
+   "text": "Often it isn't broken. Android itself quietly denied the camera, microphone or full-screen call permission.",
+   "start_s": 6.2,
+   "end_s": 13.016,
+   "start_f": 186,
+   "end_f": 390
+  },
+  {
+   "beat": "b3",
+   "text": "There was no single place to see which permission was missing, or what build was even running.",
+   "start_s": 13.316,
+   "end_s": 18.068,
+   "start_f": 399,
+   "end_f": 542
+  },
+  {
+   "beat": "b4",
+   "text": "Now a settings screen lists every permission and the build hash, with a tap straight to the fix.",
+   "start_s": 18.368,
+   "end_s": 24.08,
+   "start_f": 551,
+   "end_f": 722
+  },
+  {
+   "beat": "b5",
+   "text": "Troubleshooting a device, instead of guessing over text, now comes down to one screen.",
+   "start_s": 24.38,
+   "end_s": 29.756,
+   "start_f": 731,
+   "end_f": 893
+  }
+ ],
+ "total_s": 31.256,
+ "durationInFrames": 938,
+ "measured_track_s": 29.808,
+ "track": "/root/feature-demos/vo-b61/vo-b61.mp3"
+}

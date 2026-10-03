@@ -1,0 +1,56 @@
+{
+ "id": "m29",
+ "beat_durations": {
+  "b1": 5.688,
+  "b2": 5.544,
+  "b3": 6.216,
+  "b4": 6.384,
+  "b5": 6.288
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every sentence played at the same fixed speed \u2014 too fast to catch, or too slow to bear.",
+   "start_s": 0.5,
+   "end_s": 6.188,
+   "start_f": 15,
+   "end_f": 186
+  },
+  {
+   "beat": "b2",
+   "text": "Advanced learners sat through needless repeats; beginners never caught the fast phrase.",
+   "start_s": 6.488,
+   "end_s": 12.032,
+   "start_f": 195,
+   "end_f": 361
+  },
+  {
+   "beat": "b3",
+   "text": "So playback became a ladder: slow, then normal, then fast, all in one pass.",
+   "start_s": 12.332,
+   "end_s": 18.548,
+   "start_f": 370,
+   "end_f": 556
+  },
+  {
+   "beat": "b4",
+   "text": "A Python script now builds that ladder, giving grammar a real time budget instead of a flat guess.",
+   "start_s": 18.848,
+   "end_s": 25.232,
+   "start_f": 565,
+   "end_f": 757
+  },
+  {
+   "beat": "b5",
+   "text": "Now the learner hears slow, normal and fast in one pass \u2014 three speeds where there used to be one.",
+   "start_s": 25.532,
+   "end_s": 31.82,
+   "start_f": 766,
+   "end_f": 955
+  }
+ ],
+ "total_s": 33.32,
+ "durationInFrames": 1000,
+ "measured_track_s": 31.872,
+ "track": "/root/feature-demos/vo-m29/vo-m29.mp3"
+}

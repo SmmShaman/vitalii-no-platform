@@ -1,0 +1,7 @@
+{"id": "m29", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every sentence played at the same fixed speed — too fast to catch, or too slow to bear."],
+ ["b2", "Advanced learners sat through needless repeats; beginners never caught the fast phrase."],
+ ["b3", "So playback became a ladder: slow, then normal, then fast, all in one pass."],
+ ["b4", "A Python script now builds that ladder, giving grammar a real time budget instead of a flat guess."],
+ ["b5", "Now the learner hears slow, normal and fast in one pass — three speeds where there used to be one."]
+]}
