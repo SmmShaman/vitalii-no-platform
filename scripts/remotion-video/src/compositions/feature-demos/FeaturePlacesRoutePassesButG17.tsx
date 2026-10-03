@@ -416,8 +416,9 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
             x={WIN_MAIN.x}
             y={WIN_MAIN.y + 132}
             emoji="🔇"
-            text="Not enough written — this place stays permanently silent"
+            text="Not enough written — permanently silent"
             tone="danger"
+            fontSize={17}
           />
           <LiveWindow
             file={shotsData}
@@ -509,47 +510,74 @@ export const FeaturePlacesRoutePassesButG17: React.FC = () => {
               title="Forgotten spots become new places on the route"
               opacity={1}
             />
+            {/* dashed connectors tie the two spread-out icons to the radius check */}
             <div
               style={{
                 position: "absolute",
-                left: 480,
-                top: 372,
-                width: 200,
-                height: 200,
+                left: 290,
+                top: 456,
+                width: 240,
+                borderTop: `3px dashed ${B.accent}`,
+                opacity: mill,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 750,
+                top: 456,
+                width: 240,
+                borderTop: `3px dashed ${B.accent}`,
+                opacity: dairy,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 530,
+                top: 346,
+                width: 220,
+                height: 220,
                 borderRadius: "50%",
                 border: `3px solid ${B.accent}`,
                 background: B.accentBg,
                 transform: `scale(${radiusPulse})`,
               }}
             />
-            <div style={{ position: "absolute", left: 480, top: 460, width: 200, textAlign: "center", fontFamily }}>
-              <div style={{ fontSize: 30 }}>📍</div>
-              <div style={{ fontSize: 13, fontWeight: 800, color: B.ink, marginTop: 2 }}>Wikidata within 150m</div>
+            <div style={{ position: "absolute", left: 540, top: 428, width: 200, textAlign: "center", fontFamily }}>
+              <div style={{ fontSize: 34 }}>📍</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: B.ink, marginTop: 2 }}>Wikidata within 150m</div>
             </div>
             <div
               style={{
                 position: "absolute",
-                left: 340 + mill * 180,
-                top: 420 - mill * 40,
-                fontSize: 30,
+                left: 130 + (1 - mill) * 60,
+                top: 396,
+                width: 160,
+                textAlign: "center",
                 opacity: mill,
+                fontFamily,
               }}
             >
-              🏚
+              <div style={{ fontSize: 56 }}>🏚</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: B.ink, marginTop: 2 }}>Old mill</div>
             </div>
             <div
               style={{
                 position: "absolute",
-                left: 740 - dairy * 180,
-                top: 420 - dairy * 40,
-                fontSize: 30,
+                left: 990 - (1 - dairy) * 60,
+                top: 396,
+                width: 160,
+                textAlign: "center",
                 opacity: dairy,
+                fontFamily,
               }}
             >
-              🥛
+              <div style={{ fontSize: 56 }}>🥛</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: B.ink, marginTop: 2 }}>Old dairy</div>
             </div>
-            <FilterChip x={760} y={400} text="Wikidata" icon="🧩" color={B.accent} scale={1} opacity={1} />
-            <div style={{ position: "absolute", left: 760, top: 448, width: 300, fontSize: 12.5, fontWeight: 550, color: B.muted }}>
+            <FilterChip x={980} y={60} text="Wikidata" icon="🧩" color={B.accent} scale={1} opacity={1} />
+            <div style={{ position: "absolute", left: 980, top: 102, width: 220, fontSize: 12.5, fontWeight: 550, color: B.muted }}>
               a free facts database
             </div>
           </div>

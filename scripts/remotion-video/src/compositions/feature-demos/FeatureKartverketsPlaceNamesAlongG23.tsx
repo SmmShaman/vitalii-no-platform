@@ -269,6 +269,18 @@ const Scene: React.FC = () => {
         </div>
       </div>
 
+      {/* persistent pipeline skeleton — the architecture is on screen from beat 1,
+          dormant/grayed until Kartverket is wired in, so the frame is never half
+          empty waiting for the pipeline to start popping in at beat 2 */}
+      <div style={{ opacity: frame >= B1_S ? 0.32 : 0, filter: "grayscale(0.9)" }}>
+        <PipeNode x={KV_X} y={KV_Y} emoji="🗺" title="Kartverket" sub="Geonorge place-name register" />
+        <VertArrow x={KV_X + NODE_W / 2 - 3} y={KV_Y + 92} len={60} progress={1} />
+        <PipeNode x={RESEARCH_X} y={RESEARCH_Y} emoji="🔎" title="research.py" sub="filters names along the route" />
+        <FlowArrow x={RESEARCH_X + NODE_W + 14} y={RESEARCH_Y + 46} len={460} progress={1} color={P.muted} />
+        <PipeNode x={RUNNER_X} y={RUNNER_Y} emoji="📖" title="runner.py / dossier.py" sub="matches a local wiki page" />
+        <VertArrow x={RUNNER_X + NODE_W / 2 - 3} y={RUNNER_Y + 92} len={360} progress={1} />
+      </div>
+
       {/* pipeline nodes, beat 2 onward, dim under beat-3 LiveWindow */}
       <div style={{ opacity: pipelineOn ? (frame < B3_S ? 1 : 0.45) : 0 }}>
         <PipeNode x={KV_X} y={KV_Y} emoji="🗺" title="Kartverket" sub="Geonorge place-name register" opacity={kvPop} scale={0.9 + kvPop * 0.1} />
