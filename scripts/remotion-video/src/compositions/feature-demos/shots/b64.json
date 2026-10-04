@@ -1,0 +1,14 @@
+{
+  "id": "b64",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/one-tap-to-sign-in-zero-adb-to-update-b64",
+      "frames": 155,
+      "scroll": [[0, 0], [77, 380], [154, 760]],
+      "mouse": [[0, 300, 180], [50, 560, 260], [100, 420, 340], [154, 600, 220]]
+    }
+  ]
+}

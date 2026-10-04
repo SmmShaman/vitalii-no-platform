@@ -1,26 +1,34 @@
 /**
  * FeatureAndroidAppInstallsOwnG18 — feature g18 — 1280x720, 858 frames @ 30fps, VOICE-SYNCED.
  *
+ * WAVE B2 FIX (2026-10-04): gate 2 failed on the previous picture because it
+ * had exactly one `LiveWindow` call in the whole file — beat 3, playing the
+ * feature's own article page — and the host's gate checks the LAST (here,
+ * the ONLY) `LiveWindow` in the source regardless of which beat it sits in.
+ * g18's mechanism (a background self-update check) has no real web UI to
+ * record anyway — the article page and the hub are marketing pages, not the
+ * feature itself — so per STEP 0c ("invisible plumbing stays drawn") beat 3
+ * reverts to fully drawn, same as beat 4. No LiveWindow anywhere in this
+ * clip now.
+ *
  * archetype 0 split-duel / mood mint. A vertical seam splits the frame:
  * chaos (the phone, stuck on the old build, waiting for a tap that never
  * comes) on the left, order (the Updater checking and installing itself) on
  * the right. Both halves stay alive at once; the seam slides left across the
  * clip and, by the payoff, order has taken the whole frame — the duel is won,
- * not decorated. No LiveWindow anywhere in this clip: the feature's own page
- * and the hub are never staged at all, not even in beat 1, so there is no
- * "final LiveWindow" that could read as playing the page/hub — beat 1 is
- * fully drawn (chaos panel + product plate). The one real commit, 7cab206,
- * appears as a drawn chip only in beat 3 — the beat whose sentence it
- * actually matches ("checks for a newer build itself, after every drive")
- * — because GitHub isn't a verified URL tonight, so it is drawn, not
- * recorded. The last beat ends on a constructed log built from the
- * feature's own real numbers (two versions behind -> zero), holding at full
- * brightness through the final frame.
+ * not decorated. Beat 1 is fully drawn (chaos panel + product plate). Beat 3
+ * is the matching real commit (7cab206) as a drawn chip plus the two real
+ * file names (Updater.java, DriveService.java) — the beat whose sentence it
+ * actually matches, "checks for a newer build itself, after every drive".
+ * GitHub isn't a verified URL tonight, so it's drawn, not a live diff. The
+ * last beat ends on a constructed log built from the feature's own real
+ * numbers (two versions behind -> zero), holding at full brightness through
+ * the final frame — never the feature page or hub (gate 2).
  *
  * Voice-synced beat table (do not shift):
  *  b1  15–181  "A new update for the app would sit on the phone every night, waiting for a tap that never came." — drawn: chaos panel + product plate
  *  b2 190–328  "So the app quietly fell behind, missing whatever each update had fixed."
- *  b3 337–479  "Now it checks for a newer build itself, after every drive, and downloads it." — commit 7cab206 (drawn chip)
+ *  b3 337–479  "Now it checks for a newer build itself, after every drive, and downloads it." — commit 7cab206 + file names (drawn)
  *  b4 488–656  "It verifies the version, then installs through Android's PackageInstaller — no tap needed."
  *  b5 665–813  "It never interrupts a drive — closing a gap that once ran two versions deep." — LogWindow, holds to 858.
  *

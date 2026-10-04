@@ -227,6 +227,8 @@ import { FeatureProjectsWindowFinallyFillsP71 } from "./compositions/feature-dem
 import { FeatureNothingNewRoadGuideG24 } from "./compositions/feature-demos/FeatureNothingNewRoadGuideG24";
 import { FeatureKartverketsPlaceNamesAlongG23 } from "./compositions/feature-demos/FeatureKartverketsPlaceNamesAlongG23";
 import { FeatureTempoLadderNorwegianSentencesM29 } from "./compositions/feature-demos/FeatureTempoLadderNorwegianSentencesM29";
+import { FeatureRetiredAgentsGet403G25 } from "./compositions/feature-demos/FeatureRetiredAgentsGet403G25";
+import { FeatureOneTapSignZeroB64 } from "./compositions/feature-demos/FeatureOneTapSignZeroB64";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2230,6 +2232,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureTempoLadderNorwegianSentencesM29"
         component={FeatureTempoLadderNorwegianSentencesM29}
         durationInFrames={1000}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureRetiredAgentsGet403G25"
+        component={FeatureRetiredAgentsGet403G25}
+        durationInFrames={949}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureOneTapSignZeroB64"
+        component={FeatureOneTapSignZeroB64}
+        durationInFrames={855}
         fps={30}
         width={1280}
         height={720}
