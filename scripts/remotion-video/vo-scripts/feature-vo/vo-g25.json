@@ -1,0 +1,56 @@
+{
+ "id": "g25",
+ "beat_durations": {
+  "b1": 4.728,
+  "b2": 6.024,
+  "b3": 5.496,
+  "b4": 6.744,
+  "b5": 5.448
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Imagine firing an employee, but they still show up and sometimes run the meeting.",
+   "start_s": 0.5,
+   "end_s": 5.228,
+   "start_f": 15,
+   "end_f": 157
+  },
+  {
+   "beat": "b2",
+   "text": "That's what was happening to one of my automated agents. A retired one kept waking up on its own schedule.",
+   "start_s": 5.528,
+   "end_s": 11.552,
+   "start_f": 166,
+   "end_f": 347
+  },
+  {
+   "beat": "b3",
+   "text": "Sometimes it even won the leader election and took over control with old, outdated code.",
+   "start_s": 11.852,
+   "end_s": 17.348,
+   "start_f": 356,
+   "end_f": 520
+  },
+  {
+   "beat": "b4",
+   "text": "Now every agent sends its identity with each request, checked against a disabled list on Cloudflare Workers.",
+   "start_s": 17.648,
+   "end_s": 24.392,
+   "start_f": 529,
+   "end_f": 732
+  },
+  {
+   "beat": "b5",
+   "text": "Any retired id gets rejected instantly, every time, with a 403.",
+   "start_s": 24.692,
+   "end_s": 30.14,
+   "start_f": 741,
+   "end_f": 904
+  }
+ ],
+ "total_s": 31.64,
+ "durationInFrames": 949,
+ "measured_track_s": 30.192,
+ "track": "/root/feature-demos/vo-g25/vo-g25.mp3"
+}

@@ -1,0 +1,7 @@
+{"id": "b64", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every time I shipped a new build, I had to plug in three phones and install it by hand."],
+  ["b2", "And logging in meant typing a PIN, even on a phone already signed into the right account."],
+  ["b3", "Now the app checks for your Google account with Credential Manager, and signs you in with one tap."],
+  ["b4", "A new build checks itself for updates and installs automatically, no cable, no laptop."],
+  ["b5", "Three manual installs, every release, down to zero."]
+]}

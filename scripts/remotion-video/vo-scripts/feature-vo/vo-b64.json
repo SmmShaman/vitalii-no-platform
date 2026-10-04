@@ -1,0 +1,56 @@
+{
+ "id": "b64",
+ "beat_durations": {
+  "b1": 5.016,
+  "b2": 5.28,
+  "b3": 5.184,
+  "b4": 5.808,
+  "b5": 4.008
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every time I shipped a new build, I had to plug in three phones and install it by hand.",
+   "start_s": 0.5,
+   "end_s": 5.516,
+   "start_f": 15,
+   "end_f": 165
+  },
+  {
+   "beat": "b2",
+   "text": "And logging in meant typing a PIN, even on a phone already signed into the right account.",
+   "start_s": 5.816,
+   "end_s": 11.096,
+   "start_f": 174,
+   "end_f": 333
+  },
+  {
+   "beat": "b3",
+   "text": "Now the app checks for your Google account with Credential Manager, and signs you in with one tap.",
+   "start_s": 11.396,
+   "end_s": 16.58,
+   "start_f": 342,
+   "end_f": 497
+  },
+  {
+   "beat": "b4",
+   "text": "A new build checks itself for updates and installs automatically, no cable, no laptop.",
+   "start_s": 16.88,
+   "end_s": 22.688,
+   "start_f": 506,
+   "end_f": 681
+  },
+  {
+   "beat": "b5",
+   "text": "Three manual installs, every release, down to zero.",
+   "start_s": 22.988,
+   "end_s": 26.996,
+   "start_f": 690,
+   "end_f": 810
+  }
+ ],
+ "total_s": 28.496,
+ "durationInFrames": 855,
+ "measured_track_s": 27.048,
+ "track": "/root/feature-demos/vo-b64/vo-b64.mp3"
+}

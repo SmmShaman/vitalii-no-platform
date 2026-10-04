@@ -1,0 +1,7 @@
+{
+  "id": "b64",
+  "file": "yt-feature-b64.mp4",
+  "title": "One Tap to Sign In, Zero adb to Update | vitalii.no",
+  "description": "How Android's Credential Manager replaced a PIN login, and a self-update check replaced plugging phones into a laptop.\n\nEvery new build of the native app meant connecting phones to a laptop and running a manual install, three phones at a time. On top of that, the only way to log in was a PIN, with no shortcut for the Google account already signed into the phone.\n\nI added Credential Manager, which hands a Google ID token straight to the page so sign-in happens with one tap, keeping the PIN login only as a fallback. A new update-checker class polls a published manifest file and installs a newer build automatically when one is available. A GitHub Actions workflow now builds the app on every push and publishes it to a URL served straight from the project's own domain, so installing it the first time only needs a browser.\n\nWhat used to take three manual installs per release, cable and laptop included, is now zero.\n\n🔗 Full write-up: https://vitalii.no/features/one-tap-to-sign-in-zero-adb-to-update-b64\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#android #credentialmanager #mobiledev #cicd #githubactions",
+  "tags": ["android development", "credential manager", "google sign in", "ci cd", "github actions", "self updating apps", "mobile automation", "developer experience", "apk distribution", "java", "vitalii berbeha"]
+}

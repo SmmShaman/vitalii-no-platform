@@ -1,0 +1,7 @@
+{"id": "g25", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Imagine firing an employee, but they still show up and sometimes run the meeting."],
+  ["b2", "That's what was happening to one of my automated agents. A retired one kept waking up on its own schedule."],
+  ["b3", "Sometimes it even won the leader election and took over control with old, outdated code."],
+  ["b4", "Now every agent sends its identity with each request, checked against a disabled list on Cloudflare Workers."],
+  ["b5", "Any retired id gets rejected instantly, every time, with a 403."]
+]}
