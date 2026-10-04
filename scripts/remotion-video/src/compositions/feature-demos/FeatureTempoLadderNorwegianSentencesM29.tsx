@@ -38,7 +38,7 @@
 import React from "react";
 import { interpolate, useCurrentFrame } from "remotion";
 import { MOODS, PaletteProvider, cardShadow } from "./bright-theme";
-import { LightBg, StatPill, FilterChip, CaptionBand, BrowserWindow, seg, fontFamily } from "./bright-primitives";
+import { LightBg, StatPill, FilterChip, CaptionBand, BrowserWindow, Panel, seg, fontFamily } from "./bright-primitives";
 import { LiveWindow, LogWindow, LogLine, Win } from "./live-primitives";
 import shots from "./shots/m29.json";
 
@@ -219,6 +219,13 @@ export const FeatureTempoLadderNorwegianSentencesM29: React.FC = () => {
   });
   const ladderOpacity = Math.max(b3, b4);
 
+  // Beat 3: chaos half has no beat-of-its-own content (b1/b2 are both 0 by
+  // then), leaving it a flat, near-empty panel. A "retired" callout fades in
+  // right as b2 ends and fades back out once the half narrows past 380px
+  // (comfortably before the b4 sliver), so beat 3's whole duration is covered.
+  const chaosMemoryOp =
+    seg(frame, B2_E, B2_E + FADE) * interpolate(dividerX, [300, 380], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
   // Beat 5: the LogWindow slides up — the clip's non-crossfade transition.
   const logSlide = interpolate(frame, [B5_S, B5_S + 20], [46, 0], {
     extrapolateLeft: "clamp",
@@ -262,6 +269,27 @@ export const FeatureTempoLadderNorwegianSentencesM29: React.FC = () => {
           <StatPill x={40} y={300} emoji="🎓" text="advanced: needless repeats" tone="danger" opacity={b2} />
           <StatPill x={40} y={356} emoji="🌱" text="beginner: missed the phrase" tone="danger" opacity={b2} />
 
+          {/* beat 1: a real example sentence, fixed at the one tempo — fills the empty lower half */}
+          <Panel x={40} y={460} w={620} h={168} tone="card" opacity={b1}>
+            <div style={{ padding: "22px 28px", fontFamily }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: P.ink }}>💬 "Jeg liker å reise om sommeren."</div>
+              <div style={{ marginTop: 12, fontSize: 16, fontWeight: 700, color: P.muted, letterSpacing: 0.4 }}>
+                played back at 1.0x — the only option, every time
+              </div>
+            </div>
+          </Panel>
+
+          {/* beat 3: chaos half carries no beat-of-its-own content — keep it alive as "retired" */}
+          <div style={{ position: "absolute", left: 40, top: 110, opacity: chaosMemoryOp, fontFamily }}>
+            <div style={{ fontSize: 72, fontWeight: 800, letterSpacing: -2, color: P.muted, lineHeight: 1, textDecoration: "line-through" }}>
+              1.0x
+            </div>
+            <div style={{ marginTop: 8, fontSize: 15, fontWeight: 700, letterSpacing: 1.6, color: P.muted, textTransform: "uppercase" }}>
+              retired — one speed for all
+            </div>
+          </div>
+          <StatPill x={40} y={236} emoji="🔒" text="no longer the only option" tone="danger" opacity={chaosMemoryOp} />
+
           <div
             style={{
               transform: `scale(${interpolate(frame, [liveFrom, liveFrom + 18], [0.93, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })})`,
@@ -295,6 +323,26 @@ export const FeatureTempoLadderNorwegianSentencesM29: React.FC = () => {
             opacity: full,
           }}
         >
+          {/* beat 1: order half is still a thin sliver — a ghost preview of what's coming, spread down its height */}
+          <Panel x={25} y={30} w={170} h={140} tone="note" opacity={b1 * 0.9}>
+            <div style={{ padding: "16px 14px", fontFamily, textAlign: "center" }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: P.muted }}>⏳ coming</div>
+              <div style={{ marginTop: 6, fontSize: 13, fontWeight: 700, color: P.muted }}>a tempo ladder</div>
+            </div>
+          </Panel>
+          <Panel x={25} y={290} w={170} h={140} tone="note" opacity={b1 * 0.9}>
+            <div style={{ padding: "16px 14px", fontFamily, textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: P.muted }}>0.75x · 1.0x</div>
+              <div style={{ marginTop: 6, fontSize: 13, fontWeight: 700, color: P.muted }}>1.2x</div>
+            </div>
+          </Panel>
+          <Panel x={25} y={550} w={170} h={140} tone="note" opacity={b1 * 0.9}>
+            <div style={{ padding: "16px 14px", fontFamily, textAlign: "center" }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: P.muted }}>not yet</div>
+              <div style={{ marginTop: 6, fontSize: 13, fontWeight: 700, color: P.muted }}>built</div>
+            </div>
+          </Panel>
+
           <HalfLabel side="right" text="A Tempo Ladder: Slow · Normal · Fast" tone="accent" opacity={b3} />
           <HalfLabel side="right" text="A Python Script Builds The Ladder" tone="success" opacity={b4} />
           <HalfLabel side="right" text="Three Speeds, One Pass" tone="success" opacity={b5} />
@@ -351,6 +399,24 @@ export const FeatureTempoLadderNorwegianSentencesM29: React.FC = () => {
             opacity: full,
           }}
         />
+
+        {/* beat 3: a connector straddling the divider — "retired" becomes "the ladder" */}
+        <div
+          style={{
+            position: "absolute",
+            left: dividerX - 170,
+            top: 330,
+            width: 340,
+            textAlign: "center",
+            opacity: b3,
+            fontFamily,
+          }}
+        >
+          <div style={{ fontSize: 34, fontWeight: 800, color: P.ink }}>→</div>
+          <div style={{ marginTop: 4, fontSize: 15, fontWeight: 800, letterSpacing: 1.4, color: P.ink, textTransform: "uppercase" }}>
+            becomes a ladder
+          </div>
+        </div>
 
         {/* ================= captions ================= */}
         <CaptionBand text="One fixed speed — too fast to catch, or too slow to bear." opacity={b1} tone="danger" />
