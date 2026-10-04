@@ -226,6 +226,7 @@ import { FeatureClickProjectSeeNewestP72 } from "./compositions/feature-demos/Fe
 import { FeatureProjectsWindowFinallyFillsP71 } from "./compositions/feature-demos/FeatureProjectsWindowFinallyFillsP71";
 import { FeatureNothingNewRoadGuideG24 } from "./compositions/feature-demos/FeatureNothingNewRoadGuideG24";
 import { FeatureKartverketsPlaceNamesAlongG23 } from "./compositions/feature-demos/FeatureKartverketsPlaceNamesAlongG23";
+import { FeatureTempoLadderNorwegianSentencesM29 } from "./compositions/feature-demos/FeatureTempoLadderNorwegianSentencesM29";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2220,6 +2221,15 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureKartverketsPlaceNamesAlongG23"
         component={FeatureKartverketsPlaceNamesAlongG23}
         durationInFrames={891}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTempoLadderNorwegianSentencesM29"
+        component={FeatureTempoLadderNorwegianSentencesM29}
+        durationInFrames={1000}
         fps={30}
         width={1280}
         height={720}
