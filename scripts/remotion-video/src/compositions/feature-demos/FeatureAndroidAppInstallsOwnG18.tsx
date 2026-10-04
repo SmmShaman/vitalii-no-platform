@@ -312,24 +312,60 @@ const FrameInner: React.FC<{
           </div>
 
           {/* ── beat 4 : verifies, then installs — PackageInstaller (the one tech name) ── */}
-          <div style={{ position: "absolute", left: 30, top: 80, width: Math.max(0, orderWidth - 60), opacity: b4 }}>
-            <div style={{ fontSize: 26, fontWeight: 800, color: B.ink }}>VERIFY, THEN INSTALL</div>
-            <div style={{ marginTop: 26, display: "flex", alignItems: "center", gap: 18 }}>
-              <CheckBadge x={0} y={0} scale={check1} opacity={check1} size={44} />
-              <div style={{ fontSize: 19, fontWeight: 650, color: B.ink }}>verify package name</div>
-            </div>
-            <div style={{ marginTop: 18, display: "flex", alignItems: "center", gap: 18 }}>
-              <CheckBadge x={0} y={0} scale={check2} opacity={check2} size={44} />
-              <div style={{ fontSize: 19, fontWeight: 650, color: B.ink }}>verify version</div>
-            </div>
-            <div style={{ marginTop: 36, opacity: Math.min(1, installPop) }}>
-              <FilterChip x={0} y={0} text="PackageInstaller" icon="📲" color={B.accent} scale={Math.min(1, installPop)} opacity={Math.min(1, installPop)} />
-              <div style={{ marginTop: 14, fontSize: 15.5, fontWeight: 550, color: B.muted, maxWidth: Math.max(0, orderWidth - 60) }}>
-                Android's own silent installer — no confirmation prompt, no tap
+          <div style={{ position: "absolute", left: 30, top: 70, width: Math.max(0, orderWidth - 60), opacity: b4 }}>
+            <div style={{ fontSize: 28, fontWeight: 800, color: B.ink }}>VERIFY, THEN INSTALL</div>
+
+            <div style={{ marginTop: 32, display: "flex", flexWrap: "wrap", gap: 24 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: "16px 24px",
+                  borderRadius: 16,
+                  background: B.card,
+                  border: `1px solid ${B.border}`,
+                  opacity: check1,
+                }}
+              >
+                <CheckBadge x={0} y={0} scale={check1} opacity={1} size={48} />
+                <div style={{ fontSize: 21, fontWeight: 650, color: B.ink }}>verify package name</div>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 16,
+                  padding: "16px 24px",
+                  borderRadius: 16,
+                  background: B.card,
+                  border: `1px solid ${B.border}`,
+                  opacity: check2,
+                }}
+              >
+                <CheckBadge x={0} y={0} scale={check2} opacity={1} size={48} />
+                <div style={{ fontSize: 21, fontWeight: 650, color: B.ink }}>verify version</div>
               </div>
             </div>
-            <div style={{ marginTop: 32, opacity: Math.min(1, installPop) }}>
-              <StatPill x={0} y={0} emoji="🔕" text="0 taps needed" tone="success" opacity={1} fontSize={16} />
+
+            <div
+              style={{
+                marginTop: 44,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 28,
+                opacity: Math.min(1, installPop),
+              }}
+            >
+              <div style={{ maxWidth: Math.max(240, (orderWidth - 60) * 0.56) }}>
+                <FilterChip x={0} y={0} text="PackageInstaller" icon="📲" color={B.accent} scale={Math.min(1, installPop)} opacity={1} />
+                <div style={{ marginTop: 16, fontSize: 17, fontWeight: 550, color: B.muted }}>
+                  Android's own silent installer — no confirmation prompt, no tap
+                </div>
+              </div>
+              <StatPill x={0} y={0} emoji="🔕" text="0 taps needed" tone="success" opacity={1} fontSize={19} />
             </div>
           </div>
         </div>
