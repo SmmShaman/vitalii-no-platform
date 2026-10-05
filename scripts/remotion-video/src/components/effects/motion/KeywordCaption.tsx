@@ -39,7 +39,8 @@ export const KeywordCaption: React.FC<{
   const boxW = width - sideMargin * 2;
   const longest = Math.max(...lines.map((l) => l.join(" ").length), 1);
   const fontSize = Math.max(34, Math.min(isVertical ? 64 : 58, boxW / (longest * 0.52)));
-  const bottom = isVertical ? height * 0.14 : 135;
+  // sit above the scene's lower third (story title + source)
+  const bottom = isVertical ? height * 0.14 : look.safeBottom + 40;
 
   let idx = 0;
   return (
