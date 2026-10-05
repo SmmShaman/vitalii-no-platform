@@ -1,5 +1,5 @@
 {
- "version": "2026-10-05",
+ "version": "2026-10-05b",
  "note": "Single source of truth for scene effects in the daily digest. visual-director.js builds its prompt, valid set and data gates from this file; SKILL.md explains how to choose. 'motion' effects take their data in phrase.motionData.",
  "effects": [
   {
@@ -306,7 +306,9 @@
     "steps": [
      "3-5 short stages"
     ],
-    "result": "optional outcome"
+    "result": "optional outcome",
+    "results": "optional 1-3 outcomes fanning out instead of one result",
+    "system": "optional frame title"
    },
    "example": {
     "steps": [
@@ -335,7 +337,8 @@
      "2-5 names"
     ],
     "hub": "central party",
-    "output": "optional result"
+    "output": "optional result",
+    "outputs": "optional 1-4 outputs"
    },
    "example": {
     "inputs": [
@@ -396,6 +399,394 @@
     "the total changes in lockstep with each card",
     "the summary badge settles after the last card"
    ]
+  },
+  {
+   "name": "handoffExplain",
+   "family": "process",
+   "motion": true,
+   "useWhen": "something replaces something else and the story explains what changes (old system → new system, old rule → new rule, CEO change)",
+   "avoidWhen": "a simple one-word correction (use copyCorrection)",
+   "data": {
+    "from": "old state, ≤28 chars",
+    "to": "new state, ≤28 chars",
+    "points": [
+     "2-4 short consequences"
+    ]
+   },
+   "example": {
+    "from": "Gratis Gemini Flash",
+    "to": "Flash-Lite for gratisbrukere",
+    "points": [
+     "Gjelder fra 9. oktober",
+     "Plus mister Pro senere",
+     "Nye grenser hver femte time"
+    ]
+   },
+   "requires": [
+    "from",
+    "to",
+    "points>=2"
+   ]
+  },
+  {
+   "name": "timelineNodes",
+   "family": "process",
+   "motion": true,
+   "useWhen": "3-5 dated milestones from the article (launch, deadline, regulation steps)",
+   "avoidWhen": "dates are not in the article",
+   "data": {
+    "nodes": [
+     {
+      "date": "string",
+      "label": "string"
+     }
+    ],
+    "activeIndex": "index of the 'now' node"
+   },
+   "example": {
+    "nodes": [
+     {
+      "date": "2023",
+      "label": "Første lov"
+     },
+     {
+      "date": "2025",
+      "label": "Krav om merking"
+     },
+     {
+      "date": "2027",
+      "label": "Full håndheving"
+     }
+    ],
+    "activeIndex": 1
+   },
+   "requires": [
+    "nodes>=3"
+   ]
+  },
+  {
+   "name": "funnelAbsorption",
+   "family": "process",
+   "motion": true,
+   "useWhen": "many inputs end in one outcome (sources → one verdict, many apps → one platform, spam reports → program paused)",
+   "avoidWhen": "fewer than 3 inputs",
+   "data": {
+    "inputs": [
+     "3-6 short items"
+    ],
+    "result": "one outcome"
+   },
+   "example": {
+    "inputs": [
+     "Automatiske rapporter",
+     "Hallusinasjoner",
+     "Duplikater",
+     "Ugyldige funn"
+    ],
+    "result": "Programmet pauses"
+   },
+   "requires": [
+    "inputs>=3",
+    "result"
+   ]
+  },
+  {
+   "name": "quadrantPositioning",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "companies/products placed on two dimensions the article actually compares (price vs performance, open vs closed)",
+   "avoidWhen": "positions would be invented — x/y must follow the article",
+   "data": {
+    "xLabel": "string",
+    "yLabel": "string",
+    "items": [
+     {
+      "label": "string",
+      "x": "0-100",
+      "y": "0-100"
+     }
+    ],
+    "focus": "label of the item in focus"
+   },
+   "example": {
+    "xLabel": "Pris",
+    "yLabel": "Ytelse",
+    "items": [
+     {
+      "label": "Modell A",
+      "x": 80,
+      "y": 85
+     },
+     {
+      "label": "Modell B",
+      "x": 30,
+      "y": 60
+     },
+     {
+      "label": "Ny modell",
+      "x": 25,
+      "y": 82
+     }
+    ],
+    "focus": "Ny modell"
+   },
+   "requires": [
+    "xLabel",
+    "yLabel",
+    "items>=2"
+   ]
+  },
+  {
+   "name": "groupedBars",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "two products/periods compared across 2-3 metrics with different units (price, speed, battery)",
+   "avoidWhen": "only one metric (use ratioBars)",
+   "data": {
+    "series": [
+     "A",
+     "B"
+    ],
+    "metrics": [
+     {
+      "label": "string",
+      "unit": "string",
+      "a": "number",
+      "b": "number"
+     }
+    ]
+   },
+   "example": {
+    "series": [
+     "iPhone 16",
+     "iPhone 17"
+    ],
+    "metrics": [
+     {
+      "label": "Pris",
+      "unit": "kr",
+      "a": 11990,
+      "b": 12490
+     },
+     {
+      "label": "Batteri",
+      "unit": "t",
+      "a": 22,
+      "b": 27
+     }
+    ]
+   },
+   "requires": [
+    "metrics>=2"
+   ]
+  },
+  {
+   "name": "costLedger",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "2-5 amounts listed and summed (budget lines, fines, costs of a project)",
+   "avoidWhen": "amounts in different units",
+   "data": {
+    "title": "optional",
+    "unit": "string",
+    "lines": [
+     {
+      "label": "string",
+      "value": "number"
+     }
+    ],
+    "totalLabel": "Totalt"
+   },
+   "example": {
+    "title": "Datasenteret i Narvik",
+    "unit": "mrd. kr",
+    "lines": [
+     {
+      "label": "Bygg",
+      "value": 4.2
+     },
+     {
+      "label": "Strøm",
+      "value": 2.1
+     },
+     {
+      "label": "Utstyr",
+      "value": 6.5
+     }
+    ],
+    "totalLabel": "Totalt"
+   },
+   "requires": [
+    "lines>=2"
+   ]
+  },
+  {
+   "name": "featureMatrix",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "2-3 options compared on 2-4 features (plans, products, laws) with text or yes/no values",
+   "avoidWhen": "one option only",
+   "data": {
+    "options": [
+     "A",
+     "B"
+    ],
+    "rows": [
+     {
+      "label": "string",
+      "values": [
+       "text or true/false per option"
+      ]
+     }
+    ]
+   },
+   "example": {
+    "options": [
+     "Gratis",
+     "Plus"
+    ],
+    "rows": [
+     {
+      "label": "Gemini Pro",
+      "values": [
+       false,
+       true
+      ]
+     },
+     {
+      "label": "Grense",
+      "values": [
+       "Lav",
+       "Høy"
+      ]
+     }
+    ]
+   },
+   "requires": [
+    "options>=2",
+    "rows>=2"
+   ]
+  },
+  {
+   "name": "percentRing",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "one percentage is the news (share of users, survey result, rate) — optionally against a threshold",
+   "avoidWhen": "the number is not a percentage",
+   "data": {
+    "value": "0-100",
+    "label": "what it measures",
+    "threshold": "optional 0-100",
+    "notes": [
+     "0-2 short conclusions"
+    ]
+   },
+   "example": {
+    "value": 62,
+    "label": "av rapportene var ugyldige",
+    "threshold": 50,
+    "notes": [
+     "Google pauser programmet"
+    ]
+   },
+   "requires": [
+    "value",
+    "label"
+   ]
+  },
+  {
+   "name": "cornerTags",
+   "family": "cards",
+   "motion": true,
+   "useWhen": "one central claim with 2-4 short facts around it (who, what, where, how much)",
+   "avoidWhen": "facts are long sentences",
+   "data": {
+    "statement": "central claim ≤40 chars",
+    "tags": [
+     "2-4 tags ≤22 chars"
+    ]
+   },
+   "example": {
+    "statement": "Ny AI-lov i California",
+    "tags": [
+     "Gavin Newsom",
+     "SB 1246",
+     "30 minutter",
+     "Lokal støtte"
+    ]
+   },
+   "requires": [
+    "statement",
+    "tags>=2"
+   ]
+  },
+  {
+   "name": "statusFocus",
+   "family": "evidence",
+   "motion": true,
+   "useWhen": "fact-check or 'what we know': 2-3 claims each with a verdict (confirmed / unclear / not true)",
+   "avoidWhen": "verdicts are not in the article",
+   "data": {
+    "title": "optional",
+    "claims": [
+     {
+      "text": "≤40 chars",
+      "verdict": "yes|unclear|no"
+     }
+    ]
+   },
+   "example": {
+    "title": "Hva vi vet",
+    "claims": [
+     {
+      "text": "Robinson har sluttet",
+      "verdict": "yes"
+     },
+     {
+      "text": "Agenter brøt seg inn",
+      "verdict": "unclear"
+     },
+     {
+      "text": "OpenAI nekter alt",
+      "verdict": "no"
+     }
+    ]
+   },
+   "requires": [
+    "claims>=2"
+   ]
+  },
+  {
+   "name": "regionCallout",
+   "family": "evidence",
+   "motion": true,
+   "useWhen": "one detail of the article photo or screenshot is the evidence (a line in a document, a part of a device)",
+   "avoidWhen": "you do not know where in the photo the detail is",
+   "data": {
+    "region": {
+     "x": "%",
+     "y": "%",
+     "w": "%",
+     "h": "%"
+    },
+    "note": "what the detail shows",
+    "label": "optional"
+   },
+   "example": {
+    "region": {
+     "x": 30,
+     "y": 20,
+     "w": 35,
+     "h": 30
+    },
+    "note": "Her står fristen: 9. oktober",
+    "label": "Varselet"
+   },
+   "requires": [
+    "note",
+    "region.w"
+   ],
+   "needsImage": true
   },
   {
    "name": "counterMosaic",

@@ -11,9 +11,9 @@ which graphic goes on which sentence. The catalog with every effect, its data sh
 an example is `effects.json` next to this file — it is the single source: the render's
 Visual Director reads the same file, so an effect that is not there does not exist.
 
-Ideas behind the 12 `motion` effects come from public descriptions of an editorial
-motion library (charts, diagrams, kinetic type, evidence cards); the components are our
-own Remotion code in `scripts/remotion-video/src/components/effects/motion/`.
+The 23 `motion` effects are our own Remotion code in
+`scripts/remotion-video/src/components/effects/motion/`, built after studying an
+editorial motion library the owner licensed (charts, diagrams, kinetic type, evidence).
 
 ## How to direct a segment
 
@@ -37,7 +37,17 @@ own Remotion code in `scripts/remotion-video/src/components/effects/motion/`.
 | amounts adding up to a total | `cardCounter` |
 | how it works, stage by stage | `pipelineFlow` |
 | several parties into one centre (investors → startup) | `hubRouting` |
-| dated milestones | `progressTimeline` |
+| dated milestones | `timelineNodes` (or `progressTimeline`) |
+| something replaces something, and what changes | `handoffExplain` |
+| many inputs end in one outcome | `funnelAbsorption` |
+| two products/periods across 2–3 metrics | `groupedBars` |
+| amounts listed and summed | `costLedger` |
+| options × features, yes/no or short text | `featureMatrix` |
+| one percentage is the news | `percentRing` |
+| players placed on two real dimensions | `quadrantPositioning` |
+| a claim + 2–4 short facts (who/what/where/how much) | `cornerTags` |
+| fact-check: 2–3 claims with verdicts | `statusFocus` |
+| one detail of the photo/screenshot is the evidence | `regionCallout` |
 | countries / global rollout | `globe3D` |
 | a detail of the photo, several photos | `photoZoomReveal`, `photoSplitScreen`, `photoCollage` |
 
@@ -56,6 +66,16 @@ own Remotion code in `scripts/remotion-video/src/components/effects/motion/`.
    rendered video showed. Read the last 3 days and prefer effects viewers have not seen
    recently; never open a segment with the effect that opened most segments yesterday.
    The render enforces hard limits on top: each effect ≤ 3 per video, atmosphere ≤ 1.
+
+## Motion grammar (how every motion effect moves — `effects/motion/grammar.ts`)
+
+Learned from studying a licensed editorial motion library (study only, our own code):
+beats sit on absolute seconds (first element at 0.16 s, a ≥ 1.2 s still reading hold at
+the end; short blocks run the same timeline faster); the one hero element punches past
+its size and settles (expo.out → power2.out, no springs); data grows with power2.out and
+counters ride the same tween; strokes draw linearly; text reveals with left→right clip
+wipes; object first, label second, verdict last; one mover at a time, focus by dimming;
+print look — no glass cards, corners ≤ 4 px, labels ≥ 24 px; no exit fade.
 
 ## Motion invariants (for anyone writing or changing an effect)
 

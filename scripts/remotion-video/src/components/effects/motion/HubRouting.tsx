@@ -1,34 +1,81 @@
 /**
- * HubRouting — input pills feed a central hub: connectors draw in sequence with a dot travelling each path,
- * then one connector runs from the hub to the optional output pill.
- * data: { inputs: string[] (2-5), hub: string, output?: string }
+ * HubRouting — an accent hero hub lands first; the inputs then connect to it one at a time (item,
+ * drawn route, travelling dot); after a short pause the hub routes out to 1–4 outputs.
+ * data: { inputs: string[] (2-5), hub: string, output?: string, outputs?: string[] (1-4) }
  */
 import React from "react";
-import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig, spring, Easing } from "remotion";
-import { colors, glass, typography, clampBoth } from "../../../design-system";
-
-const trunc = (s: unknown, n = 28) => {
-  const t = String(s ?? "").trim();
-  return t.length > n ? t.slice(0, n - 1) + "…" : t;
-};
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { pace, tween, ease, punchScale, clip, look } from "./grammar";
 
 function parseInputs(data: Record<string, unknown>): string[] {
   const raw = Array.isArray(data?.inputs) ? (data.inputs as unknown[]) : [];
-  return raw.map((s) => trunc(s)).filter((s) => s.length > 0).slice(0, 5);
+  return raw.map((s) => clip(s, 26)).filter((s) => s.length > 0).slice(0, 5);
+}
+
+function parseOutputs(data: Record<string, unknown>): string[] {
+  const raw = Array.isArray(data?.outputs) ? (data.outputs as unknown[]) : [];
+  const list = raw.map((s) => clip(s, 26)).filter((s) => s.length > 0).slice(0, 4);
+  if (list.length > 0) return list;
+  const one = data?.output ? clip(data.output, 26) : "";
+  return one ? [one] : [];
 }
 
 export function hasHubRoutingData(data: Record<string, unknown>): boolean {
-  return !!data && parseInputs(data).length >= 2 && trunc(data.hub).length > 0;
+  return !!data && parseInputs(data).length >= 2 && clip(data.hub, 24).length > 0;
 }
 
 type Pt = { x: number; y: number };
-const bez = (p0: Pt, p1: Pt, p2: Pt, p3: Pt, t: number): Pt => {
-  const u = 1 - t;
-  return {
-    x: u * u * u * p0.x + 3 * u * u * t * p1.x + 3 * u * t * t * p2.x + t * t * t * p3.x,
-    y: u * u * u * p0.y + 3 * u * u * t * p1.y + 3 * u * t * t * p2.y + t * t * t * p3.y,
+type Route = { d: string; at: (p: number) => Pt };
+
+/** Turns a sampled point list into an SVG path plus an arc-length position lookup. */
+function makeRoute(pts: Pt[]): Route {
+  const cum = [0];
+  for (let i = 1; i < pts.length; i++) cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+  const total = cum[cum.length - 1] || 1;
+  const d = pts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ");
+  const at = (p: number): Pt => {
+    const target = Math.max(0, Math.min(1, p)) * total;
+    let i = 1;
+    while (i < cum.length - 1 && cum[i] < target) i++;
+    const seg = cum[i] - cum[i - 1] || 1;
+    const u = (target - cum[i - 1]) / seg;
+    return { x: pts[i - 1].x + (pts[i].x - pts[i - 1].x) * u, y: pts[i - 1].y + (pts[i].y - pts[i - 1].y) * u };
   };
-};
+  return { d, at };
+}
+
+function sCurve(s: Pt, e: Pt): Route {
+  const c1: Pt = { x: s.x + (e.x - s.x) * 0.55, y: s.y };
+  const c2: Pt = { x: e.x - (e.x - s.x) * 0.45, y: e.y };
+  const pts: Pt[] = [];
+  for (let i = 0; i <= 48; i++) {
+    const t = i / 48;
+    const u = 1 - t;
+    pts.push({
+      x: u * u * u * s.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t * t * t * e.x,
+      y: u * u * u * s.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t * t * t * e.y,
+    });
+  }
+  return makeRoute(pts);
+}
+
+/** Two-segment elbow (vertical then horizontal) with a rounded corner. */
+function elbow(s: Pt, e: Pt, r = 28): Route {
+  if (Math.abs(e.x - s.x) < 1) return makeRoute([s, e]);
+  const corner: Pt = { x: s.x, y: e.y };
+  const rr = Math.min(r, Math.abs(e.y - s.y), Math.abs(e.x - s.x));
+  const dirX = Math.sign(e.x - s.x);
+  const a: Pt = { x: s.x, y: corner.y - rr };
+  const b: Pt = { x: s.x + dirX * rr, y: corner.y };
+  const pts: Pt[] = [s, a];
+  for (let i = 1; i <= 10; i++) {
+    const t = i / 10;
+    const u = 1 - t;
+    pts.push({ x: u * u * a.x + 2 * u * t * corner.x + t * t * b.x, y: u * u * a.y + 2 * u * t * corner.y + t * t * b.y });
+  }
+  pts.push(e);
+  return makeRoute(pts);
+}
 
 export const HubRouting: React.FC<{ data: Record<string, unknown>; accentColor: string; images?: string[] }> = ({
   data,
@@ -37,149 +84,136 @@ export const HubRouting: React.FC<{ data: Record<string, unknown>; accentColor: 
   const frame = useCurrentFrame();
   const { width, height, fps, durationInFrames } = useVideoConfig();
   const inputs = parseInputs(data);
-  const hub = trunc(data?.hub);
+  const outputs = parseOutputs(data);
+  const hub = clip(data?.hub, 24);
   if (inputs.length < 2 || !hub) return null;
 
   const isVertical = height > width;
-  const d = Math.max(durationInFrames, 30);
   const n = inputs.length;
-  const output = data.output ? trunc(data.output) : "";
-  const hasOut = output.length > 0;
+  const m = outputs.length;
 
-  const fadeOut = interpolate(frame, [durationInFrames - 8, durationInFrames], [1, 0], clampBoth);
-  const at = (a: number, b: number) =>
-    interpolate(frame, [a * d, Math.max(b * d, a * d + 0.01)], [0, 1], clampBoth);
+  // ── timeline (absolute seconds) ──
+  const hubT = 0.16;
+  const inT = (i: number) => 0.55 + i * 0.35; // item lands; its route starts 0.2 s later
+  const inRouteDur = 0.6;
+  const inEnd = inT(n - 1) + 0.2 + inRouteDur;
+  const outT = inEnd + 0.5; // the pause between the two halves
+  const outStep = 0.22;
+  const outRouteDur = 0.55;
+  const BUILD = m > 0 ? outT + (m - 1) * outStep + outRouteDur + 0.35 : inEnd;
+  const { t } = pace(frame, fps, durationInFrames, BUILD);
 
-  // geometry
-  const R = isVertical ? 120 : 130;
-  const pw = isVertical ? 420 : 340;
-  const ph = isVertical ? 96 : 92;
-  const hubC: Pt = isVertical ? { x: width * 0.7, y: height * 0.46 } : { x: width * (hasOut ? 0.5 : 0.6), y: height * 0.5 };
-  const pillGap = isVertical ? 150 : 128;
-  const colH = (n - 1) * pillGap;
-  const inX = isVertical ? width * 0.05 : width * 0.06;
-  const pills = inputs.map((_, i) => ({
-    x: inX,
-    y: (isVertical ? hubC.y : height * 0.5) - colH / 2 + i * pillGap - ph / 2,
-  }));
-  const outW = isVertical ? 420 : 340;
-  const outPos: Pt = isVertical
-    ? { x: hubC.x - outW / 2, y: hubC.y + R + 190 }
-    : { x: width * 0.94 - outW, y: hubC.y - ph / 2 };
+  // ── geometry ──
+  const safeX = look.safeX;
+  const itemW = isVertical ? 480 : 460;
+  const itemH = isVertical ? 112 : 120;
+  const pitch = isVertical ? 136 : Math.min(150, 760 / Math.max(n, m, 1));
+  const hubW = isVertical ? 300 : 440;
+  const hubH = isVertical ? 300 : 360;
+  const font = 42;
 
-  const seg = 0.4 / n;
-  const t0 = (i: number) => 0.05 + i * seg;
-  const outStart = 0.46;
+  const inH = (n - 1) * pitch + itemH;
+  const outH = m > 0 ? (m - 1) * pitch + itemH : 0;
 
-  const paths = inputs.map((_, i) => {
-    const s: Pt = { x: pills[i].x + pw, y: pills[i].y + ph / 2 };
-    const dx = hubC.x - s.x;
-    const dy = hubC.y - s.y;
-    const len = Math.hypot(dx, dy) || 1;
-    const e: Pt = { x: hubC.x - (dx / len) * R, y: hubC.y - (dy / len) * R };
-    const c1: Pt = { x: s.x + (e.x - s.x) * 0.55, y: s.y };
-    const c2: Pt = { x: e.x - (e.x - s.x) * 0.45, y: e.y };
-    return { s, e, c1, c2 };
-  });
+  let hubC: Pt;
+  let inY0: number;
+  let outPts: { x: number; y: number }[] = [];
+  const inX = safeX;
+  if (isVertical) {
+    const gapV = 100;
+    const topBlock = Math.max(inH, hubH);
+    const totalH = topBlock + (m ? gapV + outH : 0);
+    const y0 = (height - totalH) / 2;
+    hubC = { x: width - safeX - hubW / 2, y: y0 + topBlock / 2 };
+    inY0 = y0 + (topBlock - inH) / 2;
+    const oy0 = y0 + topBlock + gapV;
+    outPts = outputs.map((_, j) => ({ x: inX, y: oy0 + j * pitch }));
+  } else {
+    hubC = { x: m ? width / 2 : width * 0.62, y: height / 2 };
+    inY0 = height / 2 - inH / 2;
+    const oy0 = height / 2 - outH / 2;
+    const outX = width - safeX - itemW;
+    outPts = outputs.map((_, j) => ({ x: outX, y: oy0 + j * pitch }));
+  }
+  const hubL = hubC.x - hubW / 2;
+  const hubR = hubC.x + hubW / 2;
+  const hubB = hubC.y + hubH / 2;
+  const spread = (i: number, cnt: number) => (cnt <= 1 ? 0 : (i - (cnt - 1) / 2) * Math.min(52, (hubH - 80) / (cnt - 1)));
 
-  const hubPulse = (() => {
-    // pulse when a dot arrives
-    let m = 0;
-    for (let i = 0; i < n; i++) {
-      const arrive = (t0(i) + seg * 1.0) * d;
-      const k = interpolate(frame, [arrive, arrive + 6, arrive + 14], [0, 1, 0], clampBoth);
-      m = Math.max(m, k);
-    }
-    return m;
-  })();
+  const inPos = inputs.map((_, i) => ({ x: inX, y: inY0 + i * pitch }));
+  const inRoutes = inputs.map((_, i) =>
+    sCurve({ x: inPos[i].x + itemW, y: inPos[i].y + itemH / 2 }, { x: hubL, y: hubC.y + spread(i, n) }),
+  );
+  const outRoutes = outputs.map((_, j) =>
+    isVertical
+      ? elbow({ x: hubC.x, y: hubB }, { x: outPts[j].x + itemW, y: outPts[j].y + itemH / 2 })
+      : sCurve({ x: hubR, y: hubC.y + spread(j, m) }, { x: outPts[j].x, y: outPts[j].y + itemH / 2 }),
+  );
 
-  const hubP = spring({ frame: Math.max(0, frame - 0.02 * d), fps, config: { damping: 16, stiffness: 110 } });
-  const outP = spring({ frame: Math.max(0, frame - 0.58 * d), fps, config: { damping: 16, stiffness: 110 } });
-  const outLine = Easing.inOut(Easing.cubic)(at(outStart, 0.58));
-  const oS: Pt = isVertical ? { x: hubC.x, y: hubC.y + R } : { x: hubC.x + R, y: hubC.y };
-  const oE: Pt = isVertical ? { x: hubC.x, y: outPos.y } : { x: outPos.x, y: hubC.y };
+  const hubScale = punchScale(t, hubT, 0.88);
+  const hubVisible = t >= hubT;
 
-  const hubFont = hub.length > 16 ? 26 : hub.length > 9 ? 32 : 40;
-  const pillFont = isVertical ? 30 : 28;
-
-  const pillStyle = (accent: boolean): React.CSSProperties => ({
+  const itemBase: React.CSSProperties = {
     position: "absolute",
-    width: pw,
-    height: ph,
+    width: itemW,
+    height: itemH,
     boxSizing: "border-box",
-    borderRadius: ph / 2,
-    background: accent ? accentColor : glass.backgroundStrong,
-    border: accent ? "none" : `1px solid ${glass.borderStrong}`,
-    backdropFilter: accent ? undefined : `blur(${glass.blur}px)`,
-    color: accent ? "#0a0a0a" : colors.text,
+    borderRadius: look.radius,
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    padding: "0 24px",
-    textAlign: "center",
-    fontFamily: typography.fontFamily.primary,
+    padding: "0 26px",
+    fontFamily: look.font,
     fontWeight: 700,
-    fontSize: pillFont,
-    lineHeight: 1.1,
-  });
+    fontSize: font,
+    letterSpacing: look.tracking.head,
+    lineHeight: 1.05,
+    overflowWrap: "anywhere",
+  };
+
+  const route = (r: Route, p: number, key: string, color: string, w: number) => (
+    <g key={key}>
+      {p > 0 && (
+        <path
+          d={r.d}
+          fill="none"
+          stroke={color}
+          strokeWidth={w}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          pathLength={1}
+          strokeDasharray={1}
+          strokeDashoffset={1 - p}
+        />
+      )}
+      {p > 0 && p < 1 && <circle cx={r.at(p).x} cy={r.at(p).y} r={12} fill={accentColor} />}
+    </g>
+  );
 
   return (
-    <AbsoluteFill style={{ opacity: fadeOut }}>
-      <AbsoluteFill style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5))" }} />
+    <AbsoluteFill>
+      <AbsoluteFill style={{ background: look.scrim }} />
       <svg width={width} height={height} style={{ position: "absolute", left: 0, top: 0 }}>
-        {paths.map((p, i) => {
-          const prog = Easing.inOut(Easing.cubic)(at(t0(i), t0(i) + seg * 1.0));
-          const dot = bez(p.s, p.c1, p.c2, p.e, prog);
-          const path = `M ${p.s.x} ${p.s.y} C ${p.c1.x} ${p.c1.y} ${p.c2.x} ${p.c2.y} ${p.e.x} ${p.e.y}`;
-          return (
-            <g key={i}>
-              <path d={path} fill="none" stroke={colors.textTrack} strokeWidth={3} />
-              <path
-                d={path}
-                fill="none"
-                stroke={colors.textMuted}
-                strokeWidth={4}
-                strokeLinecap="round"
-                pathLength={1}
-                strokeDasharray={1}
-                strokeDashoffset={1 - prog}
-                opacity={prog > 0 ? 1 : 0}
-              />
-              {prog > 0 && prog < 1 && <circle cx={dot.x} cy={dot.y} r={9} fill={accentColor} />}
-            </g>
-          );
-        })}
-        {hasOut && (
-          <>
-            <line x1={oS.x} y1={oS.y} x2={oE.x} y2={oE.y} stroke={colors.textTrack} strokeWidth={3} />
-            <line
-              x1={oS.x}
-              y1={oS.y}
-              x2={oS.x + (oE.x - oS.x) * outLine}
-              y2={oS.y + (oE.y - oS.y) * outLine}
-              stroke={accentColor}
-              strokeWidth={5}
-              strokeLinecap="round"
-              opacity={outLine > 0 ? 1 : 0}
-            />
-          </>
-        )}
+        {inRoutes.map((r, i) => route(r, tween(t, inT(i) + 0.2, inRouteDur, ease.power2Out), `i${i}`, look.ink, 4))}
+        {outRoutes.map((r, j) => route(r, tween(t, outT + j * outStep, outRouteDur, ease.power2Out), `o${j}`, accentColor, 5))}
       </svg>
 
-      {inputs.map((s, i) => {
-        const p = Math.min(1, spring({ frame: Math.max(0, frame - t0(i) * d + 8), fps, config: { damping: 16, stiffness: 110 } }));
+      {inputs.map((label, i) => {
+        const p = tween(t, inT(i), 0.3, ease.power3Out);
         return (
           <div
             key={i}
             style={{
-              ...pillStyle(false),
-              left: pills[i].x,
-              top: pills[i].y,
-              opacity: p,
-              transform: `translateX(${(1 - p) * -40}px)`,
+              ...itemBase,
+              left: inPos[i].x,
+              top: inPos[i].y,
+              background: look.surface,
+              border: `${look.ruleW}px solid ${look.rule}`,
+              color: look.ink,
+              opacity: Math.min(1, p * 4),
+              transform: `translateX(${(1 - p) * -30}px)`,
             }}
           >
-            {s}
+            {label}
           </div>
         );
       })}
@@ -187,47 +221,53 @@ export const HubRouting: React.FC<{ data: Record<string, unknown>; accentColor: 
       <div
         style={{
           position: "absolute",
-          left: hubC.x - R,
-          top: hubC.y - R,
-          width: R * 2,
-          height: R * 2,
+          left: hubL,
+          top: hubC.y - hubH / 2,
+          width: hubW,
+          height: hubH,
           boxSizing: "border-box",
-          borderRadius: "50%",
-          background: "rgba(0,0,0,0.5)",
-          border: `4px solid ${accentColor}`,
-          boxShadow: `0 0 ${20 + hubPulse * 40}px ${accentColor}${hubPulse > 0.3 ? "99" : "44"}`,
+          background: accentColor,
+          color: "#0a0a0a",
+          borderRadius: look.radius,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: 22,
+          padding: "0 28px",
           textAlign: "center",
-          fontFamily: typography.fontFamily.primary,
-          fontWeight: 800,
-          fontSize: hubFont,
-          color: colors.text,
-          lineHeight: 1.1,
-          wordBreak: "break-word",
-          opacity: Math.min(1, hubP),
-          transform: `scale(${(0.85 + 0.15 * Math.min(1, hubP)) * (1 + hubPulse * 0.04)})`,
+          fontFamily: look.font,
+          fontWeight: 850,
+          fontSize: hub.length > 16 ? 56 : hub.length > 10 ? 66 : 80,
+          letterSpacing: look.tracking.hero,
+          lineHeight: 1.04,
+          overflowWrap: "anywhere",
+          opacity: hubVisible ? 1 : 0,
+          transform: `scale(${hubScale})`,
         }}
       >
         {hub}
       </div>
 
-      {hasOut && (
-        <div
-          style={{
-            ...pillStyle(true),
-            width: outW,
-            left: outPos.x,
-            top: outPos.y,
-            opacity: Math.min(1, outP),
-            transform: `scale(${0.88 + 0.12 * Math.min(1, outP)})`,
-          }}
-        >
-          {output}
-        </div>
-      )}
+      {outputs.map((label, j) => {
+        const start = outT + j * outStep;
+        const p = tween(t, start + 0.4, 0.3, ease.power3Out);
+        return (
+          <div
+            key={j}
+            style={{
+              ...itemBase,
+              left: outPts[j].x,
+              top: outPts[j].y,
+              background: look.ink,
+              color: "#0a0a0a",
+              fontWeight: 800,
+              opacity: t >= start + 0.4 ? 1 : 0,
+              transform: `translateX(${(1 - p) * 30}px)`,
+            }}
+          >
+            {label}
+          </div>
+        );
+      })}
     </AbsoluteFill>
   );
 };

@@ -16,6 +16,17 @@ import { TargetOverrun, hasTargetOverrunData } from "./TargetOverrun";
 import { PipelineFlow, hasPipelineFlowData } from "./PipelineFlow";
 import { HubRouting, hasHubRoutingData } from "./HubRouting";
 import { CardCounter, hasCardCounterData } from "./CardCounter";
+import { HandoffExplain, hasHandoffExplainData } from "./HandoffExplain";
+import { TimelineNodes, hasTimelineNodesData } from "./TimelineNodes";
+import { FunnelAbsorption, hasFunnelAbsorptionData } from "./FunnelAbsorption";
+import { QuadrantPositioning, hasQuadrantPositioningData } from "./QuadrantPositioning";
+import { GroupedBars, hasGroupedBarsData } from "./GroupedBars";
+import { CostLedger, hasCostLedgerData } from "./CostLedger";
+import { FeatureMatrix, hasFeatureMatrixData } from "./FeatureMatrix";
+import { PercentRing, hasPercentRingData } from "./PercentRing";
+import { CornerTags, hasCornerTagsData } from "./CornerTags";
+import { StatusFocus, hasStatusFocusData } from "./StatusFocus";
+import { RegionCallout, hasRegionCalloutData } from "./RegionCallout";
 
 type MotionProps = { data: Record<string, unknown>; accentColor: string; images?: string[] };
 type MotionEntry = { Component: React.FC<MotionProps>; hasData: (d: Record<string, unknown>) => boolean };
@@ -33,6 +44,17 @@ export const MOTION_EFFECTS = {
   pipelineFlow: { Component: PipelineFlow, hasData: hasPipelineFlowData },
   hubRouting: { Component: HubRouting, hasData: hasHubRoutingData },
   cardCounter: { Component: CardCounter, hasData: hasCardCounterData },
+  handoffExplain: { Component: HandoffExplain, hasData: hasHandoffExplainData },
+  timelineNodes: { Component: TimelineNodes, hasData: hasTimelineNodesData },
+  funnelAbsorption: { Component: FunnelAbsorption, hasData: hasFunnelAbsorptionData },
+  quadrantPositioning: { Component: QuadrantPositioning, hasData: hasQuadrantPositioningData },
+  groupedBars: { Component: GroupedBars, hasData: hasGroupedBarsData },
+  costLedger: { Component: CostLedger, hasData: hasCostLedgerData },
+  featureMatrix: { Component: FeatureMatrix, hasData: hasFeatureMatrixData },
+  percentRing: { Component: PercentRing, hasData: hasPercentRingData },
+  cornerTags: { Component: CornerTags, hasData: hasCornerTagsData },
+  statusFocus: { Component: StatusFocus, hasData: hasStatusFocusData },
+  regionCallout: { Component: RegionCallout, hasData: hasRegionCalloutData },
 } satisfies Record<string, MotionEntry>;
 
 export type MotionEffectType = keyof typeof MOTION_EFFECTS;

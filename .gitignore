@@ -75,3 +75,7 @@ output/test-renders/
 # python bytecode (scripts/)
 __pycache__/
 .wrangler/
+
+# local preview background for tools/render-motion-previews.mjs
+scripts/remotion-video/public/_prev_photo.jpg
+/vendor-reference/
