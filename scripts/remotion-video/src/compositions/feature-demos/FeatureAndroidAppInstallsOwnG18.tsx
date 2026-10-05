@@ -37,7 +37,7 @@
 import React from "react";
 import { useCurrentFrame, interpolate, Easing } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { LightBg, CaptionBand, StatPill, FilterChip, CheckBadge, seg, fontFamily } from "./bright-primitives";
+import { LightBg, CaptionBand, StatPill, FilterChip, seg, fontFamily } from "./bright-primitives";
 import { LogWindow, LogLine, Win } from "./live-primitives";
 
 const P = MOODS.mint;
@@ -233,11 +233,14 @@ const FrameInner: React.FC<{
           {/* beat 2 — quietly falling behind */}
           <div style={{ position: "absolute", left: 30, top: 100, width: 700, opacity: b2 }}>
             <div style={{ fontSize: 22, fontWeight: 800, color: B.ink }}>QUIETLY FALLING BEHIND</div>
-            <div style={{ marginTop: 14, display: "flex", gap: 14 }}>
+            {/* explicit local frame — FilterChip is position:absolute and will jump to
+                the top-left of whatever positioned ancestor it finds; this wrapper IS
+                that ancestor, so the chips land here instead of on top of the title */}
+            <div style={{ marginTop: 18, position: "relative", height: 46 }}>
               <FilterChip x={0} y={0} text="v13 — running" icon="📱" color={B.danger} scale={1} opacity={1} />
-              <FilterChip x={0} y={0} text="v15 — waiting" icon="📦" color={B.muted} scale={1} opacity={1} />
+              <FilterChip x={195} y={0} text="v15 — waiting" icon="📦" color={B.muted} scale={1} opacity={1} />
             </div>
-            <div style={{ marginTop: 30 }}>
+            <div style={{ marginTop: 26 }}>
               <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.2, color: B.muted }}>NIGHTS MISSING THE FIX</div>
               <div style={{ marginTop: 8, width: 420, height: 22, borderRadius: 11, background: "#F4D9D3", overflow: "hidden" }}>
                 <div style={{ width: `${staleFill * 100}%`, height: "100%", borderRadius: 11, background: B.danger }} />
@@ -305,67 +308,112 @@ const FrameInner: React.FC<{
             >
               7cab206 · the app updates itself after a drive or when opened
             </div>
-            <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+            <div style={{ marginTop: 18, position: "relative", height: 46 }}>
               <FilterChip x={0} y={0} text="Updater.java" icon="🧩" color={B.accent} scale={1} opacity={1} />
-              <FilterChip x={0} y={0} text="DriveService.java" icon="🚗" color={B.accent} scale={1} opacity={1} />
+              <FilterChip x={185} y={0} text="DriveService.java" icon="🚗" color={B.accent} scale={1} opacity={1} />
+            </div>
+            <div style={{ marginTop: 12, fontSize: 13.5, fontWeight: 550, color: B.muted }}>
+              the two files that run the check and the install
             </div>
           </div>
 
-          {/* ── beat 4 : verifies, then installs — PackageInstaller (the one tech name) ── */}
-          <div style={{ position: "absolute", left: 30, top: 70, width: Math.max(0, orderWidth - 60), opacity: b4 }}>
-            <div style={{ fontSize: 28, fontWeight: 800, color: B.ink }}>VERIFY, THEN INSTALL</div>
+          {/* ── beat 4 : verifies, then installs — PackageInstaller (the one tech name) ──
+              Every badge below gets its own explicit x inside a position:relative frame —
+              FilterChip/StatPill are always position:absolute, so nesting them in a flex
+              row with x=0,y=0 (the previous version) makes them all jump to the same
+              top-left corner of the beat's own title instead of sitting where drawn. */}
+          <div style={{ position: "absolute", left: 30, top: 60, width: Math.max(0, orderWidth - 60), opacity: b4 }}>
+            <div style={{ fontSize: 26, fontWeight: 800, color: B.ink }}>VERIFY, THEN INSTALL</div>
 
-            <div style={{ marginTop: 32, display: "flex", flexWrap: "wrap", gap: 24 }}>
+            <div style={{ marginTop: 28, position: "relative", height: 68 }}>
               <div
                 style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
                   display: "flex",
                   alignItems: "center",
-                  gap: 16,
-                  padding: "16px 24px",
+                  gap: 14,
+                  padding: "14px 22px",
                   borderRadius: 16,
                   background: B.card,
                   border: `1px solid ${B.border}`,
                   opacity: check1,
                 }}
               >
-                <CheckBadge x={0} y={0} scale={check1} opacity={1} size={48} />
-                <div style={{ fontSize: 21, fontWeight: 650, color: B.ink }}>verify package name</div>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: B.success,
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 22,
+                    fontWeight: 800,
+                    transform: `scale(${check1})`,
+                  }}
+                >
+                  ✓
+                </div>
+                <div style={{ fontSize: 19, fontWeight: 650, color: B.ink }}>verify package name</div>
               </div>
               <div
                 style={{
+                  position: "absolute",
+                  left: 320,
+                  top: 0,
                   display: "flex",
                   alignItems: "center",
-                  gap: 16,
-                  padding: "16px 24px",
+                  gap: 14,
+                  padding: "14px 22px",
                   borderRadius: 16,
                   background: B.card,
                   border: `1px solid ${B.border}`,
                   opacity: check2,
                 }}
               >
-                <CheckBadge x={0} y={0} scale={check2} opacity={1} size={48} />
-                <div style={{ fontSize: 21, fontWeight: 650, color: B.ink }}>verify version</div>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: B.success,
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 22,
+                    fontWeight: 800,
+                    transform: `scale(${check2})`,
+                  }}
+                >
+                  ✓
+                </div>
+                <div style={{ fontSize: 19, fontWeight: 650, color: B.ink }}>verify version</div>
               </div>
             </div>
 
-            <div
-              style={{
-                marginTop: 44,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: 28,
-                opacity: Math.min(1, installPop),
-              }}
-            >
-              <div style={{ maxWidth: Math.max(240, (orderWidth - 60) * 0.56) }}>
-                <FilterChip x={0} y={0} text="PackageInstaller" icon="📲" color={B.accent} scale={Math.min(1, installPop)} opacity={1} />
-                <div style={{ marginTop: 16, fontSize: 17, fontWeight: 550, color: B.muted }}>
-                  Android's own silent installer — no confirmation prompt, no tap
-                </div>
+            <div style={{ marginTop: 36, position: "relative", height: 96, opacity: Math.min(1, installPop) }}>
+              <FilterChip x={0} y={0} text="PackageInstaller" icon="📲" color={B.accent} scale={Math.min(1, installPop)} opacity={1} />
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 54,
+                  width: Math.min(420, Math.max(220, orderWidth - 60 - 230)),
+                  fontSize: 16,
+                  fontWeight: 550,
+                  color: B.muted,
+                }}
+              >
+                Android's own silent installer — no confirmation prompt, no tap
               </div>
-              <StatPill x={0} y={0} emoji="🔕" text="0 taps needed" tone="success" opacity={1} fontSize={19} />
+              <div style={{ position: "absolute", left: Math.max(260, orderWidth - 60 - 210), top: 6 }}>
+                <StatPill x={0} y={0} emoji="🔕" text="0 taps needed" tone="success" opacity={1} fontSize={18} />
+              </div>
             </div>
           </div>
         </div>
@@ -390,6 +438,11 @@ const FrameInner: React.FC<{
       {/* ════ beat 5 : the result — constructed from the feature's own numbers ════ */}
       <div style={{ position: "absolute", left: WIN_B5.x, top: WIN_B5.y - 58, opacity: b5 }}>
         <StatPill x={0} y={0} emoji="✅" text="zero taps — gap closed" tone="success" opacity={b5} />
+      </div>
+      {/* separate wrapper, own explicit x — narration's "never interrupts a drive"
+          had no matching visual; this is that visual, not a restyle of the pill above */}
+      <div style={{ position: "absolute", left: WIN_B5.x + 320, top: WIN_B5.y - 58, opacity: b5 }}>
+        <StatPill x={0} y={0} emoji="🚗" text="never interrupts a drive" tone="accent" opacity={b5} />
       </div>
       <LogWindow lines={UPDATE_LOG} title="Updater — self-update check" from={681} every={16} opacity={b5} win={WIN_B5} fontSize={22} />
 
