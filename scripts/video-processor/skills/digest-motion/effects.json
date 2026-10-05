@@ -1,98 +1,516 @@
 {
-  "version": "2026-10-05",
-  "note": "Single source of truth for scene effects in the daily digest. visual-director.js builds its prompt, valid set and data gates from this file; SKILL.md explains how to choose. 'motion' effects take their data in phrase.motionData.",
-  "effects": [
-    {"name": "titleTakeover", "family": "kinetic-type", "motion": true,
-     "useWhen": "the phrase names the story's core in a few words (opening of a segment, a verdict, a product name)",
-     "avoidWhen": "more than once per segment; long sentences",
-     "data": {"title": "3-6 words, Norwegian", "kicker": "optional small label"},
-     "example": {"title": "NVIDIA KJØPER INTEL-AKSJER", "kicker": "5 mrd. dollar"},
-     "requires": ["title"]},
-    {"name": "keywordCaption", "family": "kinetic-type", "motion": true,
-     "useWhen": "an important claim without numbers; 2-3 key words carry the meaning",
-     "avoidWhen": "the phrase has numbers (use a chart) or a direct quote (use quoteMarker)",
-     "data": {"line1": "first half of the claim", "line2": "second half", "keywords": ["1-3 words from the lines"]},
-     "example": {"line1": "Modellen skriver kode", "line2": "uten menneskelig kontroll", "keywords": ["uten", "kontroll"]},
-     "requires": ["line1"]},
-    {"name": "copyCorrection", "family": "kinetic-type", "motion": true,
-     "useWhen": "the story corrects a belief, a rumour, an old figure or a reversed decision (was X, now Y)",
-     "avoidWhen": "there is no real 'wrong' version in the article",
-     "data": {"wrong": "the old claim", "right": "the corrected claim", "label": "optional, e.g. 'Faktisk'"},
-     "example": {"wrong": "Gratis for alle", "right": "Kun for betalende kunder", "label": "Nå"},
-     "requires": ["wrong", "right"]},
-    {"name": "quoteMarker", "family": "evidence", "motion": true,
-     "useWhen": "a named person is quoted in the article and the quote is the news",
-     "avoidWhen": "the quote is invented or paraphrased by us",
-     "data": {"quote": "exact quote, Norwegian translation", "highlight": "substring of quote to mark", "source": "Name, role"},
-     "example": {"quote": "Vi bygger den største datasenterparken i Europa", "highlight": "største datasenterparken", "source": "Sam Altman, OpenAI"},
-     "requires": ["quote"]},
-    {"name": "sequentialBars", "family": "comparison", "motion": true,
-     "useWhen": "2-6 values of the same metric over years/companies/countries",
-     "avoidWhen": "only one number (use counterMosaic) or mixed units",
-     "data": {"title": "optional", "unit": "optional", "items": [{"label": "string", "value": "number"}]},
-     "example": {"title": "Omsetning", "unit": "mrd. $", "items": [{"label": "2023", "value": 27}, {"label": "2024", "value": 61}, {"label": "2025", "value": 130}]},
-     "requires": ["items>=2"]},
-    {"name": "ratioBars", "family": "comparison", "motion": true,
-     "useWhen": "exactly two values compared and the RATIO is the point (3x cheaper, twice as fast)",
-     "avoidWhen": "different units",
-     "data": {"a": {"label": "string", "value": "number"}, "b": {"label": "string", "value": "number"}, "unit": "optional"},
-     "example": {"a": {"label": "GPT-4o", "value": 10}, "b": {"label": "Ny modell", "value": 32}, "unit": "tokens/s"},
-     "requires": ["a.value", "b.value"]},
-    {"name": "lineTrend", "family": "comparison", "motion": true,
-     "useWhen": "3-8 points over time where the direction (growth/decline) is the story",
-     "avoidWhen": "fewer than 3 real data points — never invent points",
-     "data": {"title": "optional", "unit": "optional", "points": [{"label": "string", "value": "number"}]},
-     "example": {"title": "Aktive brukere", "unit": "mill.", "points": [{"label": "jan", "value": 100}, {"label": "apr", "value": 300}, {"label": "aug", "value": 700}]},
-     "requires": ["points>=3"]},
-    {"name": "compositionStrip", "family": "comparison", "motion": true,
-     "useWhen": "market shares or a split of a whole in percent",
-     "avoidWhen": "values are not parts of one whole",
-     "data": {"title": "optional", "items": [{"label": "string", "value": "percent"}]},
-     "example": {"title": "Markedsandel skytjenester", "items": [{"label": "AWS", "value": 31}, {"label": "Azure", "value": 24}, {"label": "Google", "value": 11}]},
-     "requires": ["items>=2"]},
-    {"name": "targetOverrun", "family": "comparison", "motion": true,
-     "useWhen": "a result versus a goal, forecast, limit or expectation (beat/missed estimates)",
-     "avoidWhen": "no explicit target in the article",
-     "data": {"label": "what is measured", "value": "number", "target": "number", "unit": "optional"},
-     "example": {"label": "Kvartalsinntekt vs. forventning", "value": 35.1, "target": 33.2, "unit": "mrd. $"},
-     "requires": ["value", "target"]},
-    {"name": "pipelineFlow", "family": "process", "motion": true,
-     "useWhen": "how something works step by step, a chain of stages, a rollout order",
-     "avoidWhen": "dated milestones (use progressTimeline)",
-     "data": {"steps": ["3-5 short stages"], "result": "optional outcome"},
-     "example": {"steps": ["Opptak", "Transkripsjon", "Sammendrag"], "result": "Ferdig referat"},
-     "requires": ["steps>=3"]},
-    {"name": "hubRouting", "family": "process", "motion": true,
-     "useWhen": "several parties flow into one centre: investors into a startup, suppliers into a platform, partners in a deal",
-     "avoidWhen": "only one party",
-     "data": {"inputs": ["2-5 names"], "hub": "central party", "output": "optional result"},
-     "example": {"inputs": ["Microsoft", "Nvidia", "SoftBank"], "hub": "OpenAI", "output": "40 mrd. $"},
-     "requires": ["inputs>=2", "hub"]},
-    {"name": "cardCounter", "family": "cards", "motion": true,
-     "useWhen": "several amounts that add up to a total (funding rounds, layoffs per country, fines)",
-     "avoidWhen": "amounts in different units",
-     "data": {"cards": [{"label": "string", "value": "number"}], "unit": "optional", "totalLabel": "Totalt"},
-     "example": {"cards": [{"label": "Serie A", "value": 20}, {"label": "Serie B", "value": 85}, {"label": "Serie C", "value": 300}], "unit": "mill. $", "totalLabel": "Totalt hentet"},
-     "requires": ["cards>=2"]},
-
-    {"name": "counterMosaic", "family": "data", "useWhen": "one hero number with a meaningful label", "requires": ["graphicData.value"]},
-    {"name": "splitScreen", "family": "data", "useWhen": "two real labelled values side by side (before/after, us/them)", "requires": ["graphicData.left", "graphicData.right"]},
-    {"name": "dataDashboard", "family": "data", "useWhen": "several metrics from the article at once", "requires": ["graphicData.items"]},
-    {"name": "iconStagger", "family": "symbols", "useWhen": "industries or sectors affected; icons from the fixed list", "requires": ["icons>=2"]},
-    {"name": "progressTimeline", "family": "process", "useWhen": "dated milestones from the article", "requires": ["milestones>=2"]},
-    {"name": "globe3D", "family": "atmosphere", "useWhen": "the story is about specific countries or a global rollout"},
-    {"name": "photoZoomReveal", "family": "photo", "useWhen": "zoom into a detail of the article photo"},
-    {"name": "photoSplitScreen", "family": "photo", "useWhen": "two or three article photos side by side"},
-    {"name": "photoCollage", "family": "photo", "useWhen": "several article photos as a collage"},
-    {"name": "photoCompareSlider", "family": "photo", "useWhen": "before/after with comparison data", "requires": ["graphicData.left", "graphicData.right"]},
-    {"name": "photoVerticalScroll", "family": "photo", "useWhen": "a tall image such as a web page or document"},
-    {"name": "photoFilterTransition", "family": "photo", "useWhen": "a dramatic reveal: grayscale to color, blur to sharp"},
-    {"name": "photoScrollColumns", "family": "photo", "useWhen": "3+ article photos drifting in columns"},
-    {"name": "pixelDissolve", "family": "atmosphere", "useWhen": "transformation stories"},
-    {"name": "circuitBoard", "family": "atmosphere", "useWhen": "actual chips/hardware/AI-infrastructure stories only"},
-    {"name": "matrixRain", "family": "atmosphere", "useWhen": "actual cybersecurity or hacking stories only"},
-    {"name": "alertPulse", "family": "atmosphere", "useWhen": "genuinely urgent or breaking news only"},
-    {"name": "noiseWave", "family": "atmosphere", "useWhen": "organic/fluid topics; rarely"},
-    {"name": "mosaicGrid", "family": "atmosphere", "useWhen": "rarely; a calm pause"}
-  ]
+ "version": "2026-10-05",
+ "note": "Single source of truth for scene effects in the daily digest. visual-director.js builds its prompt, valid set and data gates from this file; SKILL.md explains how to choose. 'motion' effects take their data in phrase.motionData.",
+ "effects": [
+  {
+   "name": "titleTakeover",
+   "family": "kinetic-type",
+   "motion": true,
+   "useWhen": "the phrase names the story's core in a few words (opening of a segment, a verdict, a product name)",
+   "avoidWhen": "more than once per segment; long sentences",
+   "data": {
+    "title": "2-5 words, ≤32 characters, Norwegian",
+    "kicker": "optional small label"
+   },
+   "example": {
+    "title": "NVIDIA KJØPER INTEL-AKSJER",
+    "kicker": "5 mrd. dollar"
+   },
+   "requires": [
+    "title"
+   ],
+   "invariants": [
+    "fast punch-in with a small settle — never a slow generic fade",
+    "the headline holds its exact size and position for the reading hold",
+    "kicker is a plain line under an accent rule, never a rounded button",
+    "title ≤ 32 characters, 2-5 words"
+   ]
+  },
+  {
+   "name": "keywordCaption",
+   "family": "kinetic-type",
+   "motion": true,
+   "useWhen": "an important claim without numbers; 2-3 key words carry the meaning",
+   "avoidWhen": "the phrase has numbers (use a chart) or a direct quote (use quoteMarker)",
+   "data": {
+    "line1": "first half of the claim",
+    "line2": "second half",
+    "keywords": [
+     "1-3 words from the lines"
+    ]
+   },
+   "example": {
+    "line1": "Modellen skriver kode",
+    "line2": "uten menneskelig kontroll",
+    "keywords": [
+     "uten",
+     "kontroll"
+    ]
+   },
+   "requires": [
+    "line1"
+   ],
+   "invariants": [
+    "words build in reading order with the voice",
+    "only the supplied keywords take the accent colour",
+    "two balanced lines, never a third"
+   ]
+  },
+  {
+   "name": "copyCorrection",
+   "family": "kinetic-type",
+   "motion": true,
+   "useWhen": "the story corrects a belief, a rumour, an old figure or a reversed decision (was X, now Y)",
+   "avoidWhen": "there is no real 'wrong' version in the article",
+   "data": {
+    "wrong": "the old claim",
+    "right": "the corrected claim",
+    "label": "optional, e.g. 'Faktisk'"
+   },
+   "example": {
+    "wrong": "Gratis for alle",
+    "right": "Kun for betalende kunder",
+    "label": "Nå"
+   },
+   "requires": [
+    "wrong",
+    "right"
+   ],
+   "invariants": [
+    "the wrong claim is readable before the strike starts",
+    "the strike runs over the text only, then the corrected card arrives",
+    "the corrected card is the last thing that moves"
+   ]
+  },
+  {
+   "name": "quoteMarker",
+   "family": "evidence",
+   "motion": true,
+   "useWhen": "a named person is quoted in the article and the quote is the news",
+   "avoidWhen": "the quote is invented or paraphrased by us",
+   "data": {
+    "quote": "exact quote, Norwegian translation",
+    "highlight": "substring of quote to mark",
+    "source": "Name, role"
+   },
+   "example": {
+    "quote": "Vi bygger den største datasenterparken i Europa",
+    "highlight": "største datasenterparken",
+    "source": "Sam Altman, OpenAI"
+   },
+   "requires": [
+    "quote"
+   ],
+   "invariants": [
+    "the full quote is readable before the marker sweep",
+    "the marker sits behind the highlighted words only",
+    "the source line comes last"
+   ]
+  },
+  {
+   "name": "sequentialBars",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "2-6 values of the same metric over years/companies/countries",
+   "avoidWhen": "only one number (use counterMosaic) or mixed units",
+   "data": {
+    "title": "optional",
+    "unit": "optional",
+    "items": [
+     {
+      "label": "string",
+      "value": "number"
+     }
+    ]
+   },
+   "example": {
+    "title": "Omsetning",
+    "unit": "mrd. $",
+    "items": [
+     {
+      "label": "2023",
+      "value": 27
+     },
+     {
+      "label": "2024",
+      "value": 61
+     },
+     {
+      "label": "2025",
+      "value": 130
+     }
+    ]
+   },
+   "requires": [
+    "items>=2"
+   ],
+   "invariants": [
+    "one shared baseline and one scale for all columns",
+    "columns grow one at a time, the counter rides the top edge",
+    "only the tallest column takes the accent after all are up"
+   ]
+  },
+  {
+   "name": "ratioBars",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "exactly two values compared and the RATIO is the point (3x cheaper, twice as fast)",
+   "avoidWhen": "different units",
+   "data": {
+    "a": {
+     "label": "string",
+     "value": "number"
+    },
+    "b": {
+     "label": "string",
+     "value": "number"
+    },
+    "unit": "optional"
+   },
+   "example": {
+    "a": {
+     "label": "GPT-4o",
+     "value": 10
+    },
+    "b": {
+     "label": "Ny modell",
+     "value": 32
+    },
+    "unit": "tokens/s"
+   },
+   "requires": [
+    "a.value",
+    "b.value"
+   ],
+   "invariants": [
+    "both bars on one linear scale",
+    "the ratio appears only after both bars have landed"
+   ]
+  },
+  {
+   "name": "lineTrend",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "3-8 points over time where the direction (growth/decline) is the story",
+   "avoidWhen": "fewer than 3 real data points — never invent points",
+   "data": {
+    "title": "optional",
+    "unit": "optional",
+    "points": [
+     {
+      "label": "string",
+      "value": "number"
+     }
+    ]
+   },
+   "example": {
+    "title": "Aktive brukere",
+    "unit": "mill.",
+    "points": [
+     {
+      "label": "jan",
+      "value": 100
+     },
+     {
+      "label": "apr",
+      "value": 300
+     },
+     {
+      "label": "aug",
+      "value": 700
+     }
+    ]
+   },
+   "requires": [
+    "points>=3"
+   ],
+   "invariants": [
+    "points land at their measured positions while the line draws",
+    "the dashed trend comes after the observed line, never instead of it"
+   ]
+  },
+  {
+   "name": "compositionStrip",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "market shares or a split of a whole in percent",
+   "avoidWhen": "values are not parts of one whole",
+   "data": {
+    "title": "optional",
+    "items": [
+     {
+      "label": "string",
+      "value": "percent"
+     }
+    ]
+   },
+   "example": {
+    "title": "Markedsandel skytjenester",
+    "items": [
+     {
+      "label": "AWS",
+      "value": 31
+     },
+     {
+      "label": "Azure",
+      "value": 24
+     },
+     {
+      "label": "Google",
+      "value": 11
+     }
+    ]
+   },
+   "requires": [
+    "items>=2"
+   ],
+   "invariants": [
+    "segments assemble into one continuous 100 % strip",
+    "each legend entry appears when its segment lands"
+   ]
+  },
+  {
+   "name": "targetOverrun",
+   "family": "comparison",
+   "motion": true,
+   "useWhen": "a result versus a goal, forecast, limit or expectation (beat/missed estimates)",
+   "avoidWhen": "no explicit target in the article",
+   "data": {
+    "label": "what is measured",
+    "value": "number",
+    "target": "number",
+    "unit": "optional"
+   },
+   "example": {
+    "label": "Kvartalsinntekt vs. forventning",
+    "value": 35.1,
+    "target": 33.2,
+    "unit": "mrd. $"
+   },
+   "requires": [
+    "value",
+    "target"
+   ],
+   "invariants": [
+    "the goal line is visible before the fill reaches it",
+    "the excess (or shortfall) is treated differently from the part within the goal"
+   ]
+  },
+  {
+   "name": "pipelineFlow",
+   "family": "process",
+   "motion": true,
+   "useWhen": "how something works step by step, a chain of stages, a rollout order",
+   "avoidWhen": "dated milestones (use progressTimeline)",
+   "data": {
+    "steps": [
+     "3-5 short stages"
+    ],
+    "result": "optional outcome"
+   },
+   "example": {
+    "steps": [
+     "Opptak",
+     "Transkripsjon",
+     "Sammendrag"
+    ],
+    "result": "Ferdig referat"
+   },
+   "requires": [
+    "steps>=3"
+   ],
+   "invariants": [
+    "stages appear in order joined by arrows",
+    "the enclosing box draws only after the whole chain exists"
+   ]
+  },
+  {
+   "name": "hubRouting",
+   "family": "process",
+   "motion": true,
+   "useWhen": "several parties flow into one centre: investors into a startup, suppliers into a platform, partners in a deal",
+   "avoidWhen": "only one party",
+   "data": {
+    "inputs": [
+     "2-5 names"
+    ],
+    "hub": "central party",
+    "output": "optional result"
+   },
+   "example": {
+    "inputs": [
+     "Microsoft",
+     "Nvidia",
+     "SoftBank"
+    ],
+    "hub": "OpenAI",
+    "output": "40 mrd. $"
+   },
+   "requires": [
+    "inputs>=2",
+    "hub"
+   ],
+   "invariants": [
+    "inputs connect to the hub in sequence",
+    "the output connector comes last"
+   ]
+  },
+  {
+   "name": "cardCounter",
+   "family": "cards",
+   "motion": true,
+   "useWhen": "several amounts that add up to a total (funding rounds, layoffs per country, fines)",
+   "avoidWhen": "amounts in different units",
+   "data": {
+    "cards": [
+     {
+      "label": "string",
+      "value": "number"
+     }
+    ],
+    "unit": "optional",
+    "totalLabel": "Totalt"
+   },
+   "example": {
+    "cards": [
+     {
+      "label": "Serie A",
+      "value": 20
+     },
+     {
+      "label": "Serie B",
+      "value": 85
+     },
+     {
+      "label": "Serie C",
+      "value": 300
+     }
+    ],
+    "unit": "mill. $",
+    "totalLabel": "Totalt hentet"
+   },
+   "requires": [
+    "cards>=2"
+   ],
+   "invariants": [
+    "the total changes in lockstep with each card",
+    "the summary badge settles after the last card"
+   ]
+  },
+  {
+   "name": "counterMosaic",
+   "family": "data",
+   "useWhen": "one hero number with a meaningful label",
+   "requires": [
+    "graphicData.value"
+   ]
+  },
+  {
+   "name": "splitScreen",
+   "family": "data",
+   "useWhen": "two real labelled values side by side (before/after, us/them)",
+   "requires": [
+    "graphicData.left",
+    "graphicData.right"
+   ]
+  },
+  {
+   "name": "dataDashboard",
+   "family": "data",
+   "useWhen": "several metrics from the article at once",
+   "requires": [
+    "graphicData.items"
+   ]
+  },
+  {
+   "name": "iconStagger",
+   "family": "symbols",
+   "useWhen": "industries or sectors affected; icons from the fixed list",
+   "requires": [
+    "icons>=2"
+   ]
+  },
+  {
+   "name": "progressTimeline",
+   "family": "process",
+   "useWhen": "dated milestones from the article",
+   "requires": [
+    "milestones>=2"
+   ]
+  },
+  {
+   "name": "globe3D",
+   "family": "atmosphere",
+   "useWhen": "the story is about specific countries or a global rollout"
+  },
+  {
+   "name": "photoZoomReveal",
+   "family": "photo",
+   "useWhen": "zoom into a detail of the article photo"
+  },
+  {
+   "name": "photoSplitScreen",
+   "family": "photo",
+   "useWhen": "two or three article photos side by side"
+  },
+  {
+   "name": "photoCollage",
+   "family": "photo",
+   "useWhen": "several article photos as a collage"
+  },
+  {
+   "name": "photoCompareSlider",
+   "family": "photo",
+   "useWhen": "before/after with comparison data",
+   "requires": [
+    "graphicData.left",
+    "graphicData.right"
+   ]
+  },
+  {
+   "name": "photoVerticalScroll",
+   "family": "photo",
+   "useWhen": "a tall image such as a web page or document"
+  },
+  {
+   "name": "photoFilterTransition",
+   "family": "photo",
+   "useWhen": "a dramatic reveal: grayscale to color, blur to sharp"
+  },
+  {
+   "name": "photoScrollColumns",
+   "family": "photo",
+   "useWhen": "3+ article photos drifting in columns"
+  },
+  {
+   "name": "pixelDissolve",
+   "family": "atmosphere",
+   "useWhen": "transformation stories"
+  },
+  {
+   "name": "circuitBoard",
+   "family": "atmosphere",
+   "useWhen": "actual chips/hardware/AI-infrastructure stories only"
+  },
+  {
+   "name": "matrixRain",
+   "family": "atmosphere",
+   "useWhen": "actual cybersecurity or hacking stories only"
+  },
+  {
+   "name": "alertPulse",
+   "family": "atmosphere",
+   "useWhen": "genuinely urgent or breaking news only"
+  },
+  {
+   "name": "noiseWave",
+   "family": "atmosphere",
+   "useWhen": "organic/fluid topics; rarely"
+  },
+  {
+   "name": "mosaicGrid",
+   "family": "atmosphere",
+   "useWhen": "rarely; a calm pause"
+  }
+ ]
 }

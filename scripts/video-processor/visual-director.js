@@ -430,7 +430,8 @@ async function aiDirectSingleSegment(script, article, segmentMeta, segIndex, tot
   // stops segment 3 and segment 7 from picking the same transition/textEffect/backgroundEffect.
   // Feed back what's already been used so far so the director actively spreads choices out
   // across the WHOLE video, not just within this one segment's phrases.
-  const used = usedSoFar || { transitions: [], textEffects: [], backgroundEffects: [] };
+  const used = usedSoFar || { transitions: [], textEffects: [], backgroundEffects: [], sceneEffects: [] };
+  const recentNote = recentMotionPrompt(used.recentMotion, used.sceneEffects || []);
   const crossSegmentNote = segIndex === 0 ? '' : `
 CROSS-SEGMENT VARIETY (this video already used these in earlier segments — prefer options NOT in these lists, only repeat if you've genuinely exhausted the alternatives):
 - transitions used so far: ${used.transitions.join(', ') || '(none yet)'}
@@ -452,7 +453,7 @@ Content: ${content}
 
 VOICEOVER:
 ${script}
-${crossSegmentNote}
+${crossSegmentNote}${recentNote}
 TASK: Split voiceover into phrases (3-5 sec each). For EACH phrase, choose ONE effect that is CONTEXTUALLY MEANINGFUL to what the phrase says. An effect must ILLUSTRATE the specific content — never be generic decoration.
 
 CRITICAL RULE — CONTEXT OVER DECORATION:
@@ -585,7 +586,7 @@ Return JSON:
  * AI Visual Director — per-segment calls with full article context.
  * Each segment gets its own AI call for detailed cinematic scenes.
  */
-async function aiDirectVisuals(segmentScripts, segments, articles) {
+async function aiDirectVisuals(segmentScripts, segments, articles, recentMotion = null) {
   if (!process.env.NVIDIA_API_KEY && !process.env.ANTHROPIC_API_KEY) return null;
 
   const totalSegs = segmentScripts.length;
@@ -593,7 +594,7 @@ async function aiDirectVisuals(segmentScripts, segments, articles) {
 
   // Accumulates transition/textEffect/backgroundEffect choices across segments so each
   // subsequent call's CROSS-SEGMENT VARIETY note reflects what's actually been used so far.
-  const tracker = { transitions: [], textEffects: [], backgroundEffects: [] };
+  const tracker = { transitions: [], textEffects: [], backgroundEffects: [], sceneEffects: [], recentMotion };
 
   for (let i = 0; i < totalSegs; i++) {
     console.log(`  🎬 Directing segment ${i + 1}/${totalSegs}...`);
@@ -608,6 +609,7 @@ async function aiDirectVisuals(segmentScripts, segments, articles) {
       for (const phrase of result.phrases || []) {
         if (phrase.textEffect) tracker.textEffects.push(phrase.textEffect);
         if (phrase.backgroundEffect) tracker.backgroundEffects.push(phrase.backgroundEffect);
+        if (phrase.sceneEffect && phrase.sceneEffect !== 'none') tracker.sceneEffects.push(phrase.sceneEffect);
       }
     }
   }
@@ -1206,6 +1208,77 @@ function buildOverlaysFromBlocks(visualBlocks, segDuration) {
  *   entirely but still runs through the same timestamp-merge/fallback/variety pipeline below.
  * @returns {Promise<object[]>}          Visual directives per segment
  */
+
+/**
+ * Cross-day memory (digest-motion skill): what the last videos already showed and
+ * what this video used so far, so the same graphics do not open every story.
+ * recentMotion = [{date, effects:{name:count}, openers:[...]}] newest first.
+ */
+function recentMotionPrompt(recentMotion, usedThisVideo) {
+  const lines = [];
+  if (Array.isArray(recentMotion) && recentMotion.length > 0) {
+    const total = {};
+    for (const day of recentMotion) {
+      for (const [k, n] of Object.entries(day.effects || {})) total[k] = (total[k] || 0) + Number(n || 0);
+    }
+    const ranked = Object.entries(total).sort((a, b) => b[1] - a[1]);
+    const unused = [...MOTION_EFFECTS.keys()].filter(k => !total[k]);
+    lines.push(`PREVIOUS ${recentMotion.length} VIDEOS (viewers saw these recently — prefer effects that are NOT at the top of this list when the phrase allows):`);
+    lines.push(`- most used: ${ranked.slice(0, 8).map(([k, n]) => `${k}×${n}`).join(', ') || '(none)'}`);
+    if (unused.length) lines.push(`- not used recently (fresh for viewers): ${unused.join(', ')}`);
+  }
+  if (usedThisVideo.length > 0) {
+    const c = {};
+    for (const e of usedThisVideo) c[e] = (c[e] || 0) + 1;
+    lines.push(`THIS VIDEO SO FAR: ${Object.entries(c).map(([k, n]) => `${k}×${n}`).join(', ')} — each effect max 3 per video.`);
+  }
+  return lines.length ? `\n${lines.join('\n')}\n` : '';
+}
+
+/** Effects a directed video actually shows, for daily_video_drafts.motion_usage. */
+export function summarizeMotionUsage(directives) {
+  const effects = {};
+  const openers = [];
+  for (const d of directives || []) {
+    const blocks = d?.visualBlocks || [];
+    let opener = null;
+    for (const b of blocks) {
+      if (!b.sceneEffect || b.sceneEffect === 'none') continue;
+      effects[b.sceneEffect] = (effects[b.sceneEffect] || 0) + 1;
+      opener ??= b.sceneEffect;
+    }
+    openers.push(opener);
+  }
+  return { effects, openers };
+}
+
+
+// Atmosphere passes the data gate for free; once per video is plenty
+// (02-04.10 videos showed matrixRain 2-3 times each).
+const ATMOSPHERE_EFFECTS = new Set(['matrixRain', 'circuitBoard', 'alertPulse', 'noiseWave', 'mosaicGrid', 'pixelDissolve']);
+const MAX_PER_VIDEO = 3;
+
+/**
+ * Whole-video cap: each effect at most 3 times, atmosphere at most once, editor
+ * beats kept first. The prompt asked for this but the model did not obey
+ * (iconStagger 5x, progressTimeline 5x on 04.10). Mutates the directives.
+ */
+function capEffectsAcrossVideo(directives) {
+  const seen = {};
+  const blocks = [];
+  (directives || []).forEach(d => (d?.visualBlocks || []).forEach(b => blocks.push(b)));
+  const order = [...blocks.filter(b => b.fromEditor), ...blocks.filter(b => !b.fromEditor)];
+  let dropped = 0;
+  for (const b of order) {
+    const e = b.sceneEffect;
+    if (!e || e === 'none') continue;
+    const max = ATMOSPHERE_EFFECTS.has(e) ? 1 : MAX_PER_VIDEO;
+    seen[e] = (seen[e] || 0) + 1;
+    if (seen[e] > max) { b.sceneEffect = 'none'; dropped++; }
+  }
+  if (dropped) console.log(`  ✂️ video-wide effect cap dropped ${dropped} repeats`);
+}
+
 /** The editor's beats must land even when the model failed and the heuristic took over. */
 function applyBeatsToFallback(directive, segmentMeta) {
   const blocks = directive?.visualBlocks;
@@ -1214,7 +1287,7 @@ function applyBeatsToFallback(directive, segmentMeta) {
   capSceneEffects(blocks);
 }
 
-export async function directVisuals(segmentScripts, segments, segmentVoiceovers, articles = [], precomputedDirectives = null) {
+export async function directVisuals(segmentScripts, segments, segmentVoiceovers, articles = [], precomputedDirectives = null, recentMotion = null) {
   console.log(`\n🎨 Visual Director: planning ${segmentScripts.length} segments...`);
 
   // Prefer Nano-generated directives (own Claude subscription) over the live AI API chain
@@ -1223,7 +1296,7 @@ export async function directVisuals(segmentScripts, segments, segmentVoiceovers,
     console.log(`  🧠 Using ${precomputedDirectives.length} Nano-generated segment directives`);
     directives = precomputedDirectives;
   } else {
-    directives = await aiDirectVisuals(segmentScripts, segments, articles);
+    directives = await aiDirectVisuals(segmentScripts, segments, articles, recentMotion);
   }
 
   if (directives && directives.length > 0) {
@@ -1269,6 +1342,8 @@ export async function directVisuals(segmentScripts, segments, segmentVoiceovers,
     directives = fallbackDirectVisuals(segmentScripts, segments, segmentVoiceovers);
     directives.forEach((d, i) => applyBeatsToFallback(d, segments[i]));
   }
+
+  capEffectsAcrossVideo(directives);
 
   // Post-process for guaranteed variety
   directives = ensureVariety(directives);

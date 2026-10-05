@@ -45,12 +45,30 @@ own Remotion code in `scripts/remotion-video/src/components/effects/motion/`.
    must be in the article text. No data → no effect (`"none"`); the render drops an effect
    whose data is missing rather than drawing an empty frame.
 4. **Language.** All on-screen text in Norwegian Bokmål, short (labels ≤ 28 characters,
-   `titleTakeover` 3–6 words, uppercase is applied by the component). Numbers as plain
+   `titleTakeover` 2–5 words and ≤ 32 characters, uppercase is applied by the component). Numbers as plain
    numbers in `value` fields; units go in `unit` ("mrd. $", "%", "mill. brukere").
 5. **Variety across the show.** Use each effect at most 3 times per video;
    `titleTakeover` at most 4 times and once per segment. Atmosphere effects (`circuitBoard`,
    `matrixRain`, `alertPulse`, `noiseWave`, `mosaicGrid`, `pixelDissolve`) only when the
    story literally is about that (chips, hacking, breaking news) — never as decoration.
+
+6. **Cross-day memory.** `daily_video_drafts.motion_usage` records which effects each
+   rendered video showed. Read the last 3 days and prefer effects viewers have not seen
+   recently; never open a segment with the effect that opened most segments yesterday.
+   The render enforces hard limits on top: each effect ≤ 3 per video, atmosphere ≤ 1.
+
+## Motion invariants (for anyone writing or changing an effect)
+
+Each motion effect in `effects.json` lists its `invariants` — the relationship that makes
+it that effect. Keep them when restyling: e.g. `titleTakeover` is a fast punch with a
+small settle, never a slow fade; `copyCorrection` strikes the text, not the card; charts
+keep one shared scale. Every effect ends on a **reading hold** (≥ 1 s, ~40 % of the
+block) with no decorative motion. Text that the voice does not need is noise.
+
+**Review** a new or changed effect by rendering stills before, on and after its key
+change and at the end of the hold (`npx remotion still src/MotionPreviewEntry.tsx
+mp-<effect> out.png --frame=N`); check cropping, overlaps, empty frames. Technical
+checks do not replace looking at the frames.
 
 ## Output format — motionBeats (agent, in visual_scenario)
 

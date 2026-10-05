@@ -29,7 +29,7 @@ import { generateAIThumbnail } from './generate-ai-thumbnail.js';
 import { generateAllAvatarClips } from './generate-avatar.js';
 import { downloadPexelsMedia } from './pexels-media.js';
 import { scrapeAllArticleImages } from './scrape-article-images.js';
-import { directVisuals } from './visual-director.js';
+import { directVisuals, summarizeMotionUsage } from './visual-director.js';
 import { buildFactSheets } from './research-facts.js';
 import { buildKeywordSet, describesSameTopic } from './relevance.js';
 import { callLLMJson } from './llm-helper.js';
@@ -485,6 +485,30 @@ async function uploadToYouTube(filePath, title, description, tags) {
   return { videoId, watchUrl: `https://youtube.com/watch?v=${videoId}` };
 }
 
+
+/**
+ * Effects shown by the last 3 digests before dateStr (daily_video_drafts.motion_usage),
+ * newest first. Empty on any error — memory is a preference, never a blocker.
+ */
+async function loadRecentMotionUsage(dateStr) {
+  try {
+    const { data, error } = await supabase
+      .from('daily_video_drafts')
+      .select('target_date, motion_usage')
+      .lt('target_date', dateStr)
+      .not('motion_usage', 'is', null)
+      .order('target_date', { ascending: false })
+      .limit(3);
+    if (error) throw error;
+    const days = (data || []).map(r => ({ date: r.target_date, ...r.motion_usage }));
+    console.log(`  🧠 cross-day motion memory: ${days.length} previous videos`);
+    return days;
+  } catch (e) {
+    console.log(`  ⚠️ cross-day motion memory unavailable: ${e.message}`);
+    return [];
+  }
+}
+
 /**
  * Load an approved draft from the database (3-step Telegram flow).
  * Returns { articles, plan, dateStr, displayDate } in the same format
@@ -905,6 +929,7 @@ async function main() {
     ? `\n🎨 Step 2.5: Visual direction (using ${plan.visualDirectivesAi.length} Nano-generated segment directives)...`
     : '\n🎨 Step 2.5: Visual direction...');
   let visualDirectives = [];
+  const recentMotion = await loadRecentMotionUsage(dateStr);
   try {
     visualDirectives = await directVisuals(
       plan.segmentScripts || [],
@@ -912,9 +937,16 @@ async function main() {
       segmentVoiceovers,
       detailedArticlesForBot,
       plan.visualDirectivesAi,
+      recentMotion,
     );
   } catch (e) {
     console.log(`  ⚠️ Visual Director failed, using defaults: ${e.message}`);
+  }
+  // Cross-day memory: record what this video shows (preview runs leave the draft alone)
+  if (process.env.SKIP_YOUTUBE !== 'true' && visualDirectives.length > 0) {
+    const usage = summarizeMotionUsage(visualDirectives);
+    const { error: muErr } = await supabase.from('daily_video_drafts').update({ motion_usage: usage }).eq('target_date', dateStr);
+    console.log(muErr ? `  ⚠️ motion_usage not saved: ${muErr.message}` : `  🧠 motion_usage saved: ${JSON.stringify(usage.effects)}`);
   }
 
   // Visual Director results — log only, no Telegram (bot handles notifications)
