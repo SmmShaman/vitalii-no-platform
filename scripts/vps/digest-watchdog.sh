@@ -46,12 +46,17 @@ trigger() {
 GHPAT=$(cenv GH_PAT)
 
 render_running() {
-  # any daily-video render still queued or running => leave it alone
-  local n
-  n=$(curl -s -m 20 -H "Authorization: token $GHPAT" \
-    "https://api.github.com/repos/$GH_REPO/actions/workflows/daily-news-video.yml/runs?event=repository_dispatch&per_page=5" |
-    python3 -c 'import json,sys; print(sum(r["status"] in ("queued","in_progress") for r in json.load(sys.stdin).get("workflow_runs",[])))' 2>/dev/null)
-  [ "${n:-1}" != "0" ]
+  # any daily-news-video run still queued or running => leave it alone
+  # (filter by status: the event= filter returned runs weeks old, 2026-10-05)
+  local n=0 st c
+  for st in queued in_progress; do
+    c=$(curl -s -m 20 -H "Authorization: token $GHPAT" \
+      "https://api.github.com/repos/$GH_REPO/actions/workflows/daily-news-video.yml/runs?status=$st&per_page=1" |
+      python3 -c 'import json,sys; print(json.load(sys.stdin)["total_count"])' 2>/dev/null)
+    [ -z "$c" ] && return 0   # API unreachable => assume running, do nothing
+    n=$((n + c))
+  done
+  [ "$n" -gt 0 ]
 }
 
 redispatch() {
