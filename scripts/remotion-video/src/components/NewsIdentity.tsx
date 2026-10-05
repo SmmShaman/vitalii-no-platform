@@ -199,6 +199,10 @@ export const FactStrip: React.FC<{
         display: "flex",
         flexDirection: "column",
         gap: 12,
+        // dark plate: the white lines vanished on bright photos (owner, 2026-10-05)
+        padding: isVertical ? "14px 18px" : "16px 22px",
+        background: "rgba(8,8,8,0.62)",
+        borderRadius: 4,
         opacity: out,
         zIndex: 7,
       }}
