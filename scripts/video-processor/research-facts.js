@@ -134,6 +134,34 @@ function sanitize(raw, sourceName) {
   return sheet;
 }
 
+const NO_WORDS = new Set(['og','ikke','det','er','som','på','for','med','har','vi','jeg','en','et','til','av','at','de','den','kan','skal','vil','være','om','men','så','også','fra','eller','hvor']);
+const EN_WORDS = new Set(['the','and','is','of','to','that','we','this','it','will','are','have','with','for','be','our','not','what','which','where','there','can','would','could']);
+
+/** Rough language check: Norwegian letters or more Norwegian than English function words. */
+function looksNorwegian(text) {
+  const t = String(text || '').toLowerCase();
+  if (/[æøå]/.test(t)) return true;
+  const words = t.match(/\p{L}+/gu) || [];
+  let no = 0, en = 0;
+  for (const w of words) { if (NO_WORDS.has(w)) no++; if (EN_WORDS.has(w)) en++; }
+  return no > en;
+}
+
+/** Faithful Bokmål translation of a quote; null on any failure. */
+async function translateQuoteToNorwegian(text) {
+  try {
+    const parsed = await callLLMJson(
+      'Translate the quote into natural Norwegian Bokmål (not Nynorsk). Keep the meaning exactly, keep it a direct quote, no additions. Return JSON {"text": ""}.',
+      String(text),
+      { maxTokens: 300, temperature: 0 },
+    );
+    const out = typeof parsed?.text === 'string' ? parsed.text.trim().replace(/^[«"“]+|[»"”]+$/g, '') : '';
+    return out.length > 10 && looksNorwegian(out) ? out.slice(0, 220) : null;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * A quote is only usable if it really appears in the source text. LLMs
  * paraphrase quotes convincingly; an invented quote attributed to a named
@@ -209,6 +237,18 @@ Return JSON only:
     if (sheet.quote && !quoteIsGrounded(sheet.quote, `${sourceText} ${ourBody}`)) {
       console.log(`    🚫 Seg ${index + 1}: quote dropped — not found verbatim in the source`);
       sheet.quote = null;
+    }
+    // The show is Norwegian only (owner, 2026-10-05): a quote grounded in an
+    // English source is shown translated, or not at all.
+    if (sheet.quote && !looksNorwegian(sheet.quote.text)) {
+      const no = await translateQuoteToNorwegian(sheet.quote.text);
+      if (no) {
+        console.log(`    🌐 Seg ${index + 1}: quote translated to Norwegian`);
+        sheet.quote = { ...sheet.quote, text: no };
+      } else {
+        console.log(`    🚫 Seg ${index + 1}: quote dropped — not Norwegian and translation failed`);
+        sheet.quote = null;
+      }
     }
     return sheet;
   } catch (err) {
