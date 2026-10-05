@@ -1,0 +1,56 @@
+{
+ "id": "b65",
+ "beat_durations": {
+  "b1": 5.664,
+  "b2": 4.32,
+  "b3": 4.92,
+  "b4": 4.896,
+  "b5": 4.584
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One TV, a houseful of kids \u2014 and one finished child used to unlock it for everybody.",
+   "start_s": 0.5,
+   "end_s": 6.164,
+   "start_f": 15,
+   "end_f": 185
+  },
+  {
+   "beat": "b2",
+   "text": "The ones who hadn't touched their own schoolwork still got to watch, every time.",
+   "start_s": 6.464,
+   "end_s": 10.784,
+   "start_f": 194,
+   "end_f": 324
+  },
+  {
+   "beat": "b3",
+   "text": "I built a strict mode, in a Cloudflare Worker, that checks who's actually caught up.",
+   "start_s": 11.084,
+   "end_s": 16.004,
+   "start_f": 333,
+   "end_f": 480
+  },
+  {
+   "beat": "b4",
+   "text": "Now it locks the screen, and the admin panel names exactly who still owes work.",
+   "start_s": 16.304,
+   "end_s": 21.2,
+   "start_f": 489,
+   "end_f": 636
+  },
+  {
+   "beat": "b5",
+   "text": "One finished child used to be enough. Now it has to be every single one.",
+   "start_s": 21.5,
+   "end_s": 26.084,
+   "start_f": 645,
+   "end_f": 783
+  }
+ ],
+ "total_s": 27.584,
+ "durationInFrames": 828,
+ "measured_track_s": 26.136,
+ "track": "/root/feature-demos/vo-b65/vo-b65.mp3"
+}

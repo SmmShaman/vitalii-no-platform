@@ -1,0 +1,7 @@
+{"id": "b65", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "One TV, a houseful of kids — and one finished child used to unlock it for everybody."],
+  ["b2", "The ones who hadn't touched their own schoolwork still got to watch, every time."],
+  ["b3", "I built a strict mode, in a Cloudflare Worker, that checks who's actually caught up."],
+  ["b4", "Now it locks the screen, and the admin panel names exactly who still owes work."],
+  ["b5", "One finished child used to be enough. Now it has to be every single one."]
+]}

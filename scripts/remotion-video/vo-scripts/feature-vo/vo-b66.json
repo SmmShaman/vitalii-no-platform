@@ -1,0 +1,56 @@
+{
+ "id": "b66",
+ "beat_durations": {
+  "b1": 6.624,
+  "b2": 3.408,
+  "b3": 6.096,
+  "b4": 6.216,
+  "b5": 4.392
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A stranger could sit in front of our TV and watch free \u2014 because the system ignored faces it didn't know.",
+   "start_s": 0.5,
+   "end_s": 7.124,
+   "start_f": 15,
+   "end_f": 214
+  },
+  {
+   "beat": "b2",
+   "text": "Meanwhile the one child it recognized was barely in the room.",
+   "start_s": 7.424,
+   "end_s": 10.832,
+   "start_f": 223,
+   "end_f": 325
+  },
+  {
+   "beat": "b3",
+   "text": "So now, in that Cloudflare Worker, any unrecognized face gets stopped and asked who it is.",
+   "start_s": 11.132,
+   "end_s": 17.228,
+   "start_f": 334,
+   "end_f": 517
+  },
+  {
+   "beat": "b4",
+   "text": "It locks itself out like an unfinished kid, proves it's done with a PIN, or unlocks as a parent.",
+   "start_s": 17.528,
+   "end_s": 23.744,
+   "start_f": 526,
+   "end_f": 712
+  },
+  {
+   "beat": "b5",
+   "text": "That stranger sat there four hours; our own kid, just one minute.",
+   "start_s": 24.044,
+   "end_s": 28.436,
+   "start_f": 721,
+   "end_f": 853
+  }
+ ],
+ "total_s": 29.936,
+ "durationInFrames": 898,
+ "measured_track_s": 28.488,
+ "track": "/root/feature-demos/vo-b66/vo-b66.mp3"
+}

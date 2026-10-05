@@ -1,0 +1,7 @@
+{"id": "b66", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "A stranger could sit in front of our TV and watch free — because the system ignored faces it didn't know."],
+  ["b2", "Meanwhile the one child it recognized was barely in the room."],
+  ["b3", "So now, in that Cloudflare Worker, any unrecognized face gets stopped and asked who it is."],
+  ["b4", "It locks itself out like an unfinished kid, proves it's done with a PIN, or unlocks as a parent."],
+  ["b5", "That stranger sat there four hours; our own kid, just one minute."]
+]}

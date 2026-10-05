@@ -1,0 +1,7 @@
+{
+  "id": "b66",
+  "file": "yt-feature-b66.mp4",
+  "title": "An Unknown Face Used to Mean Free TV | vitalii.no",
+  "description": "A face the camera didn't recognize could sit in front of the TV for hours and nothing happened — the gate only ever reacted to faces it knew. On 4 October it logged exactly that: an unknown face on screen for four hours, while the child it did recognize was only in frame for one minute.\n\nThe presence check in workers/youtube-gate/index.js now raises an 'unknown' offender whenever the TV is unlocked, a child still owes today's set, and the camera reports an unrecognized face with no recent grace period. TvPage.tsx shows a \"Хто ти?\" prompt naming every child covered by the check: anyone who hasn't finished gets the normal lock screen, anyone who has finished must confirm with a PIN through a new /unknown-answer endpoint, and an adult clears it with the existing parent code.\n\nThe unknown face had four hours of free, unquestioned screen time; the real child, one minute. Now every face on camera has to answer who it is.\n\n🔗 Full write-up: https://vitalii.no/features/an-unknown-face-used-to-mean-free-tv-now-it-gets-asked-who-are-you-b66\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#parentalcontrols #cloudflareworkers #screentime #facerecognition #homeautomation #typescript",
+  "tags": ["parental controls", "cloudflare workers", "screen time", "face recognition", "home automation", "typescript", "react", "access control", "kids tv", "vitalii berbeha"]
+}
