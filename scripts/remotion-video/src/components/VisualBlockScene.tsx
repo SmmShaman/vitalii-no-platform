@@ -43,6 +43,7 @@ import { getMoodConfig } from "../design-system/moods";
 import { Particles, Spawner, Behavior } from "remotion-bits";
 import type { VisualBlock } from "../compositions/DailyNewsShow";
 import { resolveSceneEffect, SceneEffectRenderer } from "./effects";
+import { isMotionEffect } from "./effects/motion";
 import {
   BeforeAfterChart,
   DeltaFigure,
@@ -340,6 +341,18 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
       ? Math.round(quoteSeconds * fps)
       : 0;
 
+  // An editorial motion effect owns the frame: the research quote card would
+  // be drawn on top of it (05.10 preview: a counter over a quote), so skip the card.
+  const quoteClashesWithMotion =
+    quoteFrames > 0 &&
+    visualBlocks.some((b, bi) => {
+      const { startF, durF } = blockWindow(bi);
+      return (
+        isMotionEffect(resolveSceneEffect(b) ?? undefined) ||
+        resolveSceneEffect(b) === "counterMosaic"
+      ) && startF < quoteStartFrame + quoteFrames && startF + durF > quoteStartFrame;
+    });
+
   // ── Fade transitions ──
   const fadeIn = interpolate(
     frame,
@@ -505,7 +518,7 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
         </Sequence>
       )}
 
-      {factSheet?.quote && quoteFrames > 0 && (
+      {factSheet?.quote && quoteFrames > 0 && !quoteClashesWithMotion && (
         <Sequence from={quoteStartFrame} durationInFrames={quoteFrames}>
           <QuoteCard
             text={factSheet.quote.text}
