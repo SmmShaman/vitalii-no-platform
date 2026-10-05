@@ -18,6 +18,7 @@ import {
   clampBoth,
 } from "../design-system";
 import { Animated, Fade, Move, Ease } from "remotion-animated";
+import { categoryLabel } from "./effects/motion/grammar";
 
 export interface LowerThirdProps {
   headline: string;
@@ -93,7 +94,7 @@ export const LowerThird: React.FC<LowerThirdProps> = ({
               whiteSpace: "nowrap",
             }}
           >
-            {category}
+            {categoryLabel(category)}
           </div>
         )}
 

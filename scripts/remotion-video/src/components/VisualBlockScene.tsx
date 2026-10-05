@@ -190,6 +190,15 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
     if (currentTime >= visualBlocks[i].startTime) activeIdx = i;
   }
 
+  // One owner of the frame: while the active block plays a scene effect, the
+  // research layers (fact strip) stay off — the 04.10 preview drew the
+  // "who/where" strip over a quote card's photo.
+  const activeBlock = visualBlocks[activeIdx];
+  const effectOwnsFrame =
+    !!activeBlock &&
+    !(activeBlock.graphicType !== "none" && activeBlock.graphicData != null) &&
+    resolveSceneEffect(activeBlock) !== null;
+
   // ── Block windows, clamped so they never overlap ──
   // TTS phrase timings can run past the next phrase's start. Two overlapping
   // Sequences meant two narration lines drawn on top of each other — the
@@ -505,7 +514,7 @@ export const VisualBlockScene: React.FC<VisualBlockSceneProps> = ({
         </Sequence>
       )}
 
-      {factLines.length > 0 && (
+      {factLines.length > 0 && !effectOwnsFrame && (
         <Sequence
           from={Math.round(fps * 4)}
           durationInFrames={Math.round(fps * factStripSeconds)}
@@ -890,13 +899,21 @@ const PhraseText: React.FC<{
 
   const fontSize = isVertical ? typography.scale.h5 : typography.scale.h4;
 
+  // A dark plate behind the narration line: white text over a bright photo
+  // (the White House, sky, a yellow wallpaper) was unreadable (owner, 2026-10-05).
   const container: React.CSSProperties = {
     position: "absolute",
     top: hasGraphic ? "8%" : "20%",
-    left: "5%",
-    right: hasGraphic && !isVertical ? "40%" : "5%",
+    left: 0,
+    right: hasGraphic && !isVertical ? "40%" : 0,
+    margin: "0 auto",
+    width: "fit-content",
+    maxWidth: "88%",
     display: "flex",
     justifyContent: "center",
+    padding: isVertical ? "14px 22px" : "16px 30px",
+    background: "rgba(8,8,8,0.62)",
+    borderRadius: 4,
     zIndex: 6,
   };
 

@@ -65,7 +65,7 @@ export const TitleTakeover: React.FC<{
   const kickP = tween(t, start + 0.4 + 0.15, 0.27, ease.power2Out);
 
   return (
-    <AbsoluteFill style={{ background: "rgba(0,0,0,0.35)", justifyContent: "center", alignItems: "center" }}>
+    <AbsoluteFill style={{ background: "radial-gradient(ellipse 75% 45% at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0.3))", justifyContent: "center", alignItems: "center" }}>
       <div style={{ width: targetW, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
         <div
           style={{
@@ -99,7 +99,7 @@ export const TitleTakeover: React.FC<{
               textAlign: "right",
               color: look.ink,
               clipPath: wipeLR(kickP),
-              textShadow: "0 2px 6px rgba(0,0,0,0.6)",
+              textShadow: "0 3px 18px rgba(0,0,0,0.75), 0 1px 3px rgba(0,0,0,0.6)",
             }}
           >
             {kicker}

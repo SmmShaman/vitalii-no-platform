@@ -19,6 +19,7 @@ import {
   clampBoth,
 } from "../design-system";
 import { CategoryIcon } from "./CategoryIcon";
+import { categoryLabel } from "./effects/motion/grammar";
 
 export interface CategoryBadgeProps {
   category: string;
@@ -82,7 +83,7 @@ export const CategoryBadge: React.FC<CategoryBadgeProps> = ({
           letterSpacing: badge.letterSpacing,
         }}
       >
-        {category}
+        {categoryLabel(category)}
       </span>
     </div>
   );

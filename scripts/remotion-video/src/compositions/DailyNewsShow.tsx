@@ -409,8 +409,11 @@ export const DailyNewsShow: React.FC<DailyNewsShowProps> = ({
         durationFrames: segFrames,
       });
 
-      // Layer 2: Headline overlay — first ~3.5s, fades out
-      sequences.push({
+      // Layer 2: Headline overlay — first ~3.5s, fades out. Not in the daily show:
+      // the cold open, the divider stamp and the lower third already carry the
+      // headline, and this typewriter drew over the segment's first effect or
+      // narration line (the "ghost" headline, owner 2026-10-05).
+      if (showType === "custom") sequences.push({
         component: (
           <HeadlineOverlay durationFrames={headlineOverlayFrames} fps={fps}>
             <SceneTransition type={(segment.transition as TransitionType) || "fade"}>
