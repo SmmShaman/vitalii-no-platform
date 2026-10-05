@@ -15,6 +15,38 @@
  *   // directives[i] → { mood, transition, textReveal, visualBlocks[], dataOverlays[], ... }
  */
 
+import { readFileSync } from 'node:fs';
+
+// ── digest-motion skill: the effect catalog (single source, see skills/digest-motion/SKILL.md) ──
+
+const MOTION_CATALOG = JSON.parse(
+  readFileSync(new URL('./skills/digest-motion/effects.json', import.meta.url), 'utf8'),
+).effects;
+const MOTION_EFFECTS = new Map(MOTION_CATALOG.filter(e => e.motion).map(e => [e.name, e]));
+
+/** Prompt block listing the motion effects with their data shapes and examples. */
+function motionCatalogPrompt() {
+  return MOTION_CATALOG.filter(e => e.motion).map(e =>
+    `- ${e.name}: use when ${e.useWhen}${e.avoidWhen ? `; NOT when ${e.avoidWhen}` : ''}\n` +
+    `    motionData example: ${JSON.stringify(e.example)}`,
+  ).join('\n');
+}
+
+/** Data gate for a motion effect, driven by the catalog's `requires` list. */
+function hasMotionData(effect, data) {
+  const spec = MOTION_EFFECTS.get(effect);
+  if (!spec || !data || typeof data !== 'object') return false;
+  const num = v => isFinite(parseFloat(String(v ?? '').replace(/[^0-9.,-]/g, '').replace(',', '.')));
+  return (spec.requires || []).every(req => {
+    const m = req.match(/^([\w.]+)>=(\d+)$/);
+    if (m) return Array.isArray(data[m[1]]) && data[m[1]].filter(Boolean).length >= Number(m[2]);
+    const [k, sub] = req.split('.');
+    if (sub) return num(data[k]?.[sub]);
+    const v = data[k];
+    return ['value', 'target'].includes(k) ? num(v) : String(v ?? '').trim().length > 0;
+  });
+}
+
 // ── Available options (must match design-system constants) ──
 
 const MOODS = [
@@ -406,6 +438,11 @@ CROSS-SEGMENT VARIETY (this video already used these in earlier segments — pre
 - backgroundEffects used so far: ${[...new Set(used.backgroundEffects)].join(', ') || '(none yet)'}
 `;
 
+  const beats = Array.isArray(segmentMeta?.motionBeats) ? segmentMeta.motionBeats : [];
+  const editorPlan = beats.length === 0 ? '' : `
+EDITOR'S MOTION PLAN (written by the editor — use exactly these effects and motionData on the phrases containing these words; choose freely for the rest):
+${beats.map(b => `- "${b.cue}" → ${b.effect} ${JSON.stringify(b.motionData || {})}`).join('\n')}
+`;
   const systemPrompt = `You are a Visual Director for segment ${segIndex + 1}/${totalSegs} of a news video.
 
 ARTICLE:
@@ -433,9 +470,13 @@ CRITICAL RULE — CONTEXT OVER DECORATION:
 
 EFFECT MUST MATCH PHRASE MEANING — ask yourself: "If I remove the voiceover, can the viewer understand what this scene is about just from the visuals?" If NO — the effect is too generic.
 
-VARIETY RULE: You have 19 effects. Use AT LEAST 3 DIFFERENT effects across your 4-6 phrases. NEVER use the same effect twice in a row.
+VARIETY RULE: You have ${VALID_SCENE_EFFECTS.size} effects. Use AT LEAST 3 DIFFERENT effects across your 4-6 phrases. NEVER use the same effect twice in a row.
 
 AVAILABLE EFFECTS (use exact keywords in sceneDescription):
+
+✨ EDITORIAL MOTION (preferred when the phrase carries a claim, a quote, numbers or a process — set sceneEffect + motionData):
+${motionCatalogPrompt()}
+${editorPlan}
 
 📸 PHOTO-NATIVE (preferred — use article photos creatively):
 - "zoom into detail" + describe what area to focus on
@@ -467,7 +508,8 @@ PHRASE FIELDS:
 - "text": exact phrase
 - "sceneDescription": WHAT the viewer sees, tied to article content (2-3 sentences). Write like a film director's storyboard. This is flavor text for imageSearchQuery/renderHint context — it is NOT how sceneEffect gets picked (see below).
 - "sceneEffect": pick EXPLICITLY from the 19 values below, or "none" if this phrase should just show the background photo + key-phrase callout with no overlay graphic. Do NOT rely on sceneDescription keywords to trigger an effect — say what you want directly:
-  counterMosaic | splitScreen | mosaicGrid | iconStagger | pixelDissolve | circuitBoard | progressTimeline | alertPulse | globe3D | noiseWave | dataDashboard | matrixRain | photoScrollColumns | photoSplitScreen | photoZoomReveal | photoCollage | photoCompareSlider | photoVerticalScroll | photoFilterTransition | none
+  ${[...VALID_SCENE_EFFECTS].join(' | ')} | none
+- "motionData": REQUIRED for the editorial motion effects below — the effect's data, built ONLY from facts in the article, Norwegian Bokmål labels (≤28 chars). No data → pick another effect or "none".
 - "imageSearchQuery": Google Images search query to find the PERFECT background photo for THIS phrase. Be SPECIFIC to the content:
   ❌ BAD: "technology" (too generic)
   ✅ GOOD: "NTNU Trondheim university campus aerial view"
@@ -855,13 +897,7 @@ function ensureVariety(directives) {
 // ═══════════════════════════════════════════════════════════════════
 
 // Effect types the renderer accepts. Anything else (including "none") means no effect.
-const VALID_SCENE_EFFECTS = new Set([
-  'counterMosaic', 'splitScreen', 'mosaicGrid', 'iconStagger', 'pixelDissolve',
-  'circuitBoard', 'progressTimeline', 'alertPulse', 'globe3D', 'noiseWave',
-  'dataDashboard', 'matrixRain', 'photoScrollColumns', 'photoSplitScreen',
-  'photoZoomReveal', 'photoCollage', 'photoCompareSlider', 'photoVerticalScroll',
-  'photoFilterTransition',
-]);
+const VALID_SCENE_EFFECTS = new Set(MOTION_CATALOG.map(e => e.name));
 
 const VALID_ICONS = new Set([
   'laptop', 'brain', 'chart', 'shield', 'globe', 'medical', 'factory',
@@ -881,6 +917,8 @@ const VALID_ICONS = new Set([
 function gateSceneEffect(block) {
   const effect = block.sceneEffect;
   if (!effect || !VALID_SCENE_EFFECTS.has(effect)) return 'none';
+
+  if (MOTION_EFFECTS.has(effect)) return hasMotionData(effect, block.motionData) ? effect : 'none';
 
   const data = block.graphicData || {};
 
@@ -919,6 +957,7 @@ const CONTENT_EFFECTS = new Set([
   'splitScreen', 'counterMosaic', 'dataDashboard', 'iconStagger', 'progressTimeline',
   'photoCompareSlider', 'photoSplitScreen', 'photoZoomReveal', 'photoCollage',
   'photoVerticalScroll', 'photoFilterTransition', 'photoScrollColumns',
+  ...MOTION_EFFECTS.keys(),
 ]);
 
 /**
@@ -927,11 +966,11 @@ const CONTENT_EFFECTS = new Set([
  */
 function capSceneEffects(visualBlocks, max = 3) {
   const ranked = visualBlocks
-    .map((b, j) => ({ j, effect: b.sceneEffect }))
+    .map((b, j) => ({ j, effect: b.sceneEffect, editor: !!b.fromEditor }))
     .filter(x => x.effect && x.effect !== 'none')
     .sort((a, b) => {
-      const rank = e => (CONTENT_EFFECTS.has(e) ? 1 : 0);
-      return rank(b.effect) - rank(a.effect) || a.j - b.j;
+      const rank = x => (x.editor ? 2 : 0) + (CONTENT_EFFECTS.has(x.effect) ? 1 : 0);
+      return rank(b) - rank(a) || a.j - b.j;
     });
 
   const keep = new Set();
@@ -1016,11 +1055,46 @@ function capGraphics(visualBlocks, max = 3) {
   return [...keep].map(j => visualBlocks[j].graphicType);
 }
 
+
+const normCue = t => String(t || '').toLowerCase().replace(/[^\p{L}\p{N} ]+/gu, ' ').replace(/\s+/g, ' ').trim();
+
+/**
+ * Put each editor beat on the phrase that contains its cue (or most of its words).
+ * Mutates blocks; returns how many beats landed.
+ */
+function applyMotionBeats(visualBlocks, motionBeats) {
+  if (!Array.isArray(motionBeats) || motionBeats.length === 0) return 0;
+  let landed = 0;
+  for (const beat of motionBeats) {
+    if (!beat || !VALID_SCENE_EFFECTS.has(beat.effect)) continue;
+    const cueWords = normCue(beat.cue).split(' ').filter(w => w.length > 2);
+    if (cueWords.length === 0) continue;
+    let best = -1, bestScore = 0;
+    visualBlocks.forEach((b, j) => {
+      if (b.fromEditor) return;
+      const text = normCue(b.phraseText);
+      const score = text.includes(normCue(beat.cue)) ? 1 : cueWords.filter(w => text.includes(w)).length / cueWords.length;
+      if (score > bestScore) { bestScore = score; best = j; }
+    });
+    if (best < 0 || bestScore < 0.6) continue;
+    const b = visualBlocks[best];
+    const data = beat.motionData && typeof beat.motionData === 'object' ? beat.motionData : {};
+    b.sceneEffect = beat.effect;
+    b.fromEditor = true;
+    if (MOTION_EFFECTS.has(beat.effect)) b.motionData = data;
+    else if (beat.effect === 'counterMosaic') { b.graphicType = 'none'; b.graphicData = data; } // a graphic card would suppress the effect
+    else if (beat.effect === 'progressTimeline' && Array.isArray(data.milestones)) b.milestones = data.milestones.map(String).slice(0, 5);
+    landed++;
+  }
+  if (landed) console.log(`    🎬 editor motion beats: ${landed}/${motionBeats.length} landed`);
+  return landed;
+}
+
 /**
  * AI returns phrases without precise timestamps.
  * We align them with subtitle-based phrase boundaries.
  */
-function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
+function mergeAIWithTimestamps(aiDirective, scriptText, subtitles, motionBeats = []) {
   const timedPhrases = splitIntoPhrases(scriptText, subtitles);
   const aiPhrases = aiDirective.phrases || [];
 
@@ -1064,6 +1138,7 @@ function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
       // The model's explicit choice is now honoured; keyword-guessing the
       // storyboard prose was picking effects off words like "grid" and "wave".
       sceneEffect: ap.sceneEffect,
+      motionData: ap.motionData && typeof ap.motionData === 'object' ? ap.motionData : null,
       icons,
       milestones,
       graphicType,
@@ -1072,9 +1147,13 @@ function mergeAIWithTimestamps(aiDirective, scriptText, subtitles) {
       triggerImageChange: ap.triggerImageChange ?? (j > 0 && j % 2 === 0),
     };
 
-    block.sceneEffect = gateSceneEffect(block);
     return block;
   });
+
+  // The editor's motionBeats (digest-motion skill, written by the agent) win over the
+  // model's picks on the phrase that speaks their cue.
+  applyMotionBeats(visualBlocks, motionBeats);
+  for (const block of visualBlocks) block.sceneEffect = gateSceneEffect(block);
 
   const kept = capGraphics(visualBlocks);
   if (kept.length > 0) {
@@ -1127,6 +1206,14 @@ function buildOverlaysFromBlocks(visualBlocks, segDuration) {
  *   entirely but still runs through the same timestamp-merge/fallback/variety pipeline below.
  * @returns {Promise<object[]>}          Visual directives per segment
  */
+/** The editor's beats must land even when the model failed and the heuristic took over. */
+function applyBeatsToFallback(directive, segmentMeta) {
+  const blocks = directive?.visualBlocks;
+  if (!Array.isArray(blocks) || !applyMotionBeats(blocks, segmentMeta?.motionBeats)) return;
+  for (const b of blocks) if (b.fromEditor) b.sceneEffect = gateSceneEffect(b);
+  capSceneEffects(blocks);
+}
+
 export async function directVisuals(segmentScripts, segments, segmentVoiceovers, articles = [], precomputedDirectives = null) {
   console.log(`\n🎨 Visual Director: planning ${segmentScripts.length} segments...`);
 
@@ -1148,6 +1235,7 @@ export async function directVisuals(segmentScripts, segments, segmentVoiceovers,
       if (!directives[i]) {
         // AI failed for this segment — use heuristic fallback
         directives[i] = fallback[i] || {};
+        applyBeatsToFallback(directives[i], segments[i]);
         continue;
       }
 
@@ -1156,7 +1244,7 @@ export async function directVisuals(segmentScripts, segments, segmentVoiceovers,
         Number(segmentVoiceovers[i]?.durationSeconds) || 15;
 
       directives[i].visualBlocks = mergeAIWithTimestamps(
-        directives[i], segmentScripts[i], subs,
+        directives[i], segmentScripts[i], subs, segments[i]?.motionBeats,
       );
       delete directives[i].phrases;
 
@@ -1179,6 +1267,7 @@ export async function directVisuals(segmentScripts, segments, segmentVoiceovers,
   } else {
     console.log('  📋 Using fallback visual director');
     directives = fallbackDirectVisuals(segmentScripts, segments, segmentVoiceovers);
+    directives.forEach((d, i) => applyBeatsToFallback(d, segments[i]));
   }
 
   // Post-process for guaranteed variety

@@ -3,6 +3,7 @@
  * and returns which scene effect component to render.
  */
 import type { VisualBlock } from "../../compositions/DailyNewsShow";
+import { MOTION_EFFECTS, type MotionEffectType } from "./motion";
 
 export type SceneEffectType =
   | "counterMosaic"
@@ -25,6 +26,8 @@ export type SceneEffectType =
   | "photoCompareSlider"
   | "photoVerticalScroll"
   | "photoFilterTransition"
+  // Editorial motion effects (digest-motion skill)
+  | MotionEffectType
   | null;
 
 const PATTERNS: [RegExp, SceneEffectType][] = [
@@ -57,6 +60,7 @@ const VALID_TYPES = new Set<SceneEffectType>([
   "circuitBoard", "progressTimeline", "alertPulse", "globe3D", "noiseWave",
   "dataDashboard", "matrixRain", "photoScrollColumns", "photoSplitScreen", "photoZoomReveal", "photoCollage",
   "photoCompareSlider", "photoVerticalScroll", "photoFilterTransition",
+  ...(Object.keys(MOTION_EFFECTS) as MotionEffectType[]),
 ]);
 
 export function resolveSceneEffect(block: VisualBlock): SceneEffectType {

@@ -24,6 +24,7 @@ import { PhotoVerticalScroll } from "./PhotoVerticalScroll";
 import { PhotoFilterTransition } from "./PhotoFilterTransition";
 import { MatrixRainScene } from "./MatrixRainScene";
 import { PhotoScrollColumns } from "./PhotoScrollColumns";
+import { MOTION_EFFECTS, isMotionEffect } from "./motion";
 
 interface SceneEffectRendererProps {
   type: SceneEffectType;
@@ -44,6 +45,12 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
   const desc = block.sceneDescription || "";
   const data = (block.graphicData || {}) as Record<string, unknown>;
   const primaryImage = images[0] || "";
+
+  if (isMotionEffect(type)) {
+    const { Component, hasData } = MOTION_EFFECTS[type];
+    const motionData = (block.motionData || {}) as Record<string, unknown>;
+    return hasData(motionData) ? <Component data={motionData} accentColor={accentColor} images={images} /> : null;
+  }
 
   switch (type) {
     case "alertPulse":

@@ -1629,11 +1629,19 @@ async function main() {
     }
   }
 
+  // A SKIP_YOUTUBE run is a preview (e.g. comparing a re-render with the published
+  // video): it must not replace the social copy nor touch the draft's state.
+  const previewOnly = process.env.SKIP_YOUTUBE === 'true';
+
   // Step 5e: Copy the final mp4 to R2 for native social video posts
-  try {
-    await uploadDigestToR2(outputPath, dateStr);
-  } catch (r2Err) {
-    console.log(`⚠️ R2 digest upload failed (non-fatal): ${r2Err.message}`);
+  if (previewOnly) {
+    console.log('⏭️ Step 5e: R2 digest copy SKIPPED (preview run)');
+  } else {
+    try {
+      await uploadDigestToR2(outputPath, dateStr);
+    } catch (r2Err) {
+      console.log(`⚠️ R2 digest upload failed (non-fatal): ${r2Err.message}`);
+    }
   }
 
   // Copy video to workspace for artifact upload if YouTube failed
@@ -1696,9 +1704,13 @@ async function main() {
   // youtube_url. Manual workflow_dispatch renders (no DRAFT_ID) used to skip this,
   // so 2026-09-04 was rendered to YouTube but stayed 'rendering' and never posted.
   // Direct Telegram is the fallback when the bot cannot be reached.
-  const botNotified = await notifyBotComplete(dateStr, result.watchUrl);
-  if (!botNotified) {
-    await notifyTelegramDirect(dateStr, result.watchUrl);
+  if (previewOnly) {
+    console.log('⏭️ Draft left untouched (preview run) — video is in the workflow artifact');
+  } else {
+    const botNotified = await notifyBotComplete(dateStr, result.watchUrl);
+    if (!botNotified) {
+      await notifyTelegramDirect(dateStr, result.watchUrl);
+    }
   }
 
   console.log(`\n🎉 Daily compilation complete!`);
