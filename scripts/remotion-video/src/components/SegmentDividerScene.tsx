@@ -8,7 +8,7 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { colors } from "../design-system";
-import { ease, look, mix, punchScale, tween, wipeLR } from "./effects/motion/grammar";
+import { categoryLabel, ease, look, mix, punchScale, tween, wipeLR } from "./effects/motion/grammar";
 
 export interface SegmentDividerSceneProps {
   segmentNumber: number;
@@ -73,7 +73,7 @@ export const SegmentDividerScene: React.FC<SegmentDividerSceneProps> = ({
             </div>
             {category && (
               <div style={{ fontFamily: look.font, fontWeight: 700, fontSize: 48, color: look.ink, textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                {category}
+                {categoryLabel(category)}
               </div>
             )}
           </div>

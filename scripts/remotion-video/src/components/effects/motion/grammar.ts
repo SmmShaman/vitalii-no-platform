@@ -117,3 +117,11 @@ export const look = {
 
 /** Faded/dimmed opacity for non-focused items (focus by dimming, never by hiding). */
 export const DIM = 0.38;
+
+/** Category slugs are English; the show is Norwegian (and says KI, not AI). */
+export const CATEGORY_NO: Record<string, string> = {
+  tech: "Teknologi", ai: "KI", business: "Næringsliv", politics: "Politikk", startup: "Oppstart",
+  science: "Vitenskap", crypto: "Krypto", health: "Helse", news: "Nyheter", growth: "Vekst",
+};
+export const categoryLabel = (c?: string, language = "no") =>
+  !c ? "" : language === "no" ? CATEGORY_NO[c.toLowerCase()] ?? c : c;

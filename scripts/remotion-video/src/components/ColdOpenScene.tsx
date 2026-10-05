@@ -12,7 +12,7 @@
  */
 import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
-import { ease, look, mix, punchScale, tween, wipeLR } from "./effects/motion/grammar";
+import { categoryLabel, ease, look, mix, punchScale, tween, wipeLR } from "./effects/motion/grammar";
 
 export interface ColdOpenStory {
   headline: string;
@@ -126,7 +126,7 @@ export const ColdOpenScene: React.FC<ColdOpenSceneProps> = ({
         <Photo src={st.imageSrc} t0={t0} t1={t0 + per} t={t} dim={0.38} />
         <AbsoluteFill style={{ justifyContent: "flex-end", padding: `0 ${safeX}px ${look.safeBottom - 40}px` }}>
           <div style={{ fontFamily: look.mono, fontSize: 30, color: acc, letterSpacing: "0.1em", clipPath: wipeLR(kick), marginBottom: 16 }}>
-            {`SAK ${i + 1}${st.category ? ` · ${st.category.toUpperCase()}` : ""}`}
+            {`${language === "no" ? "SAK" : "STORY"} ${i + 1}${st.category ? ` · ${categoryLabel(st.category, language).toUpperCase()}` : ""}`}
           </div>
           <div
             style={{
