@@ -308,6 +308,8 @@ const LLM_GREETING_PATTERNS = [
   /^god\s+(morgen|dag|kveld|formiddag|ettermiddag|mandag|tirsdag|onsdag|torsdag|fredag|lørdag|søndag)[.!]?\s*/i,
   /^det er \d{1,2}\.?\s+\p{L}+[.!]?\s*/iu,
   /^hi[,!]?\s+(my name is|i'?m)\s+vitalii\s+berbeha[.!,]?\s*/i,
+  // The cold open already says "Dette er dagens tek-nytt" — drop the agent's stock opener
+  /^her er (de )?(viktigste|dagens) (teknologinyhetene|tek-nyhetene|nyhetene)[.!]?\s*/i,
 ];
 
 function stripLlmGreeting(text) {
@@ -319,6 +321,26 @@ function stripLlmGreeting(text) {
     if (out === before) break;
   }
   return out;
+}
+
+/**
+ * Cold-open cue points from the intro voiceover's word timings: where the brand line
+ * ends (the story teasers start) and where "Vi har N saker" begins (the count frame).
+ */
+function coldOpenTimes(introVoiceover, greeting, introDuration) {
+  const words = introVoiceover?.subtitles || [];
+  const greetingWords = String(greeting).split(/\s+/).filter(Boolean).length;
+  let greetingEnd = words[greetingWords - 1]?.endTime ?? 2.2;
+  let countStart = introDuration - 1.8;
+  for (let i = words.length - 2; i >= 0; i--) {
+    const a = String(words[i].text || '').toLowerCase().replace(/[^\p{L}]/gu, '');
+    const b = String(words[i + 1].text || '').toLowerCase().replace(/[^\p{L}]/gu, '');
+    if ((a === 'vi' && b === 'har') || (a === 'we' && b === 'have')) { countStart = words[i].startTime; break; }
+  }
+  greetingEnd = Math.max(1.4, Math.min(greetingEnd + 0.15, introDuration - 3));
+  countStart = Math.max(greetingEnd + 2.5, Math.min(countStart, introDuration - 0.8));
+  console.log(`  🎬 cold open: teasers ${greetingEnd.toFixed(2)}s → count ${countStart.toFixed(2)}s (intro ${introDuration}s)`);
+  return { greetingEndSeconds: greetingEnd, countStartSeconds: countStart };
 }
 
 /**
@@ -863,10 +885,13 @@ async function main() {
   // The LLM intro may still open with its own greeting/self-introduction
   // ("Velkommen til dagens nyhetsdigest fra Vitalii Berbeha.", "God mandag. Det er
   // 17. august.") — strip it, or the show greets the viewer and names the host twice.
-  const HOST_NAME = 'Vitalii Berbeha';
+  // Short brand line (owner, 2026-10-05): the old "Hei, jeg heter …, og dette er dagens
+  // nyhetsoppdatering for …" took ~6 s of a 20 s static opening. The cold open now
+  // shows the brand stamp while this line plays, then today's top stories.
+  const shortDate = String(displayDate).replace(/\s+\d{4}$/, '');
   const introGreeting = LANGUAGE === 'no'
-    ? `Hei, jeg heter ${HOST_NAME}, og dette er dagens nyhetsoppdatering for ${displayDate}.`
-    : `Hi, my name is ${HOST_NAME}, and this is your news update for ${displayDate}.`;
+    ? `Dette er dagens tek-nytt, ${shortDate}.`
+    : `This is today's tech news, ${shortDate}.`;
   const introScript = `${introGreeting} ${stripLlmGreeting(plan.introScript)}`.trim();
 
   let introVoiceover = null;
@@ -1432,7 +1457,7 @@ async function main() {
   const roundupDuration = roundupVoiceover ? Math.max(Number(roundupVoiceover.durationSeconds), 5) : 0;
   const outroDuration = outroVoiceover ? Math.max(Number(outroVoiceover.durationSeconds), 4) : 4;
   const overflowDuration = overflowVoiceover ? Math.max(Number(overflowVoiceover.durationSeconds), 4) : 0;
-  const dividerDuration = 3.5;
+  const dividerDuration = 1.5; // was 3.5 s of black (owner, 2026-10-05)
   const segmentsTotalDuration = segments.reduce((sum, s) => sum + Number(s.durationSeconds), 0);
   const dividersTotalDuration = segments.length * dividerDuration;
   const totalDuration = introDuration + roundupDuration + dividersTotalDuration + segmentsTotalDuration + overflowDuration + outroDuration;
@@ -1529,6 +1554,7 @@ async function main() {
     introDurationSeconds: introDuration,
     outroDurationSeconds: outroDuration,
     dividerDurationSeconds: dividerDuration,
+    coldOpen: coldOpenTimes(introVoiceover, introGreeting, introDuration),
     accentColor: '#FF7A00',
     introVoiceoverSrc: introAudioFilename || undefined,
     outroVoiceoverSrc: outroAudioFilename || undefined,

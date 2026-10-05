@@ -19,6 +19,7 @@ import {
   staticFile,
 } from "remotion";
 import { ShowIntroScene } from "../components/ShowIntroScene";
+import { ColdOpenScene } from "../components/ColdOpenScene";
 import { SegmentDividerScene } from "../components/SegmentDividerScene";
 import { HeadlineScene } from "../components/HeadlineScene";
 import { ContentScene } from "../components/ContentScene";
@@ -150,6 +151,8 @@ export interface DailyNewsShowProps {
   outroDurationSeconds?: number;
   /** Divider duration between segments */
   dividerDurationSeconds?: number;
+  /** Voice-driven cold open (daily): word times from the intro voiceover */
+  coldOpen?: { greetingEndSeconds: number; countStartSeconds: number };
   /** Global accent color */
   accentColor?: string;
   /** Intro voiceover audio file */
@@ -196,6 +199,7 @@ export const DailyNewsShow: React.FC<DailyNewsShowProps> = ({
   introDurationSeconds = 4,
   outroDurationSeconds = 4,
   dividerDurationSeconds = 3.5,
+  coldOpen,
   accentColor = colors.brand,
   introVoiceoverSrc,
   outroVoiceoverSrc,
@@ -249,16 +253,33 @@ export const DailyNewsShow: React.FC<DailyNewsShowProps> = ({
   sequences.push({
     component: (
       <>
-        <ShowIntroScene
-          date={date}
-          articleCount={segments.length}
-          showTitle={showTitle}
-          accentColor={accentColor}
-          language={language}
-          backgroundImages={introBackgroundImages}
-          profileImageSrc={introProfileImageSrc}
-          showType={showType}
-        />
+        {coldOpen && showType !== "custom" && segments.length > 0 ? (
+          <ColdOpenScene
+            date={date}
+            stories={segments.slice(0, 3).map((s) => ({
+              headline: s.headline,
+              imageSrc: s.imageSrc,
+              category: s.category,
+              accentColor: s.accentColor,
+            }))}
+            articleCount={segments.length}
+            greetingEndSeconds={coldOpen.greetingEndSeconds}
+            countStartSeconds={coldOpen.countStartSeconds}
+            accentColor={accentColor}
+            language={language}
+          />
+        ) : (
+          <ShowIntroScene
+            date={date}
+            articleCount={segments.length}
+            showTitle={showTitle}
+            accentColor={accentColor}
+            language={language}
+            backgroundImages={introBackgroundImages}
+            profileImageSrc={introProfileImageSrc}
+            showType={showType}
+          />
+        )}
         {introAvatarSrc && (
           <AvatarOverlay
             src={introAvatarSrc}
@@ -323,6 +344,7 @@ export const DailyNewsShow: React.FC<DailyNewsShowProps> = ({
             totalSegments={segments.length}
             category={segment.category}
             accentColor={segColor}
+            imageSrc={segment.imageSrc}
           />
         ),
         startFrame: currentFrame,

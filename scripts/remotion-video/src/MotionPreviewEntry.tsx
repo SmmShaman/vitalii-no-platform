@@ -1,6 +1,8 @@
 import React from "react";
 import { AbsoluteFill, Composition, Img, registerRoot, staticFile } from "remotion";
 import { MOTION_EFFECTS, type MotionEffectType } from "./components/effects/motion";
+import { ColdOpenScene } from "./components/ColdOpenScene";
+import { SegmentDividerScene } from "./components/SegmentDividerScene";
 import samples from "../../video-processor/skills/digest-motion/effects.json";
 
 /**
@@ -20,8 +22,24 @@ const Preview: React.FC<{ effect: string }> = ({ effect }) => {
     </AbsoluteFill>
   );
 };
+const ColdOpenPreview: React.FC = () => (
+  <ColdOpenScene
+    date="4. oktober"
+    stories={[
+      { headline: "Trump lanserer føderal AI-superstyrke", imageSrc: "_prev_photo.jpg", category: "politics", accentColor: "#e74c3c" },
+      { headline: "OpenAI-sikkerhetssjef slutter, kritiserer kulturen", imageSrc: "_prev_photo.jpg", category: "ai", accentColor: "#9b59b6" },
+      { headline: "Google strammer inn gratis Gemini-tilgang", imageSrc: "_prev_photo.jpg", category: "tech" },
+    ]}
+    articleCount={9}
+    greetingEndSeconds={2.3}
+    countStartSeconds={10.4}
+    accentColor="#FF7A00"
+  />
+);
 const Root: React.FC = () => (
   <>
+    <Composition id="mp-coldOpen" component={ColdOpenPreview} durationInFrames={360} fps={30} width={1920} height={1080} />
+    <Composition id="mp-divider" component={SegmentDividerScene as any} durationInFrames={45} fps={30} width={1920} height={1080} defaultProps={{ segmentNumber: 3, totalSegments: 9, category: "ai", accentColor: "#9b59b6", imageSrc: "_prev_photo.jpg" }} />
     {Object.keys(MOTION_EFFECTS).flatMap((k) =>
       [90, 150].map((d) => (
         <Composition key={`${k}-${d}`} id={`mp-${k}-${d}`} component={Preview as any} durationInFrames={d} fps={30} width={1920} height={1080} defaultProps={{ effect: k }} />
