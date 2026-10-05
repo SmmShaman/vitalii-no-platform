@@ -13,7 +13,9 @@
 set -u
 
 STUCK_AFTER=2700      # 45 min without progress => re-trigger
-RENDER_ALERT=10800    # 3 h in 'rendering' => alert only (never re-render: duplicate YouTube uploads)
+RERENDER_AFTER=5400   # 1.5 h in 'rendering' with no YouTube id => one re-dispatch
+RENDER_ALERT=10800    # 3 h in 'rendering' after that => alert
+GH_REPO=SmmShaman/vitalii-no-platform
 BASE="http://localhost:8200/functions/v1/daily-video-bot"
 STAMP_DIR=/run/digest-watchdog
 mkdir -p "$STAMP_DIR"
@@ -39,6 +41,23 @@ notify() {
 trigger() {
   curl -s -m 30 -X POST "$BASE?action=$1&target_date=$YDATE" \
     -H "Authorization: Bearer $KEY" -H 'Content-Type: application/json' -d '{}' >/dev/null || true
+}
+
+GHPAT=$(cenv GH_PAT)
+
+render_running() {
+  # any daily-video render still queued or running => leave it alone
+  local n
+  n=$(curl -s -m 20 -H "Authorization: token $GHPAT" \
+    "https://api.github.com/repos/$GH_REPO/actions/workflows/daily-news-video.yml/runs?event=repository_dispatch&per_page=5" |
+    python3 -c 'import json,sys; print(sum(r["status"] in ("queued","in_progress") for r in json.load(sys.stdin).get("workflow_runs",[])))' 2>/dev/null)
+  [ "${n:-1}" != "0" ]
+}
+
+redispatch() {
+  curl -s -m 20 -o /dev/null -w '%{http_code}' -X POST "https://api.github.com/repos/$GH_REPO/dispatches" \
+    -H "Authorization: token $GHPAT" -H 'Accept: application/vnd.github.v3+json' \
+    -d "{\"event_type\":\"daily-video-render\",\"client_payload\":{\"draft_id\":\"$1\",\"target_date\":\"$YDATE\",\"format\":\"horizontal\",\"language\":\"no\",\"youtube_privacy\":\"public\",\"skip_youtube\":\"false\"}}"
 }
 
 row=$(psq "SELECT status || '|' || extract(epoch from now()-updated_at)::int FROM daily_video_drafts WHERE target_date='$YDATE'")
@@ -76,8 +95,19 @@ case "$status" in
     fi
     ;;
   rendering)
-    if [ "$age" -gt "$RENDER_ALERT" ]; then
-      notify stuck-render "🐶 <b>Digest watchdog:</b> драфт $YDATE у rendering вже $((age/3600)) год — глянь GitHub Actions руками (авто-перезапуск рендеру вимкнено, щоб не було дублів на YouTube)."
+    # A render that died BEFORE the YouTube upload is safe to repeat: the render
+    # saves youtube_video_id on the draft right after the upload. 16.09, 27.09 and
+    # 01.10 were lost because this branch only sent an alert.
+    if [ "$age" -gt "$RERENDER_AFTER" ]; then
+      yt=$(psq "SELECT coalesce(youtube_video_id,'') FROM daily_video_drafts WHERE target_date='$YDATE'")
+      if [ -z "$yt" ] && [ ! -e "$STAMP_DIR/$YDATE-rerender" ] && ! render_running; then
+        touch "$STAMP_DIR/$YDATE-rerender"
+        id=$(psq "SELECT id FROM daily_video_drafts WHERE target_date='$YDATE'")
+        code=$(redispatch "$id")
+        notify rerender "🐶 <b>Digest watchdog:</b> рендер $YDATE впав до завантаження на YouTube — запустив рендер ще раз (GitHub $code)."
+      elif [ "$age" -gt "$RENDER_ALERT" ]; then
+        notify stuck-render "🐶 <b>Digest watchdog:</b> драфт $YDATE у rendering вже $((age/3600)) год і повторний рендер не допоміг — глянь GitHub Actions."
+      fi
     fi
     ;;
   failed)

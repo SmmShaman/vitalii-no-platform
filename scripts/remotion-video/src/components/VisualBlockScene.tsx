@@ -86,6 +86,15 @@ const PAN_DIRS = [
   { px: -1, py: 0 },
 ];
 
+
+// [0, fade, d - fade, d] that stays strictly increasing for any d >= 1:
+// the fade shrinks to fit blocks shorter than two fades.
+const fadeRange = (d: number, fade: number): number[] => {
+  const total = Math.max(3, d);
+  const f = Math.max(1, Math.min(fade, Math.floor((total - 1) / 2)));
+  return [0, f, total - f, total];
+};
+
 // ══════════════════════════════════════════════════════════════════
 //  Main component
 // ══════════════════════════════════════════════════════════════════
@@ -551,7 +560,8 @@ const BRollBackground: React.FC<{
   const frame = useCurrentFrame();
   const opacity = interpolate(
     frame,
-    [0, 8, Math.max(9, durationInFrames - 8), durationInFrames],
+    // Short blocks: keep the range strictly increasing (02.10 render died on [0,8,9,8])
+    fadeRange(durationInFrames, 8),
     [0, 1, 1, 0],
     clampBoth,
   );

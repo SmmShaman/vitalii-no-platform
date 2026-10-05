@@ -94,10 +94,12 @@ export const AnimatedSubtitles: React.FC<AnimatedSubtitlesProps> = ({
     config: theme.animations.springs.subtitle,
   });
 
-  const fadeFrames = subtitleFadeFrames;
+  // Shrink the fade for very short groups so the input range stays increasing
+  const groupSpan = Math.max(groupDurationFrames, 2);
+  const fadeFrames = Math.min(subtitleFadeFrames, (groupSpan - 0.5) / 2);
   const opacity = interpolate(
     localFrame,
-    [0, fadeFrames, groupDurationFrames - fadeFrames, groupDurationFrames],
+    [0, fadeFrames, groupSpan - fadeFrames, groupSpan],
     [0, 1, 1, 0],
     theme.animations.clampBoth,
   );
