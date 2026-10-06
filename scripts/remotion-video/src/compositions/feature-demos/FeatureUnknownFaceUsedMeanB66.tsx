@@ -446,7 +446,7 @@ export const FeatureUnknownFaceUsedMeanB66: React.FC = () => {
           style={{
             position: "absolute",
             left: WIN5.x + 24,
-            top: WIN5.y + WIN5.h - 66,
+            top: WIN5.y + WIN5.h + 14,
             padding: "12px 20px",
             borderRadius: 14,
             background: "rgba(255,255,255,0.96)",

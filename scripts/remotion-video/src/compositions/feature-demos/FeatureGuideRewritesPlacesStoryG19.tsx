@@ -368,6 +368,14 @@ const FrameInner: React.FC = () => {
       {/* ---------------- beat 3 : Wikidata place matching (slide-in, non-crossfade) ---------------- */}
       <Group opacity={b3} dy={b3Slide}>
         <BeatHead kicker="Wikidata Place Matching" title="two spellings, one place" opacity={b3} />
+        <StatPill x={120} y={150} emoji="🧩" text="Wikidata twin() lookup" tone="accent" opacity={b3} />
+        <StatPill x={120} y={210} emoji="🔗" text="duplicate farm names merge" tone="accent" opacity={b3} />
+        <Panel x={660} y={130} w={470} h={160} tone="card" opacity={b3}>
+          <div style={{ padding: "22px 28px", fontSize: 18, fontWeight: 600, color: B.ink, lineHeight: 1.45, fontFamily }}>
+            Two different spellings of the same farm used to get two
+            separate, half-written stories instead of one good one.
+          </div>
+        </Panel>
         <Ribbon opacity={b3 * 0.4} />
         {Array.from({ length: N2 }, (_, i) => (
           <Tick key={i} x={tickX(i, N2)} lit={i === 10} opacity={b3 * 0.4} />
