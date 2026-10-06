@@ -1,0 +1,56 @@
+{
+ "id": "p74",
+ "beat_durations": {
+  "b1": 6.936,
+  "b2": 6.768,
+  "b3": 4.512,
+  "b4": 5.736,
+  "b5": 3.696
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One video repeated the same animated effect five times in a row, even though I kept telling it to vary things.",
+   "start_s": 0.5,
+   "end_s": 7.436,
+   "start_f": 15,
+   "end_f": 223
+  },
+  {
+   "beat": "b2",
+   "text": "The system had no memory \u2014 every clip, it reached for its favorite effect again, same day or the next.",
+   "start_s": 7.736,
+   "end_s": 14.504,
+   "start_f": 232,
+   "end_f": 435
+  },
+  {
+   "beat": "b3",
+   "text": "Now a Postgres column records exactly which effect played in which video.",
+   "start_s": 14.804,
+   "end_s": 19.316,
+   "start_f": 444,
+   "end_f": 579
+  },
+  {
+   "beat": "b4",
+   "text": "The code checks that history before picking, and enforces a hard cap no prompt could guarantee.",
+   "start_s": 19.616,
+   "end_s": 25.352,
+   "start_f": 588,
+   "end_f": 761
+  },
+  {
+   "beat": "b5",
+   "text": "No effect can repeat more than three times in one video now.",
+   "start_s": 25.652,
+   "end_s": 29.348,
+   "start_f": 770,
+   "end_f": 880
+  }
+ ],
+ "total_s": 30.848,
+ "durationInFrames": 925,
+ "measured_track_s": 29.4,
+ "track": "/root/feature-demos/vo-p74/vo-p74.mp3"
+}

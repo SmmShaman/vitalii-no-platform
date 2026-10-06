@@ -1,0 +1,56 @@
+{
+ "id": "p75",
+ "beat_durations": {
+  "b1": 8.784,
+  "b2": 5.736,
+  "b3": 6.0,
+  "b4": 5.088,
+  "b5": 3.576
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every day my news video opened the same way \u2014 a generic stock photo, twenty seconds of nothing, before a single real headline showed up.",
+   "start_s": 0.5,
+   "end_s": 9.284,
+   "start_f": 15,
+   "end_f": 279
+  },
+  {
+   "beat": "b2",
+   "text": "Viewers sat through a slow, content-free intro before seeing anything I'd actually written that day.",
+   "start_s": 9.584,
+   "end_s": 15.32,
+   "start_f": 288,
+   "end_f": 460
+  },
+  {
+   "beat": "b3",
+   "text": "Now it cuts straight from one spoken line into the real photos of today's top three stories.",
+   "start_s": 15.62,
+   "end_s": 21.62,
+   "start_f": 469,
+   "end_f": 649
+  },
+  {
+   "beat": "b4",
+   "text": "The cut lands exactly on the right word, timed with Remotion to match the voice.",
+   "start_s": 21.92,
+   "end_s": 27.008,
+   "start_f": 658,
+   "end_f": 810
+  },
+  {
+   "beat": "b5",
+   "text": "That's eighteen seconds of dead air gone from every episode.",
+   "start_s": 27.308,
+   "end_s": 30.884,
+   "start_f": 819,
+   "end_f": 927
+  }
+ ],
+ "total_s": 32.384,
+ "durationInFrames": 972,
+ "measured_track_s": 30.936,
+ "track": "/root/feature-demos/vo-p75/vo-p75.mp3"
+}

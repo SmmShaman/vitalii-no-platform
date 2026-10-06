@@ -1,0 +1,7 @@
+{"id": "p74", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "One video repeated the same animated effect five times in a row, even though I kept telling it to vary things."],
+  ["b2", "The system had no memory — every clip, it reached for its favorite effect again, same day or the next."],
+  ["b3", "Now a Postgres column records exactly which effect played in which video."],
+  ["b4", "The code checks that history before picking, and enforces a hard cap no prompt could guarantee."],
+  ["b5", "No effect can repeat more than three times in one video now."]
+]}
