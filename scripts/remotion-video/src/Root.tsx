@@ -231,6 +231,8 @@ import { FeatureRetiredAgentsGet403G25 } from "./compositions/feature-demos/Feat
 import { FeatureOneTapSignZeroB64 } from "./compositions/feature-demos/FeatureOneTapSignZeroB64";
 import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/FeatureUnknownFaceUsedMeanB66";
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
+import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
+import { FeatureOneShowUsedSameP74 } from "./compositions/feature-demos/FeatureOneShowUsedSameP74";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2270,6 +2272,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureOneKidFinishesEveryoneB65"
         component={FeatureOneKidFinishesEveryoneB65}
         durationInFrames={828}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFirst20SecondsUsedP75"
+        component={FeatureFirst20SecondsUsedP75}
+        durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureOneShowUsedSameP74"
+        component={FeatureOneShowUsedSameP74}
+        durationInFrames={925}
         fps={30}
         width={1280}
         height={720}
