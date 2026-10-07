@@ -1,0 +1,56 @@
+{
+ "id": "b69",
+ "beat_durations": {
+  "b1": 4.536,
+  "b2": 5.4,
+  "b3": 3.72,
+  "b4": 5.808,
+  "b5": 7.224
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every new app the boys installed quietly counted as free TV time.",
+   "start_s": 0.5,
+   "end_s": 5.036,
+   "start_f": 15,
+   "end_f": 151
+  },
+  {
+   "beat": "b2",
+   "text": "The old rule only gated apps I already knew; anything unfamiliar defaulted to free.",
+   "start_s": 5.336,
+   "end_s": 10.736,
+   "start_f": 160,
+   "end_f": 322
+  },
+  {
+   "beat": "b3",
+   "text": "Like a guard who only recognizes faces he's already met.",
+   "start_s": 11.036,
+   "end_s": 14.756,
+   "start_f": 331,
+   "end_f": 443
+  },
+  {
+   "beat": "b4",
+   "text": "So I flipped it: only three plain apps stay free, everything else now needs the bonus.",
+   "start_s": 15.056,
+   "end_s": 20.864,
+   "start_f": 452,
+   "end_f": 626
+  },
+  {
+   "beat": "b5",
+   "text": "I applied that rule across every device, so it lives identically in four places now \u2014 and can't quietly go stale.",
+   "start_s": 21.164,
+   "end_s": 28.388,
+   "start_f": 635,
+   "end_f": 852
+  }
+ ],
+ "total_s": 29.888,
+ "durationInFrames": 897,
+ "measured_track_s": 28.44,
+ "track": "/root/feature-demos/vo-b69/vo-b69.mp3"
+}

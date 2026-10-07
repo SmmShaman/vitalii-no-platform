@@ -1,0 +1,7 @@
+{"id": "p73", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My daily video digest writes a script for each news beat, then has to guess which graphic fits it."],
+ ["b2", "The script writer described a visual idea in prose; the renderer just guessed, from its own fixed list."],
+ ["b3", "Now both sides read from one shared catalog of effects, built with Remotion."],
+ ["b4", "No more generic fallback graphics — percent rings, region callouts and timelines get picked by name instead."],
+ ["b5", "That catalog started at 12 effects and grew, the same evening, to 23."]
+]}

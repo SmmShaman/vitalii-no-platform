@@ -1,0 +1,56 @@
+{
+ "id": "p73",
+ "beat_durations": {
+  "b1": 6.192,
+  "b2": 6.744,
+  "b3": 5.064,
+  "b4": 6.936,
+  "b5": 5.112
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My daily video digest writes a script for each news beat, then has to guess which graphic fits it.",
+   "start_s": 0.5,
+   "end_s": 6.692,
+   "start_f": 15,
+   "end_f": 201
+  },
+  {
+   "beat": "b2",
+   "text": "The script writer described a visual idea in prose; the renderer just guessed, from its own fixed list.",
+   "start_s": 6.992,
+   "end_s": 13.736,
+   "start_f": 210,
+   "end_f": 412
+  },
+  {
+   "beat": "b3",
+   "text": "Now both sides read from one shared catalog of effects, built with Remotion.",
+   "start_s": 14.036,
+   "end_s": 19.1,
+   "start_f": 421,
+   "end_f": 573
+  },
+  {
+   "beat": "b4",
+   "text": "No more generic fallback graphics \u2014 percent rings, region callouts and timelines get picked by name instead.",
+   "start_s": 19.4,
+   "end_s": 26.336,
+   "start_f": 582,
+   "end_f": 790
+  },
+  {
+   "beat": "b5",
+   "text": "That catalog started at 12 effects and grew, the same evening, to 23.",
+   "start_s": 26.636,
+   "end_s": 31.748,
+   "start_f": 799,
+   "end_f": 952
+  }
+ ],
+ "total_s": 33.248,
+ "durationInFrames": 997,
+ "measured_track_s": 31.8,
+ "track": "/root/feature-demos/vo-p73/vo-p73.mp3"
+}
