@@ -420,7 +420,7 @@ import { callLLMJson } from './llm-helper.js';
  * Each segment gets its own prompt with FULL article context + creative hints.
  */
 async function aiDirectSingleSegment(script, article, segmentMeta, segIndex, totalSegs, usedSoFar = null) {
-  if (!process.env.NVIDIA_API_KEY && !process.env.ANTHROPIC_API_KEY) return null;
+  if (!process.env.GEMINI_FREE_API_KEY) return null;
 
   const title = article?.title_en || article?.title_no || segmentMeta?.headline || '';
   const content = (article?.content_en || article?.content_no || article?.original_content || '').substring(0, 1500);
@@ -587,7 +587,7 @@ Return JSON:
  * Each segment gets its own AI call for detailed cinematic scenes.
  */
 async function aiDirectVisuals(segmentScripts, segments, articles, recentMotion = null) {
-  if (!process.env.NVIDIA_API_KEY && !process.env.ANTHROPIC_API_KEY) return null;
+  if (!process.env.GEMINI_FREE_API_KEY) return null;
 
   const totalSegs = segmentScripts.length;
   const results = [];

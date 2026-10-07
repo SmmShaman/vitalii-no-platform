@@ -2,7 +2,7 @@
  * generate-clickbait.js
  *
  * AI-powered clickbait title + description generator for YouTube daily news videos.
- * Uses LLM (NVIDIA NIM / Gemini) to create engaging Norwegian titles and descriptions.
+ * Uses LLM (free Gemini) to create engaging Norwegian titles and descriptions.
  */
 
 import { callLLMJson } from './llm-helper.js';

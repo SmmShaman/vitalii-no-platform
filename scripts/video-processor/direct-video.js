@@ -1,7 +1,7 @@
 /**
  * AI Video Director
  *
- * Uses LLM (NVIDIA NIM / Gemini) to analyze a news article and generate
+ * Uses LLM (free Gemini) to analyze a news article and generate
  * a structured scene plan for Remotion multi-scene video composition.
  *
  * The AI acts as a "video director" — analyzing the article content,
@@ -41,14 +41,14 @@ Available scene types and their properties:
 `;
 
 /**
- * Call LLM (NVIDIA NIM / Gemini) with JSON response.
+ * Call LLM (free Gemini) with JSON response.
  */
 async function callAI(systemPrompt, userPrompt, maxTokens = 1500) {
   return await callLLMJson(systemPrompt, userPrompt, { maxTokens, temperature: 0.7 });
 }
 
 /**
- * Generate a video direction plan using NVIDIA NIM / Gemini.
+ * Generate a video direction plan using free Gemini.
  *
  * @param {string} articleText - The news article text
  * @param {string} headline - The article headline
@@ -56,7 +56,7 @@ async function callAI(systemPrompt, userPrompt, maxTokens = 1500) {
  * @returns {Promise<Object>} Director plan with scenes and voiceover script
  */
 export async function directVideo(articleText, headline, targetDuration = 25) {
-  const hasAI = process.env.NVIDIA_API_KEY || process.env.GOOGLE_API_KEY;
+  const hasAI = process.env.GEMINI_FREE_API_KEY;
 
   if (!hasAI) {
     console.log('⚠️ No LLM credentials, falling back to template director');
