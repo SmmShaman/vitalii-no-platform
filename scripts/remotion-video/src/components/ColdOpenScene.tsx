@@ -159,7 +159,9 @@ export const ColdOpenScene: React.FC<ColdOpenSceneProps> = ({
       <AbsoluteFill style={{ flexDirection: isV ? "column" : "row" }}>
         {list.map((st, i) => (
           <div key={i} style={{ flex: 1, position: "relative", overflow: "hidden", opacity: mix(tween(t, cStart + i * 0.08, 0.3), 0, 1) }}>
-            <Img src={resolveSrc(st.imageSrc)} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "grayscale(0.6)" }} />
+            {st.imageSrc && (
+              <Img src={resolveSrc(st.imageSrc)} style={{ width: "100%", height: "100%", objectFit: "cover", filter: "grayscale(0.6)" }} />
+            )}
             {i < cols - 1 && (
               <div style={{ position: "absolute", [isV ? "bottom" : "right"]: 0, [isV ? "left" : "top"]: 0, [isV ? "height" : "width"]: 4, [isV ? "width" : "height"]: "100%", background: "#0a0a0a" }} />
             )}

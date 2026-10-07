@@ -258,7 +258,8 @@ export const DailyNewsShow: React.FC<DailyNewsShowProps> = ({
             date={date}
             stories={segments.slice(0, 3).map((s) => ({
               headline: s.headline,
-              imageSrc: s.imageSrc,
+              // Article image can be missing (403/no og:image) — fall back to the segment's other photos
+              imageSrc: s.imageSrc || s.alternateImages?.[0] || "",
               category: s.category,
               accentColor: s.accentColor,
             }))}
@@ -344,7 +345,7 @@ export const DailyNewsShow: React.FC<DailyNewsShowProps> = ({
             totalSegments={segments.length}
             category={segment.category}
             accentColor={segColor}
-            imageSrc={segment.imageSrc}
+            imageSrc={segment.imageSrc || segment.alternateImages?.[0] || ""}
           />
         ),
         startFrame: currentFrame,
