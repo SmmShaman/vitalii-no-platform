@@ -252,7 +252,7 @@ async function enhanceWithRemotion(inputVideoPath, news, videoMeta = {}) {
   }
 
   // Check if AI credentials are available
-  const hasAI = process.env.GEMINI_FREE_API_KEY;
+  const hasAI = process.env.GEMINI_FREE_API_KEY || process.env.GROQ_API_KEY;
   const hasTTS = process.env.ZVUKOGRAM_TOKEN && process.env.ZVUKOGRAM_EMAIL;
 
   if (!hasAI || !hasTTS) {

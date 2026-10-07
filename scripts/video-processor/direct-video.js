@@ -56,7 +56,7 @@ async function callAI(systemPrompt, userPrompt, maxTokens = 1500) {
  * @returns {Promise<Object>} Director plan with scenes and voiceover script
  */
 export async function directVideo(articleText, headline, targetDuration = 25) {
-  const hasAI = process.env.GEMINI_FREE_API_KEY;
+  const hasAI = process.env.GEMINI_FREE_API_KEY || process.env.GROQ_API_KEY;
 
   if (!hasAI) {
     console.log('⚠️ No LLM credentials, falling back to template director');

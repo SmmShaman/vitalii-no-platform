@@ -90,6 +90,7 @@ jobs:
 
           # LLM
           GEMINI_FREE_API_KEY: ${{ secrets.GEMINI_FREE_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
           # TTS (Zvukogram)
           ZVUKOGRAM_TOKEN: ${{ secrets.ZVUKOGRAM_TOKEN }}

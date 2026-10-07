@@ -1,9 +1,9 @@
 /**
  * LLM Helper for Video Processor scripts (Node.js)
  *
- * Backend: free Gemini key only. NVIDIA NIM (llama-3.3-70b EOL 2026-08-26, 410)
- * and Claude (Anthropic API account has no credits) were dead links and were
- * removed on 2026-10-07.
+ * Chain: free Gemini key → Groq gpt-oss-120b (free tier). NVIDIA NIM
+ * (llama-3.3-70b EOL 2026-08-26, 410) and Claude (Anthropic API account has no
+ * credits) were dead links and were removed on 2026-10-07.
  */
 
 // Free no-billing Gemini key ONLY (owner policy 2026-08-06) — the paid
@@ -11,6 +11,10 @@
 // secret in GitHub Actions; without it callers fall back to heuristics.
 const GEMINI_FREE_API_KEY = process.env.GEMINI_FREE_API_KEY || '';
 const GEMINI_FREE_MODEL = process.env.GEMINI_FREE_MODEL_LITE || 'gemini-3.1-flash-lite';
+// Groq free tier: gpt-oss-120b = 8k TPM / 200k TPD, pool shared with the
+// portfolio edge functions (digest runs ~05:00 UTC, before they drain it).
+const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
+const GROQ_MODEL = process.env.GROQ_VIDEO_MODEL || 'openai/gpt-oss-120b';
 const LLM_TIMEOUT_MS = 120_000;
 
 /** Fetch with AbortController timeout */
@@ -38,13 +42,22 @@ export async function callLLM(systemPrompt, userPrompt, options = {}) {
       return await callGemini(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode });
     } catch (err) {
       errors.push(`Gemini: ${err.message}`);
+      console.warn(`⚠️ Gemini failed: ${err.message.substring(0, 120)}, falling back to Groq`);
+    }
+  }
+
+  if (GROQ_API_KEY) {
+    try {
+      return await callGroq(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode });
+    } catch (err) {
+      errors.push(`Groq: ${err.message}`);
     }
   }
 
   if (errors.length > 0) {
     throw new Error(`All LLM backends failed:\n  - ${errors.join('\n  - ')}`);
   }
-  throw new Error('No LLM credentials available (GEMINI_FREE_API_KEY required)');
+  throw new Error('No LLM credentials available (GEMINI_FREE_API_KEY or GROQ_API_KEY required)');
 }
 
 /**
@@ -103,6 +116,47 @@ async function callGemini(systemPrompt, userPrompt, { maxTokens, temperature, js
   const usage = data.usageMetadata;
   if (usage) {
     console.log(`💰 Gemini tokens: ${usage.promptTokenCount}+${usage.candidatesTokenCount}`);
+  }
+
+  return content;
+}
+
+// ── Groq gpt-oss (free tier, OpenAI-compatible) ──
+
+async function callGroq(systemPrompt, userPrompt, { maxTokens, temperature, jsonMode }) {
+  // gpt-oss reasons before answering and those tokens count against max_tokens:
+  // without reasoning_effort + headroom it returns EMPTY content.
+  const response = await fetchWithTimeout('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${GROQ_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: GROQ_MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature,
+      max_tokens: Math.min(Math.max(maxTokens + 1500, 2000), 8192),
+      reasoning_effort: 'low',
+      ...(jsonMode ? { response_format: { type: 'json_object' } } : {}),
+    }),
+  });
+
+  if (!response.ok) {
+    const bodyText = await response.text().catch(() => '');
+    throw new Error(`Groq ${response.status}: ${bodyText.substring(0, 300)}`);
+  }
+
+  const data = await response.json();
+  const content = (data.choices?.[0]?.message?.content || '').replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+  if (!content) throw new Error('Empty Groq response');
+
+  const usage = data.usage;
+  if (usage) {
+    console.log(`💰 Groq tokens: ${usage.prompt_tokens}+${usage.completion_tokens}`);
   }
 
   return content;

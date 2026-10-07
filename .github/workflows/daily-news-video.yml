@@ -196,6 +196,7 @@ jobs:
           # the chain was NVIDIA (aborting at 120s) → Claude (no credits) and the
           # Visual Director died on all 7 segments.
           GEMINI_FREE_API_KEY: ${{ secrets.GEMINI_FREE_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
           # Google AI (Gemini — LLM fallback + thumbnail)
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
