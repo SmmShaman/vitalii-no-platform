@@ -8,6 +8,10 @@ import { uploadImageToLinkedIn, commentOnLinkedInPost } from '../_shared/linkedi
 // killed the worker twice ("memory limit reached" → WorkerRequestCancelled) before the old
 // post-download guard could run.
 const MAX_VIDEO_BYTES = 200 * 1024 * 1024
+// The edge-runtime kills the worker at 400 s (main/index.ts workerTimeoutMs),
+// and a killed worker posts NOTHING. The native-video attempt must give up
+// early enough to leave time for the text fallback post.
+const VIDEO_BUDGET_MS = 300_000
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -37,6 +41,8 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
   // Any failure falls back to the plain text post so the daily task never dies on media.
   let videoAsset: string | null = null
   if (videoUrl) {
+    const videoDeadline = Date.now() + VIDEO_BUDGET_MS
+    const left = () => Math.max(1000, videoDeadline - Date.now())
     try {
       const head = await fetch(videoUrl, { method: 'HEAD' })
       if (!head.ok) throw new Error(`video HEAD ${head.status}`)
@@ -63,7 +69,7 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
       const asset = reg?.value?.asset
       if (!uploadUrl || !asset) throw new Error('registerUpload: no uploadUrl/asset in response')
 
-      const videoRes = await fetch(videoUrl)
+      const videoRes = await fetch(videoUrl, { signal: AbortSignal.timeout(left()) })
       if (!videoRes.ok) throw new Error(`video fetch ${videoRes.status}`)
       const bytes = new Uint8Array(await videoRes.arrayBuffer())
       if (bytes.length > MAX_VIDEO_BYTES) throw new Error(`video too large: ${bytes.length} bytes`)
@@ -72,6 +78,7 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
         body: bytes,
+        signal: AbortSignal.timeout(left()),
       })
       if (putRes.status < 200 || putRes.status >= 300) throw new Error(`upload PUT ${putRes.status}`)
 
@@ -79,7 +86,7 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
       // the 720p digest copy ~60-80 MB can take a few minutes — worker timeout is 400 s)
       const assetId = asset.split(':').pop()
       let ready = false
-      for (let i = 0; i < 36; i++) {
+      for (let i = 0; i < 36 && Date.now() + 5000 < videoDeadline; i++) {
         await new Promise(r => setTimeout(r, 5000))
         const stRes = await fetch(`https://api.linkedin.com/v2/assets/${assetId}`, {
           headers: { Authorization: `Bearer ${token}`, 'X-Restli-Protocol-Version': '2.0.0' },
@@ -90,7 +97,7 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
         if (status === 'AVAILABLE') { ready = true; break }
         if (status === 'CLIENT_ERROR' || status === 'SERVER_ERROR') throw new Error(`asset processing ${status}`)
       }
-      if (!ready) throw new Error('asset not AVAILABLE after 180s')
+      if (!ready) throw new Error(`asset not AVAILABLE within the ${VIDEO_BUDGET_MS / 1000}s video budget`)
       videoAsset = asset
     } catch (e) {
       console.error('LinkedIn video upload failed, falling back to text-only:', (e as Error).message)
