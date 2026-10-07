@@ -291,7 +291,7 @@ const FrameInner: React.FC<{
 
   // b3 split: the token forks into 3, traveling from the greeting node to
   // each of the 3 story nodes.
-  const splitT = seg(frame, B3_S + 90, B3_S + 150);
+  const splitT = seg(frame, B3_S + 40, B3_S + 100);
   const storyY = [390, 470, 550];
 
   return (
@@ -429,12 +429,13 @@ const FrameInner: React.FC<{
         >
           Headline #1 — not yet
         </div>
-        <IconCard x={830} y={320} w={280} emoji="🕐" title="clock keeps running" sub="slow, content-free intro" tone="danger" opacity={seg(frame, B2_S + 50, B2_S + 50 + FADE)} />
-        <StatPill x={300} y={310} emoji="🛑" text="no real headline yet" tone="danger" opacity={seg(frame, B2_S + 70, B2_S + 70 + FADE)} />
-        <IconCard x={90} y={470} w={320} emoji="📺" title="viewers sat through it" sub="every single episode, before mine" tone="danger" opacity={seg(frame, B2_S + 95, B2_S + 95 + FADE)} />
+        <IconCard x={830} y={320} w={280} emoji="🕐" title="clock keeps running" sub="slow, content-free intro" tone="danger" opacity={seg(frame, B2_S + 25, B2_S + 25 + FADE)} />
+        <StatPill x={300} y={310} emoji="🛑" text="no real headline yet" tone="danger" opacity={seg(frame, B2_S + 40, B2_S + 40 + FADE)} />
+        <IconCard x={90} y={470} w={320} emoji="📺" title="viewers sat through it" sub="every single episode, before mine" tone="danger" opacity={seg(frame, B2_S + 48, B2_S + 48 + FADE)} />
+        <IconCard x={830} y={460} w={280} emoji="👀" title="no payoff" sub="same empty 20s, again tomorrow" tone="danger" opacity={seg(frame, B2_S + 56, B2_S + 56 + FADE)} />
         <CaptionBand
           text="viewers sat through a slow, content-free intro before seeing anything I'd actually written that day"
-          opacity={seg(frame, B2_S + 115, B2_S + 115 + FADE)}
+          opacity={seg(frame, B2_S + 64, B2_S + 64 + FADE)}
         />
       </Group>
 
@@ -465,10 +466,10 @@ const FrameInner: React.FC<{
         </Panel>
         <CodeTag x={290} y={AXIS_Y + 118} text="ColdOpenScene.tsx" opacity={seg(frame, B3_S + 55, B3_S + 55 + FADE)} />
         {storyY.map((y, i) => {
-          const branchOpacity = seg(frame, B3_S + 90 + i * 10, B3_S + 90 + i * 10 + FADE);
+          const branchOpacity = seg(frame, B3_S + 40 + i * 10, B3_S + 40 + i * 10 + FADE);
           return (
             <React.Fragment key={i}>
-              <FlowArrow x={560} y={y + 15} len={110} color={P.success} progress={seg(frame, B3_S + 90 + i * 10, B3_S + 90 + i * 10 + 25)} opacity={1} />
+              <FlowArrow x={560} y={y + 15} len={110} color={P.success} progress={seg(frame, B3_S + 40 + i * 10, B3_S + 40 + i * 10 + 25)} opacity={1} />
               <div
                 style={{
                   position: "absolute",
@@ -500,16 +501,16 @@ const FrameInner: React.FC<{
                   height: 16,
                   borderRadius: 8,
                   background: P.success,
-                  opacity: branchOpacity * (1 - seg(frame, B3_S + 150, B3_S + 150 + FADE)),
+                  opacity: branchOpacity * (1 - seg(frame, B3_S + 110, B3_S + 110 + FADE)),
                 }}
               />
             </React.Fragment>
           );
         })}
-        <StatPill x={880} y={300} emoji="🎯" text="cuts straight to the real photos" tone="success" opacity={seg(frame, B3_S + 130, B3_S + 130 + FADE)} />
+        <StatPill x={880} y={300} emoji="🎯" text="cuts straight to the real photos" tone="success" opacity={seg(frame, B3_S + 75, B3_S + 75 + FADE)} />
         <CaptionBand
           text="now it cuts straight from one spoken line into the real photos of today's top three stories"
-          opacity={seg(frame, B3_S + 150, B3_S + 150 + FADE)}
+          opacity={seg(frame, B3_S + 90, B3_S + 90 + FADE)}
         />
       </Group>
 
@@ -585,7 +586,7 @@ const FrameInner: React.FC<{
             height: 70,
             borderRadius: 12,
             background: P.ink,
-            opacity: seg(frame, B4_S + 90, B4_S + 90 + FADE),
+            opacity: seg(frame, B4_S + 45, B4_S + 45 + FADE),
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -595,10 +596,11 @@ const FrameInner: React.FC<{
           <CodeTag x={0} y={0} text="SegmentDividerScene.tsx" opacity={1} />
           <div style={{ fontFamily, fontSize: 14, color: "#fff", fontWeight: 700 }}>3.5s black · 1.5s story-count stamp</div>
         </div>
-        <IconCard x={90} y={440} w={620} emoji="✅" title="wired into the real show" sub="DailyNewsShow.tsx + daily-compilation.js" tone="success" opacity={seg(frame, B4_S + 115, B4_S + 115 + FADE)} />
+        <IconCard x={90} y={440} w={620} emoji="✅" title="wired into the real show" sub="DailyNewsShow.tsx + daily-compilation.js" tone="success" opacity={seg(frame, B4_S + 62, B4_S + 62 + FADE)} />
+        <StatPill x={730} y={450} emoji="🎯" text="exact word, exact frame, every time" tone="accent" opacity={seg(frame, B4_S + 70, B4_S + 70 + FADE)} />
         <CaptionBand
           text="the cut lands exactly on the right word, timed with Remotion to match the voice"
-          opacity={seg(frame, B4_S + 135, B4_S + 135 + FADE)}
+          opacity={seg(frame, B4_S + 78, B4_S + 78 + FADE)}
         />
       </Group>
 

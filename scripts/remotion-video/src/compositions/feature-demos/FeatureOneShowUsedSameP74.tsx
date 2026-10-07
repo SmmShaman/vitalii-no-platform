@@ -295,7 +295,7 @@ const LogWindowP74: React.FC<{ opacity: number }> = ({ opacity }) => {
       <LogWindow
         title="visual-director · motion_usage"
         from={B5_S + 8}
-        every={22}
+        every={14}
         fontSize={21}
         win={{ x: 100, y: 130, w: 1080, h: 320 }}
         opacity={1}
@@ -309,7 +309,7 @@ const LogWindowP74: React.FC<{ opacity: number }> = ({ opacity }) => {
           display: "flex",
           alignItems: "center",
           gap: 28,
-          opacity: seg(frame, B5_S + 130, B5_S + 130 + FADE),
+          opacity: seg(frame, B5_S + 50, B5_S + 50 + FADE),
         }}
       >
         <div style={{ fontFamily, fontSize: 72, fontWeight: 800, color: P.success }}>3</div>
@@ -324,7 +324,7 @@ const LogWindowP74: React.FC<{ opacity: number }> = ({ opacity }) => {
       <CaptionBand
         text="no effect can repeat more than three times in one video now"
         tone="success"
-        opacity={seg(frame, B5_S + 150, B5_S + 150 + FADE)}
+        opacity={seg(frame, B5_S + 70, B5_S + 70 + FADE)}
       />
     </div>
   );
@@ -358,7 +358,7 @@ const FrameInner: React.FC<{ b1: number; b2: number; b3: number; b4: number; b5:
   const ledgerRow = (i: number) => seg(frame, B3_S + 70 + i * 16, B3_S + 70 + i * 16 + FADE);
 
   // b4: cards 3 and 4 (0-indexed) are past the cap and grey out.
-  const capFrom = B4_S + 90;
+  const capFrom = B4_S + 30;
 
   return (
     <AbsoluteFillLocal>
@@ -371,28 +371,54 @@ const FrameInner: React.FC<{ b1: number; b2: number; b3: number; b4: number; b5:
         {FAN.map((c, i) => (
           <Card key={`f1-${i}`} x={c.x} y={c.y} rot={c.rot} idx={i} tone={i < 5 ? "danger" : "muted"} opacity={cardIn(i, B1_S + 20)} />
         ))}
-        <StatPill x={470} y={170} emoji="🔁" text="CardCounter.tsx — 5x in a row" tone="danger" opacity={seg(frame, B1_S + 120, B1_S + 120 + FADE)} />
+        <StatPill x={470} y={170} emoji="🔁" text="CardCounter.tsx — 5x in a row" tone="danger" opacity={seg(frame, B1_S + 55, B1_S + 55 + FADE)} />
         <LiveWindow
           file={shotsFile as any}
           shot="page"
           title="vitalii.no/features/one-show-used…"
-          from={B1_S + 150}
-          hold={70}
+          from={B1_S + 70}
+          hold={130}
           zoom={() => 1.05}
           focus={{ x: 0.5, y: 0.3 }}
-          opacity={seg(frame, B1_S + 150, B1_S + 150 + FADE)}
-          win={{ x: 870, y: 500, w: 310, h: 190 }}
+          opacity={seg(frame, B1_S + 70, B1_S + 70 + FADE)}
+          win={{ x: 840, y: 480, w: 360, h: 220 }}
         />
         <CaptionBand
           text="one video repeated the same animated effect five times in a row, even though I kept telling it to vary things"
           tone="danger"
-          opacity={seg(frame, B1_S + 170, B1_S + 170 + FADE)}
+          opacity={seg(frame, B1_S + 95, B1_S + 95 + FADE)}
         />
       </Group>
 
       {/* Beat 2: two piles, today and tomorrow, both topped by the same favorite card */}
       <Group opacity={b2} dy={b2ExitY}>
         <BeatLabel x={60} y={610} kicker="no memory" title="the same favorite, day after day" opacity={1} />
+        {["MON", "TUE", "WED", "THU", "FRI", "SAT"].map((d, i) => (
+          <div
+            key={`daychip-${d}`}
+            style={{
+              position: "absolute",
+              left: 170 + i * 165,
+              top: 80,
+              width: 130,
+              padding: "8px 10px",
+              borderRadius: 10,
+              background: P.chipBg,
+              border: `1.5px solid ${P.border}`,
+              fontFamily,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              opacity: seg(frame, B2_S + 5 + i * 6, B2_S + 5 + i * 6 + FADE),
+            }}
+          >
+            <span style={{ fontSize: 16 }}>⭐</span>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>{d}</div>
+              <div style={{ fontSize: 10.5, fontWeight: 700, color: P.danger }}>CardCounter.tsx</div>
+            </div>
+          </div>
+        ))}
         <div style={{ position: "absolute", left: 250, top: 150, fontFamily, fontSize: 15, fontWeight: 800, color: P.muted, letterSpacing: 2, opacity: seg(frame, B2_S + 5, B2_S + 5 + FADE) }}>
           TODAY
         </div>
@@ -495,11 +521,11 @@ const FrameInner: React.FC<{ b1: number; b2: number; b3: number; b4: number; b5:
         >
           🧠🚫
         </div>
-        <StatPill x={470} y={470} emoji="🧠" text="no memory — same day or the next" tone="danger" opacity={seg(frame, B2_S + 120, B2_S + 120 + FADE)} />
+        <StatPill x={470} y={470} emoji="🧠" text="no memory — same day or the next" tone="danger" opacity={seg(frame, B2_S + 65, B2_S + 65 + FADE)} />
         <CaptionBand
           text="the system had no memory — every clip, it reached for its favorite effect again, same day or the next"
           tone="danger"
-          opacity={seg(frame, B2_S + 160, B2_S + 160 + FADE)}
+          opacity={seg(frame, B2_S + 90, B2_S + 90 + FADE)}
         />
       </Group>
 
@@ -567,12 +593,13 @@ const FrameInner: React.FC<{ b1: number; b2: number; b3: number; b4: number; b5:
         <div style={{ position: "absolute", left: 90, top: 470, fontFamily, fontSize: 13, fontWeight: 800, color: P.accent, opacity: seg(frame, B4_S + 20, B4_S + 20 + FADE) }}>
           checked first
         </div>
-        <CodeTag x={90} y={70} text="visual-director.js" opacity={seg(frame, B4_S + 45, B4_S + 45 + FADE)} />
-        <CodeTag x={300} y={70} text="daily-compilation.js" opacity={seg(frame, B4_S + 55, B4_S + 55 + FADE)} />
-        <StatPill x={700} y={70} emoji="🚫" text="cap: 3 uses of one effect, per video" tone="danger" opacity={seg(frame, B4_S + 110, B4_S + 110 + FADE)} />
+        <CodeTag x={90} y={70} text="visual-director.js" opacity={seg(frame, B4_S + 20, B4_S + 20 + FADE)} />
+        <CodeTag x={300} y={70} text="daily-compilation.js" opacity={seg(frame, B4_S + 28, B4_S + 28 + FADE)} />
+        <StatPill x={700} y={70} emoji="🚫" text="cap: 3 uses of one effect, per video" tone="danger" opacity={seg(frame, B4_S + 45, B4_S + 45 + FADE)} />
+        <StatPill x={700} y={130} emoji="✅" text="3 unique effects kept per video" tone="success" opacity={seg(frame, B4_S + 60, B4_S + 60 + FADE)} />
         <CaptionBand
           text="the code checks that history before picking, and enforces a hard cap no prompt could guarantee"
-          opacity={seg(frame, B4_S + 140, B4_S + 140 + FADE)}
+          opacity={seg(frame, B4_S + 70, B4_S + 70 + FADE)}
         />
       </Group>
 
