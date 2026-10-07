@@ -40,7 +40,7 @@ import { LiveShot, type ShotsFile } from "./live-primitives";
 const STAGE_W = 1920;
 const STAGE_H = 1080;
 /** Owner rule from the digest: white text never sits bare on a picture. */
-export const PLATE = 0.62;
+export const PLATE = 0.66;
 
 /** Beat visibility: 1 inside [start, next), else 0 — the cut to the next beat is the exit. */
 export const cut = (frame: number, start: number, next: number) => (frame >= start && frame < next ? 1 : 0);

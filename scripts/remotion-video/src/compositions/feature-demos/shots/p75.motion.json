@@ -1,0 +1,77 @@
+{
+ "id": "p75",
+ "composition": "FeatureFirst20SecondsUsedP75Motion",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "page",
+   "data": {
+    "title": "20 seconds of nothing",
+    "kicker": "Every episode, before the first real headline"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "page2",
+   "data": {
+    "statement": "A slow, content-free intro",
+    "tags": [
+     "Generic stock photo",
+     "Unrelated voiceover",
+     "About 20 seconds",
+     "Every single day"
+    ]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "handoffExplain",
+   "backdrop": "commit",
+   "data": {
+    "from": "Generic stock photo",
+    "to": "Top 3 story photos",
+    "points": [
+     "One spoken greeting first",
+     "Hard cut into the real photos",
+     "ColdOpenScene.tsx"
+    ],
+    "fromLabel": "BEFORE",
+    "toLabel": "NOW"
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "pipelineFlow",
+   "backdrop": "code",
+   "data": {
+    "steps": [
+     "Spoken greeting",
+     "Word timestamps",
+     "Photo cut"
+    ],
+    "result": "Lands on the word",
+    "system": "Remotion (video code)"
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "ratioBars",
+   "backdrop": "commit-top",
+   "data": {
+    "title": "Seconds before the first headline",
+    "a": {
+     "label": "Old intro",
+     "value": 20
+    },
+    "b": {
+     "label": "Cold open",
+     "value": 2
+    },
+    "unit": "s",
+    "caption": "~18 s saved/episode"
+   }
+  }
+ ]
+}

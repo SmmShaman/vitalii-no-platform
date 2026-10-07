@@ -12,7 +12,7 @@
 //             third the flow-map token crawls the stock-photo block, a counter
 //             riding it 0 → 20 s — the only mover after the title has landed.
 // b2 288-460  "a slow, content-free intro"
-//             cornerTags: the claim + four facts from problem_en.
+//             cornerTags: the claim + four facts from problem_en, over the page lower down.
 // b3 469-649  "cuts straight from one spoken line into the real photos"
 //             handoffExplain over the real commit page (895dfe9, ColdOpenScene.tsx).
 //             The lower third reroutes: the block shrinks to the greeting, the
@@ -257,12 +257,13 @@ const Inner: React.FC = () => {
       />
 
       {/* b2 — what the viewer sat through (problem_en) */}
+      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
       <MotionInsert
         effect="cornerTags"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        base={STAGE}
+        plate={0.7}
         data={{
           statement: "A slow, content-free intro",
           tags: ["Generic stock photo", "Unrelated voiceover", "About 20 seconds", "Every single day"],
@@ -282,17 +283,20 @@ const Inner: React.FC = () => {
         data={{
           from: "Generic stock photo",
           to: "Top 3 story photos",
+          fromLabel: "BEFORE",
+          toLabel: "NOW",
           points: ["One spoken greeting first", "Hard cut into the real photos", "ColdOpenScene.tsx"],
         }}
       />
 
-      {/* b4 — how the cut finds its word */}
+      {/* b4 — how the cut finds its word, over ColdOpenScene.tsx ("times come from the word timings") */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="code" from={B4} hold={B5 - B4} focus={{ x: 0.3, y: 0.3 }} />}
       <MotionInsert
         effect="pipelineFlow"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        base={STAGE}
+        plate={0.7}
         data={{
           steps: ["Spoken greeting", "Word timestamps", "Photo cut"],
           result: "Lands on the word",
@@ -300,13 +304,14 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b5 — the result, holds to the end */}
+      {/* b5 — the result over the commit summary, holds to the end */}
+      {frame >= B5 && <LiveBackdrop file={shotsFile} shot="commit-top" from={B5} hold={END - B5} />}
       <MotionInsert
         effect="ratioBars"
         from={B5}
         dur={END - B5}
         accent={ACCENT}
-        base={STAGE}
+        plate={0.7}
         data={{
           title: "Seconds before the first headline",
           a: { label: "Old intro", value: 20 },

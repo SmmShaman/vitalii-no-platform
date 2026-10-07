@@ -1,7 +1,7 @@
 /**
  * HandoffExplain — "was X, now Y": the old state lands, a line is drawn to the new state (the one hero),
  * one decisive camera move hands the lead position to the new state, then 2–4 numbered points open beside it.
- * data: { from: string, to: string, points: string[] (2-4) }
+ * data: { from: string, to: string, points: string[] (2-4), fromLabel?: "FØR", toLabel?: "NÅ" }
  */
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
@@ -117,7 +117,7 @@ export const HandoffExplain: React.FC<{ data: Record<string, unknown>; accentCol
   return (
     <AbsoluteFill>
       <div style={{ position: "absolute", inset: 0, transform: `translate(${camX}px, ${camY}px)` }}>
-        {paper("FØR", from, false, oldX, oldY, 1, oldP, (1 - oldP) * -25)}
+        {paper(clip(data?.fromLabel, 12) || "FØR", from, false, oldX, oldY, 1, oldP, (1 - oldP) * -25)}
         <svg width={width} height={height} style={{ position: "absolute", left: 0, top: 0, overflow: "visible" }}>
           <path
             d={arrowPath}
@@ -132,7 +132,7 @@ export const HandoffExplain: React.FC<{ data: Record<string, unknown>; accentCol
             opacity={lineP > 0 ? 1 : 0}
           />
         </svg>
-        {paper("NÅ", to, true, newX, newY, newScale, newVis, 0)}
+        {paper(clip(data?.toLabel, 12) || "NÅ", to, true, newX, newY, newScale, newVis, 0)}
         {points.map((p, i) => {
           const s = 2.95 + i * 0.34;
           const a = tween(t, s, 0.32, ease.power3Out);

@@ -43,17 +43,44 @@
       ]
     },
     {
+      "name": "page2",
+      "url": "https://vitalii.no/features/the-first-20-seconds-used-to-be-a-generic-stock-photo-now-its-the-actual-top-3-s-p75",
+      "frames": 150,
+      "scroll": [
+        [
+          0,
+          640
+        ],
+        [
+          149,
+          1100
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          560,
+          300
+        ],
+        [
+          149,
+          600,
+          320
+        ]
+      ]
+    },
+    {
       "name": "commit",
       "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/895dfe9c52a904a0b45f9b00e4a038098ab33921",
       "frames": 180,
       "scroll": [
         [
           0,
-          220
+          1500
         ],
         [
           179,
-          1100
+          2300
         ]
       ],
       "mouse": [
@@ -65,6 +92,60 @@
         [
           179,
           640,
+          320
+        ]
+      ]
+    },
+    {
+      "name": "code",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/blob/895dfe9c52a904a0b45f9b00e4a038098ab33921/scripts/remotion-video/src/components/ColdOpenScene.tsx",
+      "frames": 150,
+      "scroll": [
+        [
+          0,
+          120
+        ],
+        [
+          149,
+          420
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          600,
+          300
+        ],
+        [
+          149,
+          640,
+          320
+        ]
+      ]
+    },
+    {
+      "name": "commit-top",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/895dfe9c52a904a0b45f9b00e4a038098ab33921",
+      "frames": 120,
+      "scroll": [
+        [
+          0,
+          0
+        ],
+        [
+          119,
+          160
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          700,
+          300
+        ],
+        [
+          119,
+          660,
           320
         ]
       ]
