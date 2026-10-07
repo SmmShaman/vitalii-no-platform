@@ -4,8 +4,8 @@
  * data: { title?: string, unit?: string, lines: [{ label, value }, ...], totalLabel?: string }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, wipeLR, fmtNum, num, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, wipeLR, fmtNum, num, clip, look, useMotionConfig } from "./grammar";
 
 type Line = { label: string; value: number };
 
@@ -32,7 +32,7 @@ export const CostLedger: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const lines = parseLines(data);
   if (lines.length < 2) return null;
   const n = lines.length;

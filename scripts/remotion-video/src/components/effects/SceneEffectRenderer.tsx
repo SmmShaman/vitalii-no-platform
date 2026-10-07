@@ -25,6 +25,7 @@ import { PhotoFilterTransition } from "./PhotoFilterTransition";
 import { MatrixRainScene } from "./MatrixRainScene";
 import { PhotoScrollColumns } from "./PhotoScrollColumns";
 import { MOTION_EFFECTS, isMotionEffect } from "./motion";
+import { setMotionLocale } from "./motion/grammar";
 
 interface SceneEffectRendererProps {
   type: SceneEffectType;
@@ -49,6 +50,8 @@ export const SceneEffectRenderer: React.FC<SceneEffectRendererProps> = ({
   if (isMotionEffect(type)) {
     const { Component, hasData } = MOTION_EFFECTS[type];
     const motionData = (block.motionData || {}) as Record<string, unknown>;
+    // The digest is Norwegian; feature clips (motion-primitives) switch to en-US.
+    setMotionLocale("nb-NO");
     return hasData(motionData) ? <Component data={motionData} accentColor={accentColor} images={images} /> : null;
   }
 

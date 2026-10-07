@@ -4,8 +4,8 @@
  * data: { value: 62, label: "fikk svar i tide", threshold?: 50, notes?: ["...", "..."] }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, wipeLR, punchScale, fmtNum, num, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, wipeLR, punchScale, fmtNum, num, clip, look, useMotionConfig } from "./grammar";
 
 function parse(data: Record<string, unknown>) {
   const value = num(data?.value);
@@ -34,7 +34,7 @@ export const PercentRing: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const { value, ok, label, threshold, notes } = parse(data);
   if (!ok || !label) return null;
   const isVertical = height > width;

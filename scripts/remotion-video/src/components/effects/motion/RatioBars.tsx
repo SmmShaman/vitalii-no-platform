@@ -4,8 +4,8 @@
  * data: { a: { label, value }, b: { label, value }, unit?: string, title?: string, caption?: string }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, wipeLR, fmtNum, num, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, wipeLR, fmtNum, num, clip, look, useMotionConfig, motionLocale } from "./grammar";
 
 type Side = { label: string; value: number };
 
@@ -32,7 +32,7 @@ export const RatioBars: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const a = parseSide(data?.a);
   const b = parseSide(data?.b);
   if (!a || !b) return null;
@@ -50,7 +50,7 @@ export const RatioBars: React.FC<{
 
   const big = Math.max(a.value, b.value);
   const ratio = big / Math.min(a.value, b.value);
-  const ratioText = "×" + (Math.round(ratio * 10) / 10).toFixed(1).replace(".", ",");
+  const ratioText = "×" + (Math.round(ratio * 10) / 10).toLocaleString(motionLocale(), { minimumFractionDigits: 1, maximumFractionDigits: 1 });
   const aBigger = a.value >= b.value;
 
   const areaW = Math.min(width - look.safeX * 2, 1700);

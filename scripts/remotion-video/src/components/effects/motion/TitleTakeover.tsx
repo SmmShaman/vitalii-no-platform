@@ -5,8 +5,8 @@
  * data: { "title": "headline, ≤ 32 chars", "kicker"?: "plain support line" }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, pace, punchScale, tween, wipeLR } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { clip, ease, look, pace, punchScale, tween, wipeLR, useMotionConfig } from "./grammar";
 
 const BUILD = 1.1;
 const CONDENSE = 0.86; // horizontal squeeze that gives Inter a display-condensed look
@@ -38,7 +38,7 @@ export const TitleTakeover: React.FC<{
   images?: string[];
 }> = ({ data }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   if (!hasTitleTakeoverData(data)) return null;
   const isVertical = height > width;
   const { t } = pace(frame, fps, durationInFrames, BUILD);

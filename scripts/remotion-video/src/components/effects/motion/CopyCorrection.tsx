@@ -5,8 +5,8 @@
  * data: { "wrong": "old claim", "right": "corrected claim", "label"?: "Faktisk" }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, mix, pace, tween } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { clip, ease, look, mix, pace, tween, useMotionConfig } from "./grammar";
 
 const BUILD = 3.15;
 const PAPER = "#F5F2EA";
@@ -47,7 +47,7 @@ export const CopyCorrection: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   if (!hasCopyCorrectionData(data)) return null;
   const isVertical = height > width;
   const { t } = pace(frame, fps, durationInFrames, BUILD);

@@ -5,8 +5,8 @@
  * data: { "line1": "...", "line2"?: "...", "keywords": ["word", ...] }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, pace, tween } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { clip, ease, look, pace, tween, useMotionConfig } from "./grammar";
 
 const norm = (w: string) => w.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, "");
 
@@ -20,7 +20,7 @@ export const KeywordCaption: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   if (!hasKeywordCaptionData(data)) return null;
   const isVertical = height > width;
 

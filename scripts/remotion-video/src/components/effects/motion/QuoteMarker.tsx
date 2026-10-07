@@ -7,8 +7,8 @@
  *         "source"?: "Name, role" }
  */
 import React from "react";
-import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, mix, pace, tween } from "./grammar";
+import { AbsoluteFill, Img, useCurrentFrame } from "remotion";
+import { clip, ease, look, mix, pace, tween, useMotionConfig } from "./grammar";
 
 const BUILD = 2.4;
 
@@ -24,7 +24,7 @@ export const QuoteMarker: React.FC<{
   images?: string[];
 }> = ({ data, accentColor, images }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   if (!hasQuoteMarkerData(data)) return null;
   const isVertical = height > width;
   const { t } = pace(frame, fps, durationInFrames, BUILD);

@@ -6,8 +6,8 @@
  * data: { steps: string[] (3-5), result?: string, results?: string[] (1-3), system?: string }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, mix, punchScale, wipeLR, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, mix, punchScale, wipeLR, clip, look, useMotionConfig } from "./grammar";
 
 function parseSteps(data: Record<string, unknown>): string[] {
   const raw = Array.isArray(data?.steps) ? (data.steps as unknown[]) : [];
@@ -52,7 +52,7 @@ export const PipelineFlow: React.FC<{ data: Record<string, unknown>; accentColor
   accentColor,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const steps = parseSteps(data);
   if (steps.length < 3) return null;
 

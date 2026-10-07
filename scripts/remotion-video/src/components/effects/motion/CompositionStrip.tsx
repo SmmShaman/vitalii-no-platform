@@ -6,8 +6,8 @@
  * normalised to 100, with an "Andre" remainder added only if the sum is below 100)
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, wipeLR, fmtNum, num, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, wipeLR, fmtNum, num, clip, look, useMotionConfig } from "./grammar";
 
 type Item = { label: string; value: number };
 
@@ -38,7 +38,7 @@ export const CompositionStrip: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const items = parseItems(data);
   if (items.length < 2) return null;
   const n = items.length;

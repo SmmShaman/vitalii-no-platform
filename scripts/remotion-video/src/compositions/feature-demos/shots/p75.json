@@ -1,14 +1,73 @@
 {
   "id": "p75",
-  "viewport": { "width": 1120, "height": 466 },
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
   "dsf": 1.25,
   "shots": [
     {
       "name": "page",
       "url": "https://vitalii.no/features/the-first-20-seconds-used-to-be-a-generic-stock-photo-now-its-the-actual-top-3-s-p75",
       "frames": 150,
-      "scroll": [[0, 0], [75, 320], [149, 640]],
-      "mouse": [[0, 520, 200], [70, 600, 260], [149, 560, 300]]
+      "scroll": [
+        [
+          0,
+          0
+        ],
+        [
+          75,
+          320
+        ],
+        [
+          149,
+          640
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          520,
+          200
+        ],
+        [
+          70,
+          600,
+          260
+        ],
+        [
+          149,
+          560,
+          300
+        ]
+      ]
+    },
+    {
+      "name": "commit",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/895dfe9c52a904a0b45f9b00e4a038098ab33921",
+      "frames": 180,
+      "scroll": [
+        [
+          0,
+          220
+        ],
+        [
+          179,
+          1100
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          700,
+          300
+        ],
+        [
+          179,
+          640,
+          320
+        ]
+      ]
     }
   ]
 }

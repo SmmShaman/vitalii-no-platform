@@ -4,8 +4,8 @@
  * data: { series: ["Før","Nå"], metrics: [{ label: "Pris", unit: "kr", a: 199, b: 149 }, ...] }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, wipeLR, fmtNum, num, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, wipeLR, fmtNum, num, clip, look, useMotionConfig } from "./grammar";
 
 type Metric = { label: string; unit: string; a: number; b: number };
 
@@ -36,7 +36,7 @@ export const GroupedBars: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const { series, metrics } = parse(data);
   if (metrics.length < 2) return null;
   const isVertical = height > width;

@@ -4,8 +4,8 @@
  * data: { "statement": "...", "tags": ["...","...","...","..."] }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, pace, tween, wipeLR, mix } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { clip, ease, look, pace, tween, wipeLR, mix, useMotionConfig } from "./grammar";
 
 const s = (v: unknown, n: number) => clip(v, n);
 
@@ -28,7 +28,7 @@ export const CornerTags: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height, durationInFrames } = useVideoConfig();
+  const { fps, width, height, durationInFrames } = useMotionConfig();
   if (!hasCornerTagsData(data)) return null;
   const isVertical = height > width;
   const statement = s(data.statement, 90);

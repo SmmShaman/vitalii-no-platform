@@ -4,8 +4,8 @@
  * data: { xLabel: string, yLabel: string, items: [{ label: string, x: number, y: number }], focus?: string }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, mix, num, pace, tween, wipeLR } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { clip, ease, look, mix, num, pace, tween, wipeLR, useMotionConfig } from "./grammar";
 
 type Item = { label: string; x: number; y: number };
 const BUILD = 3.4;
@@ -35,7 +35,7 @@ export const QuadrantPositioning: React.FC<{ data: Record<string, unknown>; acce
   accentColor,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const { xLabel, yLabel, items } = parse(data);
   if (!xLabel || !yLabel || items.length < 2) return null;
   const n = items.length;

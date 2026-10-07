@@ -6,8 +6,8 @@
  * data: { label: string, value: number, target: number, unit?: string, note?: string }  (target > 0)
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, mix, ease, wipeLR, fmtNum, num, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, mix, ease, wipeLR, fmtNum, num, clip, look, useMotionConfig } from "./grammar";
 
 export function hasTargetOverrunData(data: Record<string, unknown>): boolean {
   if (!data) return false;
@@ -21,7 +21,7 @@ export const TargetOverrun: React.FC<{ data: Record<string, unknown>; accentColo
   accentColor,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   if (!hasTargetOverrunData(data)) return null;
 
   const isVertical = height > width;

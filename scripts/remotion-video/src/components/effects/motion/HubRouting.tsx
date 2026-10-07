@@ -4,8 +4,8 @@
  * data: { inputs: string[] (2-5), hub: string, output?: string, outputs?: string[] (1-4) }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, punchScale, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, punchScale, clip, look, useMotionConfig } from "./grammar";
 
 function parseInputs(data: Record<string, unknown>): string[] {
   const raw = Array.isArray(data?.inputs) ? (data.inputs as unknown[]) : [];
@@ -82,7 +82,7 @@ export const HubRouting: React.FC<{ data: Record<string, unknown>; accentColor: 
   accentColor,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const inputs = parseInputs(data);
   const outputs = parseOutputs(data);
   const hub = clip(data?.hub, 24);

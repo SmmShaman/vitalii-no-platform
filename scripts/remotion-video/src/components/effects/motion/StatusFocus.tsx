@@ -4,8 +4,8 @@
  * data: { "title"?: "...", "claims": [{ "text": "...", "verdict": "yes|unclear|no" }] }
  */
 import React from "react";
-import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, DIM, ease, look, mix, pace, tween, wipeLR } from "./grammar";
+import { AbsoluteFill, Img, useCurrentFrame } from "remotion";
+import { clip, DIM, ease, look, mix, pace, tween, wipeLR, useMotionConfig } from "./grammar";
 
 type Verdict = "yes" | "unclear" | "no";
 type Claim = { text: string; verdict: Verdict };
@@ -53,7 +53,7 @@ export const StatusFocus: React.FC<{
   images?: string[];
 }> = ({ data, accentColor, images }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height, durationInFrames } = useVideoConfig();
+  const { fps, width, height, durationInFrames } = useMotionConfig();
   if (!hasStatusFocusData(data)) return null;
   const isVertical = height > width;
   const claims = readClaims(data);

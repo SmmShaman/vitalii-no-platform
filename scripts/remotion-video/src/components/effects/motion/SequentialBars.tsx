@@ -5,8 +5,8 @@
  * data: { title?: string, unit?: string, highlight?: boolean, items: [{ label: "2023", value: 12 }, ...] }  (2-6 items)
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, wipeLR, fmtNum, num, clip, look, DIM } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, wipeLR, fmtNum, num, clip, look, DIM, useMotionConfig } from "./grammar";
 
 type Item = { label: string; value: number };
 
@@ -35,7 +35,7 @@ export const SequentialBars: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const items = parseItems(data);
   if (items.length < 2) return null;
   const n = items.length;

@@ -5,8 +5,8 @@
  * data: { cards: [{label, value}, ...] (2-6), unit?: string, totalLabel?: string, countLabel?: string, summary?: string }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, fmtNum, num, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, fmtNum, num, clip, look, useMotionConfig, motionLocale } from "./grammar";
 
 interface Card {
   label: string;
@@ -38,7 +38,7 @@ export const CardCounter: React.FC<{ data: Record<string, unknown>; accentColor:
   accentColor,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const cards = parseCards(data);
   if (cards.length < 2) return null;
 
@@ -66,7 +66,7 @@ export const CardCounter: React.FC<{ data: Record<string, unknown>; accentColor:
   });
   const decimals = Math.abs(total) < 100 && cards.some((c) => !Number.isInteger(c.value)) ? 1 : 0;
   const fmtRun = (x: number) =>
-    x.toLocaleString("nb-NO", { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+    x.toLocaleString(motionLocale(), { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
   const totalText = fmtRun(running);
   const summary = data.summary ? clip(data.summary, 64) : `${n} ${countLabel} · ${fmtRun(total)}${unit ? " " + unit : ""}`;
 

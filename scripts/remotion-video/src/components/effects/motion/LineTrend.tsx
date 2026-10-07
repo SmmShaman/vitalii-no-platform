@@ -5,8 +5,8 @@
  * data: { title?: string, unit?: string, conclusion?: string, points: [{ label: "jan", value: 3 }, ...] }  (3-8 points)
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, mix, ease, wipeLR, fmtNum, num, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, mix, ease, wipeLR, fmtNum, num, clip, look, useMotionConfig } from "./grammar";
 
 type Pt = { label: string; value: number };
 
@@ -40,7 +40,7 @@ export const LineTrend: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const pts = parsePoints(data);
   if (pts.length < 3) return null;
   const n = pts.length;

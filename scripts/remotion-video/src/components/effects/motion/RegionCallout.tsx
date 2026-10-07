@@ -5,8 +5,8 @@
  * Needs images[0].
  */
 import React from "react";
-import { AbsoluteFill, Img, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, mix, pace, tween, wipeLR } from "./grammar";
+import { AbsoluteFill, Img, useCurrentFrame } from "remotion";
+import { clip, ease, look, mix, pace, tween, wipeLR, useMotionConfig } from "./grammar";
 
 type Region = { x: number; y: number; w: number; h: number };
 
@@ -31,7 +31,7 @@ export const RegionCallout: React.FC<{
   images?: string[];
 }> = ({ data, accentColor, images }) => {
   const frame = useCurrentFrame();
-  const { fps, width, height, durationInFrames } = useVideoConfig();
+  const { fps, width, height, durationInFrames } = useMotionConfig();
   const photo = images?.[0];
   if (!hasRegionCalloutData(data) || !photo) return null;
   const isVertical = height > width;

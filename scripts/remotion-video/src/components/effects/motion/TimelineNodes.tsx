@@ -4,8 +4,8 @@
  * data: { nodes: [{ date: string, label: string }] (3-5), activeIndex?: number }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, mix, pace, tween } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { clip, ease, look, mix, pace, tween, useMotionConfig } from "./grammar";
 
 type Node = { date: string; label: string };
 const BUILD = 4.6;
@@ -30,7 +30,7 @@ export const TimelineNodes: React.FC<{ data: Record<string, unknown>; accentColo
   accentColor,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const nodes = parse(data);
   if (nodes.length < 3) return null;
   const n = nodes.length;

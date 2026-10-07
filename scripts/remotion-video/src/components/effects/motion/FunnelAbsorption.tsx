@@ -4,8 +4,8 @@
  * data: { inputs: string[] (3-6), result: string }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, mix, pace, punchScale, tween, wipeTD } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { clip, ease, look, mix, pace, punchScale, tween, wipeTD, useMotionConfig } from "./grammar";
 
 const BUILD = 3.3;
 
@@ -26,7 +26,7 @@ export const FunnelAbsorption: React.FC<{ data: Record<string, unknown>; accentC
   accentColor,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const { inputs, result } = parse(data);
   if (inputs.length < 3 || !result) return null;
   const n = inputs.length;

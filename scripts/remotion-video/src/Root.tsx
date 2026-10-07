@@ -232,6 +232,7 @@ import { FeatureOneTapSignZeroB64 } from "./compositions/feature-demos/FeatureOn
 import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/FeatureUnknownFaceUsedMeanB66";
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
+import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
 import { FeatureOneShowUsedSameP74 } from "./compositions/feature-demos/FeatureOneShowUsedSameP74";
 
 // Load Comfortaa globally — must happen at module level before any render
@@ -2280,6 +2281,15 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureFirst20SecondsUsedP75"
         component={FeatureFirst20SecondsUsedP75}
+        durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFirst20SecondsUsedP75Motion"
+        component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
         fps={30}
         width={1280}

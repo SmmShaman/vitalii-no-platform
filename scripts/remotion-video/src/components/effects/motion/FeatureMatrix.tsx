@@ -4,8 +4,8 @@
  * data: { options: ["A","B"], rows: [{ label: "Pris", values: ["199 kr", true] }, ...] }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { pace, tween, ease, wipeLR, clip, look } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { pace, tween, ease, wipeLR, clip, look, useMotionConfig } from "./grammar";
 
 type Cell = string | boolean;
 type Row = { label: string; values: Cell[] };
@@ -44,7 +44,7 @@ export const FeatureMatrix: React.FC<{
   images?: string[];
 }> = ({ data, accentColor }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const { options, rows } = parse(data);
   if (options.length < 2 || rows.length < 2) return null;
   const isVertical = height > width;

@@ -4,8 +4,8 @@
  * data: { from: string, to: string, points: string[] (2-4) }
  */
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { clip, ease, look, mix, pace, punchScale, tween } from "./grammar";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { clip, ease, look, mix, pace, punchScale, tween, useMotionConfig } from "./grammar";
 
 const BUILD = 4.3;
 
@@ -28,7 +28,7 @@ export const HandoffExplain: React.FC<{ data: Record<string, unknown>; accentCol
   accentColor,
 }) => {
   const frame = useCurrentFrame();
-  const { width, height, fps, durationInFrames } = useVideoConfig();
+  const { width, height, fps, durationInFrames } = useMotionConfig();
   const { from, to, points } = parse(data);
   if (!from || !to || points.length < 2) return null;
   const { t } = pace(frame, fps, durationInFrames, BUILD);

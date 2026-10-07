@@ -12,12 +12,34 @@
  * compressed by one factor when it would not leave a reading hold (see `pace`).
  */
 
+import { createContext, useContext } from "react";
+import { useVideoConfig } from "remotion";
 import { loadFont as loadInter } from "@remotion/google-fonts/Inter";
 import { loadFont as loadPlexMono } from "@remotion/google-fonts/IBMPlexMono";
 
 // Fonts load once at module level (also on the GitHub runner, which has no Inter).
 const inter = loadInter("normal", { weights: ["400", "500", "600", "700", "800", "900"], subsets: ["latin", "latin-ext"] });
 const plexMono = loadPlexMono("normal", { weights: ["400", "500"], subsets: ["latin", "latin-ext"] });
+
+/**
+ * Stage override for hosts that are not the 1920×1080 digest: the feature clips
+ * (1280×720) render an effect inside a scaled 1920×1080 box and tell it so here,
+ * together with the block length. Without a provider the real video config is used.
+ */
+export type MotionStage = { width: number; height: number; durationInFrames: number };
+export const MotionStageContext = createContext<MotionStage | null>(null);
+export function useMotionConfig() {
+  const cfg = useVideoConfig();
+  const stage = useContext(MotionStageContext);
+  return stage ? { ...cfg, ...stage } : cfg;
+}
+
+/** Number locale: the digest is Norwegian; an English host (feature clips) sets "en-US" once per bundle. */
+let numLocale = "nb-NO";
+export const setMotionLocale = (locale: string) => {
+  numLocale = locale;
+};
+export const motionLocale = () => numLocale;
 
 // ── Easings (t in 0..1) ──
 export const ease = {
@@ -75,7 +97,7 @@ export const wipeTD = (p: number) => `inset(0 0 ${(1 - clamp01(p)) * 100}% 0)`;
 /** Number formatting: Norwegian separators, integers while counting large values. */
 export function fmtNum(n: number, maxDecimals = 1): string {
   const decimals = Math.abs(n) >= 100 || Number.isInteger(n) ? 0 : maxDecimals;
-  return n.toLocaleString("nb-NO", { maximumFractionDigits: decimals, minimumFractionDigits: 0 });
+  return n.toLocaleString(numLocale, { maximumFractionDigits: decimals, minimumFractionDigits: 0 });
 }
 
 /** Parse "1,5 mrd", "35.1", 12 → number (NaN when absent). */
