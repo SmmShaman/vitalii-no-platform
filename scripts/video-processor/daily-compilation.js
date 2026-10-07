@@ -401,20 +401,21 @@ async function getVideoDuration(filePath) {
 }
 
 /**
- * Upload the final digest mp4 to Cloudflare R2 (daily-videos bucket) so
- * social publishers (nano-social-publish) can attach it as NATIVE video —
- * LinkedIn Assets API and Facebook file_url both need a public file URL,
- * and YouTube links can't be re-uploaded natively.
+ * Upload a social copy of the digest to Cloudflare R2 (daily-videos bucket)
+ * so social publishers (nano-social-publish) can attach it as NATIVE video —
+ * LinkedIn Assets API and Facebook file_url both need a public file URL.
  *
- * Two objects per day, deterministic keys so consumers build the URL from
- * the date alone:
- *   digest/<date>.mp4         the YouTube master (1080p, ~150-260 MB)
- *   digest/<date>-social.mp4  720p / CRF 26 copy (~60-80 MB) for LinkedIn
- * The social copy exists because LinkedIn's Assets API caps video at 200 MB
- * and the Edge Function that uploads it buffers the whole file in memory —
- * the master never fit (2026-09-06: 262 MB killed the worker; no digest had
- * ever gone out with native video). Keeps ~1 week: deletes <date-8 days>.
+ *   digest/<date>-social.mp4  1080p, bitrate-capped to ~140 MB
+ *
+ * Only this copy goes up (owner decision 2026-10-07). The full master
+ * (230-320 MB) had no consumer — YouTube is uploaded straight from the runner
+ * — and the R2 REST API rejects a single PUT over ~300 MB (413 on 06.10).
+ * The cap keeps the copy under LinkedIn's 200 MB limit and the memory of the
+ * Edge Function that buffers it (262 MB killed the worker on 2026-09-06).
+ * Keeps ~1 week: deletes <date-8 days>.
  */
+const SOCIAL_TARGET_MB = 140;
+
 async function uploadDigestToR2(filePath, dateStr) {
   const token = process.env.CF_API_TOKEN;
   const accountId = process.env.CF_ACCOUNT_ID;
@@ -440,29 +441,25 @@ async function uploadDigestToR2(filePath, dateStr) {
     return url;
   };
 
-  // The R2 REST API rejects a single PUT over ~300 MB (413). 06.10 rendered at
-  // 319 MB, the master failed and took the social copy down with it, so
-  // LinkedIn got no video. The master is optional; the social copy is not.
-  let masterUrl = null;
-  try {
-    masterUrl = await putObject(`digest/${dateStr}.mp4`, filePath);
-  } catch (e) {
-    console.log(`⚠️ R2 master upload failed (social copy still goes up): ${e.message.slice(0, 120)}`);
-  }
-
-  // Social copy: 720p, CRF 26, faststart. Non-fatal — the master is already up.
+  // Social copy: 1080p, CRF 21 with a maxrate derived from the duration so the
+  // file lands near SOCIAL_TARGET_MB whatever the digest length. Non-fatal.
   let socialUrl = null;
   try {
     const socialPath = path.join(path.dirname(filePath), `digest-${dateStr}-social.mp4`);
+    const duration = parseFloat(execSync(
+      `ffprobe -v error -show_entries format=duration -of csv=p=0 "${filePath}"`
+    ).toString().trim()) || 600;
+    const videoKbps = Math.max(1500, Math.min(6000, Math.floor((SOCIAL_TARGET_MB * 8 * 1024) / duration) - 128));
     execSync(
-      `ffmpeg -y -loglevel error -i "${filePath}" -vf "scale=1280:-2" -c:v libx264 -preset medium -crf 26 ` +
+      `ffmpeg -y -loglevel error -i "${filePath}" -vf "scale=1920:-2" -c:v libx264 -preset medium -crf 21 ` +
+      `-maxrate ${videoKbps}k -bufsize ${videoKbps * 2}k ` +
       `-c:a aac -b:a 128k -movflags +faststart "${socialPath}"`,
       { stdio: 'inherit', timeout: 900_000 }
     );
     socialUrl = await putObject(`digest/${dateStr}-social.mp4`, socialPath);
     await fs.unlink(socialPath).catch(() => {});
   } catch (e) {
-    console.log(`⚠️ Social copy failed (LinkedIn will get the text fallback): ${e.message}`);
+    console.log(`⚠️ Social copy failed (LinkedIn/Facebook will get the text fallback): ${e.message}`);
   }
 
   // Rolling cleanup: remove the digest from 8 days ago (deterministic keys, no listing needed)
@@ -476,7 +473,7 @@ async function uploadDigestToR2(filePath, dateStr) {
     }).catch(() => {});
   }
 
-  return { masterUrl, socialUrl };
+  return { socialUrl };
 }
 
 /**
@@ -1699,7 +1696,7 @@ async function main() {
   // video): it must not replace the social copy nor touch the draft's state.
   const previewOnly = process.env.SKIP_YOUTUBE === 'true';
 
-  // Step 5e: Copy the final mp4 to R2 for native social video posts
+  // Step 5e: Social copy of the final mp4 to R2 for native social video posts
   if (previewOnly) {
     console.log('⏭️ Step 5e: R2 digest copy SKIPPED (preview run)');
   } else {
