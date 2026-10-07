@@ -79,3 +79,6 @@ __pycache__/
 # local preview background for tools/render-motion-previews.mjs
 scripts/remotion-video/public/_prev_photo.jpg
 /vendor-reference/
+
+# local before/after renders for the owner to compare (never committed)
+/video-tests/

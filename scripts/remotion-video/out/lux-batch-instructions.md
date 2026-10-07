@@ -180,6 +180,32 @@ What the host now hands you in the wave B brief, per feature, and how to use it:
 Test a finished clip by hand: `python3 /root/feature-demos/factory.py --viewer=<id> --mp4=<path>`
 prints the verdict and PASS/FAIL without rendering or publishing anything.
 
+## STEP 0f — Motion direction: the digest's editorial effects (owner, 2026-10-07)
+
+On 2026-10-05 the daily digest stopped decorating and started explaining: an editor plans one
+effect per spoken sentence by asking **what should change on screen**, every effect follows one
+motion grammar (`src/components/effects/motion/grammar.ts`), the frame has one owner, each block
+ends on a still reading hold, and a cross-day memory keeps it varied. Measured on the rendered
+shows: decorative effects (matrix rain, icon staggers) fell from ~70 % of the effects to ~10 % (02–04.10 vs 05–06.10, `daily_video_drafts.motion_usage`);
+the owner: "набагато краще". The same now applies here. Full rules:
+`skills/feature-motion/SKILL.md`. Reference: `FeatureFirst20SecondsUsedP75Motion.tsx` +
+`shots/p75.motion.json`.
+
+1. **Plan first:** `src/compositions/feature-demos/shots/<id>.motion.json` — per beat the effect
+   from the digest catalog (`scripts/video-processor/skills/digest-motion/effects.json`,
+   `motion: true`), its backdrop shot, its data from the feature text only. ≥ 3 beats get a
+   catalog effect, none twice. The factory checks the plan against the catalog and the file
+   (gate 5) and stores what the clip used in `features.motion_usage`.
+2. **Stage with `motion-primitives.tsx`:** `<MotionInsert>` plays the effect for one beat (scaled
+   1920→1280, dark plate) over `<LiveBackdrop>` — the real product as the evidence under it.
+   The archetype is the element that survives every beat, in the band the effects keep clear
+   (y ≥ 600).
+3. **Grammar for your own pieces:** `<Arrive kind="punch|wipe|rise">`, one mover at a time,
+   ≥ 1.2 s still hold at the end of each beat, `cut(frame, start, next)` instead of exit fades,
+   no `spring()`.
+4. The blind viewer now gets two frames per beat — its key change and its reading hold — so a
+   half-arrived or overlapping hold frame is what it will see.
+
 ## STEP 1 — Learn the style (read each ONCE, never re-read)
 - `src/compositions/feature-demos/FeatureVideoFactoryV3.tsx` — the reference for the NEW
   art direction (archetype 7 "hero number", mood `violet`, 5 beats). Read it for HOW a clip wires a
@@ -204,8 +230,8 @@ prints the verdict and PASS/FAIL without rendering or publishing anything.
 - **Wrap the whole tree** in `<PaletteProvider value={P}>` so every primitive picks up your mood.
 - **Rhythm is yours:** 3 to 5 beats, each ≥90 frames (3 s), filling 450 frames. Do not reuse the
   `b1=seg(0,10)…b4=seg(340,354)` windows — pick your own split (e.g. 4 beats of 150/120/90/90,
-  or 3 long beats, or 5 short ones). Vary the transition too: crossfade, slide, wipe or a scale
-  push — at least one beat change in the clip must NOT be a plain crossfade.
+  or 3 long beats, or 5 short ones). Beat changes are CUTS (`cut()` from `motion-primitives.tsx`, STEP 0f) — the
+  next beat's effect is the transition; no crossfades between beats.
 - Plain language for a NON-technical viewer. Real plausible data in mockups (never lorem).
   Exactly ONE small tech-credibility caption per clip. Every clip ends with a quantified
   before→after.
