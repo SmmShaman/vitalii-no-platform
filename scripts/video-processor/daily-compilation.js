@@ -440,7 +440,15 @@ async function uploadDigestToR2(filePath, dateStr) {
     return url;
   };
 
-  const masterUrl = await putObject(`digest/${dateStr}.mp4`, filePath);
+  // The R2 REST API rejects a single PUT over ~300 MB (413). 06.10 rendered at
+  // 319 MB, the master failed and took the social copy down with it, so
+  // LinkedIn got no video. The master is optional; the social copy is not.
+  let masterUrl = null;
+  try {
+    masterUrl = await putObject(`digest/${dateStr}.mp4`, filePath);
+  } catch (e) {
+    console.log(`⚠️ R2 master upload failed (social copy still goes up): ${e.message.slice(0, 120)}`);
+  }
 
   // Social copy: 720p, CRF 26, faststart. Non-fatal — the master is already up.
   let socialUrl = null;
