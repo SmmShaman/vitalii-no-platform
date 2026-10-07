@@ -1,19 +1,14 @@
 /**
- * Free-first image generation cascade — shared by every function that needs an
- * image OUTSIDE the main process-image flow (blog covers, video thumbnails,
- * Telegram bot edits).
+ * Free image generation — shared by every function that needs an image OUTSIDE
+ * the main process-image flow (blog covers, video thumbnails, Telegram bot edits).
  *
- * Owner policy (2026-08-06, re-confirmed): OpenRouter runs until its prepaid
- * balance is exhausted, then everything falls to FREE providers. The paid
- * GOOGLE_API_KEY must never be a fallback for image generation — a 402 from
- * OpenRouter lands on free Cloudflare FLUX, not on a Google invoice.
+ * Owner rule 2026-10-07: images are FREE only → Cloudflare Workers AI
+ * FLUX.1-schnell (~200/day). OpenRouter (prepaid) and the billed
+ * GOOGLE_API_KEY are never used. Returns null when FLUX is unavailable and the
+ * caller degrades gracefully (keeps old image / skips thumbnail).
  *
- * Chain: OpenRouter (prepaid, gemini-2.5-flash-image ≈ $0.04/img)
- *      → Cloudflare Workers AI FLUX.1-schnell (free, ~200/day)
- *      → null (caller degrades gracefully — keeps old image / skips thumbnail)
- *
- * Input-image edits are OpenRouter-only: FLUX is text-to-image and cannot see
- * the source photo, so falling back would silently ignore the user's edit.
+ * Input-image edits are not supported: FLUX is text-to-image and cannot see
+ * the source photo, so an edit returns null instead of silently ignoring it.
  */
 
 const CF_ACCOUNT_ID = Deno.env.get('CF_ACCOUNT_ID') || '1438e8d03009209c4a82ea4c28bdb358'
@@ -34,88 +29,16 @@ export async function generateImageFree(
   aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
   inputImage?: InputImage,
 ): Promise<FreeImageResult | null> {
-  const orBase64 = await generateImageViaOpenRouter(prompt, aspectRatio, inputImage)
-  if (orBase64) {
-    return {
-      base64: orBase64,
-      provider: 'OpenRouter',
-      model: Deno.env.get('OPENROUTER_IMAGE_MODEL') || 'google/gemini-2.5-flash-image',
-    }
-  }
-
   if (inputImage) {
-    console.warn('⚠️ OpenRouter failed and edit needs the source photo — no free fallback, skipping')
+    console.warn('⚠️ Photo edit needs an image-to-image model — no free provider, skipping')
     return null
   }
-
-  const fluxBase64 = await generateImageViaCloudflareFlux(prompt, aspectRatio)
-  if (fluxBase64) {
-    return { base64: fluxBase64, provider: 'Cloudflare FLUX', model: '@cf/black-forest-labs/flux-1-schnell' }
-  }
-
-  console.warn('❌ Free image cascade exhausted (OpenRouter + FLUX failed)')
-  return null
+  return generateImageFluxFree(prompt, aspectRatio)
 }
 
 /**
- * OpenRouter chat completions with image modality. Returns raw base64 or null
- * on any failure — including 402 when the prepaid balance is out.
- */
-async function generateImageViaOpenRouter(
-  prompt: string,
-  aspectRatio: '1:1' | '16:9' | '4:5',
-  inputImage?: InputImage,
-): Promise<string | null> {
-  const apiKey = Deno.env.get('OPENROUTER_API_KEY')
-  if (!apiKey) return null
-  const model = Deno.env.get('OPENROUTER_IMAGE_MODEL') || 'google/gemini-2.5-flash-image'
-
-  const text = `${inputImage ? prompt : `Generate an image: ${prompt}`}\n\nComposition: strict ${aspectRatio} aspect ratio.`
-  const content = inputImage
-    ? [
-        { type: 'text', text },
-        { type: 'image_url', image_url: { url: `data:${inputImage.mimeType};base64,${inputImage.data}` } },
-      ]
-    : text
-
-  try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'user', content }],
-        modalities: ['image', 'text'],
-      }),
-      signal: AbortSignal.timeout(90_000),
-    })
-
-    if (!res.ok) {
-      const err = await res.text().catch(() => '')
-      console.warn(`⚠️ OpenRouter image failed (${res.status}): ${err.substring(0, 200)}`)
-      return null
-    }
-
-    const data = await res.json()
-    const dataUrl = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url || ''
-    const b64Idx = dataUrl.indexOf('base64,')
-    if (b64Idx < 0) {
-      console.warn('⚠️ OpenRouter response contains no image data')
-      return null
-    }
-    console.log(`✅ OpenRouter (${model}) generated image, base64 len=${dataUrl.length - b64Idx - 7}`)
-    return dataUrl.substring(b64Idx + 7)
-  } catch (e) {
-    console.warn(`⚠️ OpenRouter image error: ${(e as Error)?.message || e}`)
-    return null
-  }
-}
-
-/**
- * FLUX-only entry for BULK image needs (video b-roll fill). Deliberately skips
- * OpenRouter: b-roll can need dozens of images per digest and would drain the
- * prepaid balance reserved for covers/thumbnails. Free tier only — returns
- * null when FLUX is unavailable and the caller degrades gracefully.
+ * Cloudflare FLUX text-to-image (free tier). Returns null when FLUX is
+ * unavailable and the caller degrades gracefully.
  */
 export async function generateImageFluxFree(
   prompt: string,

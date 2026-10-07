@@ -1206,7 +1206,7 @@ Return JSON: {"introScript": "Her er de viktigste teknologinyhetene. I dag har v
   // Serper/Google Images was never wired (no key) and downloading press photos
   // into rendered videos is exactly the copyright exposure the NTB claim taught
   // us to avoid. Instead, groups short of MIN_IMAGES get topical AI-generated
-  // b-roll: free FLUX only (never the prepaid OpenRouter balance), uploaded to
+  // b-roll: free FLUX only, uploaded to
   // R2 so the render workflow can download them like any other image URL.
   const AI_BROLL_MAX_PER_RUN = 20;
   let aiBrollUsed = 0;
@@ -2673,7 +2673,7 @@ async function triggerRender(targetDate: string, chatId?: number, messageId?: nu
 // THUMBNAIL GENERATION + SELECTION (4 variants via Gemini)
 // ══════════════════════════════════════════════════════════════
 
-// Thumbnails go through the free-first cascade (OpenRouter prepaid → FLUX) —
+// Thumbnails go through free Cloudflare FLUX —
 // the paid Google image models were removed per owner policy 2026-08-06.
 const TOTAL_THUMBNAIL_TIMEOUT = 120_000; // 2 min max for all variants combined
 
@@ -2794,7 +2794,7 @@ async function convertToJpegViaGemini(pngBuffer: Uint8Array): Promise<Uint8Array
     for (let i = 0; i < pngBuffer.length; i++) binary += String.fromCharCode(pngBuffer[i]);
     const base64 = btoa(binary);
 
-    // OpenRouter only (input image); callers keep the PNG when this returns null.
+    // Photo edits have no free provider; callers keep the PNG when this returns null.
     const res = await generateImageFree(
       "Convert this image to JPEG format. Output the exact same image without any modifications — same content, same dimensions. Just change the format to JPEG.",
       "16:9",

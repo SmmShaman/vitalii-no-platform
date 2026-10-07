@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
-import { HUMANIZER_SOCIAL } from '../_shared/humanizer-prompt.ts'
 import { callLLM } from '../_shared/gemini-llm.ts'
+import { generateImageFluxFree } from '../_shared/free-image.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,17 +14,12 @@ const CF_API_TOKEN = Deno.env.get('CF_API_TOKEN') ?? ''
 const CF_ACCOUNT_ID = Deno.env.get('CF_ACCOUNT_ID') ?? '1438e8d03009209c4a82ea4c28bdb358'
 const R2_BUCKET = 'news-images'
 const R2_PUBLIC_BASE = `https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev`
-const VERSION = '2026-06-14-v14-flux-primary'
+const VERSION = '2026-10-07-v15-flux-only'
 
-// Image generation models in priority order (all use generateContent API)
-const IMAGE_GENERATION_MODELS = [
-  'gemini-3-pro-image-preview',
-]
-
-// Max time to wait for a single model API call (40 seconds)
-const MODEL_TIMEOUT_MS = 40_000
-// Delay between retries for transient errors
-const RETRY_DELAY_MS = 2_000
+// Owner rule 2026-10-07: image generation is FREE only — Cloudflare FLUX.
+// Paid links removed: Nano Banana Pro (billed GOOGLE_API_KEY, was generating
+// every image since OpenRouter ran dry and FLUX 400'd on width/height) and
+// OpenRouter (prepaid). Image-to-image edits had no free provider and are off.
 
 // ==========================================
 // STRUCTURED BRIEF SYSTEM
@@ -115,34 +110,6 @@ CENTER-WEIGHTED COMPOSITION (MANDATORY): Keep all critical visual elements and t
 // CASCADING PROVIDERS CONFIGURATION
 // ==========================================
 
-interface CascadingProvider {
-  name: string
-  type: 'gemini'
-  model: string
-  apiKeyEnv: string
-  priority: number
-}
-
-const CASCADING_PROVIDERS: CascadingProvider[] = [
-  { name: 'Nano Banana Pro', type: 'gemini', model: 'gemini-3-pro-image-preview', apiKeyEnv: 'GOOGLE_API_KEY', priority: 1 },
-]
-
-/**
- * Get image generation mode from api_settings
- */
-async function getImageGenerationMode(supabase: any): Promise<'gemini_only' | 'cascading'> {
-  try {
-    const { data } = await supabase
-      .from('api_settings')
-      .select('key_value')
-      .eq('key_name', 'IMAGE_GENERATION_MODE')
-      .single()
-    return (data?.key_value === 'cascading') ? 'cascading' : 'gemini_only'
-  } catch {
-    return 'gemini_only'
-  }
-}
-
 /**
  * Track provider usage in the database
  */
@@ -193,83 +160,21 @@ async function trackProviderUsage(
 // ==========================================
 
 /**
- * Generate image using cascading providers (Nano Banana Pro)
- * Returns base64 image data or null if all fail
+ * Generate image with free Cloudflare FLUX. Returns base64 or null.
  */
 async function generateImageCascading(
   prompt: string,
-  apiKey: string,
   supabase: any,
-  language?: 'en' | 'no' | 'ua',
   aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
-  articleContext?: { title: string; description?: string; content?: string }
 ): Promise<{ base64: string; provider: string; model: string } | null> {
-  // PRIORITY -1: OpenRouter (prepaid balance, gemini-2.5-flash-image ≈ $0.04/img).
-  // Owner decision 2026-07-24: spend the OpenRouter balance first for better quality;
-  // when credits run out (402) fall through to free Cloudflare FLUX.
-  if (Deno.env.get('OPENROUTER_API_KEY')) {
-    console.log('🔄 Cascading: trying OpenRouter (prepaid, primary)...')
-    const orModel = Deno.env.get('OPENROUTER_IMAGE_MODEL') || 'google/gemini-2.5-flash-image'
-    const orBase64 = await generateImageViaOpenRouter(prompt, aspectRatio)
-    if (orBase64) {
-      await trackProviderUsage(supabase, 'OpenRouter', orModel, true)
-      console.log('✅ OpenRouter succeeded')
-      return { base64: orBase64, provider: 'OpenRouter', model: orModel }
-    }
-    await trackProviderUsage(supabase, 'OpenRouter', orModel, false)
-    console.log('⚠️ OpenRouter failed/out of credits, falling back to Cloudflare FLUX...')
-  }
-
-  // PRIORITY 0: Cloudflare Workers AI FLUX.1-schnell — free, fast (~2s), ~200/day cap.
-  // If CF_AI_TOKEN is set, try this first and skip Gemini if it succeeds.
-  if (Deno.env.get('CF_AI_TOKEN')) {
-    console.log('🔄 Cascading: trying Cloudflare FLUX (free, primary)...')
-    const fluxUrl = await generateImageViaCloudflareFlux(prompt, aspectRatio)
-    if (fluxUrl) {
-      try {
-        const resp = await fetch(fluxUrl)
-        if (resp.ok) {
-          const ab = await resp.arrayBuffer()
-          const base64 = btoa(new Uint8Array(ab).reduce((d, b) => d + String.fromCharCode(b), ''))
-          await trackProviderUsage(supabase, 'Cloudflare FLUX', '@cf/black-forest-labs/flux-1-schnell', true)
-          console.log('✅ Cloudflare FLUX succeeded')
-          return { base64, provider: 'Cloudflare FLUX', model: '@cf/black-forest-labs/flux-1-schnell' }
-        }
-      } catch (e: any) {
-        console.warn(`⚠️ Cloudflare FLUX URL fetch failed: ${e?.message || e}`)
-      }
-    }
-    await trackProviderUsage(supabase, 'Cloudflare FLUX', '@cf/black-forest-labs/flux-1-schnell', false)
-    console.log('⚠️ Cloudflare FLUX failed, falling back to Gemini...')
-  }
-
-  for (const provider of CASCADING_PROVIDERS) {
-    console.log(`🔄 Cascading: trying ${provider.name} (priority ${provider.priority})...`)
-
-    // For Gemini, use existing function with full prompt (supports text)
-    const imageUrl = await generateImageFromText(prompt, apiKey, language, 'general', false, aspectRatio, articleContext)
-    if (imageUrl) {
-      try {
-        const resp = await fetch(imageUrl)
-        if (resp.ok) {
-          const ab = await resp.arrayBuffer()
-          const base64 = btoa(new Uint8Array(ab).reduce((d, b) => d + String.fromCharCode(b), ''))
-          await trackProviderUsage(supabase, provider.name, provider.model, true)
-          return { base64, provider: provider.name, model: provider.model }
-        }
-      } catch { /* fall through */ }
-    }
-
-    await trackProviderUsage(supabase, provider.name, provider.model, false)
-    console.log(`⚠️ ${provider.name} failed, trying next...`)
-  }
-
-  console.log('❌ All cascading providers failed')
-  return null
+  const result = await generateImageFluxFree(prompt, aspectRatio)
+  await trackProviderUsage(supabase, 'Cloudflare FLUX', '@cf/black-forest-labs/flux-1-schnell', !!result)
+  if (!result) console.log('❌ Cloudflare FLUX failed')
+  return result
 }
 
 // ==========================================
-// TEXT OVERLAY (for cascading mode)
+// TEXT OVERLAY
 // ==========================================
 
 /**
@@ -282,7 +187,7 @@ async function addBrandingOverlay(
   language: 'en' | 'no' | 'ua' = 'en'
 ): Promise<string> {
   // For now, skip overlay in Edge Functions to avoid WASM memory issues
-  // Branding text is handled by Gemini (in gemini_only mode) or frontend CSS overlay
+  // Branding text is handled by the frontend CSS overlay
   const now = new Date()
   const dateFormats: Record<string, string> = {
     'ua': now.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }),
@@ -292,37 +197,6 @@ async function addBrandingOverlay(
   const dateText = dateFormats[language] || dateFormats['en']
   console.log(`📝 Branding overlay skipped (Edge Function mode). Date: "${dateText}", Watermark: "vitalii.no"`)
   return imageBase64
-}
-
-// Get Google API key from env or database
-async function getGoogleApiKey(supabase: any): Promise<string | null> {
-  // First try environment variable
-  const envKey = Deno.env.get('GOOGLE_API_KEY')
-  console.log('🔑 GOOGLE_API_KEY from env:', envKey ? `found (${envKey.substring(0, 10)}...)` : 'NOT FOUND')
-
-  if (envKey) {
-    console.log('📍 Using GOOGLE_API_KEY from environment')
-    return envKey
-  }
-
-  // Fallback to database
-  try {
-    const { data, error } = await supabase
-      .from('api_settings')
-      .select('key_value')
-      .eq('key_name', 'GOOGLE_API_KEY')
-      .eq('is_active', true)
-      .single()
-
-    if (!error && data?.key_value) {
-      console.log('📍 Using GOOGLE_API_KEY from database')
-      return data.key_value
-    }
-  } catch (e) {
-    console.log('⚠️ Could not read API key from database:', e)
-  }
-
-  return null
 }
 
 interface ProcessImageRequest {
@@ -350,7 +224,7 @@ interface ProcessImageResponse {
   error?: string
   message?: string
   aspectRatio?: '1:1' | '16:9' | '4:5'
-  provider?: string  // Which provider generated the image (Nano Banana Pro)
+  provider?: string  // Which provider generated the image (Cloudflare FLUX)
   debug?: {
     version: string
     timestamp: string
@@ -415,23 +289,8 @@ serve(async (req) => {
     const imageData = await downloadImage(requestData.imageUrl)
     console.log('📥 Downloaded image, size:', imageData.length, 'bytes')
 
-    // Get Google API key
-    const googleApiKey = await getGoogleApiKey(supabase)
-    if (!googleApiKey) {
-      console.log('⚠️ GOOGLE_API_KEY not configured (neither in env nor database)')
-      return new Response(
-        JSON.stringify({
-          success: true,
-          processedImageUrl: requestData.imageUrl,
-          originalImageUrl: requestData.imageUrl,
-          error: 'GOOGLE_API_KEY not configured. Please add it in Admin → Settings → API Keys'
-        } as ProcessImageResponse),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Process image with AI
-    const processedImageUrl = await processImageWithAI(imageData, prompt, googleApiKey)
+    // Photo edits used paid Gemini; FLUX is text-to-image only, so the original image is kept.
+    const processedImageUrl: string | null = null
 
     if (!processedImageUrl) {
       // If AI processing fails, return original image
@@ -486,19 +345,15 @@ serve(async (req) => {
 
 /**
  * Handle text-to-image generation mode
- * Gets prompt from DB and generates image using Gemini 3 Pro Image
- * Includes Critic Agent validation with auto-retry (max 3 attempts)
+ * Gets prompt from DB and generates image with free Cloudflare FLUX
  */
 async function handleTextToImageGeneration(
   supabase: any,
   newsId: string,
   language?: 'en' | 'no' | 'ua',
   aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
-  retryCount: number = 0,
-  previousIssues: string[] = []
 ): Promise<Response> {
-  const MAX_RETRIES = 3
-  console.log(`🎨 Starting text-to-image generation for news: ${newsId}${language ? ` (language: ${language})` : ''} [aspectRatio: ${aspectRatio}] [attempt ${retryCount + 1}/${MAX_RETRIES}]`)
+  console.log(`🎨 Starting text-to-image generation for news: ${newsId}${language ? ` (language: ${language})` : ''} [aspectRatio: ${aspectRatio}]`)
 
   // 1. Get news record with the stored prompt
   const { data: news, error: newsError } = await supabase
@@ -532,7 +387,7 @@ async function handleTextToImageGeneration(
 
   // Check if we already have a processed image for this aspect ratio (only on first attempt)
   const existingImageUrl = aspectRatio === '16:9' ? news.processed_image_url_wide : news.processed_image_url
-  if (existingImageUrl && retryCount === 0) {
+  if (existingImageUrl) {
     console.log(`✅ Image already generated for ${aspectRatio}:`, existingImageUrl)
     return new Response(
       JSON.stringify({
@@ -571,685 +426,60 @@ async function handleTextToImageGeneration(
 
   console.log('📝 Using prompt:', imagePrompt.substring(0, 300) + '...')
 
-  // 3. Check generation mode
-  const generationMode = await getImageGenerationMode(supabase)
-  console.log(`🔧 Generation mode: ${generationMode} (version: ${VERSION})`)
+  // 3. Generate with free Cloudflare FLUX
+  const result = await generateImageCascading(imagePrompt, supabase, aspectRatio)
 
-  // ==========================================
-  // CASCADING MODE: Use free providers first
-  // ==========================================
-  if (generationMode === 'cascading') {
-    console.log('🔗 Using CASCADING providers mode')
-
-    const googleApiKey = await getGoogleApiKey(supabase) || ''
-
-    const localizedTitle = (language === 'ua' ? news.title_ua : language === 'no' ? news.title_no : news.title_en) || news.title_en || ''
-    const localizedDesc = (language === 'ua' ? news.description_ua : language === 'no' ? news.description_no : news.description_en) || news.description_en || ''
-
-    const result = await generateImageCascading(
-      imagePrompt, googleApiKey, supabase, language, aspectRatio,
-      { title: localizedTitle, description: localizedDesc, content: news.content_en }
-    )
-
-    if (!result) {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          error: 'All cascading providers failed',
-          debug: { version: VERSION, timestamp: new Date().toISOString(), lastApiError }
-        } as ProcessImageResponse),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Apply branding overlay (date + vitalii.no)
-    const brandedBase64 = await addBrandingOverlay(result.base64, language || 'en')
-
-    // Upload to Supabase Storage
-    const processedImageUrl = await uploadProcessedImage(brandedBase64)
-
-    // Save to database
-    const updateData: Record<string, any> = {
-      image_processed_at: new Date().toISOString(),
-      image_provider_used: result.provider,
-      image_model_used: result.model,
-      image_retry_count: 0,
-    }
-    // Always save to main field (website uses processed_image_url)
-    updateData.processed_image_url = processedImageUrl
-    if (aspectRatio === '16:9') {
-      updateData.processed_image_url_wide = processedImageUrl
-    }
-
-    await supabase.from('news').update(updateData).eq('id', newsId)
-
-    console.log(`✅ Cascading: Image generated by ${result.provider} (${result.model})`)
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        processedImageUrl,
-        aspectRatio,
-        provider: result.provider,
-        message: `Image generated by ${result.provider} (${aspectRatio})`,
-        debug: {
-          version: VERSION,
-          timestamp: new Date().toISOString(),
-          lastApiError: null,
-          provider: result.provider,
-          model: result.model,
-        }
-      } as ProcessImageResponse),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  }
-
-  // ==========================================
-  // GEMINI ONLY MODE
-  // ==========================================
-
-  // If retrying, add improvement feedback from previous validation
-  if (retryCount > 0 && previousIssues.length > 0) {
-    const feedbackSection = `
-
-IMPORTANT - Fix these issues from previous attempt:
-${previousIssues.map(issue => `- ${issue}`).join('\n')}
-
-Generate a BETTER image addressing all these issues.`
-    imagePrompt = imagePrompt + feedbackSection
-    console.log('🔄 Added improvement feedback to prompt')
-  }
-
-  // Get Google API key
-  const googleApiKey = await getGoogleApiKey(supabase)
-  if (!googleApiKey) {
-    console.log('⚠️ GOOGLE_API_KEY not configured')
+  if (!result) {
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'GOOGLE_API_KEY not configured. Please add it in Admin → Settings → API Keys'
-      } as ProcessImageResponse),
-      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
-  }
-
-  // Generate image using Gemini (text-to-image)
-  const newsCategory = 'general'
-  console.log('🖼️ Calling Gemini for text-to-image generation... (version:', VERSION, ')')
-  console.log('📐 Aspect ratio:', aspectRatio)
-  const geminiLocalizedTitle = (language === 'ua' ? news.title_ua : language === 'no' ? news.title_no : news.title_en) || news.title_en || ''
-  const geminiLocalizedDesc = (language === 'ua' ? news.description_ua : language === 'no' ? news.description_no : news.description_en) || news.description_en || ''
-  const processedImageUrl = await generateImageFromText(
-    imagePrompt, googleApiKey, language, newsCategory, false, aspectRatio,
-    { title: geminiLocalizedTitle, description: geminiLocalizedDesc, content: news.content_en }
-  )
-
-  if (!processedImageUrl) {
-    console.log('❌ Image generation failed')
-    return new Response(
-      JSON.stringify({
-        success: false,
-        error: `Image generation failed: ${lastApiError || 'Unknown error'}`,
-        debug: { version: VERSION, timestamp: new Date().toISOString(), lastApiError, retryCount }
+        error: 'Cloudflare FLUX failed',
+        debug: { version: VERSION, timestamp: new Date().toISOString(), lastApiError: null }
       } as ProcessImageResponse),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 
-  // Track Nano Banana (Gemini) usage
-  const usedModel = IMAGE_GENERATION_MODELS[0]
-  await trackProviderUsage(supabase, 'Nano Banana', usedModel, true)
+  // Apply branding overlay (date + vitalii.no)
+  const brandedBase64 = await addBrandingOverlay(result.base64, language || 'en')
 
-  // Run Critic Agent validation
-  console.log('🔍 Running Critic Agent validation...')
-  const validation = await validateGeneratedImage(
-    processedImageUrl,
-    imagePrompt,
-    { title: news.title_en || 'News Article', category: newsCategory, language: language || 'en' },
-    googleApiKey
-  )
+  // Upload to Supabase Storage
+  const processedImageUrl = await uploadProcessedImage(brandedBase64)
 
-  console.log(`📊 Validation result: score=${validation.score}, isValid=${validation.isValid}, issues=${validation.issues.length}`)
-
-  // Check if we need to retry
-  if (!validation.isValid && validation.shouldRetry && retryCount < MAX_RETRIES - 1) {
-    console.log(`🔄 Image failed validation (score: ${validation.score}), retrying... (${retryCount + 1}/${MAX_RETRIES})`)
-
-    await supabase.from('news').update({ image_retry_count: retryCount + 1 }).eq('id', newsId)
-
-    return handleTextToImageGeneration(
-      supabase, newsId, language, aspectRatio, retryCount + 1,
-      [...validation.issues, ...(validation.details?.improvementSuggestions || [])]
-    )
-  }
-
-  // Save final result to database
+  // Save to database
   const updateData: Record<string, any> = {
     image_processed_at: new Date().toISOString(),
-    image_quality_score: validation.score,
-    image_validation_issues: validation.issues,
-    image_retry_count: retryCount,
-    image_provider_used: 'Nano Banana',
-    image_model_used: usedModel,
+    image_provider_used: result.provider,
+    image_model_used: result.model,
+    image_retry_count: 0,
   }
-
   // Always save to main field (website uses processed_image_url)
   updateData.processed_image_url = processedImageUrl
   if (aspectRatio === '16:9') {
     updateData.processed_image_url_wide = processedImageUrl
   }
 
-  const { error: updateError } = await supabase.from('news').update(updateData).eq('id', newsId)
-  if (updateError) {
-    console.error('⚠️ Failed to update news record:', updateError)
-  }
+  await supabase.from('news').update(updateData).eq('id', newsId)
 
-  const statusEmoji = validation.isValid ? '✅' : '⚠️'
-  console.log(`${statusEmoji} Image ${validation.isValid ? 'generated and validated' : 'generated (validation issues noted)'}: ${processedImageUrl}`)
+  console.log(`✅ Image generated by ${result.provider} (${result.model})`)
 
   return new Response(
     JSON.stringify({
       success: true,
       processedImageUrl,
       aspectRatio,
-      provider: 'Nano Banana',
-      message: validation.isValid
-        ? `Image generated and validated successfully (${aspectRatio})`
-        : `Image generated with score ${validation.score}/10 (${validation.issues.length} issues) - ${aspectRatio}`,
+      provider: result.provider,
+      message: `Image generated by ${result.provider} (${aspectRatio})`,
       debug: {
         version: VERSION,
         timestamp: new Date().toISOString(),
         lastApiError: null,
-        provider: 'Nano Banana',
-        model: usedModel,
-        validation: {
-          score: validation.score,
-          isValid: validation.isValid,
-          issues: validation.issues,
-          retryCount,
-          aspectRatio
-        }
+        provider: result.provider,
+        model: result.model,
       }
     } as ProcessImageResponse),
     { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
   )
-}
-
-/**
- * Validation result interface for Critic Agent
- */
-interface ValidationResult {
-  isValid: boolean
-  score: number
-  issues: string[]
-  shouldRetry: boolean
-  details?: {
-    relevance?: number
-    quality?: number
-    branding?: boolean
-    improvementSuggestions?: string[]
-  }
-}
-
-/**
- * Validate generated image using Critic Agent (inline implementation)
- * Uses Gemini to analyze the image and provide structured feedback
- */
-async function validateGeneratedImage(
-  imageUrl: string,
-  originalPrompt: string,
-  newsContext: { title: string; category: string; language: string },
-  apiKey: string
-): Promise<ValidationResult> {
-  try {
-    // Download image
-    const response = await fetch(imageUrl)
-    if (!response.ok) {
-      console.error('❌ Failed to download image for validation')
-      return getDefaultValidation(true)
-    }
-
-    const arrayBuffer = await response.arrayBuffer()
-    const imageBase64 = btoa(
-      new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-    )
-
-    // Critic runs on the FREE Gemini key (owner policy 2026-08-06) — vision works
-    // on lite; the paid `apiKey` argument is deliberately ignored below.
-    const criticKey = Deno.env.get('GEMINI_FREE_API_KEY') || ''
-    if (!criticKey) {
-      console.warn('⚠️ GEMINI_FREE_API_KEY not set — skipping critic validation')
-      return getDefaultValidation(true)
-    }
-    const criticModel = Deno.env.get('GEMINI_FREE_MODEL_LITE') || 'gemini-3.1-flash-lite'
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${criticModel}:generateContent`
-
-    const criticPrompt = `You are an expert image quality critic for a professional news website.
-Analyze this generated image and evaluate it.
-
-NEWS CONTEXT:
-Title: ${newsContext.title}
-Category: ${newsContext.category}
-Language: ${newsContext.language}
-
-ORIGINAL IMAGE PROMPT:
-${originalPrompt.substring(0, 1000)}
-
-Evaluate:
-1. RELEVANCE (1-10): Does image match the news topic?
-2. QUALITY (1-10): Sharpness, colors, professional appearance
-3. BRANDING: Is "vitalii.no" watermark visible?
-4. ARTIFACTS: Any visual problems?
-5. TEXT_ISSUES: Problems with text on image?
-
-Respond with ONLY valid JSON:
-{
-  "relevance": <1-10>,
-  "quality": <1-10>,
-  "branding": <true/false>,
-  "artifacts": ["list"],
-  "text_issues": ["list"],
-  "overall_score": <1-10>,
-  "should_retry": <true/false>,
-  "improvement_suggestions": ["list"]
-}`
-
-    const requestBody = {
-      contents: [{
-        parts: [
-          { text: criticPrompt },
-          {
-            inline_data: {
-              mime_type: 'image/jpeg',
-              data: imageBase64
-            }
-          }
-        ]
-      }],
-      generationConfig: {
-        temperature: 0.2,
-        maxOutputTokens: 800
-      }
-    }
-
-    const apiResponse = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': criticKey
-      },
-      body: JSON.stringify(requestBody)
-    })
-
-    if (!apiResponse.ok) {
-      console.error('❌ Validation API error:', apiResponse.status)
-      return getDefaultValidation(true)
-    }
-
-    const result = await apiResponse.json()
-    const textContent = result.candidates?.[0]?.content?.parts?.[0]?.text
-
-    if (!textContent) {
-      return getDefaultValidation(true)
-    }
-
-    // Parse JSON response
-    let jsonString = textContent.trim()
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim()
-
-    try {
-      const parsed = JSON.parse(jsonString)
-      const overallScore = parsed.overall_score || Math.round((parsed.relevance + parsed.quality) / 2)
-      const issues: string[] = [...(parsed.artifacts || []), ...(parsed.text_issues || [])]
-
-      if (!parsed.branding) {
-        issues.push('Missing vitalii.no branding')
-      }
-
-      const isValid = overallScore >= 6 && issues.length <= 2
-      const shouldRetry = !isValid && overallScore >= 4
-
-      return {
-        isValid,
-        score: overallScore,
-        issues,
-        shouldRetry: parsed.should_retry ?? shouldRetry,
-        details: {
-          relevance: parsed.relevance || 5,
-          quality: parsed.quality || 5,
-          branding: parsed.branding ?? false,
-          improvementSuggestions: parsed.improvement_suggestions || []
-        }
-      }
-    } catch (parseError) {
-      console.error('❌ Failed to parse validation JSON:', parseError)
-      return getDefaultValidation(true)
-    }
-
-  } catch (error) {
-    console.error('❌ Error in image validation:', error)
-    return getDefaultValidation(true)
-  }
-}
-
-/**
- * Get default validation result (pass-through to not block workflow)
- */
-function getDefaultValidation(isValid: boolean): ValidationResult {
-  return {
-    isValid,
-    score: isValid ? 7 : 4,
-    issues: isValid ? [] : ['Validation unavailable'],
-    shouldRetry: !isValid,
-    details: {
-      relevance: 7,
-      quality: 7,
-      branding: true,
-      improvementSuggestions: []
-    }
-  }
-}
-
-/**
- * Generate image from text prompt using Gemini 3 Pro Image
- * This is the pure text-to-image generation (no reference image needed)
- */
-// Store last API error for debugging
-let lastApiError: string | null = null
-
-// Abstract fallback prompts for content policy bypass (IMAGE_OTHER errors)
-// Used when Gemini blocks generation due to sensitive topics (politics, famous people, brands, etc.)
-const FALLBACK_ABSTRACT_PROMPTS: Record<string, string> = {
-  'business_news': 'Professional abstract illustration representing business analytics, financial growth charts, and corporate success with modern geometric design elements, data visualization graphs, upward trending arrows, and clean corporate aesthetics',
-  'tech_product': 'Futuristic technology visualization with glowing digital elements, circuit patterns, microchip details, and innovation symbolism in vibrant blue and purple tones, abstract tech landscape with holographic interfaces',
-  'ai_research': 'Abstract neural network concept with interconnected glowing nodes, data streams, artificial intelligence symbolism, digital brain visualization with flowing data particles and modern gradient colors',
-  'science': 'Scientific discovery concept with abstract molecular structures, laboratory symbolism, DNA helix patterns, research innovation elements, beakers and scientific equipment in modern minimalist style',
-  'marketing_campaign': 'Dynamic marketing concept with abstract growth arrows, engagement symbols, social media icons floating in digital space, modern promotional design elements with vibrant gradient backgrounds',
-  'lifestyle': 'Contemporary lifestyle illustration with modern design aesthetics, vibrant colors, positive energy symbolism, abstract geometric patterns representing wellbeing and modern living',
-  'general': 'Professional abstract business illustration with geometric shapes, modern gradients, corporate aesthetics, interconnected nodes and flowing lines representing innovation and progress'
-}
-
-/**
- * Helper: call a single model with timeout and return parsed result or null
- * Returns: { imageUrl: string } on success, { contentPolicy: true } for IMAGE_OTHER, null on failure
- */
-async function callImageModel(
-  modelName: string,
-  requestBody: Record<string, unknown>,
-  apiKey: string
-): Promise<{ imageUrl?: string; contentPolicy?: boolean } | null> {
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`
-
-  // AbortController for timeout — prevents hanging on overloaded models
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), MODEL_TIMEOUT_MS)
-
-  try {
-    console.log(`📤 Calling ${modelName}...`)
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey
-      },
-      body: JSON.stringify(requestBody),
-      signal: controller.signal
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      let errorMessage = errorText.substring(0, 200)
-      try {
-        const errorJson = JSON.parse(errorText)
-        errorMessage = errorJson.error?.message || JSON.stringify(errorJson).substring(0, 200)
-      } catch { /* use raw text */ }
-
-      console.error(`❌ ${modelName} error: ${response.status} - ${errorMessage}`)
-      lastApiError = `${modelName}: Status ${response.status}: ${errorMessage}`
-
-      // Return null to signal retry/fallback for transient errors
-      return null
-    }
-
-    const result = await response.json()
-
-    // Check for content policy block
-    const candidate = result.candidates?.[0]
-    if (candidate?.finishReason === 'IMAGE_OTHER') {
-      const finishMsg = candidate.finishMessage || 'Content policy violation'
-      console.warn(`⚠️ ${modelName} content policy blocked: ${finishMsg}`)
-      return { contentPolicy: true }
-    }
-
-    // Extract image from response
-    if (result.candidates && result.candidates[0]?.content?.parts) {
-      for (const part of result.candidates[0].content.parts) {
-        const imageData = part.inline_data || part.inlineData
-        if (imageData && imageData.data) {
-          console.log(`✅ ${modelName} generated image successfully`)
-          const processedImageUrl = await uploadProcessedImage(imageData.data)
-          return { imageUrl: processedImageUrl }
-        }
-        if (part.text) {
-          console.log(`📝 ${modelName} text part: ${part.text.substring(0, 100)}`)
-        }
-      }
-    }
-
-    lastApiError = `${modelName}: No image in response`
-    console.log(`⚠️ ${modelName}: No image found in response parts`)
-    return null
-
-  } catch (error: any) {
-    if (error.name === 'AbortError') {
-      console.error(`⏱️ ${modelName} timed out after ${MODEL_TIMEOUT_MS / 1000}s`)
-      lastApiError = `${modelName}: Timeout after ${MODEL_TIMEOUT_MS / 1000}s`
-    } else {
-      console.error(`❌ ${modelName} error:`, error.message || error)
-      lastApiError = `${modelName}: ${error.message || String(error)}`
-    }
-    return null
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-async function generateImageFromText(
-  prompt: string,
-  apiKey: string,
-  language?: 'en' | 'no' | 'ua',
-  category?: string,
-  useAbstractFallback?: boolean,
-  aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
-  articleContext?: { title: string; description?: string; content?: string }
-): Promise<string | null> {
-  lastApiError = null
-
-  try {
-    // If using abstract fallback due to content policy, use pre-defined safe prompt
-    const effectivePrompt = useAbstractFallback
-      ? (FALLBACK_ABSTRACT_PROMPTS[category || 'general'] || FALLBACK_ABSTRACT_PROMPTS['general'])
-      : prompt
-
-    console.log('📤 Generating image (text-to-image) with model fallback chain...')
-    if (useAbstractFallback) {
-      console.log('🔄 Using ABSTRACT FALLBACK prompt due to content policy')
-      console.log('📂 Category:', category || 'general')
-    }
-    console.log('📝 Prompt length:', effectivePrompt.length, 'chars')
-    console.log('📐 Aspect ratio:', aspectRatio)
-    if (language) {
-      console.log('🌐 Language for text on image:', language)
-    }
-
-    // Date formatting based on language
-    const now = new Date()
-    const dateFormats: Record<string, string> = {
-      'ua': now.toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' }),
-      'no': now.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' }),
-      'en': now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-    }
-
-    // Language instructions for Gemini with MANDATORY date and vitalii.no branding
-    // NOTE: Language instructions must be VERY explicit because Gemini tends to default to Norwegian
-    // (likely due to "vitalii.no" domain and Norwegian news context in prompts)
-    const languageInstructions: Record<string, string> = {
-      'ua': `⚠️ CRITICAL TEXT LANGUAGE RULE — THIS IS THE #1 PRIORITY:
-ALL text, words, labels, titles, captions, and ANY written content on the image MUST be in UKRAINIAN language (Cyrillic script: А-Я, а-я).
-DO NOT use Norwegian, English, or any other language for text on the image.
-Examples of correct Ukrainian text: "Технології", "Новини", "Бізнес", "Інновації".
-DO NOT write "Teknologi", "Nyheter", "Bedrift" (that is Norwegian — FORBIDDEN).
-DO NOT write "Technology", "News", "Business" (that is English — FORBIDDEN).
-
-BRANDING ELEMENTS (small, subtle, do not distract):
-- Bottom-left corner: small date text "${dateFormats['ua']}"
-- Bottom-right corner: small watermark "vitalii.no"`,
-      'no': `⚠️ CRITICAL TEXT LANGUAGE RULE — THIS IS THE #1 PRIORITY:
-ALL text, words, labels, titles, captions, and ANY written content on the image MUST be in NORWEGIAN language (Bokmål, Latin script).
-Examples of correct Norwegian text: "Teknologi", "Nyheter", "Bedrift", "Innovasjon".
-
-BRANDING ELEMENTS (small, subtle, do not distract):
-- Bottom-left corner: small date text "${dateFormats['no']}"
-- Bottom-right corner: small watermark "vitalii.no"`,
-      'en': `⚠️ CRITICAL TEXT LANGUAGE RULE — THIS IS THE #1 PRIORITY:
-ALL text, words, labels, titles, captions, and ANY written content on the image MUST be in ENGLISH language.
-DO NOT use Norwegian, Ukrainian, or any other language for text on the image.
-Examples of correct English text: "Technology", "News", "Business", "Innovation".
-DO NOT write "Teknologi", "Nyheter", "Bedrift" (that is Norwegian — FORBIDDEN).
-DO NOT write "Технології", "Новини", "Бізнес" (that is Ukrainian — FORBIDDEN).
-
-BRANDING ELEMENTS (small, subtle, do not distract):
-- Bottom-left corner: small date text "${dateFormats['en']}"
-- Bottom-right corner: small watermark "vitalii.no"`
-    }
-
-    console.log('📅 Date being sent to AI:', dateFormats[language || 'en'])
-
-    const langInstruction = language
-      ? `\n\n${languageInstructions[language]}`
-      : `\n\nNo text on the image except "vitalii.no" at the bottom.`
-
-    // Anti-AI-slop VISUAL style instructions
-    const styleGuide = `VISUAL STYLE — MANDATORY (anti-AI-slop):
-- Shot on Canon EOS R5, 35mm lens, f/2.8, natural ambient light
-- Editorial photography style — like Bloomberg, Reuters, The Verge covers
-- Color palette: warm neutrals, muted earth tones, desaturated teals
-- FORBIDDEN colors: purple gradients, neon purple, magenta glow, violet haze
-- FORBIDDEN effects: plastic/glossy surfaces, lens flares, chromatic aberration, bloom glow
-- Add subtle film grain (Kodak Portra 400 texture), slight vignette
-- Natural imperfections: micro dust, uneven light falloff, soft depth of field
-- If people present: natural skin with visible pores, no airbrushing, no beauty filter
-- Lighting: golden hour or overcast daylight — NOT studio neon
-- Composition: rule of thirds, editorial magazine layout feel
-- Overall mood: professional, trustworthy, journalistic — NOT sci-fi, NOT futuristic
-
-TEXT ON IMAGE — ANTI-AI-SLOP RULES (MANDATORY for any headline, caption, or label rendered on the image):
-${HUMANIZER_SOCIAL}`
-
-    // Aspect ratio with concrete pixel dimensions per platform
-    const ASPECT_RATIO_SPECS: Record<string, string> = {
-      '16:9': '16:9 landscape, 1200×675 pixels. For website hero, LinkedIn, Facebook, Twitter/X. Wide editorial magazine cover feel.',
-      '4:5': '4:5 portrait, 1080×1350 pixels. For Instagram feed (highest engagement format). Vertical, mobile-first composition.',
-      '1:1': '1:1 square, 1080×1080 pixels. For Instagram square posts. Centered, balanced composition.',
-    }
-    const aspectRatioDescription = ASPECT_RATIO_SPECS[aspectRatio] || ASPECT_RATIO_SPECS['16:9']
-
-    // Article context section — tells Gemini what the article is actually about
-    const articleSection = articleContext
-      ? `\nARTICLE CONTEXT — the image illustrates THIS specific article:
-HEADLINE: "${articleContext.title}"
-${articleContext.description ? `SUMMARY: ${articleContext.description.substring(0, 300)}` : ''}
-${articleContext.content ? `ARTICLE TEXT (extract key entities from here): ${articleContext.content.substring(0, 800)}` : ''}
-
-VISUAL GROUNDING RULES (CRITICAL):
-1. READ the article text above. Identify specific products, companies, tools, technologies, and brands mentioned.
-2. The image MUST contain visual hints or references to at least 2-3 specific entities from the article.
-   Examples of visual hints: UI mockups, browser windows, product shapes, recognizable icons, text labels with product names, screenshots, interface elements.
-3. If the article mentions specific websites (like Finn.no) — show browser address bars or form elements.
-4. If the article mentions specific tools (like Skyvern, Perplexity) — show their names as subtle labels, UI panels, or screen content.
-5. Do NOT create a generic abstract image. The viewer must be able to guess WHAT the article is about by looking at the image.
-
-TEXT ON IMAGE RULES:
-- Any headline, title, or caption on the image MUST be derived from the HEADLINE above.
-- You may shorten the headline but keep the core meaning.
-- Do NOT invent your own headline or topic. The text must reflect what this article is about.
-- Translate the headline to match the required language (see language rules above).\n`
-      : ''
-
-    const requestBody = {
-      contents: [{
-        parts: [{
-          text: `${langInstruction}
-
-${styleGuide}
-
-${articleSection}Create an editorial news photograph for a professional news website.
-
-Visual concept: ${effectivePrompt}
-
-Format: ${aspectRatioDescription}, ${aspectRatio} aspect ratio.
-
-REMINDER: ${language === 'ua' ? 'All text on the image must be in UKRAINIAN (Cyrillic). No Norwegian or English text!' : language === 'en' ? 'All text on the image must be in ENGLISH. No Norwegian or Ukrainian text!' : language === 'no' ? 'All text on the image must be in NORWEGIAN.' : 'No text on the image except vitalii.no watermark.'}`
-        }]
-      }],
-      generationConfig: {
-        responseModalities: ['TEXT', 'IMAGE']
-      }
-    }
-
-    // Try each model in the fallback chain
-    for (let i = 0; i < IMAGE_GENERATION_MODELS.length; i++) {
-      const modelName = IMAGE_GENERATION_MODELS[i]
-      console.log(`🔄 Trying model ${i + 1}/${IMAGE_GENERATION_MODELS.length}: ${modelName}`)
-
-      // First attempt
-      const result = await callImageModel(modelName, requestBody, apiKey)
-
-      if (result?.imageUrl) {
-        return result.imageUrl
-      }
-
-      // Content policy block → try abstract fallback (same model)
-      if (result?.contentPolicy && !useAbstractFallback) {
-        console.log('🔄 Retrying with abstract fallback prompt to bypass content policy...')
-        return generateImageFromText(prompt, apiKey, language, category, true, aspectRatio, articleContext)
-      }
-      if (result?.contentPolicy && useAbstractFallback) {
-        lastApiError = `Content policy blocked even abstract prompt on ${modelName}`
-        console.error('❌ Content policy blocked even with abstract fallback')
-        return null
-      }
-
-      // Transient failure (503/timeout) → retry once with delay, then move to next model
-      if (!result) {
-        console.log(`⏳ Waiting ${RETRY_DELAY_MS}ms before retry...`)
-        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS))
-
-        const retryResult = await callImageModel(modelName, requestBody, apiKey)
-        if (retryResult?.imageUrl) {
-          return retryResult.imageUrl
-        }
-        if (retryResult?.contentPolicy && !useAbstractFallback) {
-          return generateImageFromText(prompt, apiKey, language, category, true, aspectRatio, articleContext)
-        }
-
-        // Move to next model
-        if (i < IMAGE_GENERATION_MODELS.length - 1) {
-          console.log(`⚠️ ${modelName} failed, falling back to next model...`)
-        }
-      }
-    }
-
-    console.log('❌ All image generation models failed')
-    return null
-
-  } catch (error: any) {
-    console.error('❌ Error in text-to-image generation:', error)
-    lastApiError = error.message || String(error)
-    return null
-  }
 }
 
 /**
@@ -1376,165 +606,8 @@ async function downloadImage(url: string): Promise<string> {
 }
 
 /**
- * Process image with AI (image-to-image mode)
- * Uses model fallback chain with timeout protection
- */
-async function processImageWithAI(imageBase64: string, prompt: string, apiKey: string): Promise<string | null> {
-  const requestBody = {
-    contents: [{
-      parts: [
-        { text: prompt },
-        {
-          inline_data: {
-            mime_type: 'image/jpeg',
-            data: imageBase64
-          }
-        }
-      ]
-    }],
-    generationConfig: {
-      responseModalities: ['TEXT', 'IMAGE']
-    }
-  }
-
-  // Try each model in the fallback chain
-  for (const modelName of IMAGE_GENERATION_MODELS) {
-    console.log(`📤 Processing image with ${modelName}...`)
-    const result = await callImageModel(modelName, requestBody, apiKey)
-
-    if (result?.imageUrl) {
-      return result.imageUrl
-    }
-
-    console.log(`⚠️ ${modelName} failed, trying next model...`)
-  }
-
-  console.log('❌ All image generation models failed for image-to-image')
-  return null
-}
-
-/**
  * Upload processed image to Supabase Storage
  */
-/**
- * Generate image via Cloudflare Workers AI FLUX.1-schnell (free, ~200 images/day).
- * Returns public R2 URL on success, null on any failure (caller falls through to next provider).
- * FLUX cannot render text accurately, so we strip text-on-image instructions from the prompt.
- */
-/**
- * Generate an image via OpenRouter (chat completions with image modality).
- * Returns raw base64 (no data: prefix) or null on any failure — including 402
- * when the prepaid balance is exhausted, which triggers the FLUX fallback.
- */
-async function generateImageViaOpenRouter(
-  prompt: string,
-  aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
-): Promise<string | null> {
-  const apiKey = Deno.env.get('OPENROUTER_API_KEY')
-  if (!apiKey) return null
-  const model = Deno.env.get('OPENROUTER_IMAGE_MODEL') || 'google/gemini-2.5-flash-image'
-
-  try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{
-          role: 'user',
-          content: `Generate an image: ${prompt}\n\nComposition: strict ${aspectRatio} aspect ratio.`,
-        }],
-        modalities: ['image', 'text'],
-      }),
-      signal: AbortSignal.timeout(90_000),
-    })
-
-    if (!res.ok) {
-      const err = await res.text().catch(() => '')
-      console.warn(`⚠️ OpenRouter image failed (${res.status}): ${err.substring(0, 200)}`)
-      return null
-    }
-
-    const data = await res.json()
-    const dataUrl = data?.choices?.[0]?.message?.images?.[0]?.image_url?.url || ''
-    const b64Idx = dataUrl.indexOf('base64,')
-    if (b64Idx < 0) {
-      console.warn('⚠️ OpenRouter response contains no image data')
-      return null
-    }
-    console.log(`✅ OpenRouter (${model}) generated image, base64 len=${dataUrl.length - b64Idx - 7}`)
-    return dataUrl.substring(b64Idx + 7)
-  } catch (e: any) {
-    console.warn(`⚠️ OpenRouter image error: ${e?.message || e}`)
-    return null
-  }
-}
-
-async function generateImageViaCloudflareFlux(
-  prompt: string,
-  aspectRatio: '1:1' | '16:9' | '4:5' = '16:9',
-): Promise<string | null> {
-  const aiToken = Deno.env.get('CF_AI_TOKEN')
-  if (!aiToken) {
-    console.log('ℹ️ CF_AI_TOKEN not set — skipping Cloudflare FLUX')
-    return null
-  }
-
-  // FLUX trained primarily on square; map aspect → approximate dimensions
-  // (CF FLUX accepts width/height but may ignore for now; we send for forward-compat)
-  const sizeMap: Record<string, { w: number; h: number }> = {
-    '1:1': { w: 1024, h: 1024 },
-    '16:9': { w: 1280, h: 720 },
-    '4:5': { w: 832, h: 1024 },
-  }
-  const { w, h } = sizeMap[aspectRatio] || sizeMap['1:1']
-
-  // FLUX is bad at rendering text/dates/watermarks; strip those instructions and
-  // append a "no text" guard so it focuses on the visual concept.
-  const cleanedPrompt = prompt
-    .replace(/⚠️[\s\S]*?(?=\n\n|$)/g, '') // remove CRITICAL TEXT LANGUAGE blocks
-    .replace(/BRANDING ELEMENTS[\s\S]*?(?=\n\n|$)/g, '') // remove watermark/date blocks
-    .replace(/\s+/g, ' ')
-    .trim()
-    .substring(0, 1500)
-
-  const finalPrompt = `${cleanedPrompt}\n\nStyle: professional editorial photography, no text in image, no watermarks, clean composition, photorealistic`
-
-  try {
-    const t0 = Date.now()
-    const res = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell`,
-      {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${aiToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: finalPrompt, steps: 4, width: w, height: h }),
-      },
-    )
-    const dt = Date.now() - t0
-
-    if (!res.ok) {
-      const body = await res.text().catch(() => '')
-      console.warn(`⚠️ Cloudflare FLUX HTTP ${res.status} (${dt}ms): ${body.substring(0, 200)}`)
-      return null
-    }
-
-    const data = await res.json()
-    if (!data?.success || !data?.result?.image) {
-      console.warn(`⚠️ Cloudflare FLUX success=false: ${JSON.stringify(data?.errors || data).substring(0, 200)}`)
-      return null
-    }
-
-    console.log(`✅ Cloudflare FLUX generated image in ${dt}ms, base64 len=${data.result.image.length}`)
-    return await uploadProcessedImage(data.result.image)
-  } catch (e: any) {
-    console.warn(`⚠️ Cloudflare FLUX exception: ${e?.message || String(e)}`)
-    return null
-  }
-}
-
 async function uploadProcessedImage(base64Image: string): Promise<string> {
   // Convert base64 to Uint8Array
   const binaryString = atob(base64Image)

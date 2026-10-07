@@ -222,7 +222,7 @@ serve(async (req) => {
                 return r?.key_value || Deno.env.get(name) || ''
               }
 
-              // Image generation — free cascade (OpenRouter → FLUX), paid key removed (owner policy 2026-08-06)
+              // Image generation — free Cloudflare FLUX only (owner rule 2026-10-07)
               const imagePromise = (async () => {
                 try {
                   console.log('🖼️ Generating blog cover via free cascade (/blog direct)...')
@@ -758,7 +758,7 @@ Return ONLY the cleaned request, nothing else.`,
                 return r?.key_value || Deno.env.get(name) || ''
               }
 
-              // Image generation — free cascade (OpenRouter → FLUX), paid key removed (owner policy 2026-08-06)
+              // Image generation — free Cloudflare FLUX only (owner rule 2026-10-07)
               const imagePromise = (async () => {
                 try {
                   console.log('🖼️ Generating blog cover via free cascade (text blog)...')

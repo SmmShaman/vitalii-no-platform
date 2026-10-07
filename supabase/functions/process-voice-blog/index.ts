@@ -190,7 +190,7 @@ The text below is the author's OWN words transcribed from a voice message.
       const imgPrompt = imgPromptData?.prompt
 
       if (imgPrompt) {
-        // Free cascade (OpenRouter → FLUX) — paid Gemini removed (owner policy 2026-08-06)
+        // Free Cloudflare FLUX only (owner rule 2026-10-07)
         const freeImg = await generateImageFree(imgPrompt, '16:9')
         if (freeImg) {
           const imgBytes = Uint8Array.from(atob(freeImg.base64), c => c.charCodeAt(0))
