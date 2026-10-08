@@ -18,11 +18,11 @@
       "mouse": [[0, 560, 300], [170, 600, 320]]
     },
     {
-      "name": "hub",
-      "url": "https://vitalii.no/features",
+      "name": "page3",
+      "url": "https://vitalii.no/features/only-3-apps-count-as-plain-tv-now-every-new-app-defaults-to-needing-the-bonus-b69",
       "frames": 183,
-      "scroll": [[0, 0], [182, 1600]],
-      "mouse": [[0, 220, 180], [90, 620, 280], [182, 500, 220]]
+      "scroll": [[0, 900], [182, 1400]],
+      "mouse": [[0, 560, 300], [90, 600, 340], [182, 560, 360]]
     }
   ]
 }

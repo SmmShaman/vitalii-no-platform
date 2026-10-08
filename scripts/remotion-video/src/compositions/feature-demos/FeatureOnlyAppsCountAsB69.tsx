@@ -20,15 +20,19 @@
 //             an unknown one waved through as free.
 // b4 452-635  "So I flipped it: only three plain apps stay free, everything else
 //             now needs the bonus."
-//             handoffExplain over vitalii.no/features (hub) as evidence the
+//             handoffExplain over the feature's own article, scrolled past the
+//             problem section into the fix (shot "page3") as evidence the
 //             write-up exists. The zoom lands tight on the three-app allow list;
-//             the single tech caption (GuardService.java) is the point that
-//             matches this beat's commit, 875a550.
+//             the tech point names the actual file (GuardService.java) with a
+//             plain-English gloss, matching this beat's commit, 875a550.
 // b5 635-852  "I applied that rule across every device ... four places now."
-//             statusFocus: the rule holding in three new surfaces (Android
-//             overlay, Termux + Home PC bridge) plus the kiosk's own pre-existing
-//             gate — camera is now at its tightest, all four device chips lit.
-//             Holds to the end, no fade.
+//             statusFocus (hard-capped at 3 rows) lists only the three NEW
+//             surfaces the commit touched (Android overlay, Termux phone, Home
+//             PC bridge, each glossed with its real file); the fourth place —
+//             the kiosk's pre-existing gate — is carried by the lower third's
+//             four-chip strip + "SAME RULE, ×4" label instead, so the on-screen
+//             row count never contradicts the "four places" line. Camera is now
+//             at its tightest, all four device chips lit. Holds to the end, no fade.
 //
 // Persistent element: the zoom-in lower third (archetype 2) — a mock kiosk app
 // grid the camera pushes into, and a row of four device chips that light up as
@@ -130,10 +134,25 @@ const LowerThird: React.FC = () => {
         />
       </Arrive>
 
-      {/* product plate, b1 only */}
+      {/* product plate, b1 only — large enough and backed by its own chip so a
+          stranger can read what this even is, not three pixels of grey text. */}
       {cut(frame, B1, B2) === 1 && (
-        <div style={{ position: "absolute", left: LT.x + 14, top: LT.y - 30, fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: "#F5F5F5" }}>
-          BOYTASKS <span style={{ fontWeight: 500, opacity: 0.8 }}>· screen-time &amp; tasks, 3 kids</span>
+        <div
+          style={{
+            position: "absolute",
+            left: LT.x + 14,
+            top: LT.y - 42,
+            padding: "7px 16px",
+            background: "rgba(10,8,20,0.85)",
+            border: `1.5px solid ${P.accentEdge}`,
+            borderRadius: 4,
+            fontSize: 19,
+            fontWeight: 800,
+            letterSpacing: 1.3,
+            color: "#F5F5F5",
+          }}
+        >
+          BOYTASKS <span style={{ fontWeight: 500, opacity: 0.85 }}>· screen-time &amp; tasks, 3 kids</span>
         </div>
       )}
 
@@ -356,6 +375,7 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
+        plate={0.8}
         data={{ title: "New App, Free TV", kicker: "Installed quietly, counted as plain time by default" }}
       />
 
@@ -366,7 +386,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.8}
         data={{
           statement: "Only known apps were ever gated",
           tags: ["Unknown app = free", "No manual review", "Silent by default", "Same for every app"],
@@ -376,20 +396,21 @@ const Inner: React.FC = () => {
       {/* b3 — the metaphor, fully drawn */}
       <GuardMetaphor />
 
-      {/* b4 — the fix, over vitalii.no/features as evidence the write-up exists */}
-      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} focus={{ x: 0.5, y: 0.3 }} />}
+      {/* b4 — the fix, over the feature's own write-up (same article, scrolled to
+          the fix section) as evidence the change shipped */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page3" from={B4} hold={B5 - B4} focus={{ x: 0.5, y: 0.3 }} />}
       <MotionInsert
         effect="handoffExplain"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.8}
         data={{
           from: "Unfamiliar app = free",
           to: "Only 3 apps stay free",
           fromLabel: "BEFORE",
           toLabel: "NOW",
-          points: ["NRK, Prisma, Kyivstar only", "Every other app needs the bonus", "GuardService.java enforces it"],
+          points: ["NRK, Prisma, Kyivstar only", "Every other app needs the bonus", "Android app enforces it (GuardService.java)"],
         }}
       />
 
@@ -402,11 +423,11 @@ const Inner: React.FC = () => {
         plate={0.7}
         base={STAGE}
         data={{
-          title: "Same rule, four places",
+          title: "Same rule, every new surface",
           claims: [
-            { text: "TV kiosk gate", verdict: "yes" },
-            { text: "Android overlay guard", verdict: "yes" },
-            { text: "Termux + Home PC bridge", verdict: "yes" },
+            { text: "Android overlay guard (GuardService.java)", verdict: "yes" },
+            { text: "Termux phone script (guard-termux.sh)", verdict: "yes" },
+            { text: "Home PC bridge (bridge.py)", verdict: "yes" },
           ],
         }}
       />
