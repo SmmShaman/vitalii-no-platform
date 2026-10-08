@@ -1,5 +1,5 @@
 // FeatureOneCatalog23EffectsP73 — feature p73 — 1280x720, 997 frames @ 30fps, VOICE-SYNCED.
-// archetype 2 zoom-in, mood mint. Motion direction (feature-motion skill, 2026-10-07).
+// archetype 3 card-deck, mood dawn. Motion direction (feature-motion skill, 2026-10-07).
 //
 // One editorial effect per sentence from the digest's 23-effect catalog, over the real
 // product as evidence, one owner of the frame, a reading hold at the end of every beat,
@@ -7,33 +7,34 @@
 //
 // Beat → effect (data only from the feature row and commits 73dc668 / 6102737):
 // b1 15-210   "writes a script for each news beat, then has to guess which graphic fits"
-//             titleTakeover over the feature's own page. The catalog dock (archetype)
-//             sits small in the lower third, grey chips, a "?" badge — nothing resolved yet.
+//             titleTakeover over the feature's own page. The card deck (archetype) flies
+//             in and lands as a loose, slightly rotated pile over the lower third, a "?"
+//             badge above it — nothing resolved yet.
 // b2 210-421  "the script writer described a visual idea in prose; the renderer guessed"
-//             cornerTags: the claim + four facts, over the page scrolled further. The dock
-//             puts a red mismatch cross on one chip — the renderer picking the wrong one.
+//             cornerTags: the claim + four facts, over the page scrolled further. The pile
+//             puts a red mismatch cross on one card — the renderer picking the wrong one.
 // b3 421-582  "now both sides read from one shared catalog of effects, built with Remotion"
 //             handoffExplain over the real commit (73dc668, the digest-motion skill landing).
-//             The one tech name ("Remotion") sits in the hand-off points. The dock's chips
-//             flip from grey to lit — the catalog is now shared.
+//             The one tech name ("Remotion") sits in the hand-off points. The pile folds,
+//             one card at a time, into a tidy row — the catalog is now shared.
 // b4 582-799  "no more generic fallback graphics — percent rings, region callouts and
 //             timelines get picked by name instead" — effect: drawn. The archetype's
-//             payoff: the dock zooms from the lower third to fill the frame, its three
-//             named chips (Percent Ring, Region Callout, Timeline) punching large while
-//             the other three dim — the catalog, read by name, up close.
+//             payoff: the row fans out into a two-row grid filling the frame, the three
+//             named cards (Percent Ring, Region Callout, Timeline) on top, large, while
+//             the other three sit small and dim below — the catalog, read by name, up close.
 // b5 799-997  "that catalog started at 12 effects and grew, the same evening, to 23"
 //             ratioBars 12 → 23 over the real commit (6102737, motion grammar v2: 12
-//             reworked + 11 new = 23). The dock zooms back to the lower third, fully lit,
-//             a "23" badge popping where the "?" used to sit. Holds to the end, no fade.
+//             reworked + 11 new = 23). The grid folds back into the row, fully lit, a "23"
+//             badge popping where the "?" used to sit. Holds to the end, no fade.
 //
-// Persistent element: the catalog dock (archetype 2), b1 through b5 — it never leaves the
-// frame; it only changes how close the camera sits to it.
+// Persistent element: the card deck (archetype 3), b1 through b5 — it never leaves the
+// frame; the same six cards only change how they are arranged (pile → row → grid → row).
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { MotionInsert, LiveBackdrop, cut } from "./motion-primitives";
 import { LiveWindow, LogWindow, type LogLine } from "./live-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/p73.json";
@@ -45,21 +46,30 @@ const B4 = 582;
 const B5 = 799;
 const END = 997;
 
-/** Bright mint accent tuned for the dark stage plate. */
-const ACCENT = "#38D996";
-const STAGE = "#0C2018";
+/** Dawn accent (azure on deep navy) tuned for the dark stage plate. */
+const ACCENT = "#4C8DFF";
+const STAGE = "#0E1526";
 
-// The catalog dock: a lower third (archetype's resting geometry, matches the effects'
-// safe-bottom band) that zooms up to fill the frame for b4's payoff, then docks back.
-const DOCK = { x: 40, y: 606, w: 1200, h: 92 };
-const FULL = { x: 140, y: 72, w: 1000, h: 556 };
+// The card deck: six cards that start as a loose pile over the lower third (archetype's
+// resting band, matches the effects' safe-bottom band), fold into a tidy row once the
+// catalog is shared, then fan out into a grid filling the frame for b4's payoff.
+const BAND = { x: 40, y: 606, w: 1200, h: 92 };
+const GRID = { x: 140, y: 72, w: 1000, h: 556 };
 
-const ZOOM_IN_START = B4 + 15;
-const ZOOM_IN_DUR = 18;
-const ZOOM_OUT_START = B5 - 26;
-const ZOOM_OUT_DUR = 20;
+const GRID_IN_START = B4 + 15;
+const GRID_IN_DUR = 18;
+const GRID_OUT_START = B5 - 26;
+const GRID_OUT_DUR = 20;
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
+
+type Rect = { x: number; y: number; w: number; h: number };
+const mixRect = (p: number, a: Rect, b: Rect): Rect => ({
+  x: mix(p, a.x, b.x),
+  y: mix(p, a.y, b.y),
+  w: mix(p, a.w, b.w),
+  h: mix(p, a.h, b.h),
+});
 
 // b3: a second, sharply-zoomed window onto the real commit that earns "built with
 // Remotion" — the full-bleed LiveBackdrop behind HandoffExplain stays, but a blind
@@ -91,76 +101,45 @@ const CHIPS: Chip[] = [
   { key: "timeline", label: "Timeline", hero: true, gloss: "steps light up in order" },
 ];
 
-const CatalogDock: React.FC = () => {
+const CardDeck: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B1) return null;
 
-  const inT = tween(sec(frame, ZOOM_IN_START, fps), 0, ZOOM_IN_DUR / fps, ease.power3Out);
-  const outT = tween(sec(frame, ZOOM_OUT_START, fps), 0, ZOOM_OUT_DUR / fps, ease.power3Out);
-  const zoom = inT * (1 - outT);
+  // Row layout: six even slots across the band — the resting state once folded.
+  const PAD = 10;
+  const GAP = 6;
+  const slotW = (BAND.w - PAD * 2 - GAP * 5) / 6;
+  const rowH = BAND.h - PAD * 2;
+  const rowY = BAND.y + PAD;
 
-  const box = {
-    x: mix(zoom, DOCK.x, FULL.x),
-    y: mix(zoom, DOCK.y, FULL.y),
-    w: mix(zoom, DOCK.w, FULL.w),
-    h: mix(zoom, DOCK.h, FULL.h),
-  };
-  const heroReveal = zoom > 0.6;
+  // Grid layout: hero cards big on top, plain cards small and dim below.
+  const colGap = 24;
+  const colW = (GRID.w - colGap * 2) / 3;
+  const topRowH = GRID.h * 0.62;
+  const bottomRowH = GRID.h - topRowH - 16;
+  const bottomCardW = colW * 0.7;
+
+  const gridInT = tween(sec(frame, GRID_IN_START, fps), 0, GRID_IN_DUR / fps, ease.power3Out);
+  const gridOutT = tween(sec(frame, GRID_OUT_START, fps), 0, GRID_OUT_DUR / fps, ease.power3Out);
+  const gridness = gridInT * (1 - gridOutT);
 
   const mismatch = frame >= B2 && frame < B3;
-  const lit = frame >= B3;
   const showQuestion = frame < B2;
   const showCounter = frame >= B5 + 40;
   const counterPop = showCounter ? punchScale(sec(frame, B5 + 40, fps), 0) : 1;
 
-  const PAD = mix(zoom, 10, 30);
-  const GAP = mix(zoom, 6, 18);
-  const slotW = (box.w - PAD * 2 - GAP * 5) / 6;
-  const slotH = box.h - PAD * 2 - mix(zoom, 0, 46);
-  const slotY = box.y + PAD + mix(zoom, 0, 46);
-
-  const kicker = heroReveal ? "PICKED BY NAME" : "THE EFFECTS CATALOG";
-  const kickerSize = mix(zoom, 12, 20);
+  const kicker = gridness > 0.5 ? "PICKED BY NAME" : frame >= B3 ? "ONE SHARED CATALOG" : "GUESSWORK, CARD BY CARD";
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      <Arrive at={B1 + 4} kind="wipe" box={DOCK} dur={0.45}>
-        <div
-          style={{
-            position: "absolute",
-            left: box.x,
-            top: box.y,
-            width: box.w,
-            height: box.h,
-            background: P.card,
-            borderRadius: 6,
-            boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
-          }}
-        />
-      </Arrive>
-
-      <div
-        style={{
-          position: "absolute",
-          left: box.x + PAD,
-          top: box.y + 10,
-          fontSize: kickerSize,
-          fontWeight: 800,
-          letterSpacing: 2,
-          color: P.accent,
-        }}
-      >
-        {kicker}
-      </div>
-
       {showQuestion && (
         <div
           style={{
             position: "absolute",
-            left: box.x + box.w - 44,
-            top: box.y + 10,
+            left: BAND.x + BAND.w / 2 - 14,
+            top: BAND.y - 40,
             width: 28,
             height: 28,
             borderRadius: 14,
@@ -182,8 +161,8 @@ const CatalogDock: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            left: box.x + box.w - 56,
-            top: box.y + 6,
+            left: BAND.x + BAND.w - 56,
+            top: BAND.y - 42,
             width: 44,
             height: 32,
             borderRadius: 6,
@@ -201,56 +180,102 @@ const CatalogDock: React.FC = () => {
         </div>
       )}
 
+      <div
+        style={{
+          position: "absolute",
+          left: BAND.x + PAD,
+          top: BAND.y - 24,
+          fontSize: 14,
+          fontWeight: 800,
+          letterSpacing: 2,
+          color: P.accent,
+        }}
+      >
+        {kicker}
+      </div>
+
       {CHIPS.map((chip, i) => {
-        const x = box.x + PAD + i * (slotW + GAP);
+        // Pile: a loose stack over the band's centre, each card nudged and rotated.
+        const pileW = 150;
+        const pileH = 72;
+        const pileCx = BAND.x + BAND.w / 2;
+        const pileCy = BAND.y + BAND.h / 2;
+        const pileRect: Rect = {
+          x: pileCx - pileW / 2 + (i - 2.5) * 5,
+          y: pileCy - pileH / 2 - i * 2,
+          w: pileW,
+          h: pileH,
+        };
+        const pileRot = (i - 2.5) * 3.5;
+
+        const rowRect: Rect = { x: BAND.x + PAD + i * (slotW + GAP), y: rowY, w: slotW, h: rowH };
+
+        const isHero = chip.hero; // percent / region / timeline
+        const heroCol = i - 3; // 0,1,2 for the three hero cards
+        const plainCol = i; // 0,1,2 for the three plain cards
+        const gridRect: Rect = isHero
+          ? { x: GRID.x + heroCol * (colW + colGap), y: GRID.y, w: colW, h: topRowH }
+          : {
+              x: GRID.x + plainCol * (colW + colGap) + (colW - bottomCardW) / 2,
+              y: GRID.y + topRowH + 16,
+              w: bottomCardW,
+              h: bottomRowH,
+            };
+
+        // Fold from the pile into the row, one card at a time, once the catalog is shared.
+        const foldT = tween(sec(frame, B3, fps), i * 0.06, 0.5, ease.power3Out);
+        const settled = mixRect(gridness, rowRect, gridRect);
+        const rect = mixRect(foldT, pileRect, settled);
+        const rotation = pileRot * (1 - foldT);
+
+        // Fly in and stack at the very start of the clip, staggered.
+        const arriveT = sec(frame, B1 + 4, fps);
+        const entranceScale = punchScale(arriveT, i * 0.05);
+        const entranceOpacity = tween(arriveT, i * 0.05, 0.12, ease.linear);
+
         const isMismatchTarget = mismatch && chip.key === "corner";
-        const dim = heroReveal && !chip.hero;
-        const heroBig = heroReveal && chip.hero;
-        const bg = isMismatchTarget ? P.dangerBg : lit ? (dim ? P.chipBg : P.successBg) : P.chipBg;
-        const edge = isMismatchTarget ? P.dangerEdge : lit ? (dim ? P.border : P.successEdge) : P.border;
-        const fg = isMismatchTarget ? P.danger : lit ? (dim ? P.muted : P.success) : P.muted;
-        const labelSize = heroBig ? mix(zoom, 13, 26) : mix(zoom, 13, 16);
+        const landed = foldT > 0.5; // lights up the moment this card's own fold completes
+        const dimInGrid = gridness > 0.5 && !isHero;
+        const heroBigInGrid = gridness > 0.5 && isHero;
+
+        const bg = isMismatchTarget ? P.dangerBg : landed ? P.successBg : P.chipBg;
+        const edge = isMismatchTarget ? P.dangerEdge : landed ? P.successEdge : P.border;
+        const fg = isMismatchTarget ? P.danger : landed ? P.success : P.muted;
+        const labelSize = heroBigInGrid ? 24 : 14;
+
         return (
           <div
             key={chip.key}
             style={{
               position: "absolute",
-              left: x,
-              top: slotY,
-              width: slotW,
-              height: heroBig ? slotH * 1.12 : slotH,
-              transform: heroBig ? `translateY(${-slotH * 0.06}px)` : undefined,
+              left: rect.x,
+              top: rect.y,
+              width: rect.w,
+              height: rect.h,
+              transform: `rotate(${rotation}deg) scale(${entranceScale})`,
+              opacity: entranceOpacity * (dimInGrid ? 0.55 : 1),
               borderRadius: 6,
               background: bg,
               border: `2px solid ${edge}`,
+              boxShadow: "6px 6px 0 rgba(0,0,0,0.3)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               padding: 4,
               boxSizing: "border-box",
-              opacity: dim ? 0.55 : 1,
             }}
           >
             <div style={{ fontSize: labelSize, fontWeight: 800, color: fg, textAlign: "center", lineHeight: 1.15 }}>
               {chip.label}
             </div>
-            {heroBig && chip.gloss && (
-              <div
-                style={{
-                  fontSize: mix(zoom, 9, 14),
-                  fontWeight: 600,
-                  color: P.muted,
-                  textAlign: "center",
-                  marginTop: 4,
-                  lineHeight: 1.2,
-                }}
-              >
+            {heroBigInGrid && chip.gloss && (
+              <div style={{ fontSize: 13, fontWeight: 600, color: P.muted, textAlign: "center", marginTop: 4, lineHeight: 1.2 }}>
                 {chip.gloss}
               </div>
             )}
             {isMismatchTarget && (
-              <div style={{ position: "absolute", fontSize: slotH * 0.7, color: P.danger, fontWeight: 900 }}>×</div>
+              <div style={{ position: "absolute", fontSize: rect.h * 0.7, color: P.danger, fontWeight: 900 }}>×</div>
             )}
           </div>
         );
@@ -294,9 +319,9 @@ const Inner: React.FC = () => {
             gap: 10,
             padding: "8px 16px",
             borderRadius: 999,
-            background: "rgba(12,32,24,0.78)",
+            background: "rgba(14,21,38,0.78)",
             border: `1.5px solid ${ACCENT}`,
-            color: "#EAFBF2",
+            color: "#EAF1FF",
             fontSize: 18,
             fontWeight: 700,
             letterSpacing: 0.3,
@@ -356,7 +381,7 @@ const Inner: React.FC = () => {
         />
       )}
 
-      {/* b4 — archetype only: the dock zooms in, naming the three effects */}
+      {/* b4 — archetype only: the row fans out into a grid, naming the three effects */}
 
       {/* b5 — the result, over the commit that took the catalog from 12 to 23, holds to the end.
           RatioBars already darkens its own stage (look.scrim) for text contrast, so stacking
@@ -389,13 +414,13 @@ const Inner: React.FC = () => {
         />
       )}
 
-      <CatalogDock />
+      <CardDeck />
     </AbsoluteFill>
   );
 };
 
 export const FeatureOneCatalog23EffectsP73: React.FC = () => (
-  <PaletteProvider value={MOODS.mint}>
+  <PaletteProvider value={MOODS.dawn}>
     <Inner />
   </PaletteProvider>
 );

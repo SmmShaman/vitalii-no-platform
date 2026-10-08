@@ -1,0 +1,55 @@
+{
+  "id": "b69",
+  "composition": "FeatureOnlyAppsCountAsB69",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "New App, Free TV",
+        "kicker": "Installed quietly, counted as plain time by default"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "Only known apps were ever gated",
+        "tags": ["Unknown app = free", "No manual review", "Silent by default", "Same for every app"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": { "note": "guard-who-only-knows-faces metaphor, no catalog effect" }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Unfamiliar app = free",
+        "to": "Only 3 apps stay free",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["NRK, Prisma, Kyivstar only", "Every other app needs the bonus", "GuardService.java enforces it"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "statusFocus",
+      "backdrop": null,
+      "data": {
+        "title": "Same rule, four places",
+        "claims": [
+          { "text": "TV kiosk gate", "verdict": "yes" },
+          { "text": "Android overlay guard", "verdict": "yes" },
+          { "text": "Termux + Home PC bridge", "verdict": "yes" }
+        ]
+      }
+    }
+  ]
+}

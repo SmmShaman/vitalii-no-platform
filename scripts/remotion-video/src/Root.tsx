@@ -235,6 +235,7 @@ import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/Featu
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
 import { FeatureOneCatalog23EffectsP73 } from "./compositions/feature-demos/FeatureOneCatalog23EffectsP73";
 import { FeatureOneShowUsedSameP74 } from "./compositions/feature-demos/FeatureOneShowUsedSameP74";
+import { FeatureOnlyAppsCountAsB69 } from "./compositions/feature-demos/FeatureOnlyAppsCountAsB69";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2310,6 +2311,15 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureOneShowUsedSameP74"
         component={FeatureOneShowUsedSameP74}
         durationInFrames={925}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureOnlyAppsCountAsB69"
+        component={FeatureOnlyAppsCountAsB69}
+        durationInFrames={897}
         fps={30}
         width={1280}
         height={720}
