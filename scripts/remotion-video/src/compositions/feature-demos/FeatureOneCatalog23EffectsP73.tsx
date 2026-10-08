@@ -273,14 +273,18 @@ const Inner: React.FC = () => {
 
       {/* b4 — archetype only: the dock zooms in, naming the three effects */}
 
-      {/* b5 — the result, over the commit that took the catalog from 12 to 23, holds to the end */}
+      {/* b5 — the result, over the commit that took the catalog from 12 to 23, holds to the end.
+          RatioBars already darkens its own stage (look.scrim) for text contrast, so stacking
+          the usual plate=0.7 on top left the commit diff almost fully black behind the two
+          bars — most of the frame read as empty. A much lighter plate here lets the real
+          diff show through while RatioBars' own scrim still carries the text contrast. */}
       {frame >= B5 && <LiveBackdrop file={shotsFile} shot="commit2" from={B5} hold={END - B5} focus={{ x: 0.5, y: 0.3 }} />}
       <MotionInsert
         effect="ratioBars"
         from={B5}
         dur={END - B5}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.15}
         data={{
           title: "Effects in the shared catalog",
           a: { label: "Started the catalog", value: 12 },
