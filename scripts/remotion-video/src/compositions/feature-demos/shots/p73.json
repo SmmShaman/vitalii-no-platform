@@ -1,0 +1,64 @@
+{
+  "id": "p73",
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/one-catalog-23-effects-the-digest-finally-knows-which-graphic-fits-each-sentence-p73",
+      "frames": 195,
+      "scroll": [
+        [0, 0],
+        [100, 220],
+        [194, 420]
+      ],
+      "mouse": [
+        [0, 520, 200],
+        [100, 580, 250],
+        [194, 560, 300]
+      ]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/one-catalog-23-effects-the-digest-finally-knows-which-graphic-fits-each-sentence-p73",
+      "frames": 211,
+      "scroll": [
+        [0, 420],
+        [210, 900]
+      ],
+      "mouse": [
+        [0, 560, 300],
+        [210, 600, 320]
+      ]
+    },
+    {
+      "name": "commit1",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/73dc6687a70cf56b382c0dc075f79fa7fcfe4010",
+      "frames": 161,
+      "scroll": [
+        [0, 300],
+        [160, 950]
+      ],
+      "mouse": [
+        [0, 700, 300],
+        [160, 650, 340]
+      ]
+    },
+    {
+      "name": "commit2",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/61027379de02f366434343bcc22ac33b49636531",
+      "frames": 198,
+      "scroll": [
+        [0, 300],
+        [197, 1050]
+      ],
+      "mouse": [
+        [0, 700, 300],
+        [197, 640, 330]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+ "id": "p73",
+ "composition": "FeatureOneCatalog23EffectsP73",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "page",
+   "data": {
+    "title": "Which graphic fits?",
+    "kicker": "My digest guesses, beat by beat"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "page2",
+   "data": {
+    "statement": "Two sides, no shared vocabulary",
+    "tags": ["Idea described in prose", "Renderer's fixed list", "Guesswork every beat", "Mismatched graphics"]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "handoffExplain",
+   "backdrop": "commit1",
+   "data": {
+    "from": "Guessing from two separate lists",
+    "to": "One shared effects catalog",
+    "fromLabel": "BEFORE",
+    "toLabel": "NOW",
+    "points": ["Script picks an effect by name", "Renderer resolves the same name", "Built with Remotion"]
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "drawn",
+   "backdrop": null,
+   "note": "archetype element only: the catalog grid zooms to full frame, naming percentRing/regionCallout/timelineNodes"
+  },
+  {
+   "beat": "b5",
+   "effect": "ratioBars",
+   "backdrop": "commit2",
+   "data": {
+    "title": "Effects in the shared catalog",
+    "a": { "label": "Started the catalog", "value": 12 },
+    "b": { "label": "By the same evening", "value": 23 },
+    "unit": "effects",
+    "caption": "+11 in one evening"
+   }
+  }
+ ]
+}
