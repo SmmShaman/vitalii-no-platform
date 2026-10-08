@@ -254,6 +254,7 @@ const CardDeck: React.FC = () => {
               height: rect.h,
               transform: `rotate(${rotation}deg) scale(${entranceScale})`,
               opacity: entranceOpacity * (dimInGrid ? 0.55 : 1),
+              zIndex: isMismatchTarget ? 50 : i,
               borderRadius: 6,
               background: bg,
               border: `2px solid ${edge}`,

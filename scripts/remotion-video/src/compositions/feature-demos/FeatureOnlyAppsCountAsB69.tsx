@@ -246,36 +246,79 @@ const LowerThird: React.FC = () => {
   );
 };
 
-/** b3 — "a guard who only recognizes faces he's already met." Drawn, no catalog effect. */
+/** b3 — "a guard who only recognizes faces he's already met." Drawn, no catalog effect.
+    Two big labelled panels pushed to the frame's edges (not two small icons adrift in the
+    middle) so the canvas reads full even with no backdrop and no lower-third zoom. */
 const GuardMetaphor: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   if (cut(frame, B3, B4) !== 1) return null;
   const t = sec(frame, B3, fps);
-  const leftIn = tween(t, 0.2, 0.3, ease.power3Out);
-  const rightIn = tween(t, 0.5, 0.3, ease.power3Out);
-  const arrowIn = tween(t, 0.9, 0.3, ease.power2Out);
+  const leftIn = tween(t, 0.15, 0.3, ease.power3Out);
+  const rightIn = tween(t, 0.4, 0.3, ease.power3Out);
+  const arrowIn = tween(t, 0.7, 0.3, ease.power2Out);
+  const captionIn = tween(t, 0.9, 0.3, ease.power2Out);
+
+  const CARD_W = 400;
+  const CARD_H = 360;
+  const CARD_Y = 110;
+  const LEFT_X = 90;
+  const RIGHT_X = 1280 - 90 - CARD_W;
 
   return (
-    <AbsoluteFill style={{ background: "radial-gradient(ellipse 75% 45% at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0.3))" }}>
-      <div style={{ position: "absolute", left: 420, top: 220, width: 220, textAlign: "center", opacity: leftIn, transform: `translateY(${mix(leftIn, 18, 0)}px)` }}>
-        <div style={{ fontSize: 72 }}>🪪</div>
-        <div style={{ marginTop: 8, fontSize: 20, fontWeight: 800, color: "#8FE3B0", letterSpacing: 1 }}>FACE I KNOW</div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "#CFCCE0" }}>recognized · gated</div>
-      </div>
-      <div style={{ position: "absolute", left: 700, top: 220, width: 220, textAlign: "center", opacity: rightIn, transform: `translateY(${mix(rightIn, 18, 0)}px)` }}>
-        <div style={{ fontSize: 72 }}>❓</div>
-        <div style={{ marginTop: 8, fontSize: 20, fontWeight: 800, color: "#F2C177", letterSpacing: 1 }}>NEW FACE</div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "#CFCCE0" }}>never seen · waved through</div>
+    <AbsoluteFill style={{ background: "radial-gradient(ellipse 85% 70% at 50% 42%, rgba(30,20,60,0.5), rgba(0,0,0,0.25))" }}>
+      <div
+        style={{
+          position: "absolute",
+          left: LEFT_X,
+          top: CARD_Y,
+          width: CARD_W,
+          height: CARD_H,
+          borderRadius: 16,
+          background: "rgba(143,227,176,0.08)",
+          border: "2px solid rgba(143,227,176,0.5)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: leftIn,
+          transform: `translateY(${mix(leftIn, 24, 0)}px)`,
+        }}
+      >
+        <div style={{ fontSize: 120 }}>🪪</div>
+        <div style={{ marginTop: 16, fontSize: 30, fontWeight: 800, color: "#8FE3B0", letterSpacing: 1 }}>FACE I KNOW</div>
+        <div style={{ marginTop: 6, fontSize: 17, fontWeight: 600, color: "#CFCCE0" }}>recognized · gated</div>
       </div>
       <div
         style={{
           position: "absolute",
-          left: 760,
-          top: 310,
-          width: 120,
+          left: RIGHT_X,
+          top: CARD_Y,
+          width: CARD_W,
+          height: CARD_H,
+          borderRadius: 16,
+          background: "rgba(242,193,119,0.08)",
+          border: "2px solid rgba(242,193,119,0.5)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          opacity: rightIn,
+          transform: `translateY(${mix(rightIn, 24, 0)}px)`,
+        }}
+      >
+        <div style={{ fontSize: 120 }}>❓</div>
+        <div style={{ marginTop: 16, fontSize: 30, fontWeight: 800, color: "#F2C177", letterSpacing: 1 }}>NEW FACE</div>
+        <div style={{ marginTop: 6, fontSize: 17, fontWeight: 600, color: "#CFCCE0" }}>never seen · waved through</div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: LEFT_X + CARD_W,
+          top: CARD_Y + CARD_H / 2 - 24,
+          width: RIGHT_X - (LEFT_X + CARD_W),
           textAlign: "center",
-          fontSize: 16,
+          fontSize: 22,
           fontWeight: 800,
           color: "#F2C177",
           opacity: arrowIn,
@@ -283,7 +326,19 @@ const GuardMetaphor: React.FC = () => {
       >
         → FREE
       </div>
-      <div style={{ position: "absolute", left: 0, bottom: 150, width: 1280, textAlign: "center", fontSize: 24, fontWeight: 700, color: "#F5F5F5" }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: CARD_Y + CARD_H + 40,
+          width: 1280,
+          textAlign: "center",
+          fontSize: 28,
+          fontWeight: 700,
+          color: "#F5F5F5",
+          opacity: captionIn,
+        }}
+      >
         Like a guard who only recognizes faces he's already met
       </div>
     </AbsoluteFill>
