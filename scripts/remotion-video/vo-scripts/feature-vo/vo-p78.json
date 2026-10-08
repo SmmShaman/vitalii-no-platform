@@ -1,0 +1,56 @@
+{
+ "id": "p78",
+ "beat_durations": {
+  "b1": 5.352,
+  "b2": 6.408,
+  "b3": 4.656,
+  "b4": 3.912,
+  "b5": 5.496
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One outage, and two whole video segments went out carrying zero AI direction at all.",
+   "start_s": 0.5,
+   "end_s": 5.852,
+   "start_f": 15,
+   "end_f": 176
+  },
+  {
+   "beat": "b2",
+   "text": "My video pipeline only ever asks one AI service \u2014 when it's down, there's no backup plan.",
+   "start_s": 6.152,
+   "end_s": 12.56,
+   "start_f": 185,
+   "end_f": 377
+  },
+  {
+   "beat": "b3",
+   "text": "On October 7th, that's exactly what happened, right in the middle of a render.",
+   "start_s": 12.86,
+   "end_s": 17.516,
+   "start_f": 386,
+   "end_f": 525
+  },
+  {
+   "beat": "b4",
+   "text": "Now Groq quietly steps in the moment that main service fails.",
+   "start_s": 17.816,
+   "end_s": 21.728,
+   "start_f": 534,
+   "end_f": 652
+  },
+  {
+   "beat": "b5",
+   "text": "Every segment still gets its direction \u2014 closing the exact gap from October 7th.",
+   "start_s": 22.028,
+   "end_s": 27.524,
+   "start_f": 661,
+   "end_f": 826
+  }
+ ],
+ "total_s": 29.024,
+ "durationInFrames": 871,
+ "measured_track_s": 27.576,
+ "track": "/root/feature-demos/vo-p78/vo-p78.mp3"
+}

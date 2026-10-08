@@ -1,0 +1,56 @@
+{
+ "id": "p77",
+ "beat_durations": {
+  "b1": 4.704,
+  "b2": 4.992,
+  "b3": 3.648,
+  "b4": 5.472,
+  "b5": 4.536
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My image generator was quietly failing for over ten days, and I never knew.",
+   "start_s": 0.5,
+   "end_s": 5.204,
+   "start_f": 15,
+   "end_f": 156
+  },
+  {
+   "beat": "b2",
+   "text": "The free provider kept getting rejected \u2014 but a paid backup silently covered for it.",
+   "start_s": 5.504,
+   "end_s": 10.496,
+   "start_f": 165,
+   "end_f": 315
+  },
+  {
+   "beat": "b3",
+   "text": "So the site looked fine while a hidden bill kept running underneath.",
+   "start_s": 10.796,
+   "end_s": 14.444,
+   "start_f": 324,
+   "end_f": 433
+  },
+  {
+   "beat": "b4",
+   "text": "I fixed the real bug in Cloudflare's request shape, then deleted every paid fallback.",
+   "start_s": 14.744,
+   "end_s": 20.216,
+   "start_f": 442,
+   "end_f": 606
+  },
+  {
+   "beat": "b5",
+   "text": "Now if the free path breaks, I see it right away \u2014 not ten days later.",
+   "start_s": 20.516,
+   "end_s": 25.052,
+   "start_f": 615,
+   "end_f": 752
+  }
+ ],
+ "total_s": 26.552,
+ "durationInFrames": 797,
+ "measured_track_s": 25.104,
+ "track": "/root/feature-demos/vo-p77/vo-p77.mp3"
+}

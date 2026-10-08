@@ -1,0 +1,7 @@
+{"id": "p78", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "One outage, and two whole video segments went out carrying zero AI direction at all."],
+  ["b2", "My video pipeline only ever asks one AI service — when it's down, there's no backup plan."],
+  ["b3", "On October 7th, that's exactly what happened, right in the middle of a render."],
+  ["b4", "Now Groq quietly steps in the moment that main service fails."],
+  ["b5", "Every segment still gets its direction — closing the exact gap from October 7th."]
+]}

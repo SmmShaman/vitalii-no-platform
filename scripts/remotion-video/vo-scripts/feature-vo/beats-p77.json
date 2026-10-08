@@ -1,0 +1,7 @@
+{"id": "p77", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "My image generator was quietly failing for over ten days, and I never knew."],
+  ["b2", "The free provider kept getting rejected — but a paid backup silently covered for it."],
+  ["b3", "So the site looked fine while a hidden bill kept running underneath."],
+  ["b4", "I fixed the real bug in Cloudflare's request shape, then deleted every paid fallback."],
+  ["b5", "Now if the free path breaks, I see it right away — not ten days later."]
+]}
