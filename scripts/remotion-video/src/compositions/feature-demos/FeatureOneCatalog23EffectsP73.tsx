@@ -34,6 +34,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { LiveWindow, LogWindow, type LogLine } from "./live-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/p73.json";
 
@@ -60,14 +61,34 @@ const ZOOM_OUT_DUR = 20;
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-type Chip = { key: string; label: string; hero: boolean };
+// b3: a second, sharply-zoomed window onto the real commit that earns "built with
+// Remotion" — the full-bleed LiveBackdrop behind HandoffExplain stays, but a blind
+// viewer read it as an AI chat screenshot because its scroll target (shots/p73.json)
+// used to land on the commit message, not the diff. Fades out before HandoffExplain's
+// own camera pan (~local frame 77) brings its "new" card into this same screen region.
+const LW3_IN = B3 + 6;
+const LW3_HOLD_END = B3 + 70;
+const LW3_OUT_DUR = 10;
+
+// b5: "see it work" — a terminal log built only from this feature's own real names
+// and numbers (no invented article content), proving the catalog gets read by name.
+const CATALOG_LOG: LogLine[] = [
+  { t: "73dc668", text: "catalog landed: 12 effects", tone: "accent" },
+  { t: "pick", text: "percentRing   — by name", tone: "ink" },
+  { t: "pick", text: "regionCallout — by name", tone: "ink" },
+  { t: "pick", text: "timeline      — by name", tone: "ink" },
+  { t: "6102737", text: "+11 new, same evening", tone: "accent" },
+  { t: "done", text: "catalog: 23, 0 fallbacks", tone: "success" },
+];
+
+type Chip = { key: string; label: string; hero: boolean; gloss?: string };
 const CHIPS: Chip[] = [
   { key: "title", label: "Title Takeover", hero: false },
   { key: "corner", label: "Corner Tags", hero: false },
   { key: "handoff", label: "Handoff", hero: false },
-  { key: "percent", label: "Percent Ring", hero: true },
-  { key: "region", label: "Region Callout", hero: true },
-  { key: "timeline", label: "Timeline", hero: true },
+  { key: "percent", label: "Percent Ring", hero: true, gloss: "a % fills a ring" },
+  { key: "region", label: "Region Callout", hero: true, gloss: "a map pin + label" },
+  { key: "timeline", label: "Timeline", hero: true, gloss: "steps light up in order" },
 ];
 
 const CatalogDock: React.FC = () => {
@@ -188,7 +209,7 @@ const CatalogDock: React.FC = () => {
         const bg = isMismatchTarget ? P.dangerBg : lit ? (dim ? P.chipBg : P.successBg) : P.chipBg;
         const edge = isMismatchTarget ? P.dangerEdge : lit ? (dim ? P.border : P.successEdge) : P.border;
         const fg = isMismatchTarget ? P.danger : lit ? (dim ? P.muted : P.success) : P.muted;
-        const labelSize = heroBig ? mix(zoom, 11, 26) : mix(zoom, 10, 16);
+        const labelSize = heroBig ? mix(zoom, 13, 26) : mix(zoom, 13, 16);
         return (
           <div
             key={chip.key}
@@ -214,6 +235,20 @@ const CatalogDock: React.FC = () => {
             <div style={{ fontSize: labelSize, fontWeight: 800, color: fg, textAlign: "center", lineHeight: 1.15 }}>
               {chip.label}
             </div>
+            {heroBig && chip.gloss && (
+              <div
+                style={{
+                  fontSize: mix(zoom, 9, 14),
+                  fontWeight: 600,
+                  color: P.muted,
+                  textAlign: "center",
+                  marginTop: 4,
+                  lineHeight: 1.2,
+                }}
+              >
+                {chip.gloss}
+              </div>
+            )}
             {isMismatchTarget && (
               <div style={{ position: "absolute", fontSize: slotH * 0.7, color: P.danger, fontWeight: 900 }}>×</div>
             )}
@@ -226,6 +261,17 @@ const CatalogDock: React.FC = () => {
 
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+
+  // b1 — a one-line product plate: who this is, so a stranger isn't left guessing.
+  const plateT = tween(sec(frame, B1 + 4, fps), 0, 0.3, ease.power3Out);
+  const plateOpacity = frame >= B1 && frame < B2 ? plateT : 0;
+
+  // b3 — the sharp, zoomed window onto the real commit (see LW3_* comment above).
+  const lw3In = tween(sec(frame, LW3_IN, fps), 0, 0.2, ease.power2Out);
+  const lw3Out = tween(sec(frame, LW3_HOLD_END, fps), 0, LW3_OUT_DUR / fps, ease.power2Out);
+  const lw3Opacity = frame >= B3 && frame < B4 ? lw3In * (1 - lw3Out) : 0;
+
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       {/* b1 — the problem, over the feature's own page */}
@@ -237,6 +283,32 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{ title: "Which graphic fits?", kicker: "My digest guesses, beat by beat" }}
       />
+      {plateOpacity > 0.004 && (
+        <div
+          style={{
+            position: "absolute",
+            left: 40,
+            top: 28,
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            padding: "8px 16px",
+            borderRadius: 999,
+            background: "rgba(12,32,24,0.78)",
+            border: `1.5px solid ${ACCENT}`,
+            color: "#EAFBF2",
+            fontSize: 18,
+            fontWeight: 700,
+            letterSpacing: 0.3,
+            fontFamily,
+            opacity: plateOpacity,
+            transform: `translateY(${(1 - plateOpacity) * -8}px)`,
+          }}
+        >
+          <span style={{ color: ACCENT, fontWeight: 800 }}>vitalii.no</span>
+          <span style={{ opacity: 0.85 }}>— Portfolio &amp; News Platform</span>
+        </div>
+      )}
 
       {/* b2 — no shared vocabulary between the two steps */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
@@ -270,6 +342,19 @@ const Inner: React.FC = () => {
           points: ["Script picks an effect by name", "Renderer resolves the same name", "Built with Remotion"],
         }}
       />
+      {lw3Opacity > 0.004 && (
+        <LiveWindow
+          file={shotsFile}
+          shot="commit1"
+          title="commit 73dc668 · MotionPreviewEntry.tsx"
+          from={B3}
+          hold={B4 - B3}
+          zoom={(t) => 2.0 + 0.3 * t}
+          focus={{ x: 0.42, y: 0.3 }}
+          opacity={lw3Opacity}
+          win={{ x: 740, y: 140, w: 460, h: 380 }}
+        />
+      )}
 
       {/* b4 — archetype only: the dock zooms in, naming the three effects */}
 
@@ -293,6 +378,16 @@ const Inner: React.FC = () => {
           caption: "+11 in one evening",
         }}
       />
+      {frame >= B5 && (
+        <LogWindow
+          lines={CATALOG_LOG}
+          title="digest-motion log"
+          from={B5 + 14}
+          every={18}
+          opacity={1}
+          win={{ x: 40, y: 16, w: 560, h: 208 }}
+        />
+      )}
 
       <CatalogDock />
     </AbsoluteFill>
