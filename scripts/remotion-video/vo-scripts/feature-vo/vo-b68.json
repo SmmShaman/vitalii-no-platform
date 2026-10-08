@@ -1,0 +1,56 @@
+{
+ "id": "b68",
+ "beat_durations": {
+  "b1": 4.656,
+  "b2": 5.544,
+  "b3": 3.912,
+  "b4": 5.88,
+  "b5": 5.88
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One of the four boys slipped out, and the family TV still thought he was home.",
+   "start_s": 0.5,
+   "end_s": 5.156,
+   "start_f": 15,
+   "end_f": 155
+  },
+  {
+   "beat": "b2",
+   "text": "It trusted only the hallway camera, so the whole house stayed stuck on a boy who'd already left.",
+   "start_s": 5.456,
+   "end_s": 11.0,
+   "start_f": 164,
+   "end_f": 330
+  },
+  {
+   "beat": "b3",
+   "text": "Now any boy taps his own name on the kiosk the moment he's gone.",
+   "start_s": 11.3,
+   "end_s": 15.212,
+   "start_f": 339,
+   "end_f": 456
+  },
+  {
+   "beat": "b4",
+   "text": "A two-tap confirm guards against accidents, then Cloudflare Workers updates the house instantly.",
+   "start_s": 15.512,
+   "end_s": 21.392,
+   "start_f": 465,
+   "end_f": 642
+  },
+  {
+   "beat": "b5",
+   "text": "The camera brings him back the instant it sees him again - home or away in just two taps.",
+   "start_s": 21.692,
+   "end_s": 27.572,
+   "start_f": 651,
+   "end_f": 827
+  }
+ ],
+ "total_s": 29.072,
+ "durationInFrames": 872,
+ "measured_track_s": 27.624,
+ "track": "/root/feature-demos/vo-b68/vo-b68.mp3"
+}
