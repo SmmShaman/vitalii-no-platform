@@ -1,0 +1,7 @@
+{"id": "d04", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every insulin dose Artem's parents worked out lived only in their heads, or on a scrap of paper."],
+ ["b2", "No record for the doctor. No history of how his settings changed over time."],
+ ["b3", "Estimating carbs for a new meal meant guessing from a label in a language nobody could read fast enough."],
+ ["b4", "Now every dose and setting change gets logged automatically, with a timestamp."],
+ ["b5", "A photo of the meal, read by AI vision, fills in the carbs — one photo instead of a label lookup."]
+]}

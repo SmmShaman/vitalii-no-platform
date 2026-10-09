@@ -1,0 +1,56 @@
+{
+ "id": "d04",
+ "beat_durations": {
+  "b1": 5.976,
+  "b2": 4.488,
+  "b3": 6.528,
+  "b4": 4.944,
+  "b5": 6.672
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every insulin dose Artem's parents worked out lived only in their heads, or on a scrap of paper.",
+   "start_s": 0.5,
+   "end_s": 6.476,
+   "start_f": 15,
+   "end_f": 194
+  },
+  {
+   "beat": "b2",
+   "text": "No record for the doctor. No history of how his settings changed over time.",
+   "start_s": 6.776,
+   "end_s": 11.264,
+   "start_f": 203,
+   "end_f": 338
+  },
+  {
+   "beat": "b3",
+   "text": "Estimating carbs for a new meal meant guessing from a label in a language nobody could read fast enough.",
+   "start_s": 11.564,
+   "end_s": 18.092,
+   "start_f": 347,
+   "end_f": 543
+  },
+  {
+   "beat": "b4",
+   "text": "Now every dose and setting change gets logged automatically, with a timestamp.",
+   "start_s": 18.392,
+   "end_s": 23.336,
+   "start_f": 552,
+   "end_f": 700
+  },
+  {
+   "beat": "b5",
+   "text": "A photo of the meal, read by AI vision, fills in the carbs \u2014 one photo instead of a label lookup.",
+   "start_s": 23.636,
+   "end_s": 30.308,
+   "start_f": 709,
+   "end_f": 909
+  }
+ ],
+ "total_s": 31.808,
+ "durationInFrames": 954,
+ "measured_track_s": 30.36,
+ "track": "/root/feature-demos/vo-d04/vo-d04.mp3"
+}

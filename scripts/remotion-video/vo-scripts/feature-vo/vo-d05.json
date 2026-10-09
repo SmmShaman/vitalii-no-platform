@@ -1,0 +1,65 @@
+{
+ "id": "d05",
+ "beat_durations": {
+  "b1": 4.896,
+  "b2": 4.584,
+  "b3": 4.512,
+  "b4": 2.328,
+  "b5": 4.464,
+  "b6": 4.176
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every new snack meant re-reading the label and typing in its carb count by hand.",
+   "start_s": 0.5,
+   "end_s": 5.396,
+   "start_f": 15,
+   "end_f": 162
+  },
+  {
+   "beat": "b2",
+   "text": "Even for a product already measured months ago \u2014 the work never got saved.",
+   "start_s": 5.696,
+   "end_s": 10.28,
+   "start_f": 171,
+   "end_f": 308
+  },
+  {
+   "beat": "b3",
+   "text": "And nothing stopped Artem from quietly changing a number his doctor relied on.",
+   "start_s": 10.58,
+   "end_s": 15.092,
+   "start_f": 317,
+   "end_f": 453
+  },
+  {
+   "beat": "b4",
+   "text": "Now one photo of the label is enough.",
+   "start_s": 15.392,
+   "end_s": 17.72,
+   "start_f": 462,
+   "end_f": 532
+  },
+  {
+   "beat": "b5",
+   "text": "AI vision reads the carbs and files the product under its own category.",
+   "start_s": 18.02,
+   "end_s": 22.484,
+   "start_f": 541,
+   "end_f": 675
+  },
+  {
+   "beat": "b6",
+   "text": "Measured once, that snack's carbs are ready every time it comes back.",
+   "start_s": 22.784,
+   "end_s": 26.96,
+   "start_f": 684,
+   "end_f": 809
+  }
+ ],
+ "total_s": 28.46,
+ "durationInFrames": 854,
+ "measured_track_s": 27.024,
+ "track": "/root/feature-demos/vo-d05/vo-d05.mp3"
+}
