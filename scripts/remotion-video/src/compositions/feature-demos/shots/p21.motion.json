@@ -1,0 +1,11 @@
+{
+  "id": "p21",
+  "composition": "FeatureMtkrutoVideo",
+  "beats": [
+    {"beat":"b1","effect":"drawn","backdrop":null,"data":{"value":"20 MB","status":"HARD CEILING"}},
+    {"beat":"b2","effect":"cornerTags","backdrop":null,"data":{"statement":"Telegram's Bot API caps downloads at 20 MB","tags":["20 MB hard limit","Bigger = instant fail","No retry, no record","Like a letter slot"]}},
+    {"beat":"b3","effect":"handoffExplain","backdrop":"commit","data":{"from":"Bot API session","to":"Real user (MTKruto)","fromLabel":"BEFORE","toLabel":"NOW","points":["Full MTProto client, not just a bot","Same protocol a real Telegram app uses","Download ceiling: 20 MB -> 2 GB"]}},
+    {"beat":"b4","effect":"ratioBars","backdrop":null,"data":{"title":"Download ceiling","a":{"label":"Bot API limit","value":20},"b":{"label":"MTKruto client","value":2000},"unit":"MB","caption":"100x the ceiling"}},
+    {"beat":"b5","effect":"drawn","backdrop":null,"data":{"value":"100%","status":"FAILURES GONE"}}
+  ]
+}

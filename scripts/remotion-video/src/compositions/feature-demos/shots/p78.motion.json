@@ -1,0 +1,11 @@
+{
+  "id": "p78",
+  "composition": "FeatureGeminiOutageBlankedOutP78",
+  "beats": [
+    {"beat":"b1","effect":"drawn","backdrop":null,"data":{"value":"1","status":"NO FALLBACK"}},
+    {"beat":"b2","effect":"pipelineFlow","backdrop":"commits","data":{"system":"video-processor","steps":["GitHub Actions run","visual-director.js","llm-helper.js","Gemini (only)"],"result":"Down = no direction"}},
+    {"beat":"b3","effect":"cornerTags","backdrop":"actions","data":{"statement":"October 7th outage","tags":["Gemini: 503","Mid-render","2 segments blind","No fallback"]}},
+    {"beat":"b4","effect":"handoffExplain","backdrop":null,"data":{"from":"Gemini only","to":"Gemini + Groq","fromLabel":"BEFORE","toLabel":"NOW","points":["llm-helper.js retries Groq","visual-director.js wired in","3 workflows updated","Segment keeps its direction"]}},
+    {"beat":"b5","effect":"drawn","backdrop":null,"data":{"value":"2","status":"GEMINI + GROQ"}}
+  ]
+}

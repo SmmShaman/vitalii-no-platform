@@ -1,0 +1,53 @@
+{
+  "id": "p77",
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/news-images-were-secretly-costing-money-for-10-days-now-theres-no-paid-fallback--p77",
+      "frames": 150,
+      "scroll": [
+        [0, 0],
+        [75, 180],
+        [149, 360]
+      ],
+      "mouse": [
+        [0, 560, 260],
+        [75, 600, 300],
+        [149, 580, 340]
+      ]
+    },
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commits",
+      "frames": 159,
+      "scroll": [
+        [0, 0],
+        [90, 280],
+        [158, 520]
+      ],
+      "mouse": [
+        [0, 540, 240],
+        [90, 600, 280],
+        [158, 560, 330]
+      ]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/actions",
+      "frames": 118,
+      "scroll": [
+        [0, 0],
+        [117, 300]
+      ],
+      "mouse": [
+        [0, 540, 240],
+        [117, 600, 300]
+      ]
+    }
+  ]
+}

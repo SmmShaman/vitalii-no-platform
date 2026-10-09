@@ -1,0 +1,11 @@
+{
+  "id": "p77",
+  "composition": "FeatureNewsImagesWereSecretlyP77",
+  "beats": [
+    {"beat":"b1","effect":"drawn","backdrop":"page","data":{"value":"10+","status":"DAYS UNNOTICED"}},
+    {"beat":"b2","effect":"cornerTags","backdrop":"commits","data":{"statement":"Free image path silently failing","tags":["Cloudflare FLUX: 0%","HTTP 400 since Aug 19","Paid backup covered it","10+ days unnoticed"]}},
+    {"beat":"b3","effect":"statusFocus","backdrop":"actions","data":{"title":"WHAT WAS REALLY HAPPENING","claims":[{"text":"Images looked fine to visitors","verdict":"yes"},{"text":"Free provider was working","verdict":"no"},{"text":"A paid bill was quietly running","verdict":"yes"}]}},
+    {"beat":"b4","effect":"handoffExplain","backdrop":null,"data":{"from":"Free path broken + paid fallback","to":"Free path fixed, zero fallback","fromLabel":"BEFORE","toLabel":"NOW","points":["Fixed Cloudflare request shape in process-image","Deleted the entire paid fallback chain","Removed billed critic + photo-edit steps","1,060 lines removed from one function"]}},
+    {"beat":"b5","effect":"drawn","backdrop":null,"data":{"value":"1","status":"FREE PATH ONLY"}}
+  ]
+}

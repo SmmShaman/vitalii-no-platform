@@ -236,6 +236,8 @@ import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos
 import { FeatureOneCatalog23EffectsP73 } from "./compositions/feature-demos/FeatureOneCatalog23EffectsP73";
 import { FeatureOneShowUsedSameP74 } from "./compositions/feature-demos/FeatureOneShowUsedSameP74";
 import { FeatureOnlyAppsCountAsB69 } from "./compositions/feature-demos/FeatureOnlyAppsCountAsB69";
+import { FeatureGeminiOutageBlankedOutP78 } from "./compositions/feature-demos/FeatureGeminiOutageBlankedOutP78";
+import { FeatureNewsImagesWereSecretlyP77 } from "./compositions/feature-demos/FeatureNewsImagesWereSecretlyP77";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2320,6 +2322,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureOnlyAppsCountAsB69"
         component={FeatureOnlyAppsCountAsB69}
         durationInFrames={897}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureGeminiOutageBlankedOutP78"
+        component={FeatureGeminiOutageBlankedOutP78}
+        durationInFrames={871}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNewsImagesWereSecretlyP77"
+        component={FeatureNewsImagesWereSecretlyP77}
+        durationInFrames={797}
         fps={30}
         width={1280}
         height={720}
