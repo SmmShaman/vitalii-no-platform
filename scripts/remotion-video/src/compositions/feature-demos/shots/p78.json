@@ -9,29 +9,35 @@
     {
       "name": "page",
       "url": "https://vitalii.no/features/a-gemini-outage-blanked-out-two-video-segments-now-groq-catches-the-call-gemini--p78",
-      "frames": 170,
+      "frames": 371,
       "scroll": [
         [0, 0],
         [85, 200],
-        [169, 380]
+        [169, 380],
+        [280, 560],
+        [370, 700]
       ],
       "mouse": [
         [0, 560, 260],
         [85, 610, 300],
-        [169, 560, 330]
+        [169, 560, 330],
+        [280, 600, 310],
+        [370, 560, 320]
       ]
     },
     {
       "name": "actions",
       "url": "https://github.com/SmmShaman/vitalii-no-platform/actions",
-      "frames": 148,
+      "frames": 275,
       "scroll": [
         [0, 0],
-        [147, 260]
+        [147, 260],
+        [274, 480]
       ],
       "mouse": [
         [0, 540, 240],
-        [147, 600, 300]
+        [147, 600, 300],
+        [274, 560, 320]
       ]
     }
   ]

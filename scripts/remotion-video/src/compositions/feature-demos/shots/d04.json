@@ -6,16 +6,20 @@
     {
       "name": "page",
       "url": "https://vitalii.no/features/artems-insulin-calculator-now-remembers-every-dose-and-reads-carbs-off-a-photo-d04",
-      "frames": 120,
+      "frames": 324,
       "scroll": [
         [0, 0],
         [60, 180],
-        [119, 340]
+        [119, 340],
+        [220, 520],
+        [323, 680]
       ],
       "mouse": [
         [0, 560, 260],
         [60, 620, 300],
-        [119, 560, 340]
+        [119, 560, 340],
+        [220, 600, 300],
+        [323, 560, 320]
       ]
     }
   ]

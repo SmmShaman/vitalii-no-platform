@@ -29,7 +29,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily, Panel, StickyNote, IconCard } from "./bright-primitives";
+import { fontFamily, Panel, StickyNote, IconCard, StatPill } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut, PLATE } from "./motion-primitives";
 import { tween, ease, mix } from "../../components/effects/motion/grammar";
 import { LogWindow } from "./live-primitives";
@@ -149,7 +149,7 @@ const DrawnLabelScene: React.FC = () => {
     <AbsoluteFill>
       <AbsoluteFill style={{ background: STAGE }} />
       <AbsoluteFill style={{ background: `rgba(8,8,8,${PLATE})` }} />
-      <Panel x={120} y={110} w={560} h={300} tone="card">
+      <Panel x={120} y={110} w={560} h={420} tone="card">
         <div style={{ position: "absolute", left: 24, top: 22, fontSize: 13, fontWeight: 800, letterSpacing: 1.8, color: P.muted }}>
           NÆRINGSINNHOLD / PER 100 G
         </div>
@@ -158,8 +158,8 @@ const DrawnLabelScene: React.FC = () => {
         <div style={{ position: "absolute", left: 24, top: 142, fontSize: 18, fontWeight: 600, color: P.muted, opacity: t }}>Fett: 9,0 g — Protein: 6,3 g</div>
         <div style={{ position: "absolute", left: 24, top: 190, fontSize: 15, fontWeight: 700, color: P.danger }}>a label nobody at the table reads fast</div>
       </Panel>
-      <IconCard x={740} y={130} w={200} emoji="⏱" title="No time" sub="to translate it" tone="danger" />
-      <StickyNote x={980} y={150} w={220} text="~30 g? guessing" rotate={-4} opacity={Math.min(1, Math.max(0, (frame - B3 - 30) / 20))} />
+      <IconCard x={740} y={190} w={200} emoji="⏱" title="No time" sub="to translate it" tone="danger" />
+      <StickyNote x={980} y={230} w={220} text="~30 g? guessing" rotate={-4} opacity={Math.min(1, Math.max(0, (frame - B3 - 30) / 20))} />
     </AbsoluteFill>
   );
 };
@@ -196,8 +196,8 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1 — the problem, dimmed over the feature's own page */}
-      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} push={0.03} />}
+      {/* b1+b2 — the problem, dimmed over the feature's own page (continuous recording, no restart) */}
+      {cut(frame, B1, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B3 - B1} push={0.03} />}
       <MotionInsert
         effect="keywordCaption"
         from={B1}
@@ -213,7 +213,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        base={STAGE}
+        plate={0.78}
         data={{
           inputs: ["No written log", "No dose history", "No settings record"],
           result: "Doctor gets nothing to review",
@@ -232,13 +232,22 @@ const Inner: React.FC = () => {
         from={B5}
         dur={END - B5}
         accent={ACCENT}
-        base={STAGE}
+        plate={0.78}
         data={{
           wrong: "Guessing carbs from a label you can't read fast enough",
           right: "One photo — AI vision reads the carbs",
           label: "NOW",
         }}
       />
+      {frame >= B5 + 50 && (
+        <StatPill x={140} y={150} emoji="🧾" text="No more guessing" tone="danger" opacity={Math.min(1, (frame - B5 - 50) / 15)} />
+      )}
+      {frame >= B5 + 65 && (
+        <StatPill x={140} y={470} emoji="📸" text="One photo, full carb count" tone="success" opacity={Math.min(1, (frame - B5 - 65) / 15)} />
+      )}
+      {frame >= B5 + 80 && (
+        <StatPill x={720} y={470} emoji="⏱" text="Seconds, not minutes" tone="success" opacity={Math.min(1, (frame - B5 - 80) / 15)} />
+      )}
       {frame >= B5 + 40 && (
         <div
           style={{

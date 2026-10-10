@@ -15,16 +15,18 @@
 //             the site. Hero enters the lower-third band at "2"/danger.
 // b2 185-386  "My video pipeline only ever asks one AI service — when it's down,
 //             there's no backup plan."
-//             pipelineFlow, drawn only (no backdrop) — the four-hop pipeline ending on
-//             its single point of failure. Hero stays in the band, "2"/danger.
+//             pipelineFlow over the same dimmed LiveBackdrop as b1 (continuous
+//             recording) — the four-hop pipeline ending on its single point of
+//             failure. Hero stays in the band, "2"/danger.
 // b3 386-534  "On October 7th, that's exactly what happened, right in the middle of a
 //             render."
 //             Drawn incident card ("OCT 7", mid-render, danger) over a dimmed
 //             LiveBackdrop of the repo's real Actions runs list (ambient evidence,
 //             no specific commit asserted). Hero returns BIG at "2"/danger.
 // b4 534-661  "Now Groq quietly steps in the moment that main service fails."
-//             copyCorrection, drawn only (no backdrop) — the wrong/right hand-off.
-//             Hero flips to "0"/success at this beat's first frame, in the band.
+//             copyCorrection over the same Actions backdrop (continuous recording) —
+//             the wrong/right hand-off. Hero flips to "0"/success at this beat's
+//             first frame, in the band.
 // b5 661-871  "Every segment still gets its direction — closing the exact gap from
 //             October 7th."
 //             Drawn full-stage LogWindow with the real retry path. Hero BIG at
@@ -287,8 +289,8 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1 — the outage's cost, over the feature's own page */}
-      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} push={0.03} />}
+      {/* b1+b2 — the outage's cost, then the vulnerable pipeline, over the feature's own page (continuous recording, no restart) */}
+      {cut(frame, B1, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B3 - B1} push={0.03} />}
       <MotionInsert
         effect="funnelAbsorption"
         from={B1}
@@ -302,13 +304,13 @@ const Inner: React.FC = () => {
       />
       <ProductPlate />
 
-      {/* b2 — the vulnerable pipeline (problem), drawn only */}
+      {/* b2 — the vulnerable pipeline (problem), over the same dimmed backdrop */}
       <MotionInsert
         effect="pipelineFlow"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        base={STAGE}
+        plate={0.78}
         data={{
           system: "video pipeline",
           steps: ["GitHub Actions run", "visual-director.js", "llm-helper.js", "Gemini (only)"],
@@ -316,22 +318,18 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — the October 7th outage, over the repo's real Actions runs */}
-      {cut(frame, B3, B4) === 1 && (
-        <>
-          <LiveBackdrop file={shotsFile} shot="actions" from={B3} hold={B4 - B3} />
-          <AbsoluteFill style={{ background: `rgba(10,8,20,${PLATE})` }} />
-        </>
-      )}
+      {/* b3+b4 — the October 7th outage, then the fix, over the repo's real Actions runs (continuous recording, no restart) */}
+      {cut(frame, B3, B5) === 1 && <LiveBackdrop file={shotsFile} shot="actions" from={B3} hold={B5 - B3} />}
+      {cut(frame, B3, B4) === 1 && <AbsoluteFill style={{ background: `rgba(10,8,20,${PLATE})` }} />}
       <IncidentCard />
 
-      {/* b4 — the fix, drawn only (no backdrop) */}
+      {/* b4 — the fix, over the same Actions backdrop, dimmed by its own plate */}
       <MotionInsert
         effect="copyCorrection"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        base={STAGE}
+        plate={0.75}
         data={{
           wrong: "Gemini only — no backup plan",
           right: "Groq steps in automatically",
