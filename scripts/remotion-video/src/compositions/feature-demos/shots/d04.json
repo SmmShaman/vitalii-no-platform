@@ -1,0 +1,22 @@
+{
+  "id": "d04",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/artems-insulin-calculator-now-remembers-every-dose-and-reads-carbs-off-a-photo-d04",
+      "frames": 120,
+      "scroll": [
+        [0, 0],
+        [60, 180],
+        [119, 340]
+      ],
+      "mouse": [
+        [0, 560, 260],
+        [60, 620, 300],
+        [119, 560, 340]
+      ]
+    }
+  ]
+}

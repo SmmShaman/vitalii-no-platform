@@ -1,0 +1,70 @@
+{
+  "id": "d04",
+  "archetype": "0 split-duel — chaos (left, danger) vs order (right, success), divider slides left->right across the clip",
+  "mood": "dawn",
+  "notes": "Recently used effects seen in p77/p73/b69: cornerTags, handoffExplain, titleTakeover, statusFocus, ratioBars — all excluded from this clip. b1 does NOT open with titleTakeover.",
+  "beats": [
+    {
+      "beat": "b1",
+      "frames": [15, 194],
+      "kind": "catalog",
+      "effect": "keywordCaption",
+      "backdrop": { "file": "d04.json", "shot": "page", "dim": true },
+      "data": {
+        "line1": "Lived only in their heads",
+        "line2": "or on a scrap of paper",
+        "keywords": ["heads", "paper"]
+      },
+      "lowerThird": "product plate 'INSULIN SIMULATOR' wipes in over the chaos (left) panel"
+    },
+    {
+      "beat": "b2",
+      "frames": [203, 338],
+      "kind": "catalog",
+      "effect": "funnelAbsorption",
+      "backdrop": null,
+      "data": {
+        "inputs": ["No written log", "No dose history", "No settings record"],
+        "result": "Doctor gets nothing to review"
+      }
+    },
+    {
+      "beat": "b3",
+      "frames": [347, 543],
+      "kind": "drawn",
+      "effect": null,
+      "backdrop": null,
+      "description": "Custom illustration built from bright-primitives: a nutrition label BrowserWindow-style card with foreign text (unreadable block lines), a StickyNote with a guessed carb number crossed through, IconCard emoji clock showing time pressure. No catalog effect fits (no wrong/right pairing yet — that lands in b5)."
+    },
+    {
+      "beat": "b4",
+      "frames": [552, 700],
+      "kind": "logWindow",
+      "effect": null,
+      "backdrop": null,
+      "description": "Full-stage LogWindow, title 'dose journal', 6 plausible lines built from the feature row (timestamped dose + settings entries), revealed one by one, fontSize 22.",
+      "lines": [
+        "07:42  dose logged: 4.5 U (meal)",
+        "07:42  carbs: 38 g, factor: 1:11",
+        "11:05  correction dose: 1.0 U",
+        "14:30  setting changed: target 5.5 -> 6.0 mmol/L",
+        "18:15  dose logged: 5.0 U (meal)",
+        "18:15  carbs: 45 g, factor: 1:11"
+      ]
+    },
+    {
+      "beat": "b5",
+      "frames": [709, 909],
+      "holdTo": 954,
+      "kind": "catalog",
+      "effect": "copyCorrection",
+      "backdrop": null,
+      "data": {
+        "wrong": "Guessing carbs from a label you can't read fast enough",
+        "right": "One photo — AI vision reads the carbs",
+        "label": "NOW"
+      },
+      "caption": "the single tech caption of the clip glosses 'AI vision' near the corrected card"
+    }
+  ]
+}

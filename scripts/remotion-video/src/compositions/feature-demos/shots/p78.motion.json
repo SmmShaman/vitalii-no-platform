@@ -1,11 +1,66 @@
 {
   "id": "p78",
   "composition": "FeatureGeminiOutageBlankedOutP78",
+  "archetype": "7 hero-number — '2 blind segments' -> '0 blind segments', compact during catalog-effect beats, full-size (>=200px) during drawn beats",
+  "mood": "violet",
+  "notes": "Re-shoot. Recent effects seen in p77/p73/b69: cornerTags, handoffExplain, titleTakeover, statusFocus, ratioBars — cornerTags and handoffExplain used in ALL THREE and are dropped entirely; titleTakeover/statusFocus/ratioBars also avoided. b1 does NOT open with titleTakeover or a drawn scene (p77's drawn opener is also avoided).",
   "beats": [
-    {"beat":"b1","effect":"drawn","backdrop":null,"data":{"value":"1","status":"NO FALLBACK"}},
-    {"beat":"b2","effect":"pipelineFlow","backdrop":"commits","data":{"system":"video-processor","steps":["GitHub Actions run","visual-director.js","llm-helper.js","Gemini (only)"],"result":"Down = no direction"}},
-    {"beat":"b3","effect":"cornerTags","backdrop":"actions","data":{"statement":"October 7th outage","tags":["Gemini: 503","Mid-render","2 segments blind","No fallback"]}},
-    {"beat":"b4","effect":"handoffExplain","backdrop":null,"data":{"from":"Gemini only","to":"Gemini + Groq","fromLabel":"BEFORE","toLabel":"NOW","points":["llm-helper.js retries Groq","visual-director.js wired in","3 workflows updated","Segment keeps its direction"]}},
-    {"beat":"b5","effect":"drawn","backdrop":null,"data":{"value":"2","status":"GEMINI + GROQ"}}
+    {
+      "beat": "b1",
+      "frames": [15, 184],
+      "kind": "catalog",
+      "effect": "funnelAbsorption",
+      "backdrop": { "file": "p78.json", "shot": "page", "dim": true },
+      "data": {
+        "inputs": ["Gemini goes down", "No fallback configured", "Render keeps going anyway"],
+        "result": "2 segments ship with zero AI direction"
+      },
+      "hero": "compact band, value '2', danger tone"
+    },
+    {
+      "beat": "b2",
+      "frames": [185, 385],
+      "kind": "catalog",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "system": "video pipeline",
+        "steps": ["GitHub Actions run", "visual-director.js", "llm-helper.js", "Gemini (only)"],
+        "result": "Down = no backup plan"
+      },
+      "hero": "compact band, value '2', danger tone"
+    },
+    {
+      "beat": "b3",
+      "frames": [386, 533],
+      "kind": "drawn",
+      "effect": null,
+      "backdrop": { "file": "p78.json", "shot": "actions", "dim": true },
+      "description": "Dated incident card: 'OCT 7' stamp, mid-render status line, danger tone, over the dimmed real GitHub Actions runs list (ambient evidence this is a real automated pipeline, no specific commit asserted).",
+      "hero": "full-size (fontSize 260), value '2', danger tone"
+    },
+    {
+      "beat": "b4",
+      "frames": [534, 660],
+      "kind": "catalog",
+      "effect": "copyCorrection",
+      "backdrop": null,
+      "data": {
+        "wrong": "Gemini only — no backup plan",
+        "right": "Groq steps in automatically",
+        "label": "NOW"
+      },
+      "hero": "compact band, value flips '2' (danger) -> '0' (success) at this beat's first frame"
+    },
+    {
+      "beat": "b5",
+      "frames": [661, 826],
+      "holdTo": 871,
+      "kind": "drawn",
+      "effect": null,
+      "backdrop": null,
+      "description": "Full-stage LogWindow 'llm-helper.js', 7 lines built from the feature's own Gemini/Groq story, revealed one by one. Single tech caption of the whole clip ('Groq — a second AI service, on standby') placed away from the hero and the LogWindow.",
+      "hero": "full-size (fontSize 260), value '0', success tone, holds to final frame"
+    }
   ]
 }

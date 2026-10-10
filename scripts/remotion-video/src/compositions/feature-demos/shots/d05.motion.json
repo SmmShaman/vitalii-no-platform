@@ -1,0 +1,63 @@
+{
+ "id": "d05",
+ "composition": "FeaturePhotoFoodLabelBecomesD05",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "keywordCaption",
+   "backdrop": "page",
+   "data": {
+    "line1": "Every new snack means",
+    "line2": "re-reading the label by hand",
+    "keywords": ["re-reading", "by hand"]
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "page2",
+   "data": {
+    "statement": "That work never got saved",
+    "tags": ["Same snack again", "Months later", "Typed once", "Lost anyway"]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "drawn",
+   "backdrop": null,
+   "data": {
+    "label": "Open to anyone",
+    "detail": "Artem could edit a number his doctor relies on"
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "handoffExplain",
+   "backdrop": "hub",
+   "data": {
+    "from": "Type the carbs by hand",
+    "to": "One photo of the label",
+    "points": ["No more re-reading labels", "Works for any snack", "Edit locked to parents' logins"]
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "pipelineFlow",
+   "backdrop": "hub2",
+   "data": {
+    "steps": ["Photo of the label", "AI vision reads the carbs", "Filed under its category"],
+    "result": "Saved to the product library",
+    "system": "AI vision extraction"
+   }
+  },
+  {
+   "beat": "b6",
+   "effect": "drawn",
+   "backdrop": null,
+   "data": {
+    "label": "Measured once",
+    "detail": "Ready every time that snack comes back"
+   }
+  }
+ ]
+}

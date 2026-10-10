@@ -1,51 +1,52 @@
 // FeatureGeminiOutageBlankedOutP78 — feature p78 — 1280x720, 871 frames @ 30fps, VOICE-SYNCED.
-// archetype 7 hero-number, mood violet. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 7 hero-number, mood violet. Motion direction v3 — RESHOOT (feature-motion skill, 2026-10-09).
 //
-// One editorial effect per sentence, chosen by what changes on screen, over the
-// real GitHub repo's own commit/run history as evidence where there is one, one
-// owner of the frame, a reading hold at the end of every beat, cuts not fades.
+// Re-shoot of this clip: same narration/frame windows, different staging. The prior
+// draft opened on a drawn beat and used cornerTags (b3) + handoffExplain (b4) — both
+// effects already used in all three of p77/p73/b69, and a drawn opener matches p77's
+// own opener. This version opens on a catalog effect and swaps in funnelAbsorption /
+// pipelineFlow / copyCorrection, none of which repeat recently used effects.
 //
-// Beat → effect (data only from the feature's own problem/solution/result text):
-// b1 15-185   "One outage, and two whole video segments went out carrying zero
-//             AI direction at all."
-//             drawn (metaphor, no catalog effect) — the hero number opens BIG at
-//             "1" (danger), a product plate names the site, and a column of
-//             pipeline chips on the right ends on the single point of failure.
-// b2 185-386  "My video pipeline only ever asks one AI service — when it's
-//             down, there's no backup plan."
-//             pipelineFlow over the repo's commit history (backdrop "commits")
-//             as evidence a real GitHub Actions pipeline exists. Hero shrinks
-//             into the lower-third band, still "1"/danger.
-// b3 386-534  "On October 7th, that's exactly what happened, right in the
-//             middle of a render."
-//             cornerTags over the repo's Actions runs (backdrop "actions") —
-//             the claim plus four facts of the actual outage.
+// Beat → picture (data only from the feature's own problem/solution/result text):
+// b1 15-185   "One outage, and two whole video segments went out carrying zero AI
+//             direction at all."
+//             funnelAbsorption over a dimmed LiveBackdrop of the feature's own page —
+//             three failure facts collapse into the stated cost. Product plate names
+//             the site. Hero enters the lower-third band at "2"/danger.
+// b2 185-386  "My video pipeline only ever asks one AI service — when it's down,
+//             there's no backup plan."
+//             pipelineFlow, drawn only (no backdrop) — the four-hop pipeline ending on
+//             its single point of failure. Hero stays in the band, "2"/danger.
+// b3 386-534  "On October 7th, that's exactly what happened, right in the middle of a
+//             render."
+//             Drawn incident card ("OCT 7", mid-render, danger) over a dimmed
+//             LiveBackdrop of the repo's real Actions runs list (ambient evidence,
+//             no specific commit asserted). Hero returns BIG at "2"/danger.
 // b4 534-661  "Now Groq quietly steps in the moment that main service fails."
-//             handoffExplain, drawn only (no backdrop) — before/now hand-off
-//             from "Gemini only" to "Gemini + Groq". Hero flips to "2"/success
-//             at this beat's first frame, still in the band.
-// b5 661-871  "Every segment still gets its direction — closing the exact gap
-//             from October 7th."
-//             drawn (metaphor, no catalog effect) — hero returns BIG at "2"
-//             (success), a log window on the right shows the real retry path.
-//             Holds to the end at full brightness, no fade.
+//             copyCorrection, drawn only (no backdrop) — the wrong/right hand-off.
+//             Hero flips to "0"/success at this beat's first frame, in the band.
+// b5 661-871  "Every segment still gets its direction — closing the exact gap from
+//             October 7th."
+//             Drawn full-stage LogWindow with the real retry path. Hero BIG at
+//             "0"/success. Holds to END at full brightness, no fade. The clip's one
+//             tech caption glosses "Groq" here.
 //
-// Persistent element: the hero number (archetype 7) — BIG and left-of-centre
-// in b1/b5 (the two beats with no catalog effect under it), shrunk into the
-// lower-third band (y >= 600, below the effects' safe bottom) for b2-b4 so it
-// never collides with the catalog effect above it. Value/tone/status flip
-// exactly once, at b4's first frame: "1"/danger/NO FALLBACK -> "2"/success/
-// GEMINI + GROQ.
+// Persistent element: the hero number (archetype 7) — BIG (fontSize 260, satisfies
+// gate 1) in b3/b5, the two beats with no catalog effect competing for the upper
+// frame; shrunk into the lower-third band (y >= 606) for b1/b2/b4 where a catalog
+// effect owns the stage above it. Value/tone flip exactly once, at b4's first frame.
 //
-// Gate 2: the clip does NOT end on the feature's own page or the hub — b5 has
-// no LiveBackdrop at all, only the drawn hero + LogWindow.
+// Gate 2: b5 ends on a drawn result (LogWindow + hero), not the feature's own page or
+// the hub.
+// Commits 5a7f8ac / 36fd038 / 46f7255 do not match any beat's spoken content, so no
+// commit diff appears anywhere in this clip.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { LogWindow } from "./live-primitives";
-import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { MotionInsert, LiveBackdrop, Arrive, cut, PLATE } from "./motion-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/p78.json";
 
@@ -60,15 +61,15 @@ const END = 871;
 const ACCENT = "#8C6FF5";
 const STAGE = "#140F26";
 
-// Lower-third band (1280x720, below the effects' safe bottom at y≈587) — the
-// hero number's SMALL home for b2-b4, same geometry as other violet clips.
+// Lower-third band (1280x720, below the effects' safe bottom at y≈587) — the hero
+// number's SMALL home while a catalog effect sits above it (b1/b2/b4).
 const BAND = { x: 40, y: 606, w: 420, h: 92 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-/** archetype 7 — the hero number, present every beat, BIG when it owns the
-    frame alone (b1/b5) and shrunk into BAND while a catalog effect sits above
-    it (b2-b4). Flips once, at B4. */
+/** archetype 7 — the hero number, present every beat, BIG when it owns the frame
+    alone (b3/b5, no catalog effect) and shrunk into BAND while a catalog effect
+    sits above it (b1/b2/b4). Flips once, at B4. */
 const HeroFigure: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -76,21 +77,21 @@ const HeroFigure: React.FC = () => {
   if (frame < B1) return null;
 
   const flipped = frame >= B4;
-  const value = flipped ? "2" : "1";
-  const status = flipped ? "GEMINI + GROQ" : "NO FALLBACK";
+  const value = flipped ? "0" : "2";
+  const status = flipped ? "GROQ FALLBACK LIVE" : "NO FALLBACK";
   const color = flipped ? P.success : P.danger;
   const bg = flipped ? P.successBg : P.dangerBg;
-  const big = frame < B2 || frame >= B5;
+  const big = (frame >= B3 && frame < B4) || frame >= B5;
 
   if (big) {
-    const inAt = frame < B2 ? B1 : B5;
+    const inAt = frame < B4 ? B3 : B5;
     const t = tween(sec(frame, inAt + 4, fps), 0, 0.5, ease.power3Out);
     return (
       <div style={{ position: "absolute", left: 90, top: 150, width: 560, fontFamily, opacity: t }}>
         <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: 2, color: "rgba(245,245,242,0.62)" }}>
-          LLM BACKENDS AVAILABLE
+          SEGMENTS WITH NO AI DIRECTION
         </div>
-        <div style={{ fontSize: 280, fontWeight: 800, lineHeight: 1, color, marginTop: 6 }}>{value}</div>
+        <div style={{ fontSize: 260, fontWeight: 800, lineHeight: 1, color, marginTop: 6 }}>{value}</div>
         <div
           style={{
             display: "inline-block",
@@ -111,9 +112,10 @@ const HeroFigure: React.FC = () => {
     );
   }
 
+  const entryAt = frame < B3 ? B1 : B4;
   const flipPunch = flipped ? Math.max(0, punchScale(sec(frame, B4, fps), 0) - 1) : 0;
   return (
-    <Arrive at={B2 + 4} kind="wipe" box={BAND} dur={0.4}>
+    <Arrive at={entryAt + 4} kind="wipe" box={BAND} dur={0.4}>
       <div
         style={{
           position: "absolute",
@@ -135,7 +137,7 @@ const HeroFigure: React.FC = () => {
           {value}
         </div>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>LLM BACKENDS</div>
+          <div style={{ fontSize: 12, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>SEGMENTS BLIND</div>
           <div style={{ fontSize: 16, fontWeight: 800, color }}>{status}</div>
         </div>
       </div>
@@ -143,100 +145,73 @@ const HeroFigure: React.FC = () => {
   );
 };
 
-type Hop = { label: string; fail?: boolean };
-const HOPS: Hop[] = [
-  { label: "GitHub Actions run" },
-  { label: "visual-director.js" },
-  { label: "llm-helper.js" },
-  { label: "Gemini (only)", fail: true },
-];
-
-/** b1 — the problem, fully drawn: product plate, big hero "1", and the
-    pipeline's single point of failure laid out as a chip column. */
-const OpeningBeat: React.FC = () => {
+/** b1 — small product plate naming the site, over the dimmed LiveBackdrop + effect. */
+const ProductPlate: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   if (cut(frame, B1, B2) !== 1) return null;
-  const t = sec(frame, B1, fps);
-  const plateIn = tween(t, 0.1, 0.3, ease.power3Out);
-  const chipsIn = tween(t, 0.35, 0.35, ease.power3Out);
-  const captionIn = tween(t, 0.8, 0.3, ease.power2Out);
-  const COL_X = 712;
-  const COL_W = 468;
-  const CHIP_Y0 = 170;
-  const CHIP_H = 76;
-  const CHIP_GAP = 16;
-
+  const t = tween(sec(frame, B1 + 4, fps), 0, 0.35, ease.power3Out);
   return (
-    <>
-      <div
-        style={{
-          position: "absolute",
-          left: 90,
-          top: 70,
-          padding: "7px 16px",
-          background: "rgba(10,8,20,0.85)",
-          border: "1.5px solid #CDC1F3",
-          borderRadius: 4,
-          fontSize: 16,
-          fontWeight: 700,
-          color: "#F5F5F5",
-          opacity: plateIn,
-          maxWidth: 560,
-          lineHeight: 1.4,
-        }}
-      >
-        <span style={{ fontWeight: 800, letterSpacing: 1 }}>PORTFOLIO &amp; NEWS PLATFORM</span>
-        <br />
-        <span style={{ fontWeight: 500, opacity: 0.85 }}>
-          my personal site &amp; content pipeline — collects tech news, writes trilingual
-          feature stories about my own commits, and renders short narrated video
-        </span>
+    <div
+      style={{
+        position: "absolute",
+        left: 40,
+        top: 24,
+        padding: "7px 16px",
+        background: "rgba(10,8,20,0.85)",
+        border: "1.5px solid #CDC1F3",
+        borderRadius: 4,
+        fontSize: 15,
+        fontWeight: 700,
+        color: "#F5F5F5",
+        opacity: t,
+        maxWidth: 560,
+        lineHeight: 1.4,
+        fontFamily,
+      }}
+    >
+      <span style={{ fontWeight: 800, letterSpacing: 1 }}>PORTFOLIO &amp; NEWS PLATFORM</span>
+      <br />
+      <span style={{ fontWeight: 500, opacity: 0.85 }}>
+        my personal site &amp; content pipeline — collects tech news, writes trilingual
+        feature stories about my own commits, and renders short narrated video
+      </span>
+    </div>
+  );
+};
+
+/** b3 — drawn incident card over a dimmed LiveBackdrop of the repo's real Actions runs. */
+const IncidentCard: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B3, B4) !== 1) return null;
+  const t = tween(sec(frame, B3 + 6, fps), 0, 0.35, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 740,
+        top: 140,
+        width: 460,
+        padding: 28,
+        borderRadius: 6,
+        background: "rgba(16,10,30,0.88)",
+        border: `2px solid ${P.danger}`,
+        boxShadow: "8px 8px 0 rgba(0,0,0,0.5)",
+        opacity: t,
+        transform: `translateY(${(1 - t) * 20}px)`,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2, color: P.danger }}>⏱ OCT 7</div>
+      <div style={{ fontSize: 30, fontWeight: 800, color: "#F5F5F2", marginTop: 8 }}>
+        Gemini: 503 Service Unavailable
       </div>
-      {HOPS.map((h, i) => {
-        const y = CHIP_Y0 + i * (CHIP_H + CHIP_GAP);
-        return (
-          <div
-            key={h.label}
-            style={{
-              position: "absolute",
-              left: COL_X,
-              top: y,
-              width: COL_W,
-              height: CHIP_H,
-              borderRadius: 4,
-              background: h.fail ? "rgba(194,42,91,0.14)" : "rgba(255,255,255,0.06)",
-              border: `2px solid ${h.fail ? "#C22A5B" : "#CDC1F3"}`,
-              display: "flex",
-              alignItems: "center",
-              padding: "0 22px",
-              fontSize: 20,
-              fontWeight: 800,
-              color: h.fail ? "#F08BAA" : "#F5F5F2",
-              opacity: chipsIn,
-              transform: `translateX(${(1 - chipsIn) * 30}px)`,
-            }}
-          >
-            {h.fail ? "✖ " : "→ "}
-            {h.label}
-          </div>
-        );
-      })}
-      <div
-        style={{
-          position: "absolute",
-          left: 90,
-          top: 540,
-          width: 1100,
-          fontSize: 24,
-          fontWeight: 700,
-          color: "#F5F5F2",
-          opacity: captionIn,
-        }}
-      >
-        No fallback meant two segments rendered with zero AI direction.
+      <div style={{ fontSize: 18, fontWeight: 600, color: "rgba(245,245,242,0.75)", marginTop: 14 }}>
+        mid-render — visual-director.js had no backend to call
       </div>
-    </>
+    </div>
   );
 };
 
@@ -250,14 +225,15 @@ const RETRY_LOG: Array<{ t: string; text: string; tone: "ink" | "muted" | "dange
   { t: "", text: "segment keeps its direction", tone: "success" },
 ];
 
-/** b5 — the result, fully drawn: big hero "2" plus a log window showing the
-    real retry path. Holds to END at full brightness, no fade. */
+/** b5 — the result, fully drawn: LogWindow with the real retry path + the clip's one
+    tech caption. Holds to END at full brightness, no fade. */
 const ClosingBeat: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   if (cut(frame, B5, END) !== 1) return null;
   const t = sec(frame, B5, fps);
   const captionIn = tween(t, 0.9, 0.3, ease.power2Out);
+  const techIn = tween(t, 1.3, 0.3, ease.power2Out);
   return (
     <>
       <LogWindow
@@ -272,6 +248,25 @@ const ClosingBeat: React.FC = () => {
       <div
         style={{
           position: "absolute",
+          right: 40,
+          top: 14,
+          maxWidth: 380,
+          textAlign: "right",
+          fontSize: 16,
+          fontWeight: 700,
+          color: "#DCD4F5",
+          background: "rgba(10,8,20,0.6)",
+          borderRadius: 8,
+          padding: "6px 14px",
+          opacity: techIn,
+          fontFamily,
+        }}
+      >
+        Groq — a second AI service, on standby
+      </div>
+      <div
+        style={{
+          position: "absolute",
           left: 90,
           top: 540,
           width: 1100,
@@ -279,9 +274,10 @@ const ClosingBeat: React.FC = () => {
           fontWeight: 700,
           color: "#F5F5F2",
           opacity: captionIn,
+          fontFamily,
         }}
       >
-        Groq catches the call now — the exact gap from October 7th is closed.
+        Every segment still gets its direction — the October 7th gap is closed.
       </div>
     </>
   );
@@ -291,57 +287,55 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1 — the outage's cost, fully drawn */}
-      <OpeningBeat />
+      {/* b1 — the outage's cost, over the feature's own page */}
+      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} push={0.03} />}
+      <MotionInsert
+        effect="funnelAbsorption"
+        from={B1}
+        dur={B2 - B1}
+        accent={ACCENT}
+        plate={0.78}
+        data={{
+          inputs: ["Gemini goes down", "No fallback configured", "Render keeps going anyway"],
+          result: "2 segments ship with zero AI direction",
+        }}
+      />
+      <ProductPlate />
 
-      {/* b2 — the vulnerable pipeline (problem), over the repo's real commit history */}
-      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="commits" from={B2} hold={B3 - B2} />}
+      {/* b2 — the vulnerable pipeline (problem), drawn only */}
       <MotionInsert
         effect="pipelineFlow"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.8}
+        base={STAGE}
         data={{
-          system: "video-processor",
+          system: "video pipeline",
           steps: ["GitHub Actions run", "visual-director.js", "llm-helper.js", "Gemini (only)"],
-          result: "Down = no direction",
+          result: "Down = no backup plan",
         }}
       />
 
       {/* b3 — the October 7th outage, over the repo's real Actions runs */}
-      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="actions" from={B3} hold={B4 - B3} />}
-      <MotionInsert
-        effect="cornerTags"
-        from={B3}
-        dur={B4 - B3}
-        accent={ACCENT}
-        plate={0.8}
-        data={{
-          statement: "October 7th outage",
-          tags: ["Gemini: 503", "Mid-render", "2 segments blind", "No fallback"],
-        }}
-      />
+      {cut(frame, B3, B4) === 1 && (
+        <>
+          <LiveBackdrop file={shotsFile} shot="actions" from={B3} hold={B4 - B3} />
+          <AbsoluteFill style={{ background: `rgba(10,8,20,${PLATE})` }} />
+        </>
+      )}
+      <IncidentCard />
 
       {/* b4 — the fix, drawn only (no backdrop) */}
       <MotionInsert
-        effect="handoffExplain"
+        effect="copyCorrection"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.8}
         base={STAGE}
         data={{
-          from: "Gemini only",
-          to: "Gemini + Groq",
-          fromLabel: "BEFORE",
-          toLabel: "NOW",
-          points: [
-            "llm-helper.js retries Groq",
-            "visual-director.js wired in",
-            "3 workflows updated",
-            "Segment keeps its direction",
-          ],
+          wrong: "Gemini only — no backup plan",
+          right: "Groq steps in automatically",
+          label: "NOW",
         }}
       />
 
