@@ -1,0 +1,56 @@
+{
+ "id": "d07",
+ "beat_durations": {
+  "b1": 5.472,
+  "b2": 6.144,
+  "b3": 5.352,
+  "b4": 4.44,
+  "b5": 4.728
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A kid could play the diabetes game for hours and never actually learn why any of it happens.",
+   "start_s": 0.5,
+   "end_s": 5.972,
+   "start_f": 15,
+   "end_f": 179
+  },
+  {
+   "beat": "b2",
+   "text": "The simulation ran, but nothing stopped to explain what insulin does, or why type 2 is different.",
+   "start_s": 6.272,
+   "end_s": 12.416,
+   "start_f": 188,
+   "end_f": 372
+  },
+  {
+   "beat": "b3",
+   "text": "Five guided lessons now walk through that reasoning step by step, right on the level map.",
+   "start_s": 12.716,
+   "end_s": 18.068,
+   "start_f": 381,
+   "end_f": 542
+  },
+  {
+   "beat": "b4",
+   "text": "Each one ends in a quiz or a hands-on round, scored with stars.",
+   "start_s": 18.368,
+   "end_s": 22.808,
+   "start_f": 551,
+   "end_f": 684
+  },
+  {
+   "beat": "b5",
+   "text": "A Playwright test plays every lesson through to completion \u2014 five for five.",
+   "start_s": 23.108,
+   "end_s": 27.836,
+   "start_f": 693,
+   "end_f": 835
+  }
+ ],
+ "total_s": 29.336,
+ "durationInFrames": 880,
+ "measured_track_s": 27.888,
+ "track": "/root/feature-demos/vo-d07/vo-d07.mp3"
+}

@@ -1,0 +1,56 @@
+{
+ "id": "d08",
+ "beat_durations": {
+  "b1": 5.736,
+  "b2": 4.728,
+  "b3": 5.688,
+  "b4": 5.04,
+  "b5": 2.976
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A slice of bread was always one fixed number \u2014 no way to say he only ate half the potatoes.",
+   "start_s": 0.5,
+   "end_s": 6.236,
+   "start_f": 15,
+   "end_f": 187
+  },
+  {
+   "beat": "b2",
+   "text": "You couldn't build a sandwich from its real parts, so the carb count was often just wrong.",
+   "start_s": 6.536,
+   "end_s": 11.264,
+   "start_f": 196,
+   "end_f": 338
+  },
+  {
+   "beat": "b3",
+   "text": "Now every food stores its real values per 100 grams, straight from Matvaretabellen.",
+   "start_s": 11.564,
+   "end_s": 17.252,
+   "start_f": 347,
+   "end_f": 518
+  },
+  {
+   "beat": "b4",
+   "text": "Parents adjust the exact grams he actually ate, and the insulin dose follows.",
+   "start_s": 17.552,
+   "end_s": 22.592,
+   "start_f": 527,
+   "end_f": 678
+  },
+  {
+   "beat": "b5",
+   "text": "Twenty-three foods, weighed instead of guessed.",
+   "start_s": 22.892,
+   "end_s": 25.868,
+   "start_f": 687,
+   "end_f": 776
+  }
+ ],
+ "total_s": 27.368,
+ "durationInFrames": 821,
+ "measured_track_s": 25.92,
+ "track": "/root/feature-demos/vo-d08/vo-d08.mp3"
+}
