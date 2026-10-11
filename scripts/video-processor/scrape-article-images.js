@@ -358,6 +358,7 @@ function isNorwegianHost(host) {
  * its <link>s are opaque news.google.com/rss/articles/CBMi... ids that redirect to
  * consent.google.com, never to the article, so every story got 0 related articles.
  * Bing wraps each link as bing.com/news/apiclick.aspx?...&url=<real article URL>.
+ * From GitHub runners Bing returns an empty feed, so that case goes through the VPS.
  *
  * @param {string} headline - Article headline to search for
  * @param {string} originalUrl - Original article URL (to exclude from results)
@@ -369,40 +370,30 @@ async function searchRelatedArticles(headline, originalUrl, limit = 3) {
 
   // Use first 8 words of headline for a focused search
   const query = headline.split(/\s+/).slice(0, 8).join(' ');
-  const url = `https://www.bing.com/news/search?format=rss&setlang=en-US&cc=US&q=${encodeURIComponent(query)}`;
+  const label = `"${query.substring(0, 40)}..."`;
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: { 'User-Agent': BROWSER_USER_AGENT },
-    });
-    clearTimeout(timeout);
-
-    if (!res.ok) {
-      console.log(`[search] "${query.substring(0, 40)}..." → Bing News HTTP ${res.status}`);
-      return [];
+    // Bing answers GitHub runners (Azure IPs) with an empty feed; the VPS gets real
+    // results, so an empty direct answer falls back to the related-news-search function.
+    let via = 'Bing';
+    let candidates = await bingNewsDirect(query);
+    if (candidates.length === 0) {
+      const viaVps = await bingNewsViaVps(query);
+      if (viaVps.error) {
+        console.log(`[search] ${label} → Bing empty here, VPS fallback failed: ${viaVps.error}`);
+      } else {
+        candidates = viaVps.urls;
+        via = 'Bing via VPS';
+      }
     }
-    const xml = await res.text();
-    const items = [...xml.matchAll(/<item>[\s\S]*?<\/item>/gi)].map(m => m[0]);
 
     const links = [];
     const seenHosts = new Set();
     const origHost = originalUrl ? safeHost(originalUrl) : '';
     let skippedNo = 0;
 
-    for (const item of items) {
+    for (const realUrl of candidates) {
       if (links.length >= limit) break;
-      const rawLink = (item.match(/<link>([^<]+)/) || [])[1];
-      if (!rawLink) continue;
-
-      let realUrl = rawLink.trim().replace(/&amp;/g, '&');
-      try {
-        const wrapped = new URL(realUrl).searchParams.get('url');
-        if (wrapped) realUrl = wrapped;
-      } catch { continue; }
-
       const host = safeHost(realUrl);
       if (!host || host === origHost || seenHosts.has(host)) continue;
       if (RELATED_SKIP_HOSTS.some(h => host === h || host.endsWith(`.${h}`))) continue;
@@ -413,7 +404,7 @@ async function searchRelatedArticles(headline, originalUrl, limit = 3) {
     }
 
     const noNote = skippedNo > 0 ? `, ${skippedNo} Norwegian skipped` : '';
-    console.log(`[search] "${query.substring(0, 40)}..." → ${links.length} related articles (${items.length} Bing results${noNote})`);
+    console.log(`[search] ${label} → ${links.length} related articles (${candidates.length} ${via} results${noNote})`);
     if (links.length > 0) {
       links.forEach((l, i) => console.log(`[search]   ${i + 1}. ${safeHost(l)}`));
     }
@@ -421,6 +412,55 @@ async function searchRelatedArticles(headline, originalUrl, limit = 3) {
   } catch (e) {
     console.log(`[search] Bing News search failed: ${e.name === 'AbortError' ? 'timeout' : e.message}`);
     return [];
+  }
+}
+
+/** Bing News RSS fetched from this machine → real article URLs (may be [] on runners). */
+async function bingNewsDirect(query) {
+  const url = `https://www.bing.com/news/search?format=rss&setlang=en-US&cc=US&q=${encodeURIComponent(query)}`;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+  try {
+    const res = await fetch(url, { signal: controller.signal, headers: { 'User-Agent': BROWSER_USER_AGENT } });
+    if (!res.ok) return [];
+    const xml = await res.text();
+    const urls = [];
+    for (const m of xml.matchAll(/<item>[\s\S]*?<\/item>/gi)) {
+      const rawLink = (m[0].match(/<link>([^<]+)/) || [])[1];
+      if (!rawLink) continue;
+      let realUrl = rawLink.trim().replace(/&amp;/g, '&');
+      try { realUrl = new URL(realUrl).searchParams.get('url') || realUrl; } catch { continue; }
+      urls.push(realUrl);
+    }
+    return urls;
+  } catch {
+    return [];
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/** The same search run on the VPS (supabase/functions/related-news-search). */
+async function bingNewsViaVps(query) {
+  const base = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!base || !key) return { error: 'SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not set', urls: [] };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20_000);
+  try {
+    const res = await fetch(`${base}/functions/v1/related-news-search`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { error: `HTTP ${res.status} ${data.error || ''}`.trim(), urls: [] };
+    return { urls: Array.isArray(data.urls) ? data.urls : [] };
+  } catch (e) {
+    return { error: e.name === 'AbortError' ? 'timeout' : e.message, urls: [] };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
