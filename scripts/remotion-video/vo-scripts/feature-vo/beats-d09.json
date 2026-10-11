@@ -1,0 +1,7 @@
+{"id": "d09", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Artem's insulin dose used to be calculated from whatever numbers were already saved, even weeks old."],
+ ["b2", "If his weight crept up and nobody noticed, the calculator kept dosing off the old numbers anyway, with no warning."],
+ ["b3", "That's like trusting a scale you stepped on last month."],
+ ["b4", "Now the save button stays locked until those numbers are confirmed fresh."],
+ ["b5", "And if his weight shifts by more than 5 percent, it flags the risk before a dose goes out."]
+]}

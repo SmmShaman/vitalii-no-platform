@@ -1,0 +1,56 @@
+{
+ "id": "d09",
+ "beat_durations": {
+  "b1": 6.312,
+  "b2": 6.936,
+  "b3": 2.88,
+  "b4": 4.152,
+  "b5": 5.4
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Artem's insulin dose used to be calculated from whatever numbers were already saved, even weeks old.",
+   "start_s": 0.5,
+   "end_s": 6.812,
+   "start_f": 15,
+   "end_f": 204
+  },
+  {
+   "beat": "b2",
+   "text": "If his weight crept up and nobody noticed, the calculator kept dosing off the old numbers anyway, with no warning.",
+   "start_s": 7.112,
+   "end_s": 14.048,
+   "start_f": 213,
+   "end_f": 421
+  },
+  {
+   "beat": "b3",
+   "text": "That's like trusting a scale you stepped on last month.",
+   "start_s": 14.348,
+   "end_s": 17.228,
+   "start_f": 430,
+   "end_f": 517
+  },
+  {
+   "beat": "b4",
+   "text": "Now the save button stays locked until those numbers are confirmed fresh.",
+   "start_s": 17.528,
+   "end_s": 21.68,
+   "start_f": 526,
+   "end_f": 650
+  },
+  {
+   "beat": "b5",
+   "text": "And if his weight shifts by more than 5 percent, it flags the risk before a dose goes out.",
+   "start_s": 21.98,
+   "end_s": 27.38,
+   "start_f": 659,
+   "end_f": 821
+  }
+ ],
+ "total_s": 28.88,
+ "durationInFrames": 866,
+ "measured_track_s": 27.432,
+ "track": "/root/feature-demos/vo-d09/vo-d09.mp3"
+}

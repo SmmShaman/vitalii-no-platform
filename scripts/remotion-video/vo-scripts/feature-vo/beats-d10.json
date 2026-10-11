@@ -1,0 +1,7 @@
+{"id": "d10", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "You sign into Google, switch back to the app, and it still says log in."],
+ ["b2", "While you were in the browser, Android quietly closed the app in the background, so it never saw you finish."],
+ ["b3", "It was like knocking on a door, then walking away before anyone answered."],
+ ["b4", "Now the app leaves a one-time code behind and keeps checking back for it itself."],
+ ["b5", "It checks in every two seconds, until the login lands."]
+]}

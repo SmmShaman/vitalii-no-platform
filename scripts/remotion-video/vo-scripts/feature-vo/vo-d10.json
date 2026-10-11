@@ -1,0 +1,56 @@
+{
+ "id": "d10",
+ "beat_durations": {
+  "b1": 4.176,
+  "b2": 6.288,
+  "b3": 4.2,
+  "b4": 4.68,
+  "b5": 3.888
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "You sign into Google, switch back to the app, and it still says log in.",
+   "start_s": 0.5,
+   "end_s": 4.676,
+   "start_f": 15,
+   "end_f": 140
+  },
+  {
+   "beat": "b2",
+   "text": "While you were in the browser, Android quietly closed the app in the background, so it never saw you finish.",
+   "start_s": 4.976,
+   "end_s": 11.264,
+   "start_f": 149,
+   "end_f": 338
+  },
+  {
+   "beat": "b3",
+   "text": "It was like knocking on a door, then walking away before anyone answered.",
+   "start_s": 11.564,
+   "end_s": 15.764,
+   "start_f": 347,
+   "end_f": 473
+  },
+  {
+   "beat": "b4",
+   "text": "Now the app leaves a one-time code behind and keeps checking back for it itself.",
+   "start_s": 16.064,
+   "end_s": 20.744,
+   "start_f": 482,
+   "end_f": 622
+  },
+  {
+   "beat": "b5",
+   "text": "It checks in every two seconds, until the login lands.",
+   "start_s": 21.044,
+   "end_s": 24.932,
+   "start_f": 631,
+   "end_f": 748
+  }
+ ],
+ "total_s": 26.432,
+ "durationInFrames": 793,
+ "measured_track_s": 24.984,
+ "track": "/root/feature-demos/vo-d10/vo-d10.mp3"
+}
