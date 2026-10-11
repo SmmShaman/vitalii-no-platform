@@ -1,0 +1,47 @@
+{
+  "id": "d08",
+  "composition": "FeatureEveryFoodArtemsGameD08",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "hub",
+      "data": { "title": "One Fixed Number", "kicker": "No matter how much was really on the plate" }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Food counted by serving, not parts",
+        "tags": ["One carb number", "No way to split it", "Sandwich ≠ its parts", "Dose math suffers"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "copyCorrection",
+      "backdrop": "page2",
+      "data": {
+        "wrong": "One fixed serving size",
+        "right": "Real values per 100 grams (Matvaretabellen)",
+        "label": "NOW"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "drawn",
+      "data": {
+        "steps": ["Grams entered on the plate", "Per-100g values recalculated", "NovoRapid dose"],
+        "result": "Dose follows the real grams",
+        "system": "Matvaretabellen (food database)"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": "drawn",
+      "data": { "note": "LogWindow built from the feature row; no catalog effect, archetype stamp only" }
+    }
+  ]
+}

@@ -239,6 +239,8 @@ import { FeatureOnlyAppsCountAsB69 } from "./compositions/feature-demos/FeatureO
 import { FeatureGeminiOutageBlankedOutP78 } from "./compositions/feature-demos/FeatureGeminiOutageBlankedOutP78";
 import { FeatureNewsImagesWereSecretlyP77 } from "./compositions/feature-demos/FeatureNewsImagesWereSecretlyP77";
 import { FeatureArtemsInsulinCalculatorRemembersD04 } from "./compositions/feature-demos/FeatureArtemsInsulinCalculatorRemembersD04";
+import { FeatureEveryFoodArtemsGameD08 } from "./compositions/feature-demos/FeatureEveryFoodArtemsGameD08";
+import { FeatureFiveNewMiniLessonsD07 } from "./compositions/feature-demos/FeatureFiveNewMiniLessonsD07";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2350,6 +2352,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureArtemsInsulinCalculatorRemembersD04"
         component={FeatureArtemsInsulinCalculatorRemembersD04}
         durationInFrames={954}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureEveryFoodArtemsGameD08"
+        component={FeatureEveryFoodArtemsGameD08}
+        durationInFrames={821}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFiveNewMiniLessonsD07"
+        component={FeatureFiveNewMiniLessonsD07}
+        durationInFrames={880}
         fps={30}
         width={1280}
         height={720}

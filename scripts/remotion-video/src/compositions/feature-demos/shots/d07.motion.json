@@ -1,0 +1,45 @@
+{
+  "id": "d07",
+  "composition": "FeatureFiveNewMiniLessonsD07",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "hub",
+      "data": { "title": "Plays For Hours, Learns Nothing", "kicker": "The simulation never stops to explain" }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "The simulation ran, unexplained",
+        "tags": ["Insulin? Never explained", "Type 1 vs Type 2? Unclear", "No pause to teach", "Quizzes, but no lessons"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "drawn",
+      "backdrop": "drawn",
+      "data": { "note": "archetype only — the five real lesson names from commit 8e55152 fold from the dim pile into a lit row on the level-map path" }
+    },
+    {
+      "beat": "b4",
+      "effect": "featureMatrix",
+      "backdrop": "drawn",
+      "data": {
+        "options": ["Ends with", "Scored"],
+        "rows": [
+          { "label": "4 lessons", "values": ["Multiple-choice quiz", "★★★"] },
+          { "label": "1 lesson", "values": ["Hands-on round", "★★★"] }
+        ]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": "drawn",
+      "data": { "note": "archetype only — each card ticks green as the Playwright test clears it, ending on a 5 / 5 stamp; no live page per gate 2" }
+    }
+  ]
+}
