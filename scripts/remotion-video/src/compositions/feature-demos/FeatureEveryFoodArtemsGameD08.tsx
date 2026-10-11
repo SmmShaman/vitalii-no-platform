@@ -26,6 +26,24 @@
 //             third's final stamp. Holds bright to the final frame, no fade.
 //
 // Persistent element: the flow-map lower third (archetype 4), b1 through b5.
+//
+// Viewer-fix pass (wave D1fix, 2026-10-10) — a blind viewer scored clarity 6/7
+// and named: no product identity on screen beyond the lower third, b4 reads as
+// an abstract diagram with no real object behind it, b5's last line reads as
+// source code. Three drawn (not recorded — no public repo exists for this
+// product) additions, none touching beat windows, duration, palette or the
+// lower-third archetype itself:
+// - ProductPlate (b1 only): a one-line corner card naming the product and
+//   that it is a Type 1 simulator, to kill the "Insulin Simulator vs Artem's
+//   Game vs Type 2" confusion the hub page's own unrelated card text caused.
+//   b1's MotionInsert plate is also raised 0.66 -> 0.78 to dim that same text.
+// - CommitNote (b4 only): a small drawn diff card with the real file name and
+//   the real before/after from commit 4a14f3c ("NovoRapid starts with the
+//   plate"), plus a one-line gloss on "NovoRapid" — sits in the top-right
+//   quarter, clear of PipelineFlow's own centered chain/frame/result layout.
+// - b5's LogWindow: last line reworded from "plateSum(): each food ×
+//   grams/100" (code) to a plain sentence; still built only from the feature
+//   row's own facts, no invented runtime log.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -176,6 +194,76 @@ const LowerThird: React.FC = () => {
   );
 };
 
+/** b1 — a one-line product plate, drawn, so identity never depends on the hub page's own text. */
+const ProductPlate: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B1, B2) !== 1) return null;
+  const p = tween(sec(frame, B1 + 10, fps), 0, 0.5, ease.power2Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 40,
+        top: 40,
+        padding: "10px 18px",
+        background: P.card,
+        border: `2px solid ${P.accent}`,
+        borderRadius: 4,
+        boxShadow: "4px 4px 0 rgba(0,0,0,0.5)",
+        opacity: p,
+        transform: `translateY(${(1 - p) * -10}px)`,
+      }}
+    >
+      <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>INSULIN SIMULATOR</div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: P.ink, marginTop: 2 }}>
+        Type 1 diabetes game, built for Artem
+      </div>
+    </div>
+  );
+};
+
+/** b4 — a small drawn diff card: the real file + the real before/after from commit 4a14f3c,
+    standing in for a live recording (no public repo exists for this product to record). */
+const CommitNote: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B4, B5) !== 1) return null;
+  const p = tween(sec(frame, B4 + 24, fps), 0, 0.5, ease.power2Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 800,
+        top: 40,
+        width: 440,
+        padding: "16px 20px",
+        background: P.card,
+        border: `2px solid ${P.border}`,
+        borderRadius: 4,
+        boxShadow: "4px 4px 0 rgba(0,0,0,0.5)",
+        opacity: p,
+        transform: `translateY(${(1 - p) * -10}px)`,
+      }}
+    >
+      <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.2, color: P.muted, fontFamily, marginBottom: 8 }}>
+        day.js — commit 4a14f3c
+      </div>
+      <div style={{ fontSize: 16, color: P.danger, fontFamily: '"JetBrains Mono", Menlo, Consolas, monospace' }}>
+        - dose = FIXED_SERVING * units
+      </div>
+      <div style={{ fontSize: 16, color: P.success, marginTop: 4, fontFamily: '"JetBrains Mono", Menlo, Consolas, monospace' }}>
+        + dose = plateSum(plate) * units
+      </div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: P.ink, fontFamily, marginTop: 10 }}>
+        NovoRapid = Artem's fast-acting mealtime insulin
+      </div>
+    </div>
+  );
+};
+
 /** b5 — drawn: the real FOODS list, read off as a log (no VPS log for this game). */
 const FoodLog: React.FC = () => {
   const frame = useCurrentFrame();
@@ -193,11 +281,11 @@ const FoodLog: React.FC = () => {
         fontSize={22}
         win={{ x: 40, y: 50, w: 1200, h: 530 }}
         lines={[
-          { text: "bread: 49g carbs / 100g — split from the old mixed serving" },
+          { text: "bread: 49g carbs per 100 grams — split from the old mixed serving" },
           { text: "cheese, margarine, jam — split out the same way" },
           { text: "potato, chicken, lompe, rice — added with real values" },
-          { text: "23 foods total — [food, grams] pairs on the plate" },
-          { text: "plateSum(): each food × grams/100 — not a fixed count" },
+          { text: "23 foods total, each with its own grams on the plate" },
+          { text: "Every dose is grams times that food's real value — never one guess for the whole plate" },
         ]}
       />
     </AbsoluteFill>
@@ -215,8 +303,10 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
+        plate={0.78}
         data={{ title: "One Fixed Number", kicker: "No matter how much was really on the plate" }}
       />
+      <ProductPlate />
 
       {/* b2 — can't build a sandwich from its real parts, over the feature's own page */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B2} hold={B3 - B2} />}
@@ -261,6 +351,7 @@ const Inner: React.FC = () => {
           system: "Matvaretabellen (food database)",
         }}
       />
+      <CommitNote />
 
       {/* b5 — the real FOODS list, holds to the final frame */}
       <FoodLog />
