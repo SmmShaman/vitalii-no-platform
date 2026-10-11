@@ -1005,14 +1005,38 @@ async function main() {
     return (hit || candidates.find(c => c.url) || {}).url || null;
   };
 
+  // Why a phrase got no picture, tallied per segment and for the whole run. Before
+  // 2026-10-11 every failure here was swallowed, so "0 found" could not be told apart
+  // from a dead key, an exhausted quota or results that were simply off-topic.
+  const runMisses = {};
+  const noteMiss = (misses, reason) => {
+    misses[reason] = (misses[reason] || 0) + 1;
+    runMisses[reason] = (runMisses[reason] || 0) + 1;
+  };
+  const formatMisses = (misses) => Object.entries(misses)
+    .sort((a, b) => b[1] - a[1])
+    .map(([r, n]) => `${r} ×${n}`)
+    .join('; ');
+  /** Short reason for a failed search API response, e.g. `HTTP 429 "Quota exceeded…"`. */
+  const httpReason = async (resp) => {
+    const body = await resp.text().catch(() => '');
+    let msg = '';
+    try { msg = JSON.parse(body)?.error?.message || JSON.parse(body)?.message || ''; } catch { msg = body; }
+    msg = String(msg).replace(/\s+/g, ' ').trim().slice(0, 100);
+    return `HTTP ${resp.status}${msg ? ` "${msg}"` : ''}`;
+  };
+
   if (hasImageSearch && totalQueries > 0) {
     for (let i = 0; i < visualDirectives.length; i++) {
       const blocks = visualDirectives[i]?.visualBlocks || [];
       const keywords = phraseKeywords[i] || new Set();
       let phraseImagesFound = 0;
+      let phraseQueries = 0;
+      const misses = {};
       for (let j = 0; j < blocks.length; j++) {
         const query = blocks[j].imageSearchQuery;
         if (!query) continue;
+        phraseQueries++;
         try {
           let imgUrl = null;
 
@@ -1029,6 +1053,9 @@ async function main() {
                 (data.images || []).map(r => ({ url: r.imageUrl, description: `${r.title || ''} ${r.source || ''}` })),
                 keywords,
               );
+              if (!imgUrl) noteMiss(misses, 'serper: 0 results');
+            } else {
+              noteMiss(misses, `serper: ${await httpReason(resp)}`);
             }
           }
 
@@ -1048,8 +1075,11 @@ async function main() {
                   })),
                   keywords,
                 );
+                if (!imgUrl) noteMiss(misses, 'google: 0 results');
+              } else {
+                noteMiss(misses, `google: ${await httpReason(resp)}`);
               }
-            } catch { /* skip */ }
+            } catch (e) { noteMiss(misses, `google: ${e.message}`); }
           }
 
           // Pexels fallback (free API, good quality stock photos)
@@ -1061,28 +1091,38 @@ async function main() {
               if (pxResp.ok) {
                 const pxData = await pxResp.json();
                 // Stock is the weakest source: require it to be on topic, or skip
-                const onTopic = (pxData.photos || [])
+                const photos = pxData.photos || [];
+                const onTopic = photos
                   .map(p => ({ url: p.src?.large2x || p.src?.large, description: p.alt || '' }))
                   .find(c => c.url && describesSameTopic(c.description, keywords));
                 imgUrl = onTopic ? onTopic.url : null;
+                if (!imgUrl) noteMiss(misses, photos.length ? 'pexels: only off-topic photos' : 'pexels: 0 results');
+              } else {
+                noteMiss(misses, `pexels: ${await httpReason(pxResp)}`);
               }
-            } catch { /* skip */ }
+            } catch (e) { noteMiss(misses, `pexels: ${e.message}`); }
           }
 
           if (imgUrl) {
             blocks[j].phraseImageUrl = imgUrl;
             phraseImagesFound++;
           }
-        } catch {
-          // Skip failed searches silently
+        } catch (e) {
+          noteMiss(misses, `error: ${e.message}`);
         }
       }
-      if (phraseImagesFound > 0) {
-        console.log(`  🔍 Seg ${i + 1}: ${phraseImagesFound}/${blocks.length} phrase images found`);
+      if (phraseQueries > 0) {
+        const why = phraseImagesFound < phraseQueries ? ` — misses: ${formatMisses(misses)}` : '';
+        console.log(`  🔍 Seg ${i + 1}: ${phraseImagesFound}/${phraseQueries} phrase images found${why}`);
       }
     }
+    if (Object.keys(runMisses).length > 0) {
+      console.log(`  📋 Per-phrase search misses (whole run): ${formatMisses(runMisses)}`);
+    }
+  } else if (!hasImageSearch) {
+    console.log('  ⚠️ No image search API key — skipping per-phrase search');
   } else {
-    console.log('  ⚠️ No image search API — skipping per-phrase search');
+    console.log('  ⚠️ Visual direction produced no imageSearchQuery — skipping per-phrase search');
   }
 
   // Step 4: Download images + prepare Remotion assets

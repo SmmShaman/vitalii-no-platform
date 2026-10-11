@@ -21,6 +21,8 @@ const MIN_IMAGE_SIZE = 20_000;   // 20 KB minimum
 const MAX_IMAGE_SIZE = 10_000_000; // 10 MB maximum
 const FETCH_TIMEOUT_MS = 10_000;
 const USER_AGENT = 'Mozilla/5.0 (compatible; DailyNewsBot/1.0)';
+// Bing News serves its RSS to a browser UA; the bot UA above is fine for article pages.
+const BROWSER_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
 
 // Domains to skip (ad networks, trackers, social widgets)
 const BLOCKED_DOMAINS = new Set([
@@ -334,53 +336,28 @@ export async function scrapeArticleImages(articleUrl, publicDir, prefix, options
 }
 
 /**
- * Resolve a Google News redirect URL to the actual article URL.
- * Google News RSS wraps all URLs in redirects like:
- * https://news.google.com/rss/articles/CBMi...
- * We follow the redirect (without downloading body) to get the real URL.
+ * Norwegian outlets are never used as a related-article image source (owner rule,
+ * 2026-10-11): their photos are largely NTB/Scanpix, and a downloaded copy in a
+ * rendered video is exactly the exposure the Copyright Agent claims were about.
+ * Everything under .no is skipped, plus Norwegian outlets on other TLDs.
  */
-async function resolveGoogleNewsUrl(gnUrl) {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    const res = await fetch(gnUrl, {
-      signal: controller.signal,
-      headers: { 'User-Agent': USER_AGENT },
-      redirect: 'manual', // Don't follow — just get Location header
-    });
-    clearTimeout(timeout);
+const NORWEGIAN_HOSTS = ['e24.com', 'nettavisen.com', 'tek.com'];
+// Syndication shells: the page is a JS app with no article photos in the HTML.
+const RELATED_SKIP_HOSTS = ['msn.com', 'bing.com', 'news.google.com', 'consent.google.com'];
 
-    // Google News returns 302/303 with Location header pointing to real URL
-    const location = res.headers.get('location');
-    if (location && !location.includes('news.google.com')) {
-      return location;
-    }
-
-    // Some redirects are 200 with meta refresh or JS redirect — try follow
-    if (res.status === 200) {
-      const controller2 = new AbortController();
-      const timeout2 = setTimeout(() => controller2.abort(), 8000);
-      const res2 = await fetch(gnUrl, {
-        signal: controller2.signal,
-        headers: { 'User-Agent': USER_AGENT },
-        redirect: 'follow',
-      });
-      clearTimeout(timeout2);
-      const finalUrl = res2.url;
-      if (finalUrl && !finalUrl.includes('news.google.com')) {
-        return finalUrl;
-      }
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
+function isNorwegianHost(host) {
+  return host.endsWith('.no') || NORWEGIAN_HOSTS.some(h => host === h || host.endsWith(`.${h}`));
 }
 
 /**
- * Search Google News RSS for related articles covering the same story.
- * Returns up to `limit` resolved URLs of other news sites.
+ * Search news for related articles covering the same story.
+ * Returns up to `limit` article URLs on other (non-Norwegian) news sites.
+ *
+ * Bing News RSS, because Google News RSS no longer resolves (0 related articles in
+ * every digest render checked in Oct 2026):
+ * its <link>s are opaque news.google.com/rss/articles/CBMi... ids that redirect to
+ * consent.google.com, never to the article, so every story got 0 related articles.
+ * Bing wraps each link as bing.com/news/apiclick.aspx?...&url=<real article URL>.
  *
  * @param {string} headline - Article headline to search for
  * @param {string} originalUrl - Original article URL (to exclude from results)
@@ -392,70 +369,68 @@ async function searchRelatedArticles(headline, originalUrl, limit = 3) {
 
   // Use first 8 words of headline for a focused search
   const query = headline.split(/\s+/).slice(0, 8).join(' ');
-  const url = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en&gl=US&ceid=US:en`;
+  const url = `https://www.bing.com/news/search?format=rss&setlang=en-US&cc=US&q=${encodeURIComponent(query)}`;
 
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': USER_AGENT },
+      headers: { 'User-Agent': BROWSER_USER_AGENT },
     });
     clearTimeout(timeout);
 
-    if (!res.ok) return [];
-    const xml = await res.text();
-
-    // Extract Google News redirect URLs from RSS items
-    const rawLinks = [];
-    const itemMatches = xml.matchAll(/<item>[\s\S]*?<\/item>/gi);
-    for (const m of itemMatches) {
-      const item = m[0];
-      const linkMatch = item.match(/<link>([^<]+)/);
-      if (linkMatch) {
-        rawLinks.push(linkMatch[1].trim());
-      }
-      if (rawLinks.length >= limit + 3) break; // extra buffer for filtering
+    if (!res.ok) {
+      console.log(`[search] "${query.substring(0, 40)}..." → Bing News HTTP ${res.status}`);
+      return [];
     }
+    const xml = await res.text();
+    const items = [...xml.matchAll(/<item>[\s\S]*?<\/item>/gi)].map(m => m[0]);
 
-    // Resolve Google News redirect URLs to actual article URLs
     const links = [];
-    const origHost = originalUrl ? new URL(originalUrl).hostname.replace('www.', '') : '';
+    const seenHosts = new Set();
+    const origHost = originalUrl ? safeHost(originalUrl) : '';
+    let skippedNo = 0;
 
-    for (const rawUrl of rawLinks) {
+    for (const item of items) {
       if (links.length >= limit) break;
+      const rawLink = (item.match(/<link>([^<]+)/) || [])[1];
+      if (!rawLink) continue;
 
-      let realUrl = rawUrl;
-      // If it's a Google News redirect, resolve it
-      if (rawUrl.includes('news.google.com')) {
-        const resolved = await resolveGoogleNewsUrl(rawUrl);
-        if (!resolved) continue;
-        realUrl = resolved;
-      }
-
-      // Skip if same domain as original article
+      let realUrl = rawLink.trim().replace(/&amp;/g, '&');
       try {
-        const foundHost = new URL(realUrl).hostname.replace('www.', '');
-        if (origHost && origHost === foundHost) continue;
+        const wrapped = new URL(realUrl).searchParams.get('url');
+        if (wrapped) realUrl = wrapped;
       } catch { continue; }
 
+      const host = safeHost(realUrl);
+      if (!host || host === origHost || seenHosts.has(host)) continue;
+      if (RELATED_SKIP_HOSTS.some(h => host === h || host.endsWith(`.${h}`))) continue;
+      if (isNorwegianHost(host)) { skippedNo++; continue; }
+
+      seenHosts.add(host);
       links.push(realUrl);
     }
 
-    console.log(`[search] "${query.substring(0, 40)}..." → ${links.length} related articles`);
+    const noNote = skippedNo > 0 ? `, ${skippedNo} Norwegian skipped` : '';
+    console.log(`[search] "${query.substring(0, 40)}..." → ${links.length} related articles (${items.length} Bing results${noNote})`);
     if (links.length > 0) {
-      links.forEach((l, i) => console.log(`[search]   ${i + 1}. ${new URL(l).hostname}`));
+      links.forEach((l, i) => console.log(`[search]   ${i + 1}. ${safeHost(l)}`));
     }
     return links;
   } catch (e) {
-    console.log(`[search] Google News search failed: ${e.message}`);
+    console.log(`[search] Bing News search failed: ${e.name === 'AbortError' ? 'timeout' : e.message}`);
     return [];
   }
 }
 
+function safeHost(u) {
+  try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return ''; }
+}
+
 /**
  * Scrape images for all segments from their source articles
- * AND from related articles found via Google News search.
+ * AND from related (non-Norwegian) articles found via Bing News search.
  *
  * @param {Array<{sourceLink: string, headline?: string, existingImages?: string[]}>} articles
  * @param {string} publicDir
