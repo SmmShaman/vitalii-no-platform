@@ -18,8 +18,9 @@
 //             from Matvaretabellen." copyCorrection over the feature's own page
 //             (second scroll position) — the lower third's block hands off here.
 // b4 527-687  "Parents adjust the exact grams he actually ate, and the insulin
-//             dose follows." pipelineFlow, drawn (no live page shows this
-//             calculation) — the lower third's dose node lights up here.
+//             dose follows." pipelineFlow over the feature's own page (third
+//             scroll position, ambient only — no live page shows the
+//             calculation itself) — the lower third's dose node lights up here.
 // b5 687-821  "Twenty-three foods, weighed instead of guessed." Drawn: a
 //             full-stage LogWindow of the real FOODS list, plus the lower
 //             third's final stamp. Holds bright to the final frame, no fade.
@@ -244,13 +245,16 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b4 — grams on the plate recalculate the dose (drawn, matches commit 4a14f3c) */}
+      {/* b4 — grams on the plate recalculate the dose (drawn, matches commit 4a14f3c),
+          over the feature's own page continuing to scroll (ambient fill, same
+          pattern as p75's code backdrop under its pipelineFlow) */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page3" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="pipelineFlow"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        base={STAGE}
+        plate={0.7}
         data={{
           steps: ["Grams entered on the plate", "Per-100g values recalculated", "NovoRapid dose"],
           result: "Dose follows the real grams",

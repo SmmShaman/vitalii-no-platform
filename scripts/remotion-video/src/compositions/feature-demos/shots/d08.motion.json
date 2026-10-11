@@ -30,7 +30,7 @@
     {
       "beat": "b4",
       "effect": "pipelineFlow",
-      "backdrop": "drawn",
+      "backdrop": "page3",
       "data": {
         "steps": ["Grams entered on the plate", "Per-100g values recalculated", "NovoRapid dose"],
         "result": "Dose follows the real grams",

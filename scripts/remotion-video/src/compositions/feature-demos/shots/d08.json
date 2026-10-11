@@ -47,6 +47,21 @@
         [90, 620, 300],
         [179, 600, 340]
       ]
+    },
+    {
+      "name": "page3",
+      "url": "https://vitalii.no/features/every-food-in-artems-game-now-carries-real-matvaretabellen-numbers-per-100-grams-d08",
+      "frames": 160,
+      "scroll": [
+        [0, 900],
+        [80, 945],
+        [159, 990]
+      ],
+      "mouse": [
+        [0, 580, 320],
+        [80, 610, 350],
+        [159, 590, 370]
+      ]
     }
   ]
 }
