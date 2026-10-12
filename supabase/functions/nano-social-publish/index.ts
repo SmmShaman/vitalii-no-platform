@@ -138,6 +138,7 @@ async function postToLinkedIn(text: string, supabase: ReturnType<typeof createCl
   if (res.status === 401) return { error: 'LinkedIn token expired' }
   if (!res.ok) return { error: `LinkedIn ${res.status}: ${(await res.text()).slice(0, 300)}` }
   const postId = res.headers.get('x-restli-id') || ''
+  console.log(`LinkedIn posted: ${postId || '(no id)'} videoUsed=${!!videoAsset} imageUsed=${!!imageAsset}`)
 
   // Article link as the first comment (external URLs in the body are down-ranked).
   let commentPosted = false
@@ -166,6 +167,7 @@ async function postToFacebook(text: string, imageUrl: string | null, videoUrl?: 
     const vRes = await fetch(`https://graph.facebook.com/v19.0/${fbPageId}/videos`, { method: 'POST', body: vForm })
     const vData = await vRes.json()
     if (vRes.ok && !vData.error && vData.id) {
+      console.log(`Facebook video posted: ${vData.id}`)
       return { url: `https://www.facebook.com/${fbPageId}/videos/${vData.id}`, videoUsed: true }
     }
     console.error('Facebook video post failed, falling back to text:', vData?.error?.message || vRes.status)
@@ -203,6 +205,81 @@ async function postToInstagram(caption: string, imageUrl: string | null): Promis
   return { url: `https://www.instagram.com/p/${pubData.id}/` }
 }
 
+type PublishResult = { url?: string; error?: string; videoUsed?: boolean; imageUsed?: boolean; commentPosted?: boolean }
+
+async function publish(platform: string, text: string, supabase: ReturnType<typeof createClient>,
+  imageUrl: string | null, videoUrl: string | null, commentUrl: string | null): Promise<PublishResult> {
+  if (platform === 'linkedin') return await postToLinkedIn(text, supabase, videoUrl, imageUrl, commentUrl)
+  if (platform === 'facebook') return await postToFacebook(text, imageUrl, videoUrl)
+  if (platform === 'instagram') return await postToInstagram(text, imageUrl)
+  return { error: `Unknown platform: ${platform}` }
+}
+
+// Async mode (`async: true` + contentId + contentType): the caller reaches this function through
+// the Cloudflare tunnel, which cuts any request at 100 s with a 524 — while a 110-140 MB native
+// LinkedIn video takes 60-150 s. On 2026-10-10 the agent saw the 524, logged "failed", and the
+// worker most likely went on and posted anyway; on 2026-10-11 the agent re-sent after the same
+// 524. So in async mode the function owns the social_media_posts row: it claims it as 'pending'
+// (the unique index idx_social_media_posts_unique_active makes a second claim fail → no duplicate
+// post), answers 202 at once, finishes the upload under EdgeRuntime.waitUntil and flips the row
+// to 'posted' / 'failed'. media_urls holds the video URL only when the video was really attached.
+async function publishAsync(supabase: ReturnType<typeof createClient>, p: {
+  platform: string; text: string; imageUrl: string | null; videoUrl: string | null; commentUrl: string | null
+  contentId: string; contentType: string; language: string
+}): Promise<Response> {
+  const { data: claimed, error: claimErr } = await supabase.from('social_media_posts').insert({
+    content_id: p.contentId,
+    content_type: p.contentType,
+    platform: p.platform,
+    language: p.language,
+    status: 'pending',
+    post_content: p.text,
+  }).select('id').single()
+
+  if (claimErr || !claimed) {
+    if ((claimErr as { code?: string } | null)?.code === '23505') {
+      const { data: existing } = await supabase.from('social_media_posts')
+        .select('id, status, platform_post_url')
+        .eq('content_id', p.contentId).eq('content_type', p.contentType)
+        .eq('platform', p.platform).eq('language', p.language)
+        .in('status', ['pending', 'posted'])
+        .order('created_at', { ascending: false }).limit(1).maybeSingle()
+      return json({ ok: true, duplicate: true, rowId: existing?.id, status: existing?.status, url: existing?.platform_post_url })
+    }
+    return json({ ok: false, error: `could not claim social_media_posts row: ${claimErr?.message || 'no row'}` }, 500)
+  }
+
+  const rowId = claimed.id as string
+  const job = (async () => {
+    let result: PublishResult
+    try {
+      result = await publish(p.platform, p.text, supabase, p.imageUrl, p.videoUrl, p.commentUrl)
+    } catch (e) {
+      result = { error: String(e) }
+    }
+    const update = result.error
+      ? { status: 'failed', error_message: result.error.slice(0, 1000) }
+      : {
+          status: 'posted',
+          platform_post_url: result.url || null,
+          posted_at: new Date().toISOString(),
+          media_urls: result.videoUsed && p.videoUrl ? [p.videoUrl] : null,
+          error_message: null,
+        }
+    const { error: upErr } = await supabase.from('social_media_posts').update(update).eq('id', rowId)
+    console.log(`nano-social-publish async ${p.platform} row ${rowId}: ${update.status}` +
+      (result.error ? ` (${result.error.slice(0, 200)})` : ` ${result.url || ''} videoUsed=${!!result.videoUsed}`) +
+      (upErr ? ` — ROW UPDATE FAILED: ${upErr.message}` : ''))
+  })()
+
+  // deno-lint-ignore no-explicit-any
+  const er = (globalThis as any).EdgeRuntime
+  if (er?.waitUntil) er.waitUntil(job)
+  else await job // no background support → behave synchronously
+
+  return json({ ok: true, accepted: true, rowId, status: er?.waitUntil ? 'pending' : 'done' }, 202)
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
 
@@ -210,7 +287,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json().catch(() => ({}))
-    const { platform, text, imageUrl, videoUrl, commentUrl, dryRun } = body as {
+    const { platform, text, imageUrl, videoUrl, commentUrl, dryRun, contentId, contentType, language } = body as {
       platform?: 'linkedin' | 'facebook' | 'instagram'
       text?: string
       imageUrl?: string | null
@@ -218,7 +295,13 @@ serve(async (req) => {
       /** LinkedIn only: article URL to post as the first comment (keep it OUT of `text`). */
       commentUrl?: string | null
       dryRun?: boolean
+      /** Async mode: answer 202 at once, post in the background, own the social_media_posts row. */
+      async?: boolean
+      contentId?: string
+      contentType?: string
+      language?: string
     }
+    const asyncMode = (body as { async?: boolean }).async === true
 
     if (!platform || !text) return json({ ok: false, error: 'platform and text are required' }, 400)
 
@@ -232,11 +315,17 @@ serve(async (req) => {
       return json({ ok: true, dryRun: true, platform, credentialsOk: checks[platform], textLength: text.length })
     }
 
-    let result: { url?: string; error?: string; videoUsed?: boolean; imageUsed?: boolean; commentPosted?: boolean }
-    if (platform === 'linkedin') result = await postToLinkedIn(text, supabase, videoUrl || null, imageUrl || null, commentUrl || null)
-    else if (platform === 'facebook') result = await postToFacebook(text, imageUrl || null, videoUrl || null)
-    else if (platform === 'instagram') result = await postToInstagram(text, imageUrl || null)
-    else return json({ ok: false, error: `Unknown platform: ${platform}` }, 400)
+    if (!['linkedin', 'facebook', 'instagram'].includes(platform)) return json({ ok: false, error: `Unknown platform: ${platform}` }, 400)
+
+    if (asyncMode) {
+      if (!contentId || !contentType) return json({ ok: false, error: 'async mode needs contentId and contentType' }, 400)
+      return await publishAsync(supabase, {
+        platform, text, imageUrl: imageUrl || null, videoUrl: videoUrl || null, commentUrl: commentUrl || null,
+        contentId, contentType, language: language || 'en',
+      })
+    }
+
+    const result = await publish(platform, text, supabase, imageUrl || null, videoUrl || null, commentUrl || null)
 
     if (result.error) return json({ ok: false, error: result.error })
     return json({ ok: true, url: result.url, videoUsed: result.videoUsed ?? false, imageUsed: result.imageUsed ?? false, commentPosted: result.commentPosted ?? false })
