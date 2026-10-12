@@ -65,17 +65,20 @@ const STAGE = "#0D1F18";
 // the big zigzag route for the b3 reveal and the b5 finale — five points spread
 // across the whole 1280x720 frame, not a straight strip.
 const BAND = { x: 40, y: 606, w: 1200, h: 92 };
-const NODE_BIG_W = 196;
-const NODE_BIG_H = 118;
+const NODE_BIG_W = 220;
+const NODE_BIG_H = 136;
 const BIG_PTS: { x: number; y: number }[] = [
-  { x: 150, y: 230 },
-  { x: 410, y: 460 },
-  { x: 665, y: 210 },
-  { x: 920, y: 460 },
-  { x: 1150, y: 230 },
+  { x: 150, y: 190 },
+  { x: 410, y: 500 },
+  { x: 665, y: 230 },
+  { x: 920, y: 500 },
+  { x: 1150, y: 190 },
 ];
 const QUIZ_CHIP = { x: 380, y: 590 };
 const HANDSON_CHIP = { x: 900, y: 590 };
+/** Faint always-on preview of the full big-map chain so b4's compact band still
+ * reads against a filled canvas instead of bare STAGE on the right/lower-right. */
+const GHOST_OPACITY = 0.22;
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
@@ -118,14 +121,15 @@ const Route: React.FC<{ x1: number; y1: number; x2: number; y2: number; progress
       style={{
         position: "absolute",
         left: x1,
-        top: y1 - 1.5,
+        top: y1 - 3,
         width: len * progress,
-        height: 3,
-        borderRadius: 2,
+        height: 6,
+        borderRadius: 3,
         background: color,
         transform: `rotate(${angle}deg)`,
         transformOrigin: "0 50%",
         opacity,
+        boxShadow: `0 0 10px ${color}`,
       }}
     />
   );
@@ -240,6 +244,32 @@ const FlowMap: React.FC = () => {
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      {/* faint always-on preview of the full level map — fills the canvas behind the
+          compact band (b4) with the route the nodes will take, not decoration without meaning */}
+      {frame >= B3 &&
+        BIG_PTS.slice(0, N - 1).map((p, i) => {
+          const q = BIG_PTS[i + 1];
+          return (
+            <Route key={`ghost-route-${i}`} x1={p.x} y1={p.y} x2={q.x} y2={q.y} progress={1} color={P.border} opacity={GHOST_OPACITY} />
+          );
+        })}
+      {frame >= B3 &&
+        BIG_PTS.map((p, i) => (
+          <div
+            key={`ghost-dot-${i}`}
+            style={{
+              position: "absolute",
+              left: p.x - 6,
+              top: p.y - 6,
+              width: 12,
+              height: 12,
+              borderRadius: "50%",
+              background: P.border,
+              opacity: GHOST_OPACITY,
+            }}
+          />
+        ))}
+
       {/* the level-map route — the main chain, both bands and the big zigzag */}
       {nodes.slice(0, N - 1).map((a, i) => {
         const b = nodes[i + 1];

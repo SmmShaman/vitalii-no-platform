@@ -38,7 +38,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, StatPill } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut, PLATE } from "./motion-primitives";
 import { LiveWindow, LogWindow } from "./live-primitives";
 import { tween, ease } from "../../components/effects/motion/grammar";
@@ -139,8 +139,24 @@ const Deck: React.FC = () => {
 
           {CARDS.map((c, i) => {
             const st = states[i];
-            if (st === "hidden") return null;
             const left = 16 + i * (cardW + gap);
+            if (st === "hidden") {
+              return (
+                <div
+                  key={`ghost-${c.label}`}
+                  style={{
+                    position: "absolute",
+                    left,
+                    top: 30,
+                    width: cardW,
+                    height: 52,
+                    border: `2px dashed ${P.border}`,
+                    borderRadius: 4,
+                    opacity: 0.35,
+                  }}
+                />
+              );
+            }
             let scaleY = 1;
             let green = st === "green";
             if (st === "flipping" && c.flipAt !== null) {
@@ -265,6 +281,12 @@ const Inner: React.FC = () => {
         plate={0.82}
         data={{ label: "Video size vs. Bot API limit", value: 200, target: 20, unit: "MB" }}
       />
+      {frame >= B1 + 30 && frame < B2 && (
+        <>
+          <StatPill x={60} y={50} emoji="📼" text="Real test: 200MB upload" tone="danger" opacity={Math.min(1, (frame - B1 - 30) / 15)} />
+          <StatPill x={620} y={50} emoji="🚧" text="Telegram Bot API cap: 20MB" tone="danger" opacity={Math.min(1, (frame - B1 - 30) / 15)} />
+        </>
+      )}
 
       {/* b2 — the metaphor for why the ceiling exists */}
       <MotionInsert
@@ -275,6 +297,23 @@ const Inner: React.FC = () => {
         plate={0.82}
         data={{ line1: "Like mailing a package", line2: "through a letter slot", keywords: ["package", "letter slot"] }}
       />
+      {frame >= B2 + 20 && frame < B3 && (
+        <>
+          <StatPill x={60} y={55} emoji="📦" text="340MB sample" tone="danger" opacity={Math.min(1, (frame - B2 - 20) / 15)} />
+          <div
+            style={{
+              position: "absolute",
+              left: 600,
+              top: 30,
+              fontSize: 100,
+              opacity: Math.min(1, (frame - B2 - 20) / 15),
+            }}
+          >
+            📪
+          </div>
+          <StatPill x={940} y={55} emoji="📦" text="512MB sample" tone="danger" opacity={Math.min(1, (frame - B2 - 20) / 15)} />
+        </>
+      )}
 
       {/* b3 — the real commit, zoomed to the matching hunk */}
       <CommitZoom />
@@ -289,6 +328,12 @@ const Inner: React.FC = () => {
         plate={0.78}
         data={{ a: { label: "Bot API", value: 20 }, b: { label: "MTKruto", value: 2000 }, unit: "MB" }}
       />
+      {frame >= B4 + 20 && frame < B5 && (
+        <>
+          <StatPill x={60} y={50} emoji="⏳" text="Before: 20MB cap" tone="danger" opacity={Math.min(1, (frame - B4 - 20) / 15)} />
+          <StatPill x={940} y={50} emoji="🚀" text="Now: 2GB cap" tone="success" opacity={Math.min(1, (frame - B4 - 20) / 15)} />
+        </>
+      )}
 
       {/* b5 — the payoff; holds to the final frame, no feature page/hub here */}
       {frame >= B5 && (

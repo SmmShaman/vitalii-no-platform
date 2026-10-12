@@ -225,6 +225,8 @@ const FreshnessLog: React.FC = () => {
 
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       {/* b1 — stale saved numbers, dimmed over the feature's own page */}
@@ -261,6 +263,40 @@ const Inner: React.FC = () => {
         plate={0.82}
         data={{ line1: "Like trusting a scale", line2: "you stepped on last month", keywords: ["scale", "last month"] }}
       />
+      {frame >= B3 && frame < B4 && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            width: 1280,
+            height: 606,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 18,
+          }}
+        >
+          <div style={{ fontSize: 150, lineHeight: 1, opacity: tween(sec(frame, B3 + 6, fps), 0, 0.3, ease.power3Out) }}>⚖️</div>
+          <div
+            style={{
+              padding: "10px 22px",
+              borderRadius: 999,
+              background: P.dangerBg,
+              border: `1.5px solid ${P.dangerEdge}`,
+              color: P.danger,
+              fontSize: 20,
+              fontWeight: 800,
+              letterSpacing: 0.5,
+              opacity: tween(sec(frame, B3 + 16, fps), 0, 0.3, ease.power3Out),
+              fontFamily,
+            }}
+          >
+            ⏱ WEIGHT LAST CONFIRMED 41 DAYS AGO
+          </div>
+        </div>
+      )}
 
       {/* b4 — the fix, drawn as the real freshness-check mechanism (no commit fits) */}
       <FreshnessLog />
@@ -302,6 +338,64 @@ const Inner: React.FC = () => {
           }}
         >
           IKF — insulin-to-carb factor
+        </div>
+      )}
+      {frame >= B5 + 15 && (
+        <div
+          style={{
+            position: "absolute",
+            left: 40,
+            top: 44,
+            width: 1200,
+            display: "flex",
+            justifyContent: "space-between",
+            opacity: tween(sec(frame, B5 + 15, fps), 0, 0.3, ease.power3Out),
+          }}
+        >
+          {[
+            { l: "IKF", d: "valid ≤ 7 days" },
+            { l: "BASAL DOSE", d: "valid ≤ 7 days" },
+            { l: "WEIGHT", d: "valid ≤ 30 days" },
+          ].map((it) => (
+            <div
+              key={it.l}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "6px 14px",
+                borderRadius: 999,
+                background: P.chipBg,
+                border: `1.5px solid ${P.border}`,
+                color: P.ink,
+                fontSize: 14,
+                fontWeight: 700,
+                fontFamily,
+                whiteSpace: "nowrap",
+              }}
+            >
+              <span style={{ color: P.accent, fontWeight: 800 }}>{it.l}</span>
+              {it.d}
+            </div>
+          ))}
+        </div>
+      )}
+      {frame >= B5 + 30 && (
+        <div
+          style={{
+            position: "absolute",
+            left: 40,
+            top: 560,
+            width: 1200,
+            textAlign: "center",
+            fontSize: 15,
+            fontWeight: 700,
+            color: P.success,
+            fontFamily,
+            opacity: tween(sec(frame, B5 + 30, fps), 0, 0.3, ease.power3Out),
+          }}
+        >
+          ✅ Fresh numbers checked before every dose
         </div>
       )}
 
