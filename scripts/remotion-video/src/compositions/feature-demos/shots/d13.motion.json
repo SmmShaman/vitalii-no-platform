@@ -1,0 +1,64 @@
+{
+  "id": "d13",
+  "composition": "FeatureProductNamesWereNorwegianD13",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Product names were Norwegian-only",
+        "tags": ["Ukrainian parent", "Daily meal log", "No Ukrainian name"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "statusFocus",
+      "backdrop": "hub",
+      "data": {
+        "title": "Searching for oatmeal",
+        "claims": [
+          { "text": "Norwegian: havregrøt — found", "verdict": "yes" },
+          { "text": "Ukrainian: овсянка — found", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "drawn",
+      "data": {
+        "steps": ["Photo of product", "AI reads label", "Entry saved"],
+        "result": "Norwegian only",
+        "system": "AI scan pipeline"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "drawn",
+      "data": {
+        "from": "Norwegian only",
+        "to": "Norwegian + Ukrainian",
+        "points": [
+          "New translation column",
+          "Picker, viewer, calculator updated",
+          "Search checks both languages",
+          "AI pipeline fills the Ukrainian line"
+        ],
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "copyCorrection",
+      "backdrop": "drawn",
+      "data": {
+        "wrong": "овсянка → no results",
+        "right": "овсянка → havregrøt",
+        "label": "Search today"
+      }
+    }
+  ]
+}

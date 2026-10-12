@@ -1,0 +1,37 @@
+{
+  "id": "d13",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/product-names-were-norwegian-only-now-they-carry-a-ukrainian-line-underneath-d13",
+      "frames": 190,
+      "scroll": [
+        [0, 0],
+        [95, 240],
+        [189, 480]
+      ],
+      "mouse": [
+        [0, 560, 260],
+        [95, 600, 300],
+        [189, 580, 320]
+      ]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 152,
+      "scroll": [
+        [0, 0],
+        [75, 160],
+        [151, 320]
+      ],
+      "mouse": [
+        [0, 540, 220],
+        [75, 600, 260],
+        [151, 560, 300]
+      ]
+    }
+  ]
+}

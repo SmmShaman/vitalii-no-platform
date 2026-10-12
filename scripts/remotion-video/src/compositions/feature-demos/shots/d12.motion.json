@@ -1,0 +1,51 @@
+{
+  "id": "d12",
+  "composition": "FeatureDoseCalculatorWasThreeD12",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Three screens before food list",
+        "tags": ["Base values", "Correction table", "Weight notes"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "statusFocus",
+      "backdrop": "page",
+      "data": {
+        "title": "After the dose is calculated",
+        "claims": [
+          { "text": "Dose shown on screen", "verdict": "yes" },
+          { "text": "Save button visible", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": null,
+      "backdrop": "hub",
+      "data": null
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "drawn",
+      "data": {
+        "from": "Save button up top",
+        "to": "Sticky bar: dose + save",
+        "points": ["No more scrolling up", "Dose updates as you scroll", "Save one tap away"],
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": null,
+      "backdrop": "drawn",
+      "data": null
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "d12",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-dose-calculator-was-three-screens-of-scrolling-now-its-one-page-with-a-save--d12",
+      "frames": 329,
+      "scroll": [
+        [0, 0],
+        [164, 260],
+        [328, 520]
+      ],
+      "mouse": [
+        [0, 560, 260],
+        [164, 600, 300],
+        [328, 580, 320]
+      ]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 163,
+      "scroll": [
+        [0, 0],
+        [81, 170],
+        [162, 340]
+      ],
+      "mouse": [
+        [0, 540, 220],
+        [81, 600, 260],
+        [162, 560, 300]
+      ]
+    }
+  ]
+}

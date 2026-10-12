@@ -1,0 +1,58 @@
+{
+  "id": "d11",
+  "composition": "FeatureEveryNumberDoseCalculatorD11",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": null,
+      "backdrop": "page",
+      "data": null
+    },
+    {
+      "beat": "b2",
+      "effect": "statusFocus",
+      "backdrop": "page",
+      "data": {
+        "title": "After an accidental swipe",
+        "claims": [
+          { "text": "Food row swiped away", "verdict": "yes" },
+          { "text": "Undo button available", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "costLedger",
+      "backdrop": "hub",
+      "data": {
+        "title": "One accidental swipe =",
+        "unit": "steps",
+        "lines": [
+          { "label": "Re-add the deleted food", "value": 1 },
+          { "label": "Recheck breakfast total", "value": 1 },
+          { "label": "Recheck lunch total", "value": 1 },
+          { "label": "Recheck dinner total", "value": 1 }
+        ],
+        "totalLabel": "Steps by hand"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "drawn",
+      "data": {
+        "from": "Tap the plus button, fifteen times",
+        "to": "Drag one finger to the value",
+        "points": ["One scrub sets the number directly", "Works like turning a dial", "Powers every number in the calculator"],
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": null,
+      "backdrop": "drawn",
+      "data": null
+    }
+  ]
+}

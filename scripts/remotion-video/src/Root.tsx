@@ -242,6 +242,9 @@ import { FeatureArtemsInsulinCalculatorRemembersD04 } from "./compositions/featu
 import { FeatureEveryFoodArtemsGameD08 } from "./compositions/feature-demos/FeatureEveryFoodArtemsGameD08";
 import { FeatureFiveNewMiniLessonsD07 } from "./compositions/feature-demos/FeatureFiveNewMiniLessonsD07";
 import { FeatureCalculatorRefusesDoseUntilD09 } from "./compositions/feature-demos/FeatureCalculatorRefusesDoseUntilD09";
+import { FeatureProductNamesWereNorwegianD13 } from "./compositions/feature-demos/FeatureProductNamesWereNorwegianD13";
+import { FeatureDoseCalculatorWasThreeD12 } from "./compositions/feature-demos/FeatureDoseCalculatorWasThreeD12";
+import { FeatureEveryNumberDoseCalculatorD11 } from "./compositions/feature-demos/FeatureEveryNumberDoseCalculatorD11";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2380,6 +2383,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureCalculatorRefusesDoseUntilD09"
         component={FeatureCalculatorRefusesDoseUntilD09}
         durationInFrames={866}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureProductNamesWereNorwegianD13"
+        component={FeatureProductNamesWereNorwegianD13}
+        durationInFrames={894}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureDoseCalculatorWasThreeD12"
+        component={FeatureDoseCalculatorWasThreeD12}
+        durationInFrames={879}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureEveryNumberDoseCalculatorD11"
+        component={FeatureEveryNumberDoseCalculatorD11}
+        durationInFrames={927}
         fps={30}
         width={1280}
         height={720}
