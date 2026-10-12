@@ -1,0 +1,57 @@
+{
+ "id": "d12",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.276,
+  "b2": 5.079,
+  "b3": 5.147,
+  "b4": 5.104,
+  "b5": 5.504
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Logging a meal meant scrolling past three screens before you even reached the food list.",
+   "start_s": 0.5,
+   "end_s": 5.776,
+   "start_f": 15,
+   "end_f": 173
+  },
+  {
+   "beat": "b2",
+   "text": "Once the dose was calculated, you scrolled all the way back up just to find save.",
+   "start_s": 6.076,
+   "end_s": 11.155,
+   "start_f": 182,
+   "end_f": 335
+  },
+  {
+   "beat": "b3",
+   "text": "A two-minute task, done several times a day, became a hunt every single time.",
+   "start_s": 11.455,
+   "end_s": 16.602,
+   "start_f": 344,
+   "end_f": 498
+  },
+  {
+   "beat": "b4",
+   "text": "A JavaScript rewrite put dose and save on one bar that follows you down the page.",
+   "start_s": 16.902,
+   "end_s": 22.006,
+   "start_f": 507,
+   "end_f": 660
+  },
+  {
+   "beat": "b5",
+   "text": "The whole log now fits in one scroll instead of three, with save always in view.",
+   "start_s": 22.306,
+   "end_s": 27.81,
+   "start_f": 669,
+   "end_f": 834
+  }
+ ],
+ "total_s": 29.31,
+ "durationInFrames": 879,
+ "measured_track_s": 27.864,
+ "track": "/root/feature-demos/vo-d12/vo-d12.mp3"
+}

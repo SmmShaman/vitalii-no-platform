@@ -1,0 +1,7 @@
+{
+  "id": "d12",
+  "file": "yt-feature-d12.mp4",
+  "title": "Dose Log: Three Screens Down to One, Save Always Visible | vitalii.no",
+  "description": "Logging a single meal used to mean scrolling past base values, a correction table and weight notes before even reaching the food picker — then scrolling further still to find the save button once the dose was calculated. For a two-minute task done several times a day, that added up to real friction.\n\nThe calculator page was restructured into three compact steps on one scroll: base values collapse into a single confirmed line, food choice becomes three equal tiles with the carb total shown right in the heading, and the dose card surfaces any warning before the breakdown underneath it. A sticky bottom bar now carries the calculated dose and a Save to the journal button no matter how far down the page you've scrolled.\n\nA full meal log now fits in one scroll instead of three, and the save button is always visible instead of requiring a scroll back up.\n\n🔗 Full write-up: https://vitalii.no/features/the-dose-calculator-was-three-screens-of-scrolling-now-its-one-page-with-a-save--d12\n📚 All 342 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#uxdesign #mobilefirst #javascript #productdesign #diabetestech",
+  "tags": ["ux redesign", "mobile first design", "javascript", "sticky navigation", "one page layout", "product design", "diabetes management app", "form design", "calc.html", "usability", "vitalii berbeha"]
+}

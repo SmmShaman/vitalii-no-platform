@@ -1,0 +1,57 @@
+{
+ "id": "d11",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.793,
+  "b2": 4.542,
+  "b3": 4.752,
+  "b4": 5.028,
+  "b5": 7.579
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Bumping carbs up by 15 grams meant tapping a tiny plus button fifteen times.",
+   "start_s": 0.5,
+   "end_s": 6.293,
+   "start_f": 15,
+   "end_f": 189
+  },
+  {
+   "beat": "b2",
+   "text": "Swipe a food row by accident and it was simply gone, with no way back.",
+   "start_s": 6.593,
+   "end_s": 11.135,
+   "start_f": 198,
+   "end_f": 334
+  },
+  {
+   "beat": "b3",
+   "text": "The only fix was re-adding it and recalculating the whole day's log by hand.",
+   "start_s": 11.435,
+   "end_s": 16.187,
+   "start_f": 343,
+   "end_f": 486
+  },
+  {
+   "beat": "b4",
+   "text": "A new JavaScript module lets you scrub a number to its value, like turning a dial.",
+   "start_s": 16.487,
+   "end_s": 21.515,
+   "start_f": 495,
+   "end_f": 645
+  },
+  {
+   "beat": "b5",
+   "text": "Now that 15-gram change takes one scrub instead of fifteen taps, and a deleted row returns within 5 seconds.",
+   "start_s": 21.815,
+   "end_s": 29.394,
+   "start_f": 654,
+   "end_f": 882
+  }
+ ],
+ "total_s": 30.894,
+ "durationInFrames": 927,
+ "measured_track_s": 29.448,
+ "track": "/root/feature-demos/vo-d11/vo-d11.mp3"
+}

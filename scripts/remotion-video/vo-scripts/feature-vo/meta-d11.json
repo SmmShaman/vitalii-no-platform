@@ -1,0 +1,7 @@
+{
+  "id": "d11",
+  "file": "yt-feature-d11.mp4",
+  "title": "15 Taps Become One Scrub in the Dose Calculator | vitalii.no",
+  "description": "Bumping a carb value from 40 grams to 55 meant tapping a tiny plus button fifteen separate times, on a phone screen already crowded with the rest of the dose card. Swipe a food row by accident and it was simply gone — the only way back was re-adding it and recalculating the whole day's log by hand.\n\nA new motion module adds press-and-hold-to-repeat and a horizontal scrub gesture directly on every value — carbs, blood sugar, ketones, given dose — plus a bottom-sheet product picker and a swipe-to-delete with an Undo snackbar that reverses the same delete call already used by the journal. The underlying insulin math was never touched; every value still flows through the same input event it always did.\n\nChanging a carb value by 15 grams now takes one scrub instead of fifteen taps, and an accidental swipe-delete is recoverable for 5 seconds instead of a manual re-entry of the whole row.\n\n🔗 Full write-up: https://vitalii.no/features/every-number-in-the-dose-calculator-used-to-just-jump-now-it-rolls-into-place-d11\n📚 All 342 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#uxdesign #gestures #javascript #mobileapp #insulindosing",
+  "tags": ["gesture controls", "ux micro interactions", "javascript", "mobile app design", "insulin dosing tool", "undo pattern", "scrub gesture", "calc.js", "diabetes management app", "product design", "vitalii berbeha"]
+}

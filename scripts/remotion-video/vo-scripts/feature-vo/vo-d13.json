@@ -1,0 +1,57 @@
+{
+ "id": "d13",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.034,
+  "b2": 4.754,
+  "b3": 5.012,
+  "b4": 5.493,
+  "b5": 5.314
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A Ukrainian-speaking parent logging her child's meal had to recognize a word written only in Norwegian.",
+   "start_s": 0.5,
+   "end_s": 6.534,
+   "start_f": 15,
+   "end_f": 196
+  },
+  {
+   "beat": "b2",
+   "text": "Search for it in her own language and nothing came up \u2014 not even a close match.",
+   "start_s": 6.834,
+   "end_s": 11.588,
+   "start_f": 205,
+   "end_f": 348
+  },
+  {
+   "beat": "b3",
+   "text": "Even new products scanned in by photo came back Norwegian-only, every time.",
+   "start_s": 11.888,
+   "end_s": 16.9,
+   "start_f": 357,
+   "end_f": 507
+  },
+  {
+   "beat": "b4",
+   "text": "Now a Ukrainian line sits right under the Norwegian name, saved straight into Cloudflare.",
+   "start_s": 17.2,
+   "end_s": 22.693,
+   "start_f": 516,
+   "end_f": 681
+  },
+  {
+   "beat": "b5",
+   "text": "Search \u043e\u0432\u0441\u044f\u043d\u043a\u0430 today and it finds havregr\u00f8t \u2014 the same entry, in her own language.",
+   "start_s": 22.993,
+   "end_s": 28.307,
+   "start_f": 690,
+   "end_f": 849
+  }
+ ],
+ "total_s": 29.807,
+ "durationInFrames": 894,
+ "measured_track_s": 28.368,
+ "track": "/root/feature-demos/vo-d13/vo-d13.mp3"
+}

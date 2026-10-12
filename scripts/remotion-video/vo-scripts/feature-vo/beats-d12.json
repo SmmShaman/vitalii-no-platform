@@ -1,0 +1,7 @@
+{"id": "d12", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Logging a meal meant scrolling past three screens before you even reached the food list."],
+ ["b2", "Once the dose was calculated, you scrolled all the way back up just to find save."],
+ ["b3", "A two-minute task, done several times a day, became a hunt every single time."],
+ ["b4", "A JavaScript rewrite put dose and save on one bar that follows you down the page."],
+ ["b5", "The whole log now fits in one scroll instead of three, with save always in view."]
+]}
