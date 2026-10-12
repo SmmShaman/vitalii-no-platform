@@ -174,14 +174,12 @@ jobs:
         working-directory: ./scripts/remotion-video
         run: npm ci
 
-      # Voiceover moved off the paid reseller on 2026-09-05 — same Microsoft
-      # voices, no balance to run out, and real word timings for the captions.
-      - name: Install edge-tts (voiceover)
-        run: python3 -m pip install --quiet edge-tts
-
       - name: Generate daily news compilation
         working-directory: ./scripts/video-processor
         env:
+          # Voiceover: Google Cloud TTS, free-tier WaveNet (google-tts-voice.py).
+          # Edge TTS died with a 403 on ~10.10.2026 (rany2/edge-tts#490).
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}
           # YouTube
           YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}

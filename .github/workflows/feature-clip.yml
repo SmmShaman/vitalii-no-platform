@@ -13,8 +13,13 @@ name: Feature Clip Render
 # the free half — voice, render, mux, verify, publish to R2.
 #
 # The voiceover is REGENERATED here from the committed beat texts and checked
-# against the committed measurement. If edge-tts drifts, the run fails instead
-# of shipping a clip whose picture no longer matches its words.
+# against the committed measurement. If it drifts, the run fails instead of
+# shipping a clip whose picture no longer matches its words.
+#
+# Voice (2026-10-12): Google Cloud TTS, free tier (vo-beats.py). Edge TTS died
+# with a 403 on ~10.10.2026 (rany2/edge-tts#490). Clips timed against the old
+# Edge voice are rebuilt with --fit, which lands every beat on its committed
+# length, so their pictures and Root.tsx stay valid.
 
 on:
   workflow_dispatch:
@@ -74,15 +79,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install edge-tts
-        run: |
-          sudo apt-get update && sudo apt-get install -y ffmpeg || true
-          python3 -m pip install --quiet edge-tts
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg || true
 
       - name: Measure the voiceover
         working-directory: ./scripts/remotion-video
         env:
           VO_OUT_ROOT: ${{ github.workspace }}/vo
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}
+          FEATURE_TTS_VOICE: ${{ vars.FEATURE_TTS_VOICE }}
         run: |
           set -euo pipefail
           BEATS="vo-scripts/feature-vo/beats-${FEATURE_ID}.json"
@@ -176,9 +181,6 @@ jobs:
         working-directory: ./scripts/remotion-video
         run: npx remotion browser ensure
 
-      - name: Install edge-tts
-        run: python3 -m pip install --quiet edge-tts
-
       # ── Live UI ────────────────────────────────────────────────────────────
       # Owner rule 2026-09-06: a UI beat shows the real product. If the clip has
       # a shot spec, record the live pages here — one screenshot per frame, so
@@ -203,16 +205,22 @@ jobs:
         working-directory: ./scripts/remotion-video
         env:
           VO_OUT_ROOT: ${{ github.workspace }}/vo
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}
+          FEATURE_TTS_VOICE: ${{ vars.FEATURE_TTS_VOICE }}
         run: |
           set -euo pipefail
           BEATS="vo-scripts/feature-vo/beats-${FEATURE_ID}.json"
           test -f "$BEATS" || { echo "::error::missing $BEATS — commit the beat texts first"; exit 1; }
-          python3 vo-scripts/vo-beats.py "$BEATS" > "${{ github.workspace }}/vo-measured.json"
+          # --fit: land each beat on the committed length (clips drawn against
+          # the old Edge voice keep their sync; a Google-measured clip is unchanged).
+          FIT=""
+          [ -f "vo-scripts/feature-vo/vo-${FEATURE_ID}.json" ] && FIT="--fit vo-scripts/feature-vo/vo-${FEATURE_ID}.json"
+          python3 vo-scripts/vo-beats.py "$BEATS" $FIT > "${{ github.workspace }}/vo-measured.json"
           cat "${{ github.workspace }}/vo-measured.json"
 
       # The composition's beat windows were written against a specific
-      # measurement. edge-tts is not bit-identical run to run, so verify the
-      # rebuild lands on the same timeline before trusting the sync.
+      # measurement. Verify the rebuild lands on the same timeline before
+      # trusting the sync.
       - name: Verify the rebuilt track matches the committed measurement
         working-directory: ./scripts/remotion-video
         run: |

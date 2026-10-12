@@ -1,9 +1,14 @@
 /**
  * TTS Voiceover Generator
  *
- * Default provider is Microsoft's free Edge TTS endpoint (see
- * edge-tts-voice.py). Zvukogram, the paid reseller this used to call, is kept
- * behind TTS_PROVIDER=zvukogram as a fallback.
+ * Default provider is Google Cloud Text-to-Speech (see google-tts-voice.py),
+ * free-tier WaveNet voices only. Zvukogram, the paid reseller this used to
+ * call, is kept behind TTS_PROVIDER=zvukogram as a fallback.
+ *
+ * 2026-10-12: Microsoft's free Edge endpoint (the default since 2026-09-05)
+ * started returning 403 to every client around 10.10 (rany2/edge-tts#490),
+ * which killed the 11.10 digest. Google replaced it; SSML marks give the same
+ * measured per-word timings the captions relied on.
  *
  * Why the switch (2026-09-05): Zvukogram's balance ran out on 02.09 and every
  * digest render died at this step for four days. Its Norwegian voices "Финн"
@@ -64,27 +69,29 @@ export const VOICE_PRESETS = {
 };
 
 /**
- * The same voices, addressed directly instead of through a reseller.
- * Norwegian is the pair the digest actually uses; the rest match the intent
- * of the Zvukogram presets above.
+ * Google Cloud TTS voices. OWNER RULE: free tier only — WaveNet (4M chars/month)
+ * or Neural2 (1M), never Chirp 3 HD or Gemini TTS. Norwegian is the pair the
+ * digest actually uses; override with GOOGLE_TTS_VOICE_MALE / _FEMALE.
  */
-export const EDGE_VOICE_PRESETS = {
-  no: { male: 'nb-NO-FinnNeural', female: 'nb-NO-PernilleNeural' },
-  en: { male: 'en-US-BrianNeural', female: 'en-US-AvaNeural' },
-  ua: { male: 'uk-UA-OstapNeural', female: 'uk-UA-PolinaNeural' },
-  ru: { male: 'ru-RU-DmitryNeural', female: 'ru-RU-SvetlanaNeural' },
+export const GOOGLE_VOICE_PRESETS = {
+  no: { male: 'nb-NO-Wavenet-G', female: 'nb-NO-Wavenet-F' },
+  en: { male: 'en-US-Wavenet-D', female: 'en-US-Wavenet-F' },
+  ua: { male: 'uk-UA-Wavenet-A', female: 'uk-UA-Wavenet-A' },
+  ru: { male: 'ru-RU-Wavenet-D', female: 'ru-RU-Wavenet-C' },
 };
 
 /**
- * Speak a script with Edge TTS, returning audio plus per-word timings taken
- * from the WordBoundary events rather than estimated after the fact.
+ * Speak a script with Google TTS, returning audio plus per-word timings taken
+ * from SSML mark timepoints rather than estimated after the fact.
  *
  * @returns {Promise<VoiceoverResult>}
  */
-async function generateWithEdgeTts(scriptText, language, gender) {
-  const preset = EDGE_VOICE_PRESETS[language] || EDGE_VOICE_PRESETS.no;
-  const voice = preset[gender] || preset.male;
-  console.log(`🔊 Edge TTS voice: ${voice}`);
+async function generateWithGoogleTts(scriptText, language, gender) {
+  const preset = GOOGLE_VOICE_PRESETS[language] || GOOGLE_VOICE_PRESETS.no;
+  const override = gender === 'female'
+    ? process.env.GOOGLE_TTS_VOICE_FEMALE : process.env.GOOGLE_TTS_VOICE_MALE;
+  const voice = override || preset[gender] || preset.male;
+  console.log(`🔊 Google TTS voice: ${voice}`);
 
   const stamp = Date.now();
   const audioPath = path.join(os.tmpdir(), `voiceover_${stamp}.mp3`);
@@ -92,7 +99,7 @@ async function generateWithEdgeTts(scriptText, language, gender) {
   const scriptPath = path.join(os.tmpdir(), `voiceover_${stamp}.txt`);
   await fs.writeFile(scriptPath, scriptText, 'utf8');
 
-  const helper = path.join(path.dirname(new URL(import.meta.url).pathname), 'edge-tts-voice.py');
+  const helper = path.join(path.dirname(new URL(import.meta.url).pathname), 'google-tts-voice.py');
   await execAsync(`python3 ${JSON.stringify(helper)} ${JSON.stringify(voice)} ` +
     `${JSON.stringify(audioPath)} ${JSON.stringify(wordsPath)} < ${JSON.stringify(scriptPath)}`,
     { maxBuffer: 10 * 1024 * 1024 });
@@ -102,13 +109,13 @@ async function generateWithEdgeTts(scriptText, language, gender) {
   const durationSeconds = parsed.durationSeconds;
 
   if (!subtitles || subtitles.length === 0) {
-    throw new Error('Edge TTS returned no word boundaries');
+    throw new Error('Google TTS returned no word timings');
   }
 
   const size = (await fs.stat(audioPath)).size;
   console.log(`✅ Audio: ${(size / 1024 / 1024).toFixed(2)} MB, ${durationSeconds}s → ${audioPath}`);
-  console.log(`📝 ${subtitles.length} word timings (measured, not estimated)`);
-  console.log('💰 Cost: 0 — Microsoft Edge endpoint');
+  console.log(`📝 ${subtitles.length} word timings (SSML marks, measured)`);
+  console.log('💰 Cost: 0 — Google TTS free tier (WaveNet)');
 
   return { audioPath, subtitles, durationSeconds };
 }
@@ -125,11 +132,11 @@ export async function generateVoiceover(scriptText, language = 'en', options = {
   console.log(`🎙️ Generating voiceover (${language})...`);
   console.log(`   Script length: ${scriptText.length} chars, ${scriptText.split(/\s+/).length} words`);
 
-  // Edge unless explicitly told otherwise. An explicit options.voice is a
+  // Google unless explicitly told otherwise. An explicit options.voice is a
   // Zvukogram voice name, so that path still goes to Zvukogram.
-  const provider = process.env.TTS_PROVIDER || (options.voice ? 'zvukogram' : 'edge');
-  if (provider === 'edge') {
-    return generateWithEdgeTts(scriptText, language, options.gender || 'male');
+  const provider = process.env.TTS_PROVIDER || (options.voice ? 'zvukogram' : 'google');
+  if (provider === 'google') {
+    return generateWithGoogleTts(scriptText, language, options.gender || 'male');
   }
 
   const ZVUKOGRAM_TOKEN = process.env.ZVUKOGRAM_TOKEN;
