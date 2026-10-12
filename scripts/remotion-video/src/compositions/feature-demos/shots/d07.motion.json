@@ -4,9 +4,9 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "titleTakeover",
+      "effect": "keywordCaption",
       "backdrop": "hub",
-      "data": { "title": "Plays For Hours, Learns Nothing", "kicker": "The simulation never stops to explain" }
+      "data": { "line1": "Plays for hours,", "line2": "learns nothing.", "keywords": ["hours", "nothing"] }
     },
     {
       "beat": "b2",
