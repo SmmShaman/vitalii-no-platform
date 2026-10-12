@@ -241,6 +241,7 @@ import { FeatureNewsImagesWereSecretlyP77 } from "./compositions/feature-demos/F
 import { FeatureArtemsInsulinCalculatorRemembersD04 } from "./compositions/feature-demos/FeatureArtemsInsulinCalculatorRemembersD04";
 import { FeatureEveryFoodArtemsGameD08 } from "./compositions/feature-demos/FeatureEveryFoodArtemsGameD08";
 import { FeatureFiveNewMiniLessonsD07 } from "./compositions/feature-demos/FeatureFiveNewMiniLessonsD07";
+import { FeatureCalculatorRefusesDoseUntilD09 } from "./compositions/feature-demos/FeatureCalculatorRefusesDoseUntilD09";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2370,6 +2371,15 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFiveNewMiniLessonsD07"
         component={FeatureFiveNewMiniLessonsD07}
         durationInFrames={880}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureCalculatorRefusesDoseUntilD09"
+        component={FeatureCalculatorRefusesDoseUntilD09}
+        durationInFrames={866}
         fps={30}
         width={1280}
         height={720}

@@ -1,0 +1,79 @@
+{
+  "id": "d09",
+  "archetype": "5 ledger — a running tally of risk lines in red accumulates through the problem beats, then is rewritten in green with the total struck through once the fix lands",
+  "mood": "dawn",
+  "notes": "Recently used effects seen in d08/p78/d04: titleTakeover, cornerTags, funnelAbsorption, pipelineFlow, copyCorrection, keywordCaption. b1 does NOT open with titleTakeover, funnelAbsorption, or keywordCaption (those were the last 3 openers). Neither given commit (e1e194d, 49d9a9f) matches any beat's claim, so no commit diff is shown anywhere in this clip — b4 draws the mechanism instead, using the real field names (IKF, basal, weight) and windows (7 days, 30 days) pulled from the live feature page.",
+  "beats": [
+    {
+      "beat": "b1",
+      "frames": [15, 204],
+      "kind": "catalog",
+      "effect": "cornerTags",
+      "backdrop": { "file": "d09.json", "shot": "page", "dim": true },
+      "data": {
+        "statement": "Dosing ran on stale saved numbers",
+        "tags": ["IKF", "basal dose", "weight"]
+      },
+      "lowerThird": "Ledger plate 'INSULIN SIMULATOR' rises, first red line item 'weight data unconfirmed' posts"
+    },
+    {
+      "beat": "b2",
+      "frames": [213, 421],
+      "kind": "catalog",
+      "effect": "funnelAbsorption",
+      "backdrop": { "file": "d09.json", "shot": "page2", "dim": true },
+      "data": {
+        "inputs": ["Weight creeps up", "Nobody notices", "No freshness check"],
+        "result": "Calculator doses off the stale numbers anyway"
+      },
+      "lowerThird": "Second red line item posts: 'no warning before dosing'"
+    },
+    {
+      "beat": "b3",
+      "frames": [430, 517],
+      "kind": "drawn",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Like trusting a scale",
+        "line2": "you stepped on last month",
+        "keywords": ["scale", "last month"]
+      },
+      "lowerThird": "No new line — ledger holds at 2 red items while the metaphor lands"
+    },
+    {
+      "beat": "b4",
+      "frames": [526, 650],
+      "kind": "logWindow",
+      "effect": null,
+      "backdrop": null,
+      "description": "Full-stage LogWindow built from the real validity windows on the feature's own page (IKF/basal 7-day, weight 30-day) — a freshness-check log, not a commit diff, since neither given commit matches this beat.",
+      "lines": [
+        "IKF last confirmed: 9 days ago (max 7)",
+        "basal dose last confirmed: 3 days ago (max 7)",
+        "weight last confirmed: 41 days ago (max 30)",
+        "SAVE BLOCKED - numbers not fresh",
+        "IKF confirmed - just now",
+        "basal dose confirmed - just now",
+        "weight confirmed - just now",
+        "SAVE UNLOCKED"
+      ],
+      "lowerThird": "Both red lines strike through, total rewrites to green 'numbers confirmed fresh'"
+    },
+    {
+      "beat": "b5",
+      "frames": [659, 821],
+      "holdTo": 866,
+      "kind": "catalog",
+      "effect": "percentRing",
+      "backdrop": null,
+      "data": {
+        "value": 5,
+        "label": "weight shift flags the risk",
+        "notes": ["Dose paused before it goes out, not calculated through silently"]
+      },
+      "caption": "the single tech caption of the clip glosses 'IKF' near the ledger",
+      "lowerThird": "Final green line posts: 'safeguard: 5%+ weight shift flags risk', ledger holds bright to the end"
+    }
+  ]
+}

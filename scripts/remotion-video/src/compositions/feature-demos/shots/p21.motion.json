@@ -1,11 +1,76 @@
 {
   "id": "p21",
-  "composition": "FeatureMtkrutoVideo",
+  "archetype": "3 card-deck — a deck of file-size cards in the y>=606 band starts as a pile of red rejected downloads and flips, one card at a time, to a green delivered stack; by the final beat the whole deck reads delivered",
+  "mood": "sand",
+  "notes": "RE-SHOOT of an existing clip: narration/timing kept exactly (B1=15,B2=200,B3=383,B4=539,B5=741,END=874), only the picture is rebuilt. Previous build of THIS archetype (p20) is the documented failure case: a 180px corner pile while a centered headline and big number owned the screen. Fix here: the deck is a full-width labeled band (x=40,y=606,w=1200,h=92, same footprint as d09's ledger) that is the thing the beat is about, not a decoration — every card carries its real size and a red/green status stamp, and it changes state in every beat. Recent openers to avoid: titleTakeover (d08), funnelAbsorption (p78), keywordCaption (d04) — b1 opens with targetOverrun instead. Only commit given (0ad86a2, 'integrate MTKruto for Telegram video downloads') is shown once, in b3, zoomed on the real client-init hunk, because that is the only beat whose sentence ('a client with MTKruto that logs in like a real user, not a bot') matches the commit message.",
   "beats": [
-    {"beat":"b1","effect":"drawn","backdrop":null,"data":{"value":"20 MB","status":"HARD CEILING"}},
-    {"beat":"b2","effect":"cornerTags","backdrop":null,"data":{"statement":"Telegram's Bot API caps downloads at 20 MB","tags":["20 MB hard limit","Bigger = instant fail","No retry, no record","Like a letter slot"]}},
-    {"beat":"b3","effect":"handoffExplain","backdrop":"commit","data":{"from":"Bot API session","to":"Real user (MTKruto)","fromLabel":"BEFORE","toLabel":"NOW","points":["Full MTProto client, not just a bot","Same protocol a real Telegram app uses","Download ceiling: 20 MB -> 2 GB"]}},
-    {"beat":"b4","effect":"ratioBars","backdrop":null,"data":{"title":"Download ceiling","a":{"label":"Bot API limit","value":20},"b":{"label":"MTKruto client","value":2000},"unit":"MB","caption":"100x the ceiling"}},
-    {"beat":"b5","effect":"drawn","backdrop":null,"data":{"value":"100%","status":"FAILURES GONE"}}
+    {
+      "beat": "b1",
+      "frames": [15, 191],
+      "kind": "catalog",
+      "effect": "targetOverrun",
+      "backdrop": null,
+      "data": {
+        "label": "Video size vs. Bot API limit",
+        "value": 200,
+        "target": 20,
+        "unit": "MB"
+      },
+      "lowerThird": "Product plate 'PORTFOLIO & NEWS PLATFORM' rises top-left; deck arrives with 2 red cards: 61MB DROPPED, 182MB DROPPED",
+      "caption": "Product: Portfolio & News Platform — collects tech news, writes trilingual feature stories about its own commits, renders short narrated video"
+    },
+    {
+      "beat": "b2",
+      "frames": [200, 374],
+      "kind": "catalog",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Like mailing a package",
+        "line2": "through a letter slot",
+        "keywords": ["package", "letter slot"]
+      },
+      "lowerThird": "Deck gains 2 more red cards: 340MB DROPPED, 512MB DROPPED (4 red total); status badge reads '0 delivered / 4 dropped'"
+    },
+    {
+      "beat": "b3",
+      "frames": [383, 530],
+      "kind": "live",
+      "effect": null,
+      "backdrop": { "file": "p21.json", "shot": "commit", "dim": false },
+      "description": "Real commit 0ad86a2 ('feat: integrate MTKruto for Telegram video downloads (bypass 20MB limit)') shown via a custom LiveWindow box that ends above y=606 (clear of the deck band), zoomed on the client-init hunk: 'const client = new Client({ apiId, apiHash }); await client.start({ botToken });'. One tech gloss caption here: 'MTProto - Telegram's own client protocol, not the limited Bot API'.",
+      "lowerThird": "Deck unchanged in content but status badge text updates to 'switching clients...'; satisfies no-beat-left-static rule via the badge state change"
+    },
+    {
+      "beat": "b4",
+      "frames": [539, 732],
+      "kind": "catalog",
+      "effect": "ratioBars",
+      "backdrop": { "file": "p21.json", "shot": "hub", "dim": true },
+      "data": {
+        "a": { "label": "Bot API", "value": 20 },
+        "b": { "label": "MTKruto", "value": 2000 },
+        "unit": "MB"
+      },
+      "lowerThird": "All 4 cards flip red->green one by one (scaleY squish, no spring): 61MB/182MB/340MB/512MB DELIVERED; a 5th card arrives already green: 2.1GB DOCUMENTARY DELIVERED; badge reads '5 delivered / 0 dropped'"
+    },
+    {
+      "beat": "b5",
+      "frames": [741, 829],
+      "holdTo": 874,
+      "kind": "logWindow",
+      "effect": null,
+      "backdrop": null,
+      "description": "Fully drawn result beat, no LiveBackdrop/feature page/hub (gate 2). Hero '100%' + caption 'Video failures: gone', LogWindow with 6 real lines built from the feature's own numbers (6 channels, 20MB Bot API limit, MTProto client online, 2GB new cap, 50MB-2GB+ ingestion range, 100% of 'video too large' failures eliminated).",
+      "lines": [
+        "6 Telegram channels monitored",
+        "Bot API limit: 20MB - exceeded daily",
+        "MTProto client (MTKruto): online",
+        "New download cap: 2GB",
+        "Ingesting 50MB clips to 2GB+ documentaries",
+        "video-too-large failures: 100% eliminated"
+      ],
+      "lowerThird": "Deck holds bright: all 5 cards green, badge '5 delivered - 0 dropped', unchanged through the final frame"
+    }
   ]
 }

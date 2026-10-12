@@ -1,13 +1,16 @@
 // FeatureFiveNewMiniLessonsD07 — feature d07 — 1280x720, 880 frames @ 30fps, VOICE-SYNCED.
-// archetype 3 card-deck, mood mint. Motion direction (feature-motion skill, 2026-10-07).
+// archetype 4 flow-map, mood mint. Motion direction (feature-motion skill, 2026-10-07).
 //
-// The deck is the game's five real lessons (from the commit below), not abstract
-// chips. It breathes through the clip: a dim, scattered pile (b1-b2, nothing taught
-// yet) folds into a big lit row on a level-map path (b3, the reveal), shrinks back
-// into a tidy band while each lesson's ending is explained (b4, room is made for the
-// matrix panel above), then expands again for the finale, ticking green one by one
-// (b5) and ending on a bright "5 / 5" stamp. No grid state needed — pile, big row,
-// small row cover every beat.
+// The map is the game's five real lessons (from the commit below) as nodes on a
+// level-map route, not abstract icons. It breathes through the clip: a dim,
+// disconnected scatter (b1-b2, nothing taught yet) folds into a big lit zigzag
+// route spanning the whole frame with a token traveling it (b3, the reveal),
+// shrinks back into a tidy connected band while each lesson's ending is explained
+// (b4, room is made for the matrix panel above), then expands again across the
+// full frame for the finale — a second token travels the route ticking each node
+// green in turn, and the route itself forks into two branches (quiz / hands-on),
+// ending on a bright "5 / 5" stamp. No grid state needed — scatter, big zigzag,
+// small band cover every beat.
 //
 // Beat → effect (data only from the feature row and the one matching commit —
 // 8e55152 "five game lessons — food to sugar, insulin key, type 2 rusty lock, too
@@ -22,18 +25,22 @@
 // b3 381-551  "Five guided lessons now walk through that reasoning step by step,
 //             right on the level map." Drawn: no live page shows this — the
 //             archetype's own hand-off, the five real lesson names (commit
-//             8e55152) fold from the dim pile into a lit row on the level-map path.
+//             8e55152) fold from the dim scatter into a lit zigzag route across
+//             the whole frame, a token traveling node to node as each lands.
 // b4 551-693  "Each one ends in a quiz or a hands-on round, scored with stars."
-//             featureMatrix, drawn (the row shrinks back into the band so the
-//             matrix panel owns the centre) — each card also gains its own
+//             featureMatrix, drawn (the route shrinks back into the band so the
+//             matrix panel owns the centre) — each node also gains its own
 //             star / hands-on badge.
 // b5 693-880  "A Playwright test plays every lesson through to completion — five
-//             for five." Drawn: the row expands back out, each card ticks green
-//             in turn, ending on a bright "5 / 5" stamp. Holds bright to the
-//             final frame, no fade.
+//             for five." Drawn: the route expands back out across the full frame,
+//             a second token travels it ticking each node green in turn, and the
+//             route forks into two branch lines ending on "QUIZ · 4" and
+//             "HANDS-ON · 1" chips, closing on a bright "5 / 5" stamp. Holds
+//             bright to the final frame, no fade.
 //
-// Persistent element: the card deck (archetype 3), b1 through b5 — five cards,
-// the same five lessons throughout, only their arrangement and markings change.
+// Persistent element: the lesson flow-map (archetype 4), b1 through b5 — five
+// nodes, the same five lessons throughout; only the route's shape (scatter, big
+// zigzag, small band) and its markings (badges, checks, branch) change.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -54,10 +61,21 @@ const END = 880;
 const ACCENT = "#34D399";
 const STAGE = "#0D1F18";
 
-// Resting band (pile, and the tidy-but-small row during b4) vs. the big row for
-// the b3 reveal and the b5 finale.
+// Resting band (scatter's "home" position, and b4's compact connected row) vs.
+// the big zigzag route for the b3 reveal and the b5 finale — five points spread
+// across the whole 1280x720 frame, not a straight strip.
 const BAND = { x: 40, y: 606, w: 1200, h: 92 };
-const ROW_BIG = { x: 60, y: 168, w: 1160, h: 400 };
+const NODE_BIG_W = 196;
+const NODE_BIG_H = 118;
+const BIG_PTS: { x: number; y: number }[] = [
+  { x: 150, y: 230 },
+  { x: 410, y: 460 },
+  { x: 665, y: 210 },
+  { x: 920, y: 460 },
+  { x: 1150, y: 230 },
+];
+const QUIZ_CHIP = { x: 380, y: 590 };
+const HANDSON_CHIP = { x: 900, y: 590 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
@@ -80,29 +98,79 @@ const LESSONS: Lesson[] = [
 ];
 const N = LESSONS.length;
 
-const CardDeck: React.FC = () => {
+/** A route segment between two node centers; draws on with `progress` 0..1. */
+const Route: React.FC<{ x1: number; y1: number; x2: number; y2: number; progress: number; color: string; opacity?: number }> = ({
+  x1,
+  y1,
+  x2,
+  y2,
+  progress,
+  color,
+  opacity = 1,
+}) => {
+  if (progress <= 0.004 || opacity <= 0.004) return null;
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x1,
+        top: y1 - 1.5,
+        width: len * progress,
+        height: 3,
+        borderRadius: 2,
+        background: color,
+        transform: `rotate(${angle}deg)`,
+        transformOrigin: "0 50%",
+        opacity,
+      }}
+    />
+  );
+};
+
+/** A small glowing dot traveling a route, `t` 0..1. */
+const Token: React.FC<{ x1: number; y1: number; x2: number; y2: number; t: number; color: string }> = ({ x1, y1, x2, y2, t, color }) => {
+  if (t <= 0 || t >= 1) return null;
+  const x = x1 + (x2 - x1) * t;
+  const y = y1 + (y2 - y1) * t;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: x - 7,
+        top: y - 7,
+        width: 14,
+        height: 14,
+        borderRadius: "50%",
+        background: color,
+        boxShadow: `0 0 12px ${color}`,
+      }}
+    />
+  );
+};
+
+const FlowMap: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B1) return null;
 
-  // Band layout: a tidy row of five slots inside BAND (pile's "home" position, and b4's compact row).
+  // Band layout: a tidy row of five slots inside BAND (scatter's "home" position, and b4's compact row).
   const PAD = 10;
   const GAP = 6;
   const slotW = (BAND.w - PAD * 2 - GAP * (N - 1)) / N;
   const rowH = BAND.h - PAD * 2;
   const rowY = BAND.y + PAD;
 
-  // Big-row layout: five large cards filling most of the frame (the reveal + finale).
-  const gapBig = 20;
-  const cardWBig = (ROW_BIG.w - gapBig * (N - 1)) / N;
-
   const pileCx = BAND.x + BAND.w / 2;
   const pileCy = BAND.y + BAND.h / 2;
 
   const shrink = tween(sec(frame, B4, fps), 0, 0.4, ease.power3InOut);
   const expand = tween(sec(frame, B5, fps), 0, 0.4, ease.power3InOut);
-  // 0 = small (band) row, 1 = big row — settles small through b4, big again from b5.
+  // 0 = small (band) route, 1 = big zigzag route — settles small through b4, big again from b5.
   const bigness = mix(expand, 1 - shrink, 1);
 
   const inBig = (frame >= B3 && frame < B4) || frame >= B5;
@@ -115,26 +183,149 @@ const CardDeck: React.FC = () => {
       : frame >= B3
       ? "FIVE GUIDED LESSONS"
       : "NO LESSONS, JUST PLAY";
-  const kickerY = inBig ? ROW_BIG.y - 34 : BAND.y - 28;
-  const kickerX = inBig ? ROW_BIG.x : BAND.x + PAD;
+  const kickerY = inBig ? 96 : BAND.y - 28;
+  const kickerX = inBig ? 60 : BAND.x + PAD;
 
   const stampStart = B5 + 140;
   const showStamp = frame >= stampStart;
   const stampPop = showStamp ? punchScale(sec(frame, stampStart, fps), 0) : 1;
 
+  // Compute every node's rect + fold progress first, so the routes between them
+  // can be drawn from real (animated) centers before the node chips go on top.
+  const nodes = LESSONS.map((lesson, i) => {
+    const pileW = 150;
+    const pileH = 72;
+    const pileRect: Rect = {
+      x: pileCx - pileW / 2 + (i - 2) * 6,
+      y: pileCy - pileH / 2 - i * 2,
+      w: pileW,
+      h: pileH,
+    };
+    const pileRot = (i - 2) * 3.5;
+
+    const smallRect: Rect = { x: BAND.x + PAD + i * (slotW + GAP), y: rowY, w: slotW, h: rowH };
+    const bigRect: Rect = { x: BIG_PTS[i].x - NODE_BIG_W / 2, y: BIG_PTS[i].y - NODE_BIG_H / 2, w: NODE_BIG_W, h: NODE_BIG_H };
+    const settled = mixRect(bigness, smallRect, bigRect);
+
+    const foldT = tween(sec(frame, B3, fps), i * 0.07, 0.5, ease.power3Out);
+    const rect = mixRect(foldT, pileRect, settled);
+    const rotation = pileRot * (1 - foldT);
+    const cx = rect.x + rect.w / 2;
+    const cy = rect.y + rect.h / 2;
+
+    const arriveT = sec(frame, B1 + 4, fps);
+    const entranceScale = punchScale(arriveT, i * 0.05);
+    const entranceOpacity = tween(arriveT, i * 0.05, 0.12, ease.linear);
+
+    const landed = foldT > 0.5;
+    const badgeT = frame >= B4 ? tween(sec(frame, B4 + i * 10, fps), 0, 0.3, ease.power3Out) : 0;
+    const checkStart = B5 + i * 25;
+    const checkT = frame >= B5 ? tween(sec(frame, checkStart, fps), 0, 0.25, ease.power3Out) : 0;
+
+    return { lesson, i, rect, rotation, cx, cy, foldT, entranceScale, entranceOpacity, landed, badgeT, checkT };
+  });
+
+  // Discovery token (b3): leads the folding-in wave along the chain.
+  const discoveryT = frame >= B3 && frame < B4 ? tween(sec(frame, B3, fps), 0.05, 0.9, ease.sineInOut) : 0;
+  // Test token (b5): a second pass, driving the "five for five" read along the chain.
+  const testT = frame >= B5 ? tween(sec(frame, B5, fps), 0.1, 1.1, ease.sineInOut) : 0;
+
+  const chainPos = (t: number) => {
+    const seg = Math.min(N - 2, Math.floor(t * (N - 1)));
+    const local = t * (N - 1) - seg;
+    const a = nodes[seg];
+    const b = nodes[seg + 1];
+    return { x: mix(local, a.cx, b.cx), y: mix(local, a.cy, b.cy) };
+  };
+
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      {/* the level-map path — only while the row is big (the reveal + the finale) */}
-      {inBig && (
-        <div
-          style={{
-            position: "absolute",
-            left: ROW_BIG.x,
-            top: ROW_BIG.y + ROW_BIG.h + 18,
-            width: ROW_BIG.w,
-            height: 2,
-            background: P.border,
-          }}
+      {/* the level-map route — the main chain, both bands and the big zigzag */}
+      {nodes.slice(0, N - 1).map((a, i) => {
+        const b = nodes[i + 1];
+        const progress = Math.min(a.foldT, b.foldT);
+        return <Route key={`route-${i}`} x1={a.cx} y1={a.cy} x2={b.cx} y2={b.cy} progress={progress} color={P.border} />;
+      })}
+
+      {/* b5 finale: the route forks into two branches — quiz (4) and hands-on (1) */}
+      {inBig &&
+        frame >= B5 &&
+        nodes.map((node) => {
+          const target = node.lesson.handsOn ? HANDSON_CHIP : QUIZ_CHIP;
+          return (
+            <Route
+              key={`branch-${node.i}`}
+              x1={node.cx}
+              y1={node.cy}
+              x2={target.x}
+              y2={target.y}
+              progress={node.checkT}
+              color={node.lesson.handsOn ? P.amber : P.success}
+              opacity={0.85}
+            />
+          );
+        })}
+      {inBig && frame >= B5 && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              left: QUIZ_CHIP.x - 86,
+              top: QUIZ_CHIP.y - 20,
+              width: 172,
+              padding: "8px 12px",
+              borderRadius: 999,
+              background: P.successBg,
+              border: `1.5px solid ${P.successEdge}`,
+              color: P.success,
+              fontSize: 15,
+              fontWeight: 800,
+              textAlign: "center",
+              opacity: Math.max(...nodes.filter((n) => !n.lesson.handsOn).map((n) => n.checkT)),
+            }}
+          >
+            ★★★ QUIZ · 4
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: HANDSON_CHIP.x - 86,
+              top: HANDSON_CHIP.y - 20,
+              width: 172,
+              padding: "8px 12px",
+              borderRadius: 999,
+              background: P.noteBg,
+              border: `1.5px solid ${P.amber}`,
+              color: P.amber,
+              fontSize: 15,
+              fontWeight: 800,
+              textAlign: "center",
+              opacity: Math.max(...nodes.filter((n) => n.lesson.handsOn).map((n) => n.checkT)),
+            }}
+          >
+            ✋ HANDS-ON · 1
+          </div>
+        </>
+      )}
+
+      {discoveryT > 0 && discoveryT < 1 && (
+        <Token
+          x1={chainPos(discoveryT).x}
+          y1={chainPos(discoveryT).y}
+          x2={chainPos(discoveryT).x}
+          y2={chainPos(discoveryT).y}
+          t={0.5}
+          color={ACCENT}
+        />
+      )}
+      {testT > 0 && testT < 1 && (
+        <Token
+          x1={chainPos(testT).x}
+          y1={chainPos(testT).y}
+          x2={chainPos(testT).x}
+          y2={chainPos(testT).y}
+          t={0.5}
+          color={P.success}
         />
       )}
 
@@ -181,7 +372,7 @@ const CardDeck: React.FC = () => {
           style={{
             position: "absolute",
             left: 1280 / 2 - 90,
-            top: ROW_BIG.y - 74,
+            top: 94,
             width: 180,
             height: 56,
             borderRadius: 6,
@@ -200,38 +391,11 @@ const CardDeck: React.FC = () => {
         </div>
       )}
 
-      {LESSONS.map((lesson, i) => {
-        const pileW = 150;
-        const pileH = 72;
-        const pileRect: Rect = {
-          x: pileCx - pileW / 2 + (i - 2) * 6,
-          y: pileCy - pileH / 2 - i * 2,
-          w: pileW,
-          h: pileH,
-        };
-        const pileRot = (i - 2) * 3.5;
-
-        const smallRect: Rect = { x: BAND.x + PAD + i * (slotW + GAP), y: rowY, w: slotW, h: rowH };
-        const bigRect: Rect = { x: ROW_BIG.x + i * (cardWBig + gapBig), y: ROW_BIG.y, w: cardWBig, h: ROW_BIG.h };
-        const settled = mixRect(bigness, smallRect, bigRect);
-
-        const foldT = tween(sec(frame, B3, fps), i * 0.07, 0.5, ease.power3Out);
-        const rect = mixRect(foldT, pileRect, settled);
-        const rotation = pileRot * (1 - foldT);
-
-        const arriveT = sec(frame, B1 + 4, fps);
-        const entranceScale = punchScale(arriveT, i * 0.05);
-        const entranceOpacity = tween(arriveT, i * 0.05, 0.12, ease.linear);
-
-        const landed = foldT > 0.5;
+      {nodes.map(({ lesson, i, rect, rotation, foldT, entranceScale, entranceOpacity, landed, badgeT, checkT }) => {
         const bg = landed ? P.successBg : P.chipBg;
         const edge = landed ? P.successEdge : P.border;
         const fg = landed ? P.success : P.muted;
-        const big = rect.h > 150;
-
-        const badgeT = frame >= B4 ? tween(sec(frame, B4 + i * 10, fps), 0, 0.3, ease.power3Out) : 0;
-        const checkStart = B5 + i * 25;
-        const checkT = frame >= B5 ? tween(sec(frame, checkStart, fps), 0, 0.25, ease.power3Out) : 0;
+        const big = bigness > 0.5;
 
         return (
           <div
@@ -244,8 +408,8 @@ const CardDeck: React.FC = () => {
               height: rect.h,
               transform: `rotate(${rotation}deg) scale(${entranceScale})`,
               opacity: entranceOpacity,
-              zIndex: i,
-              borderRadius: 6,
+              zIndex: i + 1,
+              borderRadius: big ? 999 : 6,
               background: bg,
               border: `2px solid ${edge}`,
               boxShadow: "6px 6px 0 rgba(0,0,0,0.35)",
@@ -383,7 +547,7 @@ const Inner: React.FC = () => {
 
       {/* b5 — archetype only: five green checks, then the "5 / 5" stamp, holds to the end */}
 
-      <CardDeck />
+      <FlowMap />
     </AbsoluteFill>
   );
 };
