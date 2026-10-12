@@ -1,0 +1,56 @@
+{
+ "id": "d06",
+ "beat_durations": {
+  "b1": 4.416,
+  "b2": 4.656,
+  "b3": 5.376,
+  "b4": 5.808,
+  "b5": 6.504
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Artem's parents could only use the dose button if they'd already picked his food.",
+   "start_s": 0.5,
+   "end_s": 4.916,
+   "start_f": 15,
+   "end_f": 147
+  },
+  {
+   "beat": "b2",
+   "text": "Any other time, the app just stopped \u2014 no numbers, no next step.",
+   "start_s": 5.216,
+   "end_s": 9.872,
+   "start_f": 156,
+   "end_f": 296
+  },
+  {
+   "beat": "b3",
+   "text": "Now one button on Cloudflare Workers asks first: food, or no food at all?",
+   "start_s": 10.172,
+   "end_s": 15.548,
+   "start_f": 305,
+   "end_f": 466
+  },
+  {
+   "beat": "b4",
+   "text": "Choose food and it adds carbs to the correction. Choose none and it doses on correction alone.",
+   "start_s": 15.848,
+   "end_s": 21.656,
+   "start_f": 475,
+   "end_f": 650
+  },
+  {
+   "beat": "b5",
+   "text": "If blood sugar is stale, a Measure Now button appears right there \u2014 every path now ends in one tap.",
+   "start_s": 21.956,
+   "end_s": 28.46,
+   "start_f": 659,
+   "end_f": 854
+  }
+ ],
+ "total_s": 29.96,
+ "durationInFrames": 899,
+ "measured_track_s": 28.512,
+ "track": "/root/feature-demos/vo-d06/vo-d06.mp3"
+}

@@ -1,0 +1,7 @@
+{"id": "d06", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Artem's parents could only use the dose button if they'd already picked his food."],
+  ["b2", "Any other time, the app just stopped — no numbers, no next step."],
+  ["b3", "Now one button on Cloudflare Workers asks first: food, or no food at all?"],
+  ["b4", "Choose food and it adds carbs to the correction. Choose none and it doses on correction alone."],
+  ["b5", "If blood sugar is stale, a Measure Now button appears right there — every path now ends in one tap."]
+]}
