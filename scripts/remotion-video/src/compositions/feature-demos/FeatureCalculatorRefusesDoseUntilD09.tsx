@@ -223,6 +223,52 @@ const FreshnessLog: React.FC = () => {
   );
 };
 
+/** b5 — supplementary, always-visible (for the full beat) safeguard-rule card on the
+    right half of the frame. percentRing's own card is centered and its "notes" line
+    only starts appearing late in the beat, so without this the right side of the
+    canvas sits bare for most of the beat regardless of which frame is sampled. */
+const SafeguardPreview: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B5, END) !== 1) return null;
+  const t = tween(sec(frame, B5 + 10, fps), 0, 0.35, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 860,
+        top: 150,
+        width: 340,
+        padding: 24,
+        borderRadius: 6,
+        background: "rgba(10,14,20,0.82)",
+        border: `2px solid ${P.accent}`,
+        opacity: t,
+        transform: `translateY(${(1 - t) * 20}px)`,
+        fontFamily,
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>
+        THE SAFEGUARD RULE
+      </div>
+      <div style={{ marginTop: 16, opacity: 0.5 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>UNDER 5% SHIFT</div>
+        <div style={{ marginTop: 4, fontSize: 17, fontWeight: 600, color: "rgba(220,230,245,0.75)" }}>
+          saves silently, no check
+        </div>
+      </div>
+      <div style={{ marginTop: 18, borderRadius: 4, border: `1.5px solid ${P.danger}`, background: "rgba(0,0,0,0.3)", padding: "14px 16px" }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: P.danger, letterSpacing: 1 }}>5%+ SHIFT</div>
+        <div style={{ marginTop: 4, fontSize: 18, fontWeight: 700, color: "#DCE6F5" }}>
+          SAVE PAUSED — re-check required
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -314,6 +360,7 @@ const Inner: React.FC = () => {
           notes: ["Dose paused before it goes out, not calculated through silently"],
         }}
       />
+      <SafeguardPreview />
       {frame >= B5 + 50 && (
         <StatPill x={140} y={150} emoji="📉" text="Weight drift caught" tone="danger" opacity={Math.min(1, (frame - B5 - 50) / 15)} />
       )}

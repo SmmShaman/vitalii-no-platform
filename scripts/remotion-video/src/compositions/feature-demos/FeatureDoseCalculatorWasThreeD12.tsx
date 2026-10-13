@@ -210,6 +210,100 @@ const HuntCard: React.FC = () => {
   );
 };
 
+/** b4 — a supplementary, always-visible (for the full beat) sticky-bar mockup on
+    the right half of the frame. handoffExplain's own camera move + staggered
+    points list leaves that half empty for a while; this card does not depend on
+    that timing, so the right half is never left bare regardless of which frame
+    is sampled. */
+const StickyBarPreview: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B4, B5) !== 1) return null;
+  const t = tween(sec(frame, B4 + 6, fps), 0, 0.35, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 780,
+        top: 120,
+        width: 420,
+        padding: 28,
+        borderRadius: 6,
+        background: "rgba(16,10,30,0.88)",
+        border: `2px solid ${P.success}`,
+        boxShadow: "8px 8px 0 rgba(0,0,0,0.5)",
+        opacity: t,
+        transform: `translateY(${(1 - t) * 20}px)`,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2, color: P.success }}>
+        📌 WHAT THE SCROLL LOOKS LIKE NOW
+      </div>
+
+      <div style={{ marginTop: 18, opacity: 0.55 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>BEFORE</div>
+        <div
+          style={{
+            marginTop: 6,
+            height: 60,
+            borderRadius: 4,
+            border: `1.5px dashed ${P.border}`,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 15,
+            fontWeight: 700,
+            color: "rgba(245,245,242,0.6)",
+            textAlign: "center",
+            padding: "0 12px",
+          }}
+        >
+          Save lives up top — scroll away, it's gone
+        </div>
+      </div>
+
+      <div style={{ marginTop: 20 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>NOW — STICKY</div>
+        <div
+          style={{
+            marginTop: 6,
+            borderRadius: 4,
+            border: `1.5px solid ${P.border}`,
+            background: "rgba(0,0,0,0.3)",
+            padding: "16px 18px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>DOSE</div>
+            <div style={{ fontSize: 30, fontWeight: 800, color: "#F5F5F2" }}>6.0 U</div>
+          </div>
+          <div
+            style={{
+              padding: "10px 24px",
+              borderRadius: 4,
+              background: P.success,
+              color: "#0A0A0A",
+              fontSize: 18,
+              fontWeight: 800,
+            }}
+          >
+            Save
+          </div>
+        </div>
+      </div>
+
+      <div style={{ fontSize: 16, fontWeight: 600, color: "rgba(245,245,242,0.75)", marginTop: 16 }}>
+        the bar follows you down the page — never out of reach
+      </div>
+    </div>
+  );
+};
+
 const RESULT_LOG: Array<{ t: string; text: string; tone: "ink" | "muted" | "danger" | "success" | "accent" }> = [
   { t: "before", text: "calc.html: base values → correction → weight → food", tone: "danger" },
   { t: "", text: "save button: top of page only", tone: "danger" },
@@ -334,6 +428,7 @@ const Inner: React.FC = () => {
           toLabel: "NOW",
         }}
       />
+      <StickyBarPreview />
 
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />

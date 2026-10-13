@@ -203,6 +203,99 @@ const TechGloss: React.FC = () => {
   );
 };
 
+/** b3 — supplementary, always-visible "every time" strip across the top of the
+    frame. pipelineFlow's own chain compacts to a small centered glyph and its
+    frame/title/result land late in the beat (by design, per its own internal
+    pacing), so without this the top two-thirds of the canvas sit bare for most
+    of the beat regardless of which frame is sampled. */
+const RepeatStrip: React.FC = () => {
+  const frame = useCurrentFrame();
+  if (cut(frame, B3, B4) !== 1) return null;
+  const items = ["🥣 oatmeal", "🍞 bread", "🧀 cheese", "🥛 milk"];
+  return (
+    <Arrive at={B3 + 4} kind="rise" box={{ x: 60, y: 56, w: 1160, h: 150 }} dur={0.3}>
+      <div style={{ position: "absolute", left: 60, top: 56, width: 1160, fontFamily }}>
+        <div style={{ fontSize: 19, fontWeight: 800, letterSpacing: 2, color: ACCENT }}>
+          EVERY NEW PRODUCT, SAME RESULT
+        </div>
+        <div style={{ display: "flex", gap: 16, marginTop: 14 }}>
+          {items.map((label) => (
+            <div
+              key={label}
+              style={{
+                flex: 1,
+                padding: "16px 18px",
+                borderRadius: 8,
+                background: "rgba(28,22,16,0.82)",
+                border: `1.5px solid ${ACCENT}`,
+                color: "#F6EFE6",
+                fontSize: 20,
+                fontWeight: 700,
+                textAlign: "center",
+                boxSizing: "border-box",
+              }}
+            >
+              <div>{label}</div>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: ACCENT, marginTop: 8 }}>
+                NO ONLY
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
+/** b4 — supplementary, always-visible database-row mockup on the right half of
+    the frame. handoffExplain's own camera move lands its new-state box roughly
+    over the left half, and its staggered points list starts only in the back
+    half of the beat; this card does not depend on that timing, so the right
+    side is never left bare regardless of which frame is sampled. */
+const TranslationRowPreview: React.FC = () => {
+  const frame = useCurrentFrame();
+  if (cut(frame, B4, B5) !== 1) return null;
+  return (
+    <Arrive at={B4 + 6} kind="rise" box={{ x: 820, y: 150, w: 380, h: 360 }} dur={0.3}>
+      <div
+        style={{
+          position: "absolute",
+          left: 820,
+          top: 150,
+          width: 380,
+          padding: 24,
+          borderRadius: 8,
+          background: "rgba(28,22,16,0.88)",
+          border: `2px solid ${ACCENT}`,
+          fontFamily,
+          color: "#F6EFE6",
+          boxSizing: "border-box",
+        }}
+      >
+        <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 2, color: ACCENT }}>
+          DATABASE ROW — "oatmeal"
+        </div>
+        <div style={{ marginTop: 18 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(246,239,230,0.6)", letterSpacing: 1 }}>
+            NO COLUMN
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4 }}>havregrøt</div>
+        </div>
+        <div style={{ marginTop: 20, opacity: 0.6 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: "rgba(246,239,230,0.6)", letterSpacing: 1 }}>
+            UA COLUMN — BEFORE
+          </div>
+          <div style={{ fontSize: 22, fontWeight: 700, marginTop: 4, fontStyle: "italic" }}>(empty)</div>
+        </div>
+        <div style={{ marginTop: 20 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: ACCENT, letterSpacing: 1 }}>UA COLUMN — NOW</div>
+          <div style={{ fontSize: 24, fontWeight: 700, marginTop: 4, color: ACCENT }}>овсянка</div>
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -248,6 +341,7 @@ const Inner: React.FC = () => {
           system: "AI scan pipeline",
         }}
       />
+      <RepeatStrip />
 
       {/* b4 — the fix, drawn only (no backdrop); the one tech name lands here */}
       <MotionInsert
@@ -270,6 +364,7 @@ const Inner: React.FC = () => {
           toLabel: "NOW",
         }}
       />
+      <TranslationRowPreview />
 
       {/* b5 — the result, drawn only; neither the page nor the hub is shown here */}
       <MotionInsert

@@ -286,6 +286,75 @@ const JsGloss: React.FC = () => {
   );
 };
 
+/** b4 — supplementary, always-visible scrub-dial mockup on the right half of
+    the frame. handoffExplain's own camera move lands its new-state box over
+    the left-middle, and its staggered points list starts only in the back
+    half of the beat; this card does not depend on that timing, so the right
+    side is never left bare regardless of which frame is sampled. */
+const ScrubDialPreview: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  if (cut(frame, B4, B5) !== 1) return null;
+  const t = sec(frame, B4 + 6, fps);
+  const in_ = tween(t, 0, 0.35, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 820,
+        top: 170,
+        width: 380,
+        padding: 26,
+        borderRadius: 8,
+        background: "rgba(8,16,13,0.88)",
+        border: `2px solid ${ACCENT}`,
+        opacity: in_,
+        fontFamily,
+        color: "#F5F5F5",
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 2, color: ACCENT }}>LIKE TURNING A DIAL</div>
+      <div
+        style={{
+          marginTop: 24,
+          height: 10,
+          borderRadius: 999,
+          background: "rgba(255,255,255,0.14)",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            left: "4%",
+            top: -14,
+            width: 38,
+            height: 38,
+            borderRadius: "50%",
+            background: ACCENT,
+            border: "3px solid #0A1712",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginTop: 14,
+          fontSize: 13,
+          fontWeight: 700,
+          color: "rgba(245,245,242,0.55)",
+        }}
+      >
+        <span>👆 drag</span>
+        <span>one finger, one motion</span>
+      </div>
+      <div style={{ marginTop: 24, fontSize: 24, fontWeight: 800, color: "#F5F5F2" }}>+15g in a single scrub</div>
+    </div>
+  );
+};
+
 const RESULT_LOG: Array<{ t: string; text: string; tone: "ink" | "muted" | "danger" | "success" | "accent" }> = [
   { t: "before", text: "+15g change = 15 taps on the stepper", tone: "danger" },
   { t: "", text: "swipe a row by accident = gone, no undo", tone: "danger" },
@@ -417,6 +486,7 @@ const Inner: React.FC = () => {
           points: ["One scrub sets the number directly", "Works like turning a dial", "Powers every number in the calculator"],
         }}
       />
+      <ScrubDialPreview />
       <JsGloss />
 
       {/* b5 — the result, fully drawn, holds to the end */}

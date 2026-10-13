@@ -63,10 +63,11 @@ const STAGE = "#17123A";
 // Resting band (dim home row for b1-b2, and the collapsed row during b4) vs. the
 // big zigzag level-map path used for the b3 reveal and the b5 finale.
 const BAND = { x: 40, y: 606, w: 1200, h: 92 };
-const NODE_W = 196;
-const NODE_H = 160;
+const NODE_W = 224;
+const NODE_H = 184;
 const PATH_X = [90, 365, 640, 915, 1190];
-const PATH_Y = [560, 300, 560, 300, 560];
+const PATH_Y = [600, 270, 600, 270, 600];
+const ROAD_W = 46;
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
@@ -152,7 +153,8 @@ const FlowMap: React.FC = () => {
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      {/* the route — the same line joining every node, flat in the band, a zigzag on the big path */}
+      {/* the route — a wide road band (fills the gap between nodes) with a bright
+          center line on top, flat in the band, a zigzag on the big path */}
       {nodeRects.slice(0, -1).map((r, i) => {
         const a = centerOf(r);
         const b = centerOf(nodeRects[i + 1]);
@@ -160,21 +162,37 @@ const FlowMap: React.FC = () => {
         const dy = b.y - a.y;
         const len = Math.sqrt(dx * dx + dy * dy);
         const angleDeg = (Math.atan2(dy, dx) * 180) / Math.PI;
+        const roadW = mix(bigness, 10, ROAD_W);
         return (
-          <div
-            key={`route-${i}`}
-            style={{
-              position: "absolute",
-              left: a.x,
-              top: a.y,
-              width: len,
-              height: 3,
-              background: P.border,
-              transform: `rotate(${angleDeg}deg)`,
-              transformOrigin: "0 50%",
-              borderRadius: 2,
-            }}
-          />
+          <React.Fragment key={`route-${i}`}>
+            <div
+              style={{
+                position: "absolute",
+                left: a.x,
+                top: a.y - roadW / 2,
+                width: len,
+                height: roadW,
+                background: P.chipBg,
+                opacity: 0.22,
+                transform: `rotate(${angleDeg}deg)`,
+                transformOrigin: `0 ${roadW / 2}px`,
+                borderRadius: roadW / 2,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: a.x,
+                top: a.y,
+                width: len,
+                height: 4,
+                background: P.border,
+                transform: `rotate(${angleDeg}deg)`,
+                transformOrigin: "0 50%",
+                borderRadius: 2,
+              }}
+            />
+          </React.Fragment>
         );
       })}
 
