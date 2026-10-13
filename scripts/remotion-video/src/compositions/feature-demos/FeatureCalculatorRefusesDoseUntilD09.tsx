@@ -32,6 +32,27 @@
 //             "IKF" here. Ledger posts its final green safeguard line.
 //
 // Persistent element: the ledger lower third (archetype 5), b1 through b5, y>=606.
+//
+// WAVE D1 fix (2026-10-13, blind-viewer verdict clarity=6/thesis=9, both need 7):
+// beat windows, durationInFrames, palette (dawn) and narration are all untouched.
+// 1) b1's own LiveBackdrop plate raised 0.78->0.93 — at 0.78 the real page's own
+//    headline ("The Calculator Now Refuses a Dose...") read through the dim and
+//    gave away the fixed state before the problem narration finished.
+// 2) b1's product tag expanded into a 4-line card: name + "built for my son
+//    Artem" + inline glosses for IKF and basal dose, right where those words
+//    first appear as corner tags — was previously just "INSULIN SIMULATOR" with
+//    no person, and IKF's only gloss was stranded in b5.
+// 3) b4 (FreshnessLog) gets a second panel, a real locked/unlocked Save button
+//    mock in sync with the log's own SAVE BLOCKED / SAVE UNLOCKED lines — the
+//    line said "the save button stays locked" but no button was ever drawn,
+//    only log text. LogWindow narrowed 1200->700 wide to make room beside it.
+// 4) b2 gets DriftSchematic, a small rising-bars-over-time card with the real
+//    "41 days since last confirm" fact in the funnel's open bottom-left corner
+//    — the funnel's inverted-triangle shape alone doesn't depict a weight
+//    drifting upward unnoticed, so this draws that literally.
+// Still true: neither e1e194d nor 49d9a9f says what any beat says (both are
+// about the calculator's open-screen and login flow, not the freshness gate),
+// so no commit diff appears anywhere in this clip.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -168,24 +189,29 @@ const Ledger: React.FC = () => {
       </Arrive>
 
       {frame >= B1 + 20 && frame < B2 && (
-        <Arrive at={B1 + 20} kind="rise" box={{ x: LT.x + 16, y: LT.y - 48, w: 320, h: 34 }}>
+        <Arrive at={B1 + 20} kind="rise" box={{ x: LT.x + 16, y: LT.y - 104, w: 420, h: 90 }}>
           <div
             style={{
               position: "absolute",
               left: LT.x + 16,
-              top: LT.y - 48,
-              fontSize: 15,
-              fontWeight: 800,
-              letterSpacing: 0.4,
-              color: P.ink,
+              top: LT.y - 104,
+              width: 420,
+              padding: "10px 16px",
               background: P.card,
               border: `2px solid ${P.border}`,
               borderRadius: 4,
-              padding: "5px 12px",
               boxShadow: "4px 4px 0 rgba(0,0,0,0.5)",
+              boxSizing: "border-box",
             }}
           >
-            INSULIN SIMULATOR
+            <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.4, color: P.ink }}>INSULIN SIMULATOR</div>
+            <div style={{ marginTop: 1, fontSize: 12, fontWeight: 600, color: P.muted }}>built for my son Artem</div>
+            <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: P.accent }}>
+              IKF <span style={{ color: P.ink, fontWeight: 500 }}>= insulin-to-carb factor</span>
+            </div>
+            <div style={{ marginTop: 2, fontSize: 12, fontWeight: 700, color: P.accent }}>
+              basal dose <span style={{ color: P.ink, fontWeight: 500 }}>= steady background insulin</span>
+            </div>
           </div>
         </Arrive>
       )}
@@ -193,10 +219,65 @@ const Ledger: React.FC = () => {
   );
 };
 
+/** b2 — a weight-drifting-upward-unchecked card in the funnel's open bottom-left
+    corner. The funnel silhouette alone is 3 abstract labels collapsing into a
+    result; it never draws the actual "weight creeps up, nobody notices" shape
+    the line describes, so this adds that as a small rising-bars sparkline with
+    the real "41 days" fact (same number the b3 scale caption uses). */
+const DriftSchematic: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B2, B3) !== 1) return null;
+  const t = tween(sec(frame, B2 + 10, fps), 0, 0.4, ease.power3Out);
+  const bars = [18, 26, 34, 46];
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 40,
+        top: 430,
+        width: 360,
+        padding: 18,
+        borderRadius: 6,
+        background: "rgba(10,14,20,0.82)",
+        border: `2px solid ${P.border}`,
+        opacity: t,
+        transform: `translateY(${(1 - t) * 16}px)`,
+        fontFamily,
+        boxSizing: "border-box",
+      }}
+    >
+      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.4, color: P.muted }}>WEIGHT, UNCHECKED</div>
+      <div style={{ marginTop: 12, display: "flex", alignItems: "flex-end", gap: 10, height: 50 }}>
+        {bars.map((h, i) => (
+          <div
+            key={i}
+            style={{
+              width: 28,
+              height: h,
+              borderRadius: 3,
+              background: i === bars.length - 1 ? P.danger : P.muted,
+              opacity: i === bars.length - 1 ? 1 : 0.5,
+            }}
+          />
+        ))}
+      </div>
+      <div style={{ marginTop: 10, fontSize: 13, fontWeight: 700, color: P.danger }}>41 days since last confirm</div>
+    </div>
+  );
+};
+
 const FreshnessLog: React.FC = () => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
   const visible = cut(frame, B4, B5) === 1;
   if (!visible) return null;
+  // "SAVE UNLOCKED" is log line index 7, revealed at from + 7*every.
+  const unlockFrame = B4 + 7 * 14;
+  const unlocked = frame >= unlockFrame;
+  const t = tween(sec(frame, B4 + 6, fps), 0, 0.35, ease.power3Out);
   return (
     <AbsoluteFill>
       <AbsoluteFill style={{ background: STAGE }} />
@@ -207,7 +288,7 @@ const FreshnessLog: React.FC = () => {
         every={14}
         opacity={1}
         fontSize={21}
-        win={{ x: 40, y: 50, w: 1200, h: 530 }}
+        win={{ x: 40, y: 50, w: 700, h: 530 }}
         lines={[
           { text: "IKF last confirmed: 9 days ago (max 7)", tone: "danger" },
           { text: "basal dose last confirmed: 3 days ago (max 7)" },
@@ -219,6 +300,59 @@ const FreshnessLog: React.FC = () => {
           { text: "SAVE UNLOCKED", tone: "success" },
         ]}
       />
+      {/* the actual Save button the log's text describes but never shows */}
+      <div
+        style={{
+          position: "absolute",
+          left: 800,
+          top: 150,
+          width: 380,
+          padding: 24,
+          borderRadius: 6,
+          background: "rgba(10,14,20,0.82)",
+          border: `2px solid ${P.accent}`,
+          opacity: t,
+          transform: `translateY(${(1 - t) * 20}px)`,
+          fontFamily,
+          boxSizing: "border-box",
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>THE SAVE BUTTON</div>
+        <div style={{ marginTop: 20, display: "flex", justifyContent: "center" }}>
+          <div
+            style={{
+              width: 260,
+              height: 56,
+              borderRadius: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              fontSize: 18,
+              fontWeight: 800,
+              letterSpacing: 0.5,
+              color: unlocked ? "#0A1712" : "rgba(220,230,245,0.45)",
+              background: unlocked ? P.success : "rgba(255,255,255,0.08)",
+              border: `2px solid ${unlocked ? P.successEdge : P.dangerEdge}`,
+              boxShadow: unlocked ? `0 0 0 4px ${P.successBg}` : "none",
+            }}
+          >
+            <span>{unlocked ? "✅" : "🔒"}</span>
+            <span>SAVE</span>
+          </div>
+        </div>
+        <div
+          style={{
+            marginTop: 16,
+            fontSize: 14,
+            fontWeight: 700,
+            textAlign: "center",
+            color: unlocked ? P.success : P.danger,
+          }}
+        >
+          {unlocked ? "numbers confirmed fresh" : "numbers not fresh — blocked"}
+        </div>
+      </div>
     </AbsoluteFill>
   );
 };
@@ -282,7 +416,7 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        plate={0.78}
+        plate={0.93}
         data={{ statement: "Dosing ran on stale saved numbers", tags: ["IKF", "basal dose", "weight"] }}
       />
 
@@ -299,6 +433,7 @@ const Inner: React.FC = () => {
           result: "Calculator doses off the stale numbers anyway",
         }}
       />
+      <DriftSchematic />
 
       {/* b3 — metaphor, drawn, no backdrop and no commit fit */}
       <MotionInsert
