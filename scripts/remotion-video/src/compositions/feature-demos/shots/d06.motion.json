@@ -1,0 +1,55 @@
+{
+  "id": "d06",
+  "composition": "FeatureNovorapidButtonAsksWhatD06",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "The dose button only worked",
+        "line2": "if Artem's food was picked first",
+        "keywords": ["only worked", "picked first"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "Any other time, the app just stopped",
+        "tags": ["No numbers shown", "No next step", "Every single time", "Food had to come first"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page2",
+      "data": {
+        "from": "Pick food, then find the dose button",
+        "to": "Button asks food or none, first",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["One Cloudflare Workers check", "Runs the instant dose is tapped", "No food picked still works"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "featureMatrix",
+      "backdrop": null,
+      "data": {
+        "options": ["Food chosen", "No food"],
+        "rows": [
+          { "label": "Carbs added", "values": ["Yes", "No"] },
+          { "label": "Dose basis", "values": ["Carbs + correction", "Correction only"] }
+        ]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "LogWindow decision-flow result, no catalog effect — Gate 2 close, no feature page/hub visible"
+    }
+  ]
+}

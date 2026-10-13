@@ -1,0 +1,60 @@
+{
+ "id": "d10",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "page",
+   "data": {
+    "title": "Still says log in",
+    "kicker": "Even after signing in with Google"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "pipelineFlow",
+   "backdrop": "hub",
+   "data": {
+    "steps": [
+     "Sign in with Google",
+     "Switch back to app",
+     "Android kills the app",
+     "Login never confirmed"
+    ],
+    "result": "Still logged out",
+    "system": "Android background limits"
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "keywordCaption",
+   "backdrop": "page2",
+   "data": {
+    "line1": "You knocked on the door,",
+    "line2": "then walked away before anyone answered.",
+    "keywords": ["knocked", "answered"]
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "handoffExplain",
+   "backdrop": "page2",
+   "data": {
+    "from": "Walks away after knocking",
+    "to": "Leaves a code, keeps checking",
+    "points": [
+     "One-time code = a retry token",
+     "Polls every 2 seconds",
+     "Commit 49d9a9f: reliable Google login"
+    ],
+    "fromLabel": "BEFORE",
+    "toLabel": "NOW"
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "drawn",
+   "note": "LogWindow with real polling lines + ledger settles to CONFIRMED; no feature page or hub shown (gate 2)"
+  }
+ ]
+}

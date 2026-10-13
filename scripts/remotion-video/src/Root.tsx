@@ -245,6 +245,8 @@ import { FeatureCalculatorRefusesDoseUntilD09 } from "./compositions/feature-dem
 import { FeatureProductNamesWereNorwegianD13 } from "./compositions/feature-demos/FeatureProductNamesWereNorwegianD13";
 import { FeatureDoseCalculatorWasThreeD12 } from "./compositions/feature-demos/FeatureDoseCalculatorWasThreeD12";
 import { FeatureEveryNumberDoseCalculatorD11 } from "./compositions/feature-demos/FeatureEveryNumberDoseCalculatorD11";
+import { FeatureAndroidAppNoLongerD10 } from "./compositions/feature-demos/FeatureAndroidAppNoLongerD10";
+import { FeatureNovorapidButtonAsksWhatD06 } from "./compositions/feature-demos/FeatureNovorapidButtonAsksWhatD06";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2410,6 +2412,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureEveryNumberDoseCalculatorD11"
         component={FeatureEveryNumberDoseCalculatorD11}
         durationInFrames={927}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureAndroidAppNoLongerD10"
+        component={FeatureAndroidAppNoLongerD10}
+        durationInFrames={793}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNovorapidButtonAsksWhatD06"
+        component={FeatureNovorapidButtonAsksWhatD06}
+        durationInFrames={899}
         fps={30}
         width={1280}
         height={720}

@@ -4,9 +4,16 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "keywordCaption",
+      "effect": "statusFocus",
       "backdrop": "hub",
-      "data": { "line1": "Plays for hours,", "line2": "learns nothing.", "keywords": ["hours", "nothing"] }
+      "data": {
+        "title": "After hours of play",
+        "claims": [
+          { "text": "Why insulin matters?", "verdict": "no" },
+          { "text": "Why type 2 is different?", "verdict": "no" },
+          { "text": "Any of it explained?", "verdict": "no" }
+        ]
+      }
     },
     {
       "beat": "b2",
@@ -21,7 +28,7 @@
       "beat": "b3",
       "effect": "drawn",
       "backdrop": "drawn",
-      "data": { "note": "archetype only — the five real lesson names from commit 8e55152 fold from the dim pile into a lit row on the level-map path" }
+      "data": { "note": "archetype only — the five real lesson cards (commit 8e55152) fly off the dim deck and flip face-up into the big fan" }
     },
     {
       "beat": "b4",
@@ -39,7 +46,7 @@
       "beat": "b5",
       "effect": "drawn",
       "backdrop": "drawn",
-      "data": { "note": "archetype only — each card ticks green as the Playwright test clears it, ending on a 5 / 5 stamp; no live page per gate 2" }
+      "data": { "note": "archetype collapses back to the small deck row, each card ticking green; LogWindow owns the stage with 7 real Playwright pass lines (no live page per gate 2), holds bright to the final frame" }
     }
   ]
 }
