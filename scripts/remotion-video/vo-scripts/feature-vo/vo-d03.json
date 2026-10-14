@@ -1,0 +1,57 @@
+{
+ "id": "d03",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.33,
+  "b2": 5.755,
+  "b3": 4.777,
+  "b4": 5.481,
+  "b5": 5.544
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Artem's parents wanted him to learn about his diabetes by playing a game.",
+   "start_s": 0.5,
+   "end_s": 4.83,
+   "start_f": 15,
+   "end_f": 145
+  },
+  {
+   "beat": "b2",
+   "text": "But every simulator online used a generic kid's body \u2014 nothing matched his real doses.",
+   "start_s": 5.13,
+   "end_s": 10.885,
+   "start_f": 154,
+   "end_f": 327
+  },
+  {
+   "beat": "b3",
+   "text": "So his dad built the game on a real Hovorka model instead of a generic one.",
+   "start_s": 11.185,
+   "end_s": 15.962,
+   "start_f": 336,
+   "end_f": 479
+  },
+  {
+   "beat": "b4",
+   "text": "It's tuned to Artem's own insulin, his own weight, like a tutor who already read his chart.",
+   "start_s": 16.262,
+   "end_s": 21.743,
+   "start_f": 488,
+   "end_f": 652
+  },
+  {
+   "beat": "b5",
+   "text": "Now the glucose curves match sheet 08.10 \u2014 his own doctor's worksheet.",
+   "start_s": 22.043,
+   "end_s": 27.587,
+   "start_f": 661,
+   "end_f": 828
+  }
+ ],
+ "total_s": 29.087,
+ "durationInFrames": 873,
+ "measured_track_s": 27.648,
+ "track": "/root/feature-demos/vo-d03/vo-d03.mp3"
+}

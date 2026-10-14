@@ -1,0 +1,7 @@
+{"id": "p76", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every night, feature clips just sat there — a static screen while a voice narrated over it."],
+  ["b2", "Meanwhile the nightly news digest already used real motion graphics — title cards, counters, callouts."],
+  ["b3", "So the same Remotion pipeline that builds the news digest now builds the feature clips too."],
+  ["b4", "One shared grammar file plans a motion effect per voice beat — like handing the clips the news show's own editor."],
+  ["b5", "One engineering build now powers two products instead of one."]
+]}

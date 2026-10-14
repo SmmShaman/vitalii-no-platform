@@ -1,0 +1,57 @@
+{
+ "id": "p76",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.694,
+  "b2": 6.901,
+  "b3": 5.606,
+  "b4": 6.433,
+  "b5": 3.837
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every night, feature clips just sat there \u2014 a static screen while a voice narrated over it.",
+   "start_s": 0.5,
+   "end_s": 6.194,
+   "start_f": 15,
+   "end_f": 186
+  },
+  {
+   "beat": "b2",
+   "text": "Meanwhile the nightly news digest already used real motion graphics \u2014 title cards, counters, callouts.",
+   "start_s": 6.494,
+   "end_s": 13.395,
+   "start_f": 195,
+   "end_f": 402
+  },
+  {
+   "beat": "b3",
+   "text": "So the same Remotion pipeline that builds the news digest now builds the feature clips too.",
+   "start_s": 13.695,
+   "end_s": 19.301,
+   "start_f": 411,
+   "end_f": 579
+  },
+  {
+   "beat": "b4",
+   "text": "One shared grammar file plans a motion effect per voice beat \u2014 like handing the clips the news show's own editor.",
+   "start_s": 19.601,
+   "end_s": 26.034,
+   "start_f": 588,
+   "end_f": 781
+  },
+  {
+   "beat": "b5",
+   "text": "One engineering build now powers two products instead of one.",
+   "start_s": 26.334,
+   "end_s": 30.171,
+   "start_f": 790,
+   "end_f": 905
+  }
+ ],
+ "total_s": 31.671,
+ "durationInFrames": 950,
+ "measured_track_s": 30.24,
+ "track": "/root/feature-demos/vo-p76/vo-p76.mp3"
+}

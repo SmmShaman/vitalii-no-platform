@@ -1,0 +1,7 @@
+{"id": "d03", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Artem's parents wanted him to learn about his diabetes by playing a game."],
+  ["b2", "But every simulator online used a generic kid's body — nothing matched his real doses."],
+  ["b3", "So his dad built the game on a real Hovorka model instead of a generic one."],
+  ["b4", "It's tuned to Artem's own insulin, his own weight, like a tutor who already read his chart."],
+  ["b5", "Now the glucose curves match sheet 08.10 — his own doctor's worksheet."]
+]}
