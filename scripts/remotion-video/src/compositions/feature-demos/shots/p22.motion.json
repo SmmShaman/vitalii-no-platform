@@ -1,0 +1,53 @@
+{
+  "id": "p22",
+  "composition": "FeatureSourceConsolidation",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cardCounter",
+      "backdrop": "page",
+      "data": {
+        "cards": [
+          { "label": "Telegram channels", "value": 6 },
+          { "label": "RSS feeds", "value": 26 }
+        ],
+        "unit": "sources",
+        "totalLabel": "All sources"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "32 different clocks",
+        "tags": ["6 Telegram", "26 RSS", "own schedule"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "hubRouting",
+      "backdrop": "actions",
+      "data": {
+        "inputs": ["Telegram channels", "RSS feeds"],
+        "hub": "GitHub Actions intake",
+        "output": "One moderation queue"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "actions",
+      "data": {
+        "steps": ["Round-robin across sources", "Batch the rest", "Stay fast & cheap"],
+        "result": "No throttling",
+        "system": "GitHub Actions"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "Flow-map (archetype 4) goes BIG — 32 scattered sources (6 Telegram + 26 RSS) converge into one labelled queue, '32 -> 1' — plus a LogWindow built from this feature's own numbers (no runtime log for this product). Holds to END, no fade."
+    }
+  ]
+}

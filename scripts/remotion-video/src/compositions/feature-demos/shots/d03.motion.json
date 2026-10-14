@@ -1,0 +1,49 @@
+{
+  "id": "d03",
+  "composition": "FeatureRealHovorkaModelTurnsD03",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "A Game, Not a Textbook",
+        "kicker": "Artem's parents wanted a real lesson, not a generic one"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Every simulator used a generic body",
+        "tags": ["Generic carb ratios", "Generic corrections", "Didn't match his body"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Generic simulator body",
+        "to": "Real Hovorka model",
+        "points": ["Tuned to his own weight", "Per-kg insulin math", "Built by his dad"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Meal & Levemir reminders", "NovoRapid dose calculator", "4 real-day missions"],
+        "result": "Scored against his real plan",
+        "system": "Hovorka 2004 model (the math)"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "LogWindow (t1d-model.js) built from the feature's own facts + hero number 08.10 goes BIG as the final result; holds to END, no fade."
+    }
+  ]
+}

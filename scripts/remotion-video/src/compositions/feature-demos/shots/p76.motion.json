@@ -1,0 +1,57 @@
+{
+  "id": "p76",
+  "composition": "FeatureClipsGetDigestsMotionP76",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "A static screen",
+        "line2": "while a voice narrated",
+        "keywords": ["static", "narrated"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cardCounter",
+      "backdrop": "page",
+      "data": {
+        "cards": [
+          { "label": "Kinetic type", "value": 3 },
+          { "label": "Evidence", "value": 3 },
+          { "label": "Comparison", "value": 10 },
+          { "label": "Process", "value": 5 },
+          { "label": "Cards", "value": 2 }
+        ],
+        "unit": "effects",
+        "totalLabel": "All effects"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "hubRouting",
+      "backdrop": null,
+      "data": {
+        "inputs": ["News digest script", "Feature clip script"],
+        "hub": "One shared pipeline",
+        "output": "One render engine"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Voice beat measured", "Grammar picks an effect", "MotionInsert renders it"],
+        "result": "One effect per beat",
+        "system": "grammar.ts (shared)"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "Ledger (archetype 5) goes BIG — full receipt, old 0/23 total struck through, rewritten 23/23 in green — plus a LogWindow (motion_usage) listing the 4 real effects this clip itself used. Holds to END, no fade."
+    }
+  ]
+}

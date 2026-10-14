@@ -247,6 +247,8 @@ import { FeatureDoseCalculatorWasThreeD12 } from "./compositions/feature-demos/F
 import { FeatureEveryNumberDoseCalculatorD11 } from "./compositions/feature-demos/FeatureEveryNumberDoseCalculatorD11";
 import { FeatureAndroidAppNoLongerD10 } from "./compositions/feature-demos/FeatureAndroidAppNoLongerD10";
 import { FeatureNovorapidButtonAsksWhatD06 } from "./compositions/feature-demos/FeatureNovorapidButtonAsksWhatD06";
+import { FeatureRealHovorkaModelTurnsD03 } from "./compositions/feature-demos/FeatureRealHovorkaModelTurnsD03";
+import { FeatureDemoClipsGetDigestsP76 } from "./compositions/feature-demos/FeatureDemoClipsGetDigestsP76";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2430,6 +2432,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureNovorapidButtonAsksWhatD06"
         component={FeatureNovorapidButtonAsksWhatD06}
         durationInFrames={899}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureRealHovorkaModelTurnsD03"
+        component={FeatureRealHovorkaModelTurnsD03}
+        durationInFrames={873}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureDemoClipsGetDigestsP76"
+        component={FeatureDemoClipsGetDigestsP76}
+        durationInFrames={950}
         fps={30}
         width={1280}
         height={720}

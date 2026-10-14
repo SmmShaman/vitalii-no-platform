@@ -1,0 +1,26 @@
+{
+  "id": "d03",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/a-real-hovorka-model-turns-artems-day-into-a-lesson-not-a-generic-simulator-d03",
+      "frames": 321,
+      "scroll": [
+        [0, 0],
+        [80, 140],
+        [160, 300],
+        [240, 460],
+        [320, 600]
+      ],
+      "mouse": [
+        [0, 560, 260],
+        [80, 600, 300],
+        [160, 580, 340],
+        [240, 600, 300],
+        [320, 560, 320]
+      ]
+    }
+  ]
+}
