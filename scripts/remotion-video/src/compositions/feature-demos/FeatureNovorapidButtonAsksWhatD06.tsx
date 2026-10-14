@@ -282,6 +282,182 @@ const WorkersGloss: React.FC = () => {
   );
 };
 
+/**
+ * b4 — the two real branches, drawn large so the beat fills the canvas (the
+ * generic featureMatrix catalog panel measured too small/corner-heavy here).
+ * Dose-tap hub fans out to the two branches, landing on an oversized table.
+ */
+const BRANCH_HUB = { x: 490, y: 54, w: 300, h: 58 };
+const BRANCH_LEFT = { x: 120, y: 206, w: 380, h: 64 };
+const BRANCH_RIGHT = { x: 780, y: 206, w: 380, h: 64 };
+const BRANCH_TABLE = { x: 70, y: 300, w: 1140, h: 290 };
+const TABLE_LABEL_W = 300;
+const TABLE_GAP = 24;
+const TABLE_COL_W = (BRANCH_TABLE.w - TABLE_LABEL_W - TABLE_GAP * 2) / 2;
+const BRANCH_ROWS: { label: string; values: [string, string] }[] = [
+  { label: "Carbs added", values: ["Yes", "No"] },
+  { label: "Dose basis", values: ["Carbs + correction", "Correction only"] },
+];
+
+const BranchMatrix: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B4, B5) !== 1) return null;
+  const cols = `${TABLE_LABEL_W}px repeat(2, ${TABLE_COL_W}px)`;
+
+  return (
+    <>
+      <Arrive at={B4 + 4} kind="punch" box={BRANCH_HUB} dur={0.3}>
+        <div
+          style={{
+            position: "absolute",
+            left: BRANCH_HUB.x,
+            top: BRANCH_HUB.y,
+            width: BRANCH_HUB.w,
+            height: BRANCH_HUB.h,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 10,
+            background: P.card,
+            border: `2px solid ${P.accentEdge}`,
+            borderRadius: 6,
+            boxShadow: "4px 4px 0 rgba(0,0,0,0.5)",
+            fontFamily,
+            fontSize: 22,
+            fontWeight: 800,
+            color: P.ink,
+            whiteSpace: "nowrap",
+          }}
+        >
+          <span>💉</span>
+          <span>DOSE TAPPED</span>
+        </div>
+      </Arrive>
+
+      <Arrive at={B4 + 16} kind="rise" box={{ x: 300, y: 120, w: 680, h: 90 }} dur={0.3}>
+        <div style={{ position: "absolute", left: 416, top: 122, fontSize: 52, fontWeight: 800, color: P.accent }}>↙</div>
+        <div style={{ position: "absolute", left: 796, top: 122, fontSize: 52, fontWeight: 800, color: P.accent }}>↘</div>
+      </Arrive>
+
+      <Arrive at={B4 + 22} kind="wipe" box={BRANCH_LEFT} dur={0.35}>
+        <div
+          style={{
+            position: "absolute",
+            left: BRANCH_LEFT.x,
+            top: BRANCH_LEFT.y,
+            width: BRANCH_LEFT.w,
+            height: BRANCH_LEFT.h,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: P.chipBg,
+            border: `2px solid ${P.border}`,
+            borderRadius: 6,
+            fontFamily,
+            fontSize: 24,
+            fontWeight: 800,
+            color: P.ink,
+            whiteSpace: "nowrap",
+          }}
+        >
+          FOOD CHOSEN
+        </div>
+      </Arrive>
+      <Arrive at={B4 + 22} kind="wipe" box={BRANCH_RIGHT} dur={0.35}>
+        <div
+          style={{
+            position: "absolute",
+            left: BRANCH_RIGHT.x,
+            top: BRANCH_RIGHT.y,
+            width: BRANCH_RIGHT.w,
+            height: BRANCH_RIGHT.h,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: P.chipBg,
+            border: `2px solid ${P.border}`,
+            borderRadius: 6,
+            fontFamily,
+            fontSize: 24,
+            fontWeight: 800,
+            color: P.ink,
+            whiteSpace: "nowrap",
+          }}
+        >
+          NO FOOD
+        </div>
+      </Arrive>
+
+      <Arrive at={B4 + 34} kind="rise" box={BRANCH_TABLE} dur={0.4}>
+        <div style={{ position: "absolute", left: BRANCH_TABLE.x, top: BRANCH_TABLE.y, width: BRANCH_TABLE.w, fontFamily }}>
+          <div style={{ display: "grid", gridTemplateColumns: cols, columnGap: TABLE_GAP, marginBottom: 16 }}>
+            <div />
+            {(["Food chosen", "No food"] as const).map((o) => (
+              <div
+                key={o}
+                style={{
+                  background: P.accentEdge,
+                  color: P.ink,
+                  borderRadius: 6,
+                  padding: "16px 10px",
+                  fontSize: 32,
+                  fontWeight: 800,
+                  textAlign: "center",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {o}
+              </div>
+            ))}
+          </div>
+          {BRANCH_ROWS.map((row) => (
+            <div
+              key={row.label}
+              style={{
+                display: "grid",
+                gridTemplateColumns: cols,
+                columnGap: TABLE_GAP,
+                alignItems: "center",
+                minHeight: 108,
+                borderBottom: `2px solid ${P.border}`,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 28,
+                  fontWeight: 700,
+                  color: P.ink,
+                  borderLeft: `4px solid ${P.accent}`,
+                  paddingLeft: 14,
+                  lineHeight: 1.2,
+                }}
+              >
+                {row.label}
+              </div>
+              {row.values.map((v, i) => (
+                <div
+                  key={i}
+                  style={{
+                    fontSize: v.length > 12 ? 24 : 34,
+                    fontWeight: 700,
+                    color: v === "Yes" ? P.success : v === "No" ? P.muted : P.ink,
+                    textAlign: "center",
+                    lineHeight: 1.2,
+                    padding: "0 10px",
+                  }}
+                >
+                  {v}
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </Arrive>
+    </>
+  );
+};
+
 const RESULT_LOG: LogLine[] = [
   { t: "00:00", text: "dose button tapped", tone: "accent" },
   { t: "00:00", text: "Cloudflare Worker asks: food or none?", tone: "accent" },
@@ -404,22 +580,8 @@ const Inner: React.FC = () => {
       />
       <WorkersGloss />
 
-      {/* b4 — the two branches, drawn only (no backdrop) */}
-      <MotionInsert
-        effect="featureMatrix"
-        from={B4}
-        dur={B5 - B4}
-        accent={ACCENT}
-        plate={0.8}
-        base={STAGE}
-        data={{
-          options: ["Food chosen", "No food"],
-          rows: [
-            { label: "Carbs added", values: ["Yes", "No"] },
-            { label: "Dose basis", values: ["Carbs + correction", "Correction only"] },
-          ],
-        }}
-      />
+      {/* b4 — the two branches, drawn only (no backdrop), oversized to fill the canvas */}
+      <BranchMatrix />
 
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />

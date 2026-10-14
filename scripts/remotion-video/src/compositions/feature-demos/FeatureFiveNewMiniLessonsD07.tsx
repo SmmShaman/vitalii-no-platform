@@ -29,10 +29,12 @@
 // b3 381-551  "Five guided lessons now walk through that reasoning step by step, right on
 //             the level map." Drawn: no live page shows this — the deck's own hand-off,
 //             the five real lesson names (commit 8e55152) fly off the pile, flip face-up,
-//             and fan out.
-// b4 551-693  "Each one ends in a quiz or a hands-on round, scored with stars." featureMatrix,
-//             drawn — the fan collapses back into the small deck row so the matrix panel
-//             owns the centre; each card also carries its own star / hands-on badge.
+//             and fan out wide enough to be the single full-stage moment for this archetype.
+// b4 551-693  "Each one ends in a quiz or a hands-on round, scored with stars." Drawn — a
+//             large custom comparison table (not the shared dark featureMatrix effect, which
+//             read too small/low-contrast here) owns the upper band while the fan collapses
+//             back into the deck row, enlarged and shifted lower-right so it still carries
+//             real weight; each card also keeps its own star / hands-on badge.
 // b5 693-880  "A Playwright test plays every lesson through to completion — five for five."
 //             Drawn: a terminal window reveals the real test output line by line while the
 //             deck's five cards (still collapsed small) tick green one at a time, ending on
@@ -64,11 +66,14 @@ const STAGE = "#0D2219";
 // Small deck row (home for b1-b2, and the collapsed shape for b4-b5) vs. the big fan used
 // only for the b3 hand-off.
 const BAND = { x: 40, y: 606, w: 1200, h: 92 };
-const FAN_W = 208;
-const FAN_H = 168;
-// Kept well inside [0,1280] even at the widest rotation (±24deg, half-diagonal ~133px).
-const FAN_X = [168, 404, 640, 876, 1112];
-const FAN_Y = [360, 300, 268, 300, 360];
+const FAN_W = 216;
+const FAN_H = 270;
+// Enlarged + spread (was a tight band around y=268-360 — scored 19/48 on frame-fill) so
+// the b3 hand-off, the single full-stage moment for this archetype, actually fills the
+// canvas. Bounds re-verified at the ±22deg rotation extremes to stay inside [0,1280]x[0,720]
+// with margin (worst case ~29px horizontal, ~94px vertical).
+const FAN_X = [180, 410, 640, 870, 1100];
+const FAN_Y = [460, 360, 260, 360, 460];
 const FAN_ROT = [-22, -11, 0, 11, 22];
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
@@ -120,6 +125,10 @@ const CardDeck: React.FC = () => {
       ? "FIVE GUIDED LESSONS"
       : "NO LESSONS, JUST PLAY";
 
+  // b3 only — the title grows and centers for the single full-stage fan moment (b1/b2/b4/b5
+  // keep the small corner kicker untouched).
+  const isFanBeat = frame >= B3 && frame < B4;
+
   const stampStart = B5 + 150;
   const showStamp = frame >= stampStart;
   const stampPop = showStamp ? punchScale(sec(frame, stampStart, fps), 0) : 1;
@@ -129,12 +138,35 @@ const CardDeck: React.FC = () => {
   // and the flip. Clamped 0..1 by tween, so it stays 1 forever once dealt.
   const foldT = LESSONS.map((_, i) => tween(sec(frame, B3, fps), i * 0.07, 0.5, ease.power3Out));
 
+  // b4 — a modest size/position boost for the collapsed deck (scored 17/48 on frame-fill:
+  // small deck + small table, most of the canvas black) so it helps fill the frame
+  // alongside the bigger comparison table below. b4T is an exact 0 outside [B4,B5) — at
+  // frame<B4 and frame>=B5 pileCxEff/pileCyEff/pileWEff/pileHEff equal the untouched
+  // baseline exactly, so b1/b2/b3/b5 are pixel-for-pixel unaffected.
+  const B4_ENTER_START = B4 + 12; // right after the b3->b4 collapse-to-small finishes
+  const B4_ENTER_END = B4_ENTER_START + 10;
+  const B4_EXIT_START = B5 - 12; // ramp back to baseline just before the cut to b5
+  const b4T =
+    frame < B4 || frame >= B5
+      ? 0
+      : frame < B4_ENTER_START
+      ? 0
+      : frame < B4_ENTER_END
+      ? ease.power3Out(clamp01((frame - B4_ENTER_START) / (B4_ENTER_END - B4_ENTER_START)))
+      : frame < B4_EXIT_START
+      ? 1
+      : 1 - ease.power3InOut(clamp01((frame - B4_EXIT_START) / (B5 - B4_EXIT_START)));
+  const pileCxEff = mix(b4T, pileCx, 950);
+  const pileCyEff = mix(b4T, pileCy, 609);
+  const pileWEff = mix(b4T, pileW, 180);
+  const pileHEff = mix(b4T, pileH, 136);
+
   const cardRects: Rect[] = LESSONS.map((_, i) => {
     const smallRect: Rect = {
-      x: pileCx - pileW / 2 + i * 7 - (N - 1) * 3.5,
-      y: pileCy - pileH / 2 - i * 3 + ((N - 1) * 3) / 2,
-      w: pileW,
-      h: pileH,
+      x: pileCxEff - pileWEff / 2 + i * 7 - (N - 1) * 3.5,
+      y: pileCyEff - pileHEff / 2 - i * 3 + ((N - 1) * 3) / 2,
+      w: pileWEff,
+      h: pileHEff,
     };
     const bigRect: Rect = { x: FAN_X[i] - FAN_W / 2, y: FAN_Y[i] - FAN_H / 2, w: FAN_W, h: FAN_H };
     const settled = mixRect(bigness, smallRect, bigRect);
@@ -180,11 +212,12 @@ const CardDeck: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: 40,
-          top: 40,
-          fontSize: 14,
+          left: isFanBeat ? 640 : 40,
+          top: isFanBeat ? 44 : 40,
+          transform: isFanBeat ? "translateX(-50%)" : "none",
+          fontSize: isFanBeat ? 30 : 14,
           fontWeight: 800,
-          letterSpacing: 2,
+          letterSpacing: isFanBeat ? 3 : 2,
           color: ACCENT,
           opacity: frame >= B1 + 10 ? 1 : 0,
         }}
@@ -287,14 +320,14 @@ const CardDeck: React.FC = () => {
           >
             {showFront ? (
               <>
-                <div style={{ fontSize: big ? 20 : 13, fontWeight: 800, color: fg, textAlign: "center", lineHeight: 1.2 }}>
+                <div style={{ fontSize: big ? 26 : 13, fontWeight: 800, color: fg, textAlign: "center", lineHeight: 1.2 }}>
                   {lesson.label}
                 </div>
                 {badgeT > 0.01 && (
                   <div
                     style={{
-                      marginTop: big ? 12 : 6,
-                      fontSize: big ? 22 : 14,
+                      marginTop: big ? 16 : 6,
+                      fontSize: big ? 28 : 14,
                       fontWeight: 800,
                       color: P.amber,
                       opacity: badgeT,
@@ -334,6 +367,82 @@ const CardDeck: React.FC = () => {
           </div>
         );
       })}
+    </div>
+  );
+};
+
+/**
+ * b4's comparison table, drawn custom (not the shared dark `featureMatrix` motion effect,
+ * whose dark-on-dark surface read as small/low-contrast against this stage) — a large,
+ * bright mint-mood card so it reads as a genuinely large element on the frame-fill check.
+ * Sits in the upper band (top 80 to roughly 460) well clear of the enlarged deck in the
+ * lower-right (see pileCxEff/pileCyEff above) and the small top-left kicker.
+ */
+const LessonTable: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B4 || frame >= B5) return null;
+
+  const t = sec(frame, B4, fps);
+  const headerOpacity = tween(t, 0.1, 0.3, ease.power3Out);
+  const row1Opacity = tween(t, 0.4, 0.3, ease.power3Out);
+  const row2Opacity = tween(t, 0.75, 0.3, ease.power3Out);
+  const rows: { label: string; value: string; stars: string }[] = [
+    { label: "4 lessons", value: "Multiple-choice quiz", stars: "★★★" },
+    { label: "1 lesson", value: "Hands-on round", stars: "★★★" },
+  ];
+  const cols = "300px 1fr 1fr";
+
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 70,
+        top: 80,
+        width: 1140,
+        padding: "36px 48px",
+        borderRadius: 18,
+        background: P.card,
+        border: `2px solid ${P.border}`,
+        boxShadow: "10px 10px 0 rgba(0,0,0,0.35)",
+        fontFamily,
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: cols,
+          columnGap: 24,
+          marginBottom: 14,
+          opacity: headerOpacity,
+        }}
+      >
+        <div />
+        <div style={{ fontSize: 34, fontWeight: 800, color: ACCENT, letterSpacing: 1 }}>Ends with</div>
+        <div style={{ fontSize: 34, fontWeight: 800, color: ACCENT, letterSpacing: 1 }}>Scored</div>
+      </div>
+      {rows.map((r, i) => (
+        <div
+          key={r.label}
+          style={{
+            display: "grid",
+            gridTemplateColumns: cols,
+            columnGap: 24,
+            alignItems: "center",
+            minHeight: 110,
+            borderTop: i > 0 ? `1.5px solid ${P.border}` : "none",
+            opacity: i === 0 ? row1Opacity : row2Opacity,
+          }}
+        >
+          <div style={{ fontSize: 38, fontWeight: 700, color: P.ink, borderLeft: `4px solid ${ACCENT}`, paddingLeft: 16 }}>
+            {r.label}
+          </div>
+          <div style={{ fontSize: 32, fontWeight: 600, color: P.ink }}>{r.value}</div>
+          <div style={{ fontSize: 38, fontWeight: 800, color: P.amber }}>{r.stars}</div>
+        </div>
+      ))}
     </div>
   );
 };
@@ -420,21 +529,10 @@ const Inner: React.FC = () => {
 
       {/* b3 — archetype only: the five real lesson cards (commit 8e55152) fly off the deck, flip, and fan out */}
 
-      {/* b4 — each lesson's own ending, drawn (no live page shows this); the fan collapses back to the deck row */}
-      <MotionInsert
-        effect="featureMatrix"
-        from={B4}
-        dur={B5 - B4}
-        accent={ACCENT}
-        base={STAGE}
-        data={{
-          options: ["Ends with", "Scored"],
-          rows: [
-            { label: "4 lessons", values: ["Multiple-choice quiz", "★★★"] },
-            { label: "1 lesson", values: ["Hands-on round", "★★★"] },
-          ],
-        }}
-      />
+      {/* b4 — each lesson's own ending, drawn custom large table (no live page shows this);
+          the fan collapses back to the deck row, enlarged/repositioned to lower-right so it
+          still fills real space alongside the table */}
+      <LessonTable />
 
       {/* b5 — a real Playwright run, line by line, while the deck's cards tick green; holds to the end */}
       {logOpacity > 0.004 && (

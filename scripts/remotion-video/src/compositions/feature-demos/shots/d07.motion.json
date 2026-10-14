@@ -32,9 +32,10 @@
     },
     {
       "beat": "b4",
-      "effect": "featureMatrix",
+      "effect": "drawn",
       "backdrop": "drawn",
       "data": {
+        "note": "custom large comparison table (not the shared featureMatrix effect — it read small/low-contrast on this stage) owns the upper band; the fan collapses back to the deck row, enlarged and shifted lower-right so it still carries weight",
         "options": ["Ends with", "Scored"],
         "rows": [
           { "label": "4 lessons", "values": ["Multiple-choice quiz", "★★★"] },
