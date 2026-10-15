@@ -1,28 +1,27 @@
 {
   "id": "p76",
-  "composition": "FeatureClipsGetDigestsMotionP76",
+  "composition": "FeatureDemoClipsGetDigestsP76",
   "beats": [
     {
       "beat": "b1",
-      "effect": "keywordCaption",
+      "effect": "titleTakeover",
       "backdrop": "page",
       "data": {
-        "line1": "A static screen",
-        "line2": "while a voice narrated",
-        "keywords": ["static", "narrated"]
+        "title": "The clips just sat there.",
+        "kicker": "Every night — a static screen, a voice narrating over nothing moving"
       }
     },
     {
       "beat": "b2",
       "effect": "cardCounter",
-      "backdrop": "page",
+      "backdrop": null,
       "data": {
         "cards": [
-          { "label": "Kinetic type", "value": 3 },
-          { "label": "Evidence", "value": 3 },
-          { "label": "Comparison", "value": 10 },
+          { "label": "Title cards", "value": 3 },
+          { "label": "Callouts", "value": 3 },
+          { "label": "Comparisons", "value": 10 },
           { "label": "Process", "value": 5 },
-          { "label": "Cards", "value": 2 }
+          { "label": "Counters", "value": 2 }
         ],
         "unit": "effects",
         "totalLabel": "All effects"
@@ -43,7 +42,7 @@
       "effect": "pipelineFlow",
       "backdrop": null,
       "data": {
-        "steps": ["Voice beat measured", "Grammar picks an effect", "MotionInsert renders it"],
+        "steps": ["Voice beat measured", "Grammar picks an effect", "The chosen effect renders"],
         "result": "One effect per beat",
         "system": "grammar.ts (shared)"
       }

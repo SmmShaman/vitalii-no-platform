@@ -1,6 +1,13 @@
 // FeatureDemoClipsGetDigestsP76 — feature p76 — 1280x720, 950 frames @ 30fps, VOICE-SYNCED.
 // archetype 5 ledger, mood sand. Motion direction v2 (feature-motion skill, 2026-10-07).
 //
+// RE-SHOOT (2026-10-15): same narration, same cut points (B1-B5/END unchanged from the
+// prior cut — they already matched tonight's re-measured beat starts exactly), picture
+// rewritten only where it had to be: b1 used keywordCaption, which is tonight's banned
+// opener (d06 already opens on it) — swapped for titleTakeover, the only other beat whose
+// job (announce the problem) fits a single beat. b2/b3/b4/b5 already worked (cardCounter /
+// hubRouting / pipelineFlow / drawn ledger+LogWindow, 4 effects, no repeats) and are kept.
+//
 // One editorial effect per sentence, chosen by what changes on screen, over the
 // real product's own feature page as evidence, one owner of the frame, a reading
 // hold at the end of every beat, cuts not fades.
@@ -9,23 +16,18 @@
 // digest-motion catalog file, scripts/video-processor/skills/digest-motion/effects.json):
 // b1 15-195   "Every night, feature clips just sat there — a static screen while a
 //             voice narrated over it."
-//             keywordCaption over a LiveBackdrop of the feature's own page
+//             titleTakeover over a LiveBackdrop of the feature's own page
 //             (backdrop "page"). A small product plate names Portfolio & News
 //             Platform once. Ledger enters the lower-third band at "0/23"/danger
 //             (nothing shared yet — the stated deficit).
 // b2 195-411  "Meanwhile the nightly news digest already used real motion graphics
 //             — title cards, counters, callouts."
-//             cardCounter, drawn only — the LiveBackdrop now ENDS at B2 (was
-//             running through B3), because the live page's own real "PROBLEM"
-//             section header was scrolling into view right as this beat
-//             started, bleeding through the scrim and reading as a leftover
-//             label during a beat that isn't about a problem. The REAL
-//             5-family breakdown of the digest's 23 motion effects (3+3+10+5+2)
-//             is unchanged, but 3 of the 5 chip labels now use the exact words
-//             the narration says (Title cards / Callouts / Counters) instead
-//             of the internal catalog family names (kinetic-type / evidence /
-//             cards) a viewer has no way to parse. Ledger stays in the band,
-//             unchanged.
+//             cardCounter, drawn only — the LiveBackdrop ends at B2 (the live page's
+//             own "PROBLEM" section header was bleeding through this beat's scrim
+//             when it ran longer). The REAL 5-family breakdown of the digest's 23
+//             motion effects (3+3+10+5+2) is unchanged; 3 of the 5 chip labels use
+//             the exact words the narration says (Title cards / Callouts /
+//             Counters). Ledger stays small in the band, unchanged.
 // b3 411-588  "So the same Remotion pipeline that builds the news digest now
 //             builds the feature clips too."
 //             hubRouting, drawn only (no backdrop — the shared pipeline itself has
@@ -34,9 +36,9 @@
 // b4 588-790  "One shared grammar file plans a motion effect per voice beat — like
 //             handing the clips the news show's own editor."
 //             pipelineFlow, drawn only — the three real stages this very clip ran
-//             through to land on screen, worded in plain English (no raw
-//             component name) so "MotionInsert" isn't dropped on screen
-//             unexplained. Ledger stays in the band, already flipped.
+//             through to land on screen, worded in plain English (voice measured ->
+//             grammar picks an effect -> the chosen effect renders). Ledger
+//             unchanged, still "23/23"/success in the band.
 // b5 790-950  "One engineering build now powers two products instead of one."
 //             Fully drawn: the ledger goes BIG — the old 0/23 total struck through,
 //             rewritten 23/23 in green — plus a LogWindow (motion_usage) listing
@@ -51,20 +53,12 @@
 // reveal — the small band only ever shows the running total. Gate 2: b5 ends on
 // a drawn result (ledger + LogWindow), not a page.
 //
-// GitHub commits were verified tonight (5a7f8ac, 36fd038, 46f7255) but none
-// states this clip's shared-pipeline claim directly — all three are generic
-// "tonight's clips"/"narration measured" commits for OTHER feature ids (b69,
-// p73), not evidence that would read as proof to a blind viewer of THIS
-// feature's claim. So b3's hub and b4's grammar file stay drawn, per STEP 0c's
-// "draw the mechanism" fallback when no commit proves the sentence.
-//
-// WAVE D fix (blind-viewer round, clarity 6/10): the live page's own
-// "PROBLEM" section header was bleeding through the b2 scrim because
-// LiveBackdrop ran continuously from B1 through B3 — it now stops at B2.
-// b2's chip labels were renamed to the narration's own words (Title cards /
-// Callouts / Counters) instead of internal catalog family names. b4's
-// "MotionInsert renders it" item was reworded to plain English. shots/p76.json
-// was trimmed to match the shorter backdrop window.
+// GitHub commits were checked tonight (5a7f8ac, 36fd038, 46f7255) but none states
+// this clip's shared-pipeline claim directly — all three are generic "tonight's
+// clips"/"narration measured" commits for OTHER feature ids (b69, p73), not
+// evidence that would read as proof to a blind viewer of THIS feature's claim. So
+// b3's hub and b4's grammar file stay drawn, per STEP 0c's "draw the mechanism"
+// fallback when no commit proves the sentence.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -295,7 +289,7 @@ const BeatRail: React.FC = () => {
 };
 
 const LOG_LINES: Array<{ t?: string; text: string; tone: "ink" | "muted" | "danger" | "success" | "accent" }> = [
-  { text: "beat1 -> keywordCaption", tone: "muted" },
+  { text: "beat1 -> titleTakeover", tone: "muted" },
   { text: "beat2 -> cardCounter", tone: "ink" },
   { text: "beat3 -> hubRouting", tone: "accent" },
   { text: "beat4 -> pipelineFlow", tone: "accent" },
@@ -346,20 +340,19 @@ const Inner: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       {/* b1 — the flat-screen problem, over the feature's own page. Backdrop ends at B2
-          (was running through B3) — the live page's own "PROBLEM" section header was
-          scrolling into view right as b2 started, bleeding through the scrim during a
-          beat that isn't about a problem. b2 is drawn-only, like b3/b4. */}
+          (the live page's own "PROBLEM" section header bleeds through if it runs longer) —
+          b2 is drawn-only, like b3/b4. titleTakeover replaces keywordCaption here (tonight's
+          banned opener, already used by d06). */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} push={0.03} />}
       <MotionInsert
-        effect="keywordCaption"
+        effect="titleTakeover"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
         plate={0.78}
         data={{
-          line1: "A static screen",
-          line2: "while a voice narrated",
-          keywords: ["static", "narrated"],
+          title: "The clips just sat there.",
+          kicker: "Every night — a static screen, a voice narrating over nothing moving",
         }}
       />
       <ProductPlate />

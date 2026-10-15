@@ -1,0 +1,35 @@
+{
+  "id": "b68",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 2,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/instead-of-waiting-for-the-camera-the-kiosk-now-lets-you-say-a-brother-isnt-home-b68",
+      "frames": 149,
+      "scroll": [[0, 0], [148, 60]],
+      "mouse": [[0, 500, 200], [148, 500, 260]]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/instead-of-waiting-for-the-camera-the-kiosk-now-lets-you-say-a-brother-isnt-home-b68",
+      "frames": 175,
+      "scroll": [[0, 80], [174, 180]],
+      "mouse": [[0, 500, 240], [174, 500, 300]]
+    },
+    {
+      "name": "page3",
+      "url": "https://vitalii.no/features/instead-of-waiting-for-the-camera-the-kiosk-now-lets-you-say-a-brother-isnt-home-b68",
+      "frames": 126,
+      "scroll": [[0, 220], [125, 400]],
+      "mouse": [[0, 500, 260], [125, 500, 320]]
+    },
+    {
+      "name": "page4",
+      "url": "https://vitalii.no/features/instead-of-waiting-for-the-camera-the-kiosk-now-lets-you-say-a-brother-isnt-home-b68",
+      "frames": 186,
+      "scroll": [[0, 440], [185, 700]],
+      "mouse": [[0, 500, 280], [185, 500, 340]]
+    }
+  ]
+}

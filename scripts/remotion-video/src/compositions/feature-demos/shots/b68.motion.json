@@ -1,0 +1,52 @@
+{
+  "id": "b68",
+  "composition": "FeatureInsteadWaitingCameraKioskB68",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "He left. The TV didn't notice.",
+        "kicker": "One of four boys slipped out — the hallway camera still called him home"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "quoteMarker",
+      "backdrop": "page2",
+      "data": {
+        "quote": "Trust only the hallway camera — and the whole house stays stuck on a boy who already left.",
+        "source": "old rule",
+        "highlight": "whole house stays stuck"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page3",
+      "data": {
+        "from": "Wait for the hallway camera",
+        "to": "Tap your own name on the kiosk",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Any of the 4 boys", "The moment he's gone", "src/pages/TvPage.tsx"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "page4",
+      "data": {
+        "steps": ["Tap name once", "Confirm with second tap", "Workers push the update"],
+        "result": "House updates instantly — no accidental taps",
+        "system": "workers/youtube-gate/index.js"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "archetype divider slides fully to the order side; LogWindow replays the gate's own away/home toggle, dark stage, no page/hub backdrop (gate 2)"
+    }
+  ]
+}

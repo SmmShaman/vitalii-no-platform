@@ -1,0 +1,51 @@
+{
+  "id": "b70",
+  "composition": "FeatureVacationModeKidsKeepB70",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "No TV. Still judged.",
+        "kicker": "Away at Grandma's for weeks — no camera either"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "A false \"done but unpaid\"",
+        "tags": ["No bonus to gate away", "Read as done, unpaid", "Shut brothers' YouTube", "They were home, watching"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page3",
+      "data": {
+        "from": "Same rules for every child",
+        "to": "away_mode:<child> flag",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Toggled from any phone", "Gate skips the away child", "workers/youtube-gate/index.js"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["One task prepared", "Marked done", "Next task queued"],
+        "result": "No cap. No bonus needed.",
+        "system": "TasksPage + daily-cron"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "archetype ribbon lands its final stamp (0 SHUTDOWNS); LogWindow shows the gate's own state over a dark base — no page/hub backdrop (gate 2)"
+    }
+  ]
+}
