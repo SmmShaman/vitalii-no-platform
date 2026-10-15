@@ -1,0 +1,57 @@
+{
+ "id": "b70",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.127,
+  "b2": 9.384,
+  "b3": 4.935,
+  "b4": 6.387,
+  "b5": 4.387
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One of my boys stays at his grandmother's for weeks \u2014 no TV, no camera.",
+   "start_s": 0.5,
+   "end_s": 5.627,
+   "start_f": 15,
+   "end_f": 169
+  },
+  {
+   "beat": "b2",
+   "text": "But the system judged him by home rules. Finishing tasks with no bonus read as 'done, unpaid' \u2014 shutting off his brothers' YouTube back home.",
+   "start_s": 5.927,
+   "end_s": 15.311,
+   "start_f": 178,
+   "end_f": 459
+  },
+  {
+   "beat": "b3",
+   "text": "So a Supabase flag marks him off-site, and the home gate learns to skip him.",
+   "start_s": 15.611,
+   "end_s": 20.546,
+   "start_f": 468,
+   "end_f": 616
+  },
+  {
+   "beat": "b4",
+   "text": "Away, he gets one task at a time, no cap, no bonus \u2014 for as long as he's gone.",
+   "start_s": 20.846,
+   "end_s": 27.233,
+   "start_f": 625,
+   "end_f": 817
+  },
+  {
+   "beat": "b5",
+   "text": "His brothers' YouTube never drops again. Zero false shutdowns.",
+   "start_s": 27.533,
+   "end_s": 31.92,
+   "start_f": 826,
+   "end_f": 958
+  }
+ ],
+ "total_s": 33.42,
+ "durationInFrames": 1003,
+ "measured_track_s": 31.968,
+ "track": "/root/feature-demos/vo-b70/vo-b70.mp3"
+}
