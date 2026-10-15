@@ -180,6 +180,73 @@ const ProductPlate: React.FC = () => {
   );
 };
 
+/** b3+b4 — handoffExplain and pipelineFlow each build up over ~4.3-4.8s and stay
+    sparse through most of their own beat (points/result land late in the build),
+    so these two beats get a rail of the SAME real facts their catalog effect
+    already carries (handoffExplain's own points / pipelineFlow's own steps),
+    spread down the right side of the canvas and visible from the first half-
+    second — no backdrop exists for either beat to lean on instead. b1/b2/b5 are
+    untouched. */
+const BeatRail: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B3 || frame >= B5) return null;
+
+  const inB3 = frame < B4;
+  const beatStart = inB3 ? B3 : B4;
+  const header = inB3 ? "WHY A REAL MODEL" : "WRAPPED INTO HIS DAY";
+  const items = inB3
+    ? ["Tuned to his own weight", "Per-kg insulin math", "Built by his dad"]
+    : ["Meal & Levemir reminders", "NovoRapid dose calculator", "4 real-day missions"];
+  const tops = [90, 265, 440];
+  const headerT = tween(sec(frame, beatStart + 2, fps), 0, 0.3, ease.power3Out);
+
+  return (
+    <>
+      <div
+        style={{
+          position: "absolute",
+          left: 760,
+          top: 54,
+          width: 460,
+          fontSize: 14,
+          fontWeight: 800,
+          letterSpacing: 2,
+          color: "rgba(230,236,250,0.55)",
+          opacity: headerT,
+          fontFamily,
+        }}
+      >
+        {header}
+      </div>
+      {items.map((label, i) => {
+        const t = tween(sec(frame, beatStart + 4 + i * 4, fps), 0, 0.35, ease.power3Out);
+        return (
+          <div
+            key={label}
+            style={{
+              position: "absolute",
+              left: 760,
+              top: tops[i],
+              width: 460,
+              background: P.card,
+              borderRadius: 4,
+              boxShadow: "6px 6px 0 rgba(0,0,0,0.4)",
+              padding: "20px 24px",
+              opacity: t,
+              fontFamily,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>{`0${i + 1}`}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: P.ink, marginTop: 4 }}>{label}</div>
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
 const LOG_LINES: Array<{ t?: string; text: string; tone: "ink" | "muted" | "danger" | "success" | "accent" }> = [
   { text: "loading t1d-model.js (Hovorka, per kg)…", tone: "muted" },
   { text: "NovoRapid + Levemir absorption curves ready", tone: "ink" },
@@ -287,6 +354,7 @@ const Inner: React.FC = () => {
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />
 
+      <BeatRail />
       <HeroFigure />
     </AbsoluteFill>
   );

@@ -210,6 +210,73 @@ const ProductPlate: React.FC = () => {
   );
 };
 
+/** b3+b4 — hubRouting's own diagram clusters around mid-height on a plain dark
+    stage (no backdrop — the shared pipeline has no public page), and pipelineFlow
+    compacts to a small centered chain for most of its own build, so both beats
+    stay sparse at the sampled midpoint. This rail restates the SAME real facts
+    each catalog effect already carries (hubRouting's own inputs/hub/output,
+    pipelineFlow's own steps), spread down the right side and visible from the
+    first half-second. b1/b2/b5 are untouched. */
+const BeatRail: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B3 || frame >= B5) return null;
+
+  const inB3 = frame < B4;
+  const beatStart = inB3 ? B3 : B4;
+  const header = inB3 ? "ONE SHARED PIPELINE" : "ONE EFFECT PER BEAT";
+  const items = inB3
+    ? ["News digest script", "Feature clip script", "One render engine"]
+    : ["Voice beat measured", "Grammar picks an effect", "MotionInsert renders it"];
+  const tops = [90, 265, 440];
+  const headerT = tween(sec(frame, beatStart + 2, fps), 0, 0.3, ease.power3Out);
+
+  return (
+    <>
+      <div
+        style={{
+          position: "absolute",
+          left: 760,
+          top: 54,
+          width: 460,
+          fontSize: 14,
+          fontWeight: 800,
+          letterSpacing: 2,
+          color: "rgba(255,243,230,0.55)",
+          opacity: headerT,
+          fontFamily,
+        }}
+      >
+        {header}
+      </div>
+      {items.map((label, i) => {
+        const t = tween(sec(frame, beatStart + 4 + i * 4, fps), 0, 0.35, ease.power3Out);
+        return (
+          <div
+            key={label}
+            style={{
+              position: "absolute",
+              left: 760,
+              top: tops[i],
+              width: 460,
+              background: P.card,
+              borderRadius: 4,
+              boxShadow: "6px 6px 0 rgba(0,0,0,0.4)",
+              padding: "20px 24px",
+              opacity: t,
+              fontFamily,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>{`0${i + 1}`}</div>
+            <div style={{ fontSize: 22, fontWeight: 800, color: P.ink, marginTop: 4 }}>{label}</div>
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
 const LOG_LINES: Array<{ t?: string; text: string; tone: "ink" | "muted" | "danger" | "success" | "accent" }> = [
   { text: "beat1 -> keywordCaption", tone: "muted" },
   { text: "beat2 -> cardCounter", tone: "ink" },
@@ -328,6 +395,7 @@ const Inner: React.FC = () => {
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />
 
+      <BeatRail />
       <LedgerFigure />
     </AbsoluteFill>
   );

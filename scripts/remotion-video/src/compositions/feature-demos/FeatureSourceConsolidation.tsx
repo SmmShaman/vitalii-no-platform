@@ -209,6 +209,47 @@ const FlowMapFigure: React.FC = () => {
   );
 };
 
+/** b4 — pipelineFlow compacts to a small centered chain for most of its own
+    build (frame-outline still drawing at the sampled midpoint, result box later
+    still), so even over the "actions" backdrop the frame falls short. A thin
+    top ticker restates pipelineFlow's own steps/result, visible from the first
+    half-second, in the otherwise-empty top strip above the backdrop's header
+    band. b1/b2/b3/b5 already pass and are untouched. */
+const StepTicker: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B4 || frame >= B5) return null;
+  const t = tween(sec(frame, B4 + 4, fps), 0, 0.35, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 40,
+        top: 56,
+        width: 1200,
+        height: 64,
+        background: P.card,
+        borderRadius: 4,
+        boxShadow: "6px 6px 0 rgba(0,0,0,0.35)",
+        display: "flex",
+        alignItems: "center",
+        gap: 18,
+        padding: "0 22px",
+        opacity: t,
+        fontFamily,
+      }}
+    >
+      <span style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1, color: P.muted }}>INTAKE</span>
+      <span style={{ fontSize: 19, fontWeight: 800, color: P.ink }}>Round-robin across sources</span>
+      <span style={{ fontSize: 19, fontWeight: 800, color: P.muted }}>&gt;</span>
+      <span style={{ fontSize: 19, fontWeight: 800, color: P.ink }}>Batch the rest</span>
+      <span style={{ fontSize: 19, fontWeight: 800, color: P.muted }}>&gt;</span>
+      <span style={{ fontSize: 19, fontWeight: 800, color: P.success }}>No throttling</span>
+    </div>
+  );
+};
+
 /** b1 — small product plate naming the real product, over the LiveBackdrop + effect. */
 const ProductPlate: React.FC = () => {
   const frame = useCurrentFrame();
@@ -356,6 +397,7 @@ const Inner: React.FC = () => {
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />
 
+      <StepTicker />
       <FlowMapFigure />
     </AbsoluteFill>
   );
