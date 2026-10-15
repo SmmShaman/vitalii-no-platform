@@ -18,14 +18,25 @@
 //             three plain facts from problem_en. Hero stays in the band, unchanged.
 // b3 336-488  "So his dad built the game on a real Hovorka model instead of a
 //             generic one."
-//             handoffExplain, drawn only (no backdrop — invisible plumbing, the
-//             model itself has no public page). Generic body → real Hovorka model.
-//             Hero flips to "08.10"/success here, in the band, with a small punch.
+//             handoffExplain, drawn only (no commit's message names "Hovorka
+//             model" by itself — the model build has no public page, so this
+//             stays invisible plumbing). Generic body → real Hovorka model,
+//             with explicit English fromLabel/toLabel ("BEFORE"/"NOW" — the
+//             catalog component's Norwegian defaults were a stray-looking "NÅ"
+//             tag a blind viewer flagged as a rendering bug). A BeatRail on the
+//             right restates the handoff's own points plus one gloss line
+//             ("Hovorka model = the published equation…") since the term is
+//             never defined anywhere else on screen. Hero flips to "08.10"/
+//             success here, in the band, with a small punch.
 // b4 488-661  "It's tuned to Artem's own insulin, his own weight, like a tutor who
 //             already read his chart."
-//             pipelineFlow, drawn only — the three real stages from solution_en.
-//             The clip's one tech caption ("Hovorka 2004 model") sits on this
-//             frame. Hero stays in the band, already flipped to success.
+//             CommitEvidence: the ONE commit whose message says this — 02ed872
+//             "realistic Artem's day and missions on a calibrated type 1 body"
+//             — a LiveWindow (shot "commit") zoomed 2.0-2.3x onto the day.js
+//             hunk, real code instead of an abstract pipeline diagram. One
+//             caption below names "Hovorka 2004 model" and glosses NovoRapid/
+//             Levemir inline, so no jargon is left undefined. Hero stays in
+//             the band, already flipped to success.
 // b5 661-873  "Now the glucose curves match sheet 08.10 — his own doctor's
 //             worksheet."
 //             Fully drawn: hero number goes BIG (fontSize 210, owns the frame) at
@@ -34,21 +45,24 @@
 //             feature page nor the hub appears in this beat.
 //
 // Persistent element: the hero number (archetype 7) — small in the lower-third
-// band (y >= 606) for b1-b4 where a catalog effect owns the stage above it, BIG
-// (fontSize 210, satisfies gate 1) only in b5, the one beat with no competing
-// catalog effect. Value never changes (08.10, the real worksheet from result_en);
-// only its tone/status flips once, at b3's first frame, from "not yet matched" to
-// "matched". Gate 2: b5 ends on a drawn result (LogWindow + hero), not a page.
+// band (y >= 606) for b1-b4 where a catalog effect/LiveWindow owns the stage
+// above it, BIG (fontSize 210, satisfies gate 1) only in b5, the one beat with
+// no competing visual. Value never changes (08.10, the real worksheet from
+// result_en); only its tone/status flips once, at b3's first frame, from "not
+// yet matched" to "matched". Gate 2: b5 ends on a drawn result (LogWindow +
+// hero), not a page.
 //
-// No GitHub URL was verified tonight for this product, so the model build (b3)
-// and the day-wrapper mechanism (b4) are drawn, not filmed — per STEP 0c,
-// invisible plumbing stays drawn.
+// Of this feature's three commits, only 02ed872 ("Artem's day" + missions on a
+// calibrated body) says what any beat says — it is shown in b4. The other two
+// (game-mode level map; an unrelated Android APK fix) match no sentence here
+// and are not shown. The model build itself (b3) has no commit whose message
+// names "Hovorka model" — it stays drawn, per STEP 0c, invisible plumbing.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { LogWindow } from "./live-primitives";
+import { LiveWindow, LogWindow } from "./live-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/d03.json";
@@ -180,27 +194,23 @@ const ProductPlate: React.FC = () => {
   );
 };
 
-/** b3+b4 — handoffExplain and pipelineFlow each build up over ~4.3-4.8s and stay
-    sparse through most of their own beat (points/result land late in the build),
-    so these two beats get a rail of the SAME real facts their catalog effect
-    already carries (handoffExplain's own points / pipelineFlow's own steps),
-    spread down the right side of the canvas and visible from the first half-
-    second — no backdrop exists for either beat to lean on instead. b1/b2/b5 are
-    untouched. */
+/** b3 — handoffExplain builds up over ~4.3s and stays sparse through most of
+    the beat (points land late in the build), so it gets a rail of the SAME
+    real facts the catalog effect already carries (handoffExplain's own
+    points), spread down the right side of the canvas and visible from the
+    first half-second — no backdrop exists for the beat to lean on instead.
+    A one-line gloss under the header names what "Hovorka model" is, since
+    the term is never explained anywhere else on screen. b4 now plays the
+    real commit instead (CommitEvidence, below); b1/b2/b5 are untouched. */
 const BeatRail: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
-  if (frame < B3 || frame >= B5) return null;
+  if (frame < B3 || frame >= B4) return null;
 
-  const inB3 = frame < B4;
-  const beatStart = inB3 ? B3 : B4;
-  const header = inB3 ? "WHY A REAL MODEL" : "WRAPPED INTO HIS DAY";
-  const items = inB3
-    ? ["Tuned to his own weight", "Per-kg insulin math", "Built by his dad"]
-    : ["Meal & Levemir reminders", "NovoRapid dose calculator", "4 real-day missions"];
-  const tops = [90, 265, 440];
-  const headerT = tween(sec(frame, beatStart + 2, fps), 0, 0.3, ease.power3Out);
+  const items = ["Tuned to his own weight", "Per-kg insulin math", "Built by his dad"];
+  const tops = [128, 300, 472];
+  const headerT = tween(sec(frame, B3 + 2, fps), 0, 0.3, ease.power3Out);
 
   return (
     <>
@@ -218,10 +228,25 @@ const BeatRail: React.FC = () => {
           fontFamily,
         }}
       >
-        {header}
+        WHY A REAL MODEL
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 760,
+          top: 78,
+          width: 460,
+          fontSize: 15,
+          fontWeight: 600,
+          color: "rgba(230,236,250,0.8)",
+          opacity: headerT,
+          fontFamily,
+        }}
+      >
+        Hovorka model = the published equation doctors use for insulin vs. glucose
       </div>
       {items.map((label, i) => {
-        const t = tween(sec(frame, beatStart + 4 + i * 4, fps), 0, 0.35, ease.power3Out);
+        const t = tween(sec(frame, B3 + 4 + i * 4, fps), 0, 0.35, ease.power3Out);
         return (
           <div
             key={label}
@@ -243,6 +268,69 @@ const BeatRail: React.FC = () => {
           </div>
         );
       })}
+    </>
+  );
+};
+
+/** b4 window above the hero band, clear of BAND (y 606-698). */
+const WIN_COMMIT = { x: 150, y: 90, w: 980, h: 460 };
+
+/** b4 — "tuned to Artem's own insulin, his own weight, like a tutor who already
+    read his chart": the ONE commit whose message says this ("realistic Artem's
+    day and missions on a calibrated type 1 body", 02ed872), zoomed onto the
+    day.js hunk — real evidence instead of an abstract pipeline diagram.
+    A single caption carries the tech name plus a gloss for NovoRapid/Levemir,
+    so the jargon is never left undefined. */
+const CommitEvidence: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  if (cut(frame, B4, B5) !== 1) return null;
+  const kickerT = tween(sec(frame, B4 + 2, fps), 0, 0.3, ease.power3Out);
+  const captionT = tween(sec(frame, B4 + 3, fps), 0, 0.35, ease.power3Out);
+  return (
+    <>
+      <div
+        style={{
+          position: "absolute",
+          left: WIN_COMMIT.x,
+          top: WIN_COMMIT.y - 36,
+          width: WIN_COMMIT.w,
+          fontSize: 14,
+          fontWeight: 800,
+          letterSpacing: 2,
+          color: "rgba(230,236,250,0.55)",
+          opacity: kickerT,
+          fontFamily,
+        }}
+      >
+        LIKE A TUTOR WHO ALREADY READ HIS CHART
+      </div>
+      <LiveWindow
+        file={shotsFile}
+        shot="commit"
+        title="github.com/SmmShaman/vitalii-no-platform/commit/02ed872"
+        from={B4}
+        hold={B5 - B4}
+        zoom={(t) => 2.0 + 0.3 * ease.sineInOut(t)}
+        focus={{ x: 0.5, y: 0.3 }}
+        opacity={1}
+        win={WIN_COMMIT}
+      />
+      <div
+        style={{
+          position: "absolute",
+          left: WIN_COMMIT.x,
+          top: WIN_COMMIT.y + WIN_COMMIT.h + 20,
+          width: WIN_COMMIT.w,
+          fontSize: 20,
+          fontWeight: 700,
+          color: "#E6ECFA",
+          opacity: captionT,
+          fontFamily,
+        }}
+      >
+        Hovorka 2004 model — real NovoRapid (fast insulin) + Levemir (long-acting) doses, not generic.
+      </div>
     </>
   );
 };
@@ -333,23 +421,14 @@ const Inner: React.FC = () => {
         data={{
           from: "Generic simulator body",
           to: "Real Hovorka model",
+          fromLabel: "BEFORE",
+          toLabel: "NOW",
           points: ["Tuned to his own weight", "Per-kg insulin math", "Built by his dad"],
         }}
       />
 
-      {/* b4 — how it's wrapped into Artem's real day, drawn only */}
-      <MotionInsert
-        effect="pipelineFlow"
-        from={B4}
-        dur={B5 - B4}
-        accent={ACCENT}
-        plate={0.78}
-        data={{
-          steps: ["Meal & Levemir reminders", "NovoRapid dose calculator", "4 real-day missions"],
-          result: "Scored against his real plan",
-          system: "Hovorka 2004 model (the math)",
-        }}
-      />
+      {/* b4 — how it's wrapped into Artem's real day: the real commit, not a diagram */}
+      <CommitEvidence />
 
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />

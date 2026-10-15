@@ -15,9 +15,16 @@
 //             (nothing shared yet — the stated deficit).
 // b2 195-411  "Meanwhile the nightly news digest already used real motion graphics
 //             — title cards, counters, callouts."
-//             cardCounter over the same continuous page recording — the REAL
-//             5-family breakdown of the digest's 23 motion effects (3+3+10+5+2),
-//             summing to the exact total used below. Ledger stays in the band,
+//             cardCounter, drawn only — the LiveBackdrop now ENDS at B2 (was
+//             running through B3), because the live page's own real "PROBLEM"
+//             section header was scrolling into view right as this beat
+//             started, bleeding through the scrim and reading as a leftover
+//             label during a beat that isn't about a problem. The REAL
+//             5-family breakdown of the digest's 23 motion effects (3+3+10+5+2)
+//             is unchanged, but 3 of the 5 chip labels now use the exact words
+//             the narration says (Title cards / Callouts / Counters) instead
+//             of the internal catalog family names (kinetic-type / evidence /
+//             cards) a viewer has no way to parse. Ledger stays in the band,
 //             unchanged.
 // b3 411-588  "So the same Remotion pipeline that builds the news digest now
 //             builds the feature clips too."
@@ -27,7 +34,9 @@
 // b4 588-790  "One shared grammar file plans a motion effect per voice beat — like
 //             handing the clips the news show's own editor."
 //             pipelineFlow, drawn only — the three real stages this very clip ran
-//             through to land on screen. Ledger stays in the band, already flipped.
+//             through to land on screen, worded in plain English (no raw
+//             component name) so "MotionInsert" isn't dropped on screen
+//             unexplained. Ledger stays in the band, already flipped.
 // b5 790-950  "One engineering build now powers two products instead of one."
 //             Fully drawn: the ledger goes BIG — the old 0/23 total struck through,
 //             rewritten 23/23 in green — plus a LogWindow (motion_usage) listing
@@ -42,12 +51,20 @@
 // reveal — the small band only ever shows the running total. Gate 2: b5 ends on
 // a drawn result (ledger + LogWindow), not a page.
 //
-// GitHub commits were verified tonight (5a7f8ac, 36fd038) but neither states
-// this clip's shared-pipeline claim directly — both are generic "tonight's
-// clips"/"narration measured" commits for other feature ids, not evidence that
-// would read as proof to a blind viewer. So b3's hub and b4's grammar file stay
-// drawn, per STEP 0c's "draw the mechanism" fallback when no commit proves the
-// sentence.
+// GitHub commits were verified tonight (5a7f8ac, 36fd038, 46f7255) but none
+// states this clip's shared-pipeline claim directly — all three are generic
+// "tonight's clips"/"narration measured" commits for OTHER feature ids (b69,
+// p73), not evidence that would read as proof to a blind viewer of THIS
+// feature's claim. So b3's hub and b4's grammar file stay drawn, per STEP 0c's
+// "draw the mechanism" fallback when no commit proves the sentence.
+//
+// WAVE D fix (blind-viewer round, clarity 6/10): the live page's own
+// "PROBLEM" section header was bleeding through the b2 scrim because
+// LiveBackdrop ran continuously from B1 through B3 — it now stops at B2.
+// b2's chip labels were renamed to the narration's own words (Title cards /
+// Callouts / Counters) instead of internal catalog family names. b4's
+// "MotionInsert renders it" item was reworded to plain English. shots/p76.json
+// was trimmed to match the shorter backdrop window.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -228,7 +245,7 @@ const BeatRail: React.FC = () => {
   const header = inB3 ? "ONE SHARED PIPELINE" : "ONE EFFECT PER BEAT";
   const items = inB3
     ? ["News digest script", "Feature clip script", "One render engine"]
-    : ["Voice beat measured", "Grammar picks an effect", "MotionInsert renders it"];
+    : ["Voice beat measured", "Grammar picks an effect", "The chosen effect renders"];
   const tops = [90, 265, 440];
   const headerT = tween(sec(frame, beatStart + 2, fps), 0, 0.3, ease.power3Out);
 
@@ -328,8 +345,11 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1+b2 — the flat-screen problem, then the digest's own effect catalog, over the feature's own page (continuous recording, no restart) */}
-      {cut(frame, B1, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B3 - B1} push={0.03} />}
+      {/* b1 — the flat-screen problem, over the feature's own page. Backdrop ends at B2
+          (was running through B3) — the live page's own "PROBLEM" section header was
+          scrolling into view right as b2 started, bleeding through the scrim during a
+          beat that isn't about a problem. b2 is drawn-only, like b3/b4. */}
+      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} push={0.03} />}
       <MotionInsert
         effect="keywordCaption"
         from={B1}
@@ -344,7 +364,11 @@ const Inner: React.FC = () => {
       />
       <ProductPlate />
 
-      {/* b2 — the digest's real 23-effect catalog, over the same continuous backdrop */}
+      {/* b2 — the digest's real 23-effect catalog, drawn only (no backdrop — see note above).
+          Labels use the narration's own words for 3 of the 5 real families: kinetic-type
+          (titleTakeover/keywordCaption/copyCorrection) = "Title cards", evidence
+          (quoteMarker/statusFocus/regionCallout) = "Callouts", cards (cardCounter/cornerTags)
+          = "Counters" — same real counts, just named the way the voice names them. */}
       <MotionInsert
         effect="cardCounter"
         from={B2}
@@ -353,11 +377,11 @@ const Inner: React.FC = () => {
         plate={0.78}
         data={{
           cards: [
-            { label: "Kinetic type", value: 3 },
-            { label: "Evidence", value: 3 },
-            { label: "Comparison", value: 10 },
+            { label: "Title cards", value: 3 },
+            { label: "Callouts", value: 3 },
+            { label: "Comparisons", value: 10 },
             { label: "Process", value: 5 },
-            { label: "Cards", value: 2 },
+            { label: "Counters", value: 2 },
           ],
           unit: "effects",
           totalLabel: "All effects",
@@ -386,7 +410,7 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         plate={0.78}
         data={{
-          steps: ["Voice beat measured", "Grammar picks an effect", "MotionInsert renders it"],
+          steps: ["Voice beat measured", "Grammar picks an effect", "The chosen effect renders"],
           result: "One effect per beat",
           system: "grammar.ts (shared)",
         }}
