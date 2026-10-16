@@ -79,9 +79,10 @@ const END = 950;
 const ACCENT = "#B4531F";
 const STAGE = "#1C140F";
 
-/** Lower-third band (1280x720, below the effects' safe bottom at y≈587) — the
-    ledger total's SMALL home while a catalog effect sits above it (b1-b4). */
-const BAND = { x: 40, y: 602, w: 480, h: 96 };
+/** Lower-third band (1280x720, below BeatRail's third box at y≈520) — the
+    ledger's full-width itemized strip (5 chips + total pill) while a catalog
+    effect sits above it (b1-b4); spans almost the whole canvas width. */
+const BAND = { x: 40, y: 555, w: 1200, h: 150 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
@@ -149,31 +150,52 @@ const LedgerFigure: React.FC = () => {
   }
 
   const flipPunch = flipped ? Math.max(0, punchScale(sec(frame, B3, fps), 0) - 1) : 0;
+  const items = [
+    { label: "Title cards", v: 3 },
+    { label: "Callouts", v: 3 },
+    { label: "Comparisons", v: 10 },
+    { label: "Process", v: 5 },
+    { label: "Counters", v: 2 },
+  ];
   return (
     <Arrive at={B1 + 4} kind="wipe" box={BAND} dur={0.4}>
-      <div
-        style={{
-          position: "absolute",
-          left: BAND.x,
-          top: BAND.y,
-          width: BAND.w,
-          height: BAND.h,
-          background: P.card,
-          borderRadius: 4,
-          boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
-          display: "flex",
-          alignItems: "center",
-          gap: 20,
-          padding: "0 22px",
-          fontFamily,
-        }}
-      >
-        <div style={{ fontSize: 38, fontWeight: 800, color, transform: `scale(${1 + flipPunch * 0.3})`, whiteSpace: "nowrap" }}>
-          {value}
+      <div style={{ position: "absolute", left: BAND.x, top: BAND.y, width: BAND.w, fontFamily }}>
+        <div style={{ display: "flex", gap: 18, marginBottom: 12 }}>
+          {items.map((it) => (
+            <div
+              key={it.label}
+              style={{
+                width: 224,
+                background: P.card,
+                borderRadius: 4,
+                border: `1.5px solid ${color}`,
+                padding: "10px 14px",
+                boxShadow: "4px 4px 0 rgba(0,0,0,0.35)",
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 800, color: P.muted, letterSpacing: 0.5 }}>{it.label}</div>
+              <div style={{ fontSize: 26, fontWeight: 800, color }}>{it.v}</div>
+            </div>
+          ))}
         </div>
-        <div>
-          <div style={{ fontSize: 12, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>EFFECTS SHARED</div>
-          <div style={{ fontSize: 15, fontWeight: 800, color }}>{status}</div>
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 16,
+            padding: "9px 20px",
+            borderRadius: 4,
+            background: bg,
+            border: `2px solid ${color}`,
+            boxShadow: "4px 4px 0 rgba(0,0,0,0.35)",
+            transform: `scale(${1 + flipPunch * 0.15})`,
+          }}
+        >
+          <div style={{ fontSize: 28, fontWeight: 800, color, whiteSpace: "nowrap" }}>{value}</div>
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.muted, letterSpacing: 1 }}>EFFECTS SHARED</div>
+            <div style={{ fontSize: 14, fontWeight: 800, color }}>{status}</div>
+          </div>
         </div>
       </div>
     </Arrive>
