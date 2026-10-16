@@ -1,0 +1,7 @@
+{
+  "id": "b67",
+  "file": "yt-feature-b67.mp4",
+  "title": "Grade Zero, Zero Chores: His Own PIN Still Opens the TV | vitalii.no",
+  "description": "My youngest, Myron, is grade 0 — he has no homework or chore tasks assigned in the app yet. But the TV gate logic checked every child against the same \"all tasks done\" rule, so a kid with zero tasks could never satisfy it and got locked out of plain TV right alongside the kids who actually had unfinished chores.\n\nI added a check that flags grade-0 children as exempt from the task requirement. On the worker side, the Cloudflare Worker behind the gate now computes which children are even part of the watch list, and short-circuits straight to an unlocked TV for the ones who aren't — while still respecting the master override, so a parent can lock down the whole house regardless of grade.\n\nMyron can now unlock plain TV with his own PIN the moment he asks, without the app silently expecting homework that doesn't exist yet, and the strict-mode override still works exactly as before.\n\n🔗 Full write-up: https://vitalii.no/features/a-child-with-no-daily-tasks-was-locked-out-of-the-tv-too-now-his-own-pin-opens-i-b67\n📚 All 345 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#automation #parentalcontrol #familytech #cloudflareworkers #screentime",
+  "tags": ["parental controls", "family tech", "cloudflare workers", "screen time", "youtube gate", "edge computing", "react", "typescript", "child accounts", "automation", "vitalii berbeha"]
+}

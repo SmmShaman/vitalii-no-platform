@@ -1,0 +1,57 @@
+{
+ "id": "b67",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.92,
+  "b2": 5.297,
+  "b3": 5.364,
+  "b4": 5.084,
+  "b5": 6.298
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My youngest hasn't started homework yet \u2014 the TV gate still treated him like he had chores to finish.",
+   "start_s": 0.5,
+   "end_s": 6.42,
+   "start_f": 15,
+   "end_f": 193
+  },
+  {
+   "beat": "b2",
+   "text": "The rule checked every child the same way: all tasks done, or no TV.",
+   "start_s": 6.72,
+   "end_s": 12.017,
+   "start_f": 202,
+   "end_f": 361
+  },
+  {
+   "beat": "b3",
+   "text": "In the Cloudflare Worker behind the gate, a child with zero tasks could never pass.",
+   "start_s": 12.317,
+   "end_s": 17.681,
+   "start_f": 370,
+   "end_f": 530
+  },
+  {
+   "beat": "b4",
+   "text": "Now kids with no tasks are exempt; a parent can still lock the house down.",
+   "start_s": 17.981,
+   "end_s": 23.065,
+   "start_f": 539,
+   "end_f": 692
+  },
+  {
+   "beat": "b5",
+   "text": "Myron now unlocks the TV himself, with his own PIN \u2014 no homework needed, even at grade zero.",
+   "start_s": 23.365,
+   "end_s": 29.663,
+   "start_f": 701,
+   "end_f": 890
+  }
+ ],
+ "total_s": 31.163,
+ "durationInFrames": 935,
+ "measured_track_s": 29.712,
+ "track": "/root/feature-demos/vo-b67/vo-b67.mp3"
+}

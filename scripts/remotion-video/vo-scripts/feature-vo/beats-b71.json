@@ -1,0 +1,7 @@
+{"id": "b71", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "On October 14th, YouTube ran for 80 straight minutes with zero chores finished that day."],
+ ["b2", "The gate used to default open whenever nobody had started their tasks — nobody had to earn it."],
+ ["b3", "Now it defaults locked, and a parent needs a real way in."],
+ ["b4", "They scan a QR code, sign in with their Google account, then confirm with WebAuthn — their phone's own fingerprint check."],
+ ["b5", "One scan now buys exactly 30 minutes of access."]
+]}

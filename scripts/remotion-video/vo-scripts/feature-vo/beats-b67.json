@@ -1,0 +1,7 @@
+{"id": "b67", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My youngest hasn't started homework yet — the TV gate still treated him like he had chores to finish."],
+ ["b2", "The rule checked every child the same way: all tasks done, or no TV."],
+ ["b3", "In the Cloudflare Worker behind the gate, a child with zero tasks could never pass."],
+ ["b4", "Now kids with no tasks are exempt; a parent can still lock the house down."],
+ ["b5", "Myron now unlocks the TV himself, with his own PIN — no homework needed, even at grade zero."]
+]}

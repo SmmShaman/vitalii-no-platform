@@ -1,0 +1,57 @@
+{
+ "id": "b71",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.819,
+  "b2": 5.678,
+  "b3": 3.955,
+  "b4": 7.741,
+  "b5": 3.557
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "On October 14th, YouTube ran for 80 straight minutes with zero chores finished that day.",
+   "start_s": 0.5,
+   "end_s": 6.319,
+   "start_f": 15,
+   "end_f": 190
+  },
+  {
+   "beat": "b2",
+   "text": "The gate used to default open whenever nobody had started their tasks \u2014 nobody had to earn it.",
+   "start_s": 6.619,
+   "end_s": 12.297,
+   "start_f": 199,
+   "end_f": 369
+  },
+  {
+   "beat": "b3",
+   "text": "Now it defaults locked, and a parent needs a real way in.",
+   "start_s": 12.597,
+   "end_s": 16.552,
+   "start_f": 378,
+   "end_f": 497
+  },
+  {
+   "beat": "b4",
+   "text": "They scan a QR code, sign in with their Google account, then confirm with WebAuthn \u2014 their phone's own fingerprint check.",
+   "start_s": 16.852,
+   "end_s": 24.593,
+   "start_f": 506,
+   "end_f": 738
+  },
+  {
+   "beat": "b5",
+   "text": "One scan now buys exactly 30 minutes of access.",
+   "start_s": 24.893,
+   "end_s": 28.45,
+   "start_f": 747,
+   "end_f": 854
+  }
+ ],
+ "total_s": 29.95,
+ "durationInFrames": 898,
+ "measured_track_s": 28.512,
+ "track": "/root/feature-demos/vo-b71/vo-b71.mp3"
+}
