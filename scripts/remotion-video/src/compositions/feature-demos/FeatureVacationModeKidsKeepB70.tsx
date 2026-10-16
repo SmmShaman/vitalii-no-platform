@@ -104,7 +104,7 @@ const TimelineRibbon: React.FC = () => {
         <div style={{ position: "absolute", left: RIBBON.x + 20, top: RIBBON.y + 16 }}>
           <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>BOYTASKS</div>
           <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.2 }}>
-            away mode · b70
+            "Vacation Mode"
           </div>
         </div>
         <div style={{ position: "absolute", left: SLOT0 - 20, top: LINE_Y - 1, width: RIBBON.w - PLATE_W - 4, height: 2, background: P.border }} />
@@ -169,10 +169,10 @@ const ResultStage: React.FC = () => {
         win={{ x: 140, y: 268, w: 1000, h: 280 }}
         fontSize={21}
         lines={[
-          { t: "settings", text: "away_mode:<child> → true", tone: "accent" },
+          { t: "Supabase", text: "away_mode:<child> → true — flagged away", tone: "accent" },
           { t: "TasksPage", text: "toggle read from any phone", tone: "muted" },
-          { t: "daily-cron", text: "next task queued (bonus_reserve)", tone: "muted" },
-          { t: "youtube-gate", text: "awayModeIds() excludes <child>", tone: "ink" },
+          { t: "daily-cron", text: "next task queued — no bonus owed", tone: "muted" },
+          { t: "youtube-gate", text: "skips his ID — awayModeIds()", tone: "ink" },
           { t: "activeIdSet()", text: "brothers only → YouTube stays on", tone: "success" },
           { t: "camera: home", text: "away_mode:<child> cleared", tone: "success" },
         ]}
@@ -201,6 +201,16 @@ const Inner: React.FC = () => {
     <AbsoluteFill style={{ background: STAGE }}>
       {/* b1 — the human problem, over the feature's own page */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
+      {cut(frame, B1, B2) === 1 && (
+        <Arrive at={B1 + 4} kind="wipe" box={{ x: 24, y: 86, w: 420, h: 60 }} dur={0.45}>
+          <div style={{ position: "absolute", left: 24, top: 90 }}>
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 2.2, color: ACCENT, fontFamily }}>BOYTASKS</div>
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#fff", marginTop: 2, fontFamily }}>
+              chores gate YouTube for 3 kids
+            </div>
+          </div>
+        </Arrive>
+      )}
       <MotionInsert
         effect="titleTakeover"
         from={B1}
@@ -235,7 +245,7 @@ const Inner: React.FC = () => {
         plate={0.7}
         data={{
           from: "Same rules for every child",
-          to: "away_mode:<child> flag",
+          to: "away_mode:<child> flag (Supabase)",
           fromLabel: "BEFORE",
           toLabel: "NOW",
           points: ["Toggled from any phone", "Gate skips the away child", "workers/youtube-gate/index.js"],
