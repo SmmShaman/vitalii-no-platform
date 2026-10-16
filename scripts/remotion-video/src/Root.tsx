@@ -251,6 +251,8 @@ import { FeatureRealHovorkaModelTurnsD03 } from "./compositions/feature-demos/Fe
 import { FeatureDemoClipsGetDigestsP76 } from "./compositions/feature-demos/FeatureDemoClipsGetDigestsP76";
 import { FeatureVacationModeKidsKeepB70 } from "./compositions/feature-demos/FeatureVacationModeKidsKeepB70";
 import { FeatureInsteadWaitingCameraKioskB68 } from "./compositions/feature-demos/FeatureInsteadWaitingCameraKioskB68";
+import { FeatureParentsPhoneUnlocksYoutubeB71 } from "./compositions/feature-demos/FeatureParentsPhoneUnlocksYoutubeB71";
+import { FeatureChildNoDailyTasksB67 } from "./compositions/feature-demos/FeatureChildNoDailyTasksB67";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2470,6 +2472,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureInsteadWaitingCameraKioskB68"
         component={FeatureInsteadWaitingCameraKioskB68}
         durationInFrames={872}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureParentsPhoneUnlocksYoutubeB71"
+        component={FeatureParentsPhoneUnlocksYoutubeB71}
+        durationInFrames={898}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureChildNoDailyTasksB67"
+        component={FeatureChildNoDailyTasksB67}
+        durationInFrames={935}
         fps={30}
         width={1280}
         height={720}

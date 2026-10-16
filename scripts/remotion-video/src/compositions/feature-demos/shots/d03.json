@@ -21,21 +21,6 @@
         [240, 600, 300],
         [320, 560, 320]
       ]
-    },
-    {
-      "name": "commit",
-      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/02ed872",
-      "frames": 150,
-      "scroll": [
-        [0, 0],
-        [60, 520],
-        [149, 860]
-      ],
-      "mouse": [
-        [0, 560, 160],
-        [60, 560, 260],
-        [149, 700, 300]
-      ]
     }
   ]
 }

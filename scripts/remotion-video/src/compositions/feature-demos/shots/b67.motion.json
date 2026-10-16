@@ -1,0 +1,51 @@
+{
+  "id": "b67",
+  "composition": "FeatureChildNoDailyTasksB67",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Gate still says: finish your chores",
+        "tags": ["0 tasks assigned", "Too young for homework", "Checked the same way", "Blocked anyway"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": {
+        "line1": "All tasks done,",
+        "line2": "or no TV.",
+        "keywords": ["all tasks done", "no TV"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "page3",
+      "data": {
+        "steps": ["Count tasks done", "Compare to tasks assigned", "0 of 0 — still blocked"],
+        "result": "Access denied",
+        "system": "Cloudflare Worker: youtube-gate"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Same rule for everyone",
+        "to": "0 tasks = exempt now",
+        "points": ["No tasks, no gate check", "Parent lock still works", "Myron unlocks with his PIN"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype element only: hero '0' flips to success and the label settles on the PIN unlock; result shown as a LogWindow built from the feature's own facts (Myron, grade zero, PIN, Cloudflare Worker)"
+    }
+  ]
+}

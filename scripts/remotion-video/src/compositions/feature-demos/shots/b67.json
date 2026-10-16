@@ -1,0 +1,35 @@
+{
+  "id": "b67",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/a-child-with-no-daily-tasks-was-locked-out-of-the-tv-too-now-his-own-pin-opens-i-b67",
+      "frames": 187,
+      "scroll": [[0, 0], [93, 110], [186, 240]],
+      "mouse": [[0, 540, 180], [93, 570, 210], [186, 560, 240]]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/a-child-with-no-daily-tasks-was-locked-out-of-the-tv-too-now-his-own-pin-opens-i-b67",
+      "frames": 168,
+      "scroll": [[0, 240], [83, 380], [167, 500]],
+      "mouse": [[0, 560, 240], [83, 590, 280], [167, 580, 300]]
+    },
+    {
+      "name": "page3",
+      "url": "https://vitalii.no/features/a-child-with-no-daily-tasks-was-locked-out-of-the-tv-too-now-his-own-pin-opens-i-b67",
+      "frames": 169,
+      "scroll": [[0, 500], [84, 620], [168, 720]],
+      "mouse": [[0, 580, 300], [168, 600, 320]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 162,
+      "scroll": [[0, 0], [80, 160], [161, 320]],
+      "mouse": [[0, 540, 200], [161, 560, 260]]
+    }
+  ]
+}

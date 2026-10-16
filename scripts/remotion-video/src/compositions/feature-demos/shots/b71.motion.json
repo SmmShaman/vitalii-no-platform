@@ -1,0 +1,55 @@
+{
+  "id": "b71",
+  "composition": "FeatureParentsPhoneUnlocksYoutubeB71",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "80 minutes, zero chores",
+        "kicker": "Oct 14 - the gate stayed open anyway"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "Tier 2 defaulted to OPEN",
+        "tags": [
+          "No tasks started",
+          "Nobody had to earn it",
+          "Default stayed open",
+          "Oct 14: 80 min free"
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "copyCorrection",
+      "backdrop": "page3",
+      "data": {
+        "wrong": "Tier 2 opens by default",
+        "right": "Tier 2 locks by default",
+        "label": "NOW"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Scan the kiosk QR", "Sign in with Google", "Confirm with WebAuthn"],
+        "result": "Tier 2 unlocks",
+        "system": "WebAuthn (phone's own fingerprint check)"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype element only: zoom strip settles on '30 min window'; result shown as a LogWindow built from problem/solution/result numbers"
+    }
+  ]
+}

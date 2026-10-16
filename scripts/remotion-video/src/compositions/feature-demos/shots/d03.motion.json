@@ -4,11 +4,12 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "titleTakeover",
+      "effect": "keywordCaption",
       "backdrop": "page",
       "data": {
-        "title": "A Game, Not a Textbook",
-        "kicker": "Artem's parents wanted a real lesson, not a generic one"
+        "line1": "A game,",
+        "line2": "not a textbook.",
+        "keywords": ["game", "textbook"]
       }
     },
     {
@@ -17,7 +18,7 @@
       "backdrop": "page",
       "data": {
         "statement": "Every simulator used a generic body",
-        "tags": ["Generic carb ratios", "Generic corrections", "Didn't match his body"]
+        "tags": ["Generic carb ratios", "Generic corrections", "Didn't match his real doses"]
       }
     },
     {
@@ -27,6 +28,8 @@
       "data": {
         "from": "Generic simulator body",
         "to": "Real Hovorka model",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
         "points": ["Tuned to his own weight", "Per-kg insulin math", "Built by his dad"]
       }
     },
@@ -35,15 +38,16 @@
       "effect": "pipelineFlow",
       "backdrop": null,
       "data": {
-        "steps": ["Meal & Levemir reminders", "NovoRapid dose calculator", "4 real-day missions"],
-        "result": "Scored against his real plan",
-        "system": "Hovorka 2004 model (the math)"
+        "steps": ["Calibrate to his weight", "Match NovoRapid + Levemir doses", "Run his real day"],
+        "result": "Tutor who already read the chart",
+        "system": "commit 02ed872 — \"realistic Artem's day and missions on a calibrated type 1 body\""
       }
     },
     {
       "beat": "b5",
       "effect": "drawn",
-      "note": "LogWindow (t1d-model.js) built from the feature's own facts + hero number 08.10 goes BIG as the final result; holds to END, no fade."
+      "backdrop": null,
+      "note": "archetype element only: split-duel lower third lands fully model-dominant on 'MATCH: SHEET 08.10'; result shown as a LogWindow built from the model's own facts (t1d-model.js, Hovorka, NovoRapid/Levemir, sheet 08.10)"
     }
   ]
 }
