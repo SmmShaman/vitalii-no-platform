@@ -1,0 +1,7 @@
+{"id": "b63", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A kid taps a button, waiting for the app to read it aloud — and nothing comes out."],
+ ["b2", "Every spoken line had been a separate pre-recorded clip; anything missing one just stayed silent."],
+ ["b3", "The app's wrapper had no way to generate speech on its own, the way a browser normally would."],
+ ["b4", "Now it borrows the phone's own text-to-speech voice whenever nothing was pre-recorded."],
+ ["b5", "Cached or not, every phrase gets read out loud now."]
+]}

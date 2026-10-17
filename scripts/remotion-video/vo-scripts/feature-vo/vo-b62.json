@@ -1,0 +1,57 @@
+{
+ "id": "b62",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.383,
+  "b2": 6.081,
+  "b3": 5.302,
+  "b4": 3.637,
+  "b5": 4.24
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One phone setting changes, and a kid's homework app just disappears.",
+   "start_s": 0.5,
+   "end_s": 4.883,
+   "start_f": 15,
+   "end_f": 146
+  },
+  {
+   "beat": "b2",
+   "text": "It wasn't broken \u2014 it had been living inside Chrome, as a wrapped web page, not a real program.",
+   "start_s": 5.183,
+   "end_s": 11.264,
+   "start_f": 155,
+   "end_f": 338
+  },
+  {
+   "beat": "b3",
+   "text": "When Chrome got suspended, the whole app vanished with it, for all three kids at once.",
+   "start_s": 11.564,
+   "end_s": 16.866,
+   "start_f": 347,
+   "end_f": 506
+  },
+  {
+   "beat": "b4",
+   "text": "Now it's a real native app, with no Chrome underneath it.",
+   "start_s": 17.166,
+   "end_s": 20.803,
+   "start_f": 515,
+   "end_f": 624
+  },
+  {
+   "beat": "b5",
+   "text": "The same suspension happens today, and all three kids keep going.",
+   "start_s": 21.103,
+   "end_s": 25.343,
+   "start_f": 633,
+   "end_f": 760
+  }
+ ],
+ "total_s": 26.843,
+ "durationInFrames": 805,
+ "measured_track_s": 25.392,
+ "track": "/root/feature-demos/vo-b62/vo-b62.mp3"
+}

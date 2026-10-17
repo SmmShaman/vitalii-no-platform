@@ -1,0 +1,57 @@
+{
+ "id": "b63",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.032,
+  "b2": 6.084,
+  "b3": 5.566,
+  "b4": 4.999,
+  "b5": 3.462
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A kid taps a button, waiting for the app to read it aloud \u2014 and nothing comes out.",
+   "start_s": 0.5,
+   "end_s": 5.532,
+   "start_f": 15,
+   "end_f": 166
+  },
+  {
+   "beat": "b2",
+   "text": "Every spoken line had been a separate pre-recorded clip; anything missing one just stayed silent.",
+   "start_s": 5.832,
+   "end_s": 11.916,
+   "start_f": 175,
+   "end_f": 357
+  },
+  {
+   "beat": "b3",
+   "text": "The app's wrapper had no way to generate speech on its own, the way a browser normally would.",
+   "start_s": 12.216,
+   "end_s": 17.782,
+   "start_f": 366,
+   "end_f": 533
+  },
+  {
+   "beat": "b4",
+   "text": "Now it borrows the phone's own text-to-speech voice whenever nothing was pre-recorded.",
+   "start_s": 18.082,
+   "end_s": 23.081,
+   "start_f": 542,
+   "end_f": 692
+  },
+  {
+   "beat": "b5",
+   "text": "Cached or not, every phrase gets read out loud now.",
+   "start_s": 23.381,
+   "end_s": 26.843,
+   "start_f": 701,
+   "end_f": 805
+  }
+ ],
+ "total_s": 28.343,
+ "durationInFrames": 850,
+ "measured_track_s": 26.904,
+ "track": "/root/feature-demos/vo-b63/vo-b63.mp3"
+}

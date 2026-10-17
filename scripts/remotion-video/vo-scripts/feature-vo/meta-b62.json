@@ -1,0 +1,7 @@
+{
+  "id": "b62",
+  "file": "yt-feature-b62.mp4",
+  "title": "Family Link Killed Chrome — So Boytasks Got Its Own App | vitalii.no",
+  "description": "Boytasks is a family task app, originally built as a Chrome-wrapped PWA. The moment Google's Family Link suspends Chrome on a kid's phone — which it does by design, as a parental control — the whole app disappears for every kid on the plan at once, even though nothing in Boytasks itself had changed.\n\nA separate native Android project now loads the Boytasks site directly inside its own WebView shell, with no dependency on the Chrome package at all. Signing in no longer needs a browser session either: a new PIN-login endpoint takes a 4-digit code, exchanges it for a magic-link token, and verifies it into a real session, with a matching PIN entry screen in the app.\n\nBefore this, a single Family Link policy change could take down homework access for all three kids at once. Now the native app keeps working straight through a Chrome suspension, because it never depended on Chrome in the first place.\n\n🔗 Full write-up: https://vitalii.no/features/family-link-killed-chrome-so-boytasks-got-its-own-app-b62\n📚 All 346 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#android #webview #familylink #parentalcontrols #nativeapp",
+  "tags": ["android development", "native app", "webview", "parental controls", "family link", "chrome webapk", "pin authentication", "gotrue", "mobile engineering", "java", "offline reliability", "vitalii berbeha"]
+}

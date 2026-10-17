@@ -1,0 +1,7 @@
+{
+  "id": "b63",
+  "file": "yt-feature-b63.mp4",
+  "title": "No Recording? The App Now Speaks It Anyway | vitalii.no",
+  "description": "Boytasks runs inside a plain WebView wrapper, not a real browser, so it has none of a browser's built-in speech features. Any sentence that didn't already have a pre-recorded audio clip cached for it just played nothing at all — confusing for a kid who taps a button expecting the app to read it out loud.\n\nAndroid's native text-to-speech engine is now bridged into the app through a small polyfill, nativeTts.ts, that recreates the same speechSynthesis interface the web pages already call, except it routes to the Android bridge instead of a browser API that was never there. WebView debugging was also enabled so the page's actual behavior can be inspected live while testing.\n\nBefore, a phrase without a cached recording was simply silence. Now every phrase gets spoken, cached or not, because the app always has the phone's own text-to-speech voice to fall back on.\n\n🔗 Full write-up: https://vitalii.no/features/no-recording-the-app-now-speaks-it-anyway-b63\n📚 All 346 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#texttospeech #android #webview #typescript #accessibility",
+  "tags": ["text to speech", "android tts", "webview", "accessibility", "mobile engineering", "typescript", "native bridge", "speech synthesis", "kids app", "offline fallback", "java", "vitalii berbeha"]
+}
