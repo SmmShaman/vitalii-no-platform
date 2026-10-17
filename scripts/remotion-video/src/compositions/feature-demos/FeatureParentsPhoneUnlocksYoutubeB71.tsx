@@ -132,8 +132,72 @@ const ZoomStrip: React.FC = () => {
   );
 };
 
+/** First beat only: names the product in one plain line, per the viewer test. */
+const ProductPlate: React.FC = () => {
+  const frame = useCurrentFrame();
+  if (cut(frame, B1, B2) !== 1) return null;
+  return (
+    <Arrive at={B1 + 2} kind="rise" box={{ x: 40, y: 40, w: 600, h: 60 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 40,
+          top: 40,
+          padding: "12px 20px",
+          borderRadius: 6,
+          background: "rgba(8,8,8,0.72)",
+          border: `1.5px solid ${ACCENT}`,
+          fontSize: 20,
+          fontWeight: 700,
+          color: "#E8FBFF",
+          fontFamily,
+        }}
+      >
+        Boytasks — screen-time &amp; task gate
+      </div>
+    </Arrive>
+  );
+};
+
+/** A small checkerboard glyph that reads as "a QR code" without claiming to be a real one. */
+const QrGlyph: React.FC = () => {
+  const cells = [
+    1, 1, 1, 0, 1, 1, 1,
+    1, 0, 1, 0, 1, 0, 1,
+    1, 0, 1, 1, 1, 0, 1,
+    1, 0, 0, 0, 0, 0, 1,
+    1, 1, 1, 0, 1, 1, 1,
+    0, 0, 1, 1, 0, 1, 0,
+    1, 0, 1, 0, 1, 1, 0,
+  ];
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(7, 1fr)",
+        width: 64,
+        height: 64,
+        background: "#fff",
+        borderRadius: 4,
+        padding: 4,
+        boxSizing: "border-box",
+        flexShrink: 0,
+      }}
+    >
+      {cells.map((c, i) => (
+        <div key={i} style={{ background: c ? "#0a0a0a" : "transparent" }} />
+      ))}
+    </div>
+  );
+};
+
 /** b4 — top caption for the drawn-only mechanism beat (no public page for a phone flow). */
-const DrawnCaption: React.FC<{ text: string; from: number; dur: number }> = ({ text, from, dur }) => {
+const DrawnCaption: React.FC<{ text: string; from: number; dur: number; icon?: boolean }> = ({
+  text,
+  from,
+  dur,
+  icon,
+}) => {
   const frame = useCurrentFrame();
   if (cut(frame, from, from + dur) !== 1) return null;
   return (
@@ -144,19 +208,18 @@ const DrawnCaption: React.FC<{ text: string; from: number; dur: number }> = ({ t
           left: 40,
           top: 56,
           width: 1200,
+          display: "flex",
+          alignItems: "center",
+          gap: 20,
           padding: "20px 32px",
           background: "rgba(10,16,20,0.85)",
           border: `2px solid ${ACCENT}`,
           borderRadius: 6,
-          fontSize: 34,
-          fontWeight: 800,
-          letterSpacing: 0.4,
-          color: "#E8FBFF",
-          fontFamily,
           boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
         }}
       >
-        {text}
+        {icon && <QrGlyph />}
+        <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: 0.4, color: "#E8FBFF", fontFamily }}>{text}</div>
       </div>
     </Arrive>
   );
@@ -204,8 +267,10 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
+        plate={0.85}
         data={{ title: "80 minutes, zero chores", kicker: "Oct 14 — the gate stayed open anyway" }}
       />
+      <ProductPlate />
 
       {/* b2 — why: tier 2 defaulted open, nobody had to earn it */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
@@ -216,7 +281,7 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         plate={0.7}
         data={{
-          statement: "Tier 2 defaulted to OPEN",
+          statement: "Tier 2 (YouTube access) defaulted to OPEN",
           tags: ["No tasks started", "Nobody had to earn it", "Default stayed open", "Oct 14: 80 min free"],
         }}
       />
@@ -243,15 +308,15 @@ const Inner: React.FC = () => {
         data={{
           steps: ["Scan the kiosk QR", "Sign in with Google", "Confirm with WebAuthn"],
           result: "Tier 2 unlocks",
-          system: "WebAuthn (phone's own fingerprint check)",
+          system: "WebAuthn passkey",
         }}
       />
-      <DrawnCaption text="QR SCAN → GOOGLE SIGN-IN → WEBAUTHN — NO SHARED PASSWORD" from={B4} dur={B5 - B4} />
+      <DrawnCaption text="QR SCAN → GOOGLE SIGN-IN → WEBAUTHN — NO SHARED PASSWORD" from={B4} dur={B5 - B4} icon />
 
       {/* b5 — the result: 30 minutes of access, shown running and as the hero number */}
       {frame >= B5 && (
         <LogWindow
-          title="youtube-gate worker"
+          title="Cloudflare Worker: youtube-gate"
           from={B5}
           every={16}
           opacity={1}
@@ -262,9 +327,9 @@ const Inner: React.FC = () => {
             { t: "OCT14", text: "80 min free, 0 tasks done", tone: "danger" },
             { t: "FIX", text: "default flips to LOCKED", tone: "muted" },
             { t: "SCAN", text: "parent scans kiosk QR code", tone: "muted" },
-            { t: "AUTH", text: "Google sign-in matches parent_emails", tone: "muted" },
+            { t: "AUTH", text: "Google sign-in matches a parent", tone: "muted" },
             { t: "PASSKEY", text: "WebAuthn: phone fingerprint OK", tone: "success" },
-            { t: "GRANT", text: "qr_pass set, tier2 unlocked", tone: "success" },
+            { t: "GRANT", text: "parent pass opens tier 2", tone: "success" },
             { t: "WINDOW", text: "30 min, countdown on the TV", tone: "success" },
           ]}
         />
