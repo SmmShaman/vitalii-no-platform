@@ -210,8 +210,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        base={STAGE}
-        plate={0.7}
+        plate={0.55}
         data={{
           steps: ["Count tasks done", "Compare to tasks assigned", "0 of 0 — still blocked"],
           result: "Access denied",
@@ -231,6 +230,8 @@ const Inner: React.FC = () => {
         data={{
           from: "Same rule for everyone",
           to: "0 tasks = exempt now",
+          fromLabel: "BEFORE",
+          toLabel: "NOW",
           points: ["No tasks, no gate check", "Parent lock still works", "Myron unlocks with his PIN"],
         }}
       />

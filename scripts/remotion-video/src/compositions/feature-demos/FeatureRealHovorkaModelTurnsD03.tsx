@@ -58,8 +58,9 @@ const END = 873;
 const ACCENT = "#8B7CF6";
 const STAGE = "#10151D";
 
-// Lower third geometry — same band as d04's split-duel reference (y>=606, safe-bottom clear above).
-const LT = { x: 40, y: 606, w: 1200, h: 92 };
+// Lower third geometry — enlarged from the 92px reference band so the duel reads as the
+// biggest thing on screen (contact-sheet QA, 2026-10-16: the thin band under-filled every beat).
+const LT = { x: 40, y: 538, w: 1200, h: 160 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
@@ -94,10 +95,10 @@ const LowerThird: React.FC = () => {
             boxSizing: "border-box",
           }}
         >
-          <div style={{ position: "absolute", left: 16, top: 10, fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.danger, whiteSpace: "nowrap" }}>
+          <div style={{ position: "absolute", left: 20, top: 18, fontSize: 15, fontWeight: 800, letterSpacing: 1.6, color: P.danger, whiteSpace: "nowrap" }}>
             👤 GENERIC BODY
           </div>
-          <div style={{ position: "absolute", left: 16, top: 36, fontSize: 14, fontWeight: 700, color: P.ink, whiteSpace: "nowrap" }}>{genericLine}</div>
+          <div style={{ position: "absolute", left: 20, top: 56, fontSize: 22, fontWeight: 700, color: P.ink, whiteSpace: "nowrap" }}>{genericLine}</div>
         </div>
         <div
           style={{
@@ -113,10 +114,10 @@ const LowerThird: React.FC = () => {
             boxSizing: "border-box",
           }}
         >
-          <div style={{ position: "absolute", left: 16, top: 10, fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.success, whiteSpace: "nowrap" }}>
+          <div style={{ position: "absolute", left: 20, top: 18, fontSize: 15, fontWeight: 800, letterSpacing: 1.6, color: P.success, whiteSpace: "nowrap" }}>
             🩺 HOVORKA MODEL
           </div>
-          <div style={{ position: "absolute", left: 16, top: 36, fontSize: 14, fontWeight: 700, color: P.ink, whiteSpace: "nowrap" }}>{modelLine}</div>
+          <div style={{ position: "absolute", left: 20, top: 56, fontSize: 22, fontWeight: 700, color: P.ink, whiteSpace: "nowrap" }}>{modelLine}</div>
         </div>
         <div style={{ position: "absolute", left: dividerX - 2, top: LT.y, width: 4, height: LT.h, background: P.ink }} />
       </Arrive>
@@ -156,6 +157,36 @@ const LOG_LINES: Array<{ text: string; tone?: "ink" | "muted" | "danger" | "succ
   { text: "glucose curve checked vs sheet 08.10", tone: "success" },
   { text: "match: his own doctor's worksheet", tone: "success" },
 ];
+
+/** b3+b4 — top caption for the fully-drawn beats (no public page to show as evidence). */
+const DrawnCaption: React.FC<{ text: string; from: number; dur: number }> = ({ text, from, dur }) => {
+  const frame = useCurrentFrame();
+  if (cut(frame, from, from + dur) !== 1) return null;
+  return (
+    <Arrive at={from + 6} kind="rise" box={{ x: 40, y: 56, w: 1200, h: 90 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 40,
+          top: 56,
+          width: 1200,
+          padding: "20px 32px",
+          background: "rgba(10,14,22,0.85)",
+          border: `2px solid ${ACCENT}`,
+          borderRadius: 6,
+          fontSize: 34,
+          fontWeight: 800,
+          letterSpacing: 0.4,
+          color: "#EDE9FE",
+          fontFamily,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+        }}
+      >
+        {text}
+      </div>
+    </Arrive>
+  );
+};
 
 const ClosingBeat: React.FC = () => {
   const frame = useCurrentFrame();
@@ -215,8 +246,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        base={STAGE}
-        plate={0.78}
+        plate={0.5}
         data={{
           statement: "Every simulator used a generic body",
           tags: ["Generic carb ratios", "Generic corrections", "Didn't match his real doses"],
@@ -239,6 +269,7 @@ const Inner: React.FC = () => {
           points: ["Tuned to his own weight", "Per-kg insulin math", "Built by his dad"],
         }}
       />
+      <DrawnCaption text="THE FIX: A REAL HOVORKA MODEL, NOT A GENERIC ONE" from={B3} dur={B4 - B3} />
 
       {/* b4 — tuned to Artem's own insulin and weight: the one matching commit, quoted as text, never a live diff */}
       <MotionInsert
@@ -254,6 +285,7 @@ const Inner: React.FC = () => {
           system: 'commit 02ed872 — "realistic Artem\'s day and missions on a calibrated type 1 body"',
         }}
       />
+      <DrawnCaption text="TUNED TO ARTEM'S OWN WEIGHT + INSULIN" from={B4} dur={B5 - B4} />
 
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />

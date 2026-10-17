@@ -132,6 +132,36 @@ const ZoomStrip: React.FC = () => {
   );
 };
 
+/** b4 — top caption for the drawn-only mechanism beat (no public page for a phone flow). */
+const DrawnCaption: React.FC<{ text: string; from: number; dur: number }> = ({ text, from, dur }) => {
+  const frame = useCurrentFrame();
+  if (cut(frame, from, from + dur) !== 1) return null;
+  return (
+    <Arrive at={from + 6} kind="rise" box={{ x: 40, y: 56, w: 1200, h: 90 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 40,
+          top: 56,
+          width: 1200,
+          padding: "20px 32px",
+          background: "rgba(10,16,20,0.85)",
+          border: `2px solid ${ACCENT}`,
+          borderRadius: 6,
+          fontSize: 34,
+          fontWeight: 800,
+          letterSpacing: 0.4,
+          color: "#E8FBFF",
+          fontFamily,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+        }}
+      >
+        {text}
+      </div>
+    </Arrive>
+  );
+};
+
 /** The hero number for the result beat — arrives with a punch, holds to the end. */
 const ResultStamp: React.FC = () => {
   const frame = useCurrentFrame();
@@ -216,6 +246,7 @@ const Inner: React.FC = () => {
           system: "WebAuthn (phone's own fingerprint check)",
         }}
       />
+      <DrawnCaption text="QR SCAN → GOOGLE SIGN-IN → WEBAUTHN — NO SHARED PASSWORD" from={B4} dur={B5 - B4} />
 
       {/* b5 — the result: 30 minutes of access, shown running and as the hero number */}
       {frame >= B5 && (
