@@ -1,0 +1,21 @@
+{
+  "id": "b63",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/no-recording-the-app-now-speaks-it-anyway-b63",
+      "frames": 160,
+      "scroll": [[0, 0], [80, 320], [159, 600]],
+      "mouse": [[0, 560, 220], [80, 560, 260], [159, 560, 300]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 150,
+      "scroll": [[0, 0], [75, 700], [149, 1400]],
+      "mouse": [[0, 300, 200], [75, 650, 260], [149, 550, 220]]
+    }
+  ]
+}

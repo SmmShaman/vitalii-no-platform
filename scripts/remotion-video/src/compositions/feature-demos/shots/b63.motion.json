@@ -1,0 +1,48 @@
+{
+  "id": "b63",
+  "composition": "FeatureNoRecordingAppSpeaksB63",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "drawn",
+      "backdrop": "page",
+      "note": "archetype element only: the card-deck pile dominates the frame; a kid's tap lands on a phrase that isn't in the pile and gets a mute glyph back."
+    },
+    {
+      "beat": "b2",
+      "effect": "funnelAbsorption",
+      "backdrop": "hub",
+      "data": {
+        "inputs": ["Good morning!", "Chore done!", "3-day streak!", "New task added"],
+        "result": "No recorded clip -> silence"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "drawn",
+      "backdrop": "page",
+      "note": "archetype element only: a browser box (has its own voice) vs this app's WebView wrapper (no voice built in) schematic fills the upper frame; the docked deck continues unchanged below."
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "No built-in voice",
+        "to": "Phone's own voice engine",
+        "points": ["Uses the phone's own voice", "Covers every missing clip"],
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": {
+        "title": "Every phrase speaks now",
+        "kicker": "Cached or not"
+      }
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "id": "b62",
+  "composition": "FeatureFamilyLinkKilledChromeB62",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "drawn",
+      "backdrop": "page",
+      "note": "archetype element only: wide view of a phone home screen (Family Link control icon, Boytasks icon, filler icons); product name plate names Boytasks."
+    },
+    {
+      "beat": "b2",
+      "effect": "copyCorrection",
+      "backdrop": "hub",
+      "data": {
+        "wrong": "The app just broke",
+        "right": "It was a web page wrapped in Chrome",
+        "label": "ACTUALLY"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "funnelAbsorption",
+      "backdrop": "page",
+      "data": {
+        "inputs": ["Kid 1's Boytasks", "Kid 2's Boytasks", "Kid 3's Boytasks"],
+        "result": "Chrome suspended -> every kid's app gone"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Web page inside Chrome",
+        "to": "Real native Android app",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["No Chrome dependency", "Works through any suspension"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype element only: camera zooms tight onto the native Boytasks icon filling most of the frame, with all three kid-status dots green/online beneath it -- the result, holding to the final frame."
+    }
+  ]
+}

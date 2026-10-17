@@ -1,0 +1,52 @@
+{
+  "id": "b61",
+  "composition": "FeatureRealSettingsScreenBuiltB61",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "drawn",
+      "backdrop": "page",
+      "note": "archetype element only: the timeline ribbon lands its first stamp (SYMPTOM) as a phone's incoming call rings silently and a notification bubble never fully arrives; product name plate names bir."
+    },
+    {
+      "beat": "b2",
+      "effect": "copyCorrection",
+      "backdrop": "hub",
+      "data": {
+        "wrong": "The app is broken",
+        "right": "Android quietly denied camera, mic or full-screen call permission",
+        "label": "ACTUALLY"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "No single place to check",
+        "tags": ["Camera permission?", "Mic permission?", "Full-screen calls?", "Which build?"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "No visibility anywhere",
+        "to": "One settings screen",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Every permission listed", "Build hash included", "Tap straight to the fix"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": {
+        "title": "One screen, not guesswork",
+        "kicker": "Every permission plus the build hash"
+      }
+    }
+  ]
+}

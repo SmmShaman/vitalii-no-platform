@@ -253,6 +253,9 @@ import { FeatureVacationModeKidsKeepB70 } from "./compositions/feature-demos/Fea
 import { FeatureInsteadWaitingCameraKioskB68 } from "./compositions/feature-demos/FeatureInsteadWaitingCameraKioskB68";
 import { FeatureParentsPhoneUnlocksYoutubeB71 } from "./compositions/feature-demos/FeatureParentsPhoneUnlocksYoutubeB71";
 import { FeatureChildNoDailyTasksB67 } from "./compositions/feature-demos/FeatureChildNoDailyTasksB67";
+import { FeatureNoRecordingAppSpeaksB63 } from "./compositions/feature-demos/FeatureNoRecordingAppSpeaksB63";
+import { FeatureFamilyLinkKilledChromeB62 } from "./compositions/feature-demos/FeatureFamilyLinkKilledChromeB62";
+import { FeatureRealSettingsScreenBuiltB61 } from "./compositions/feature-demos/FeatureRealSettingsScreenBuiltB61";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2490,6 +2493,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureChildNoDailyTasksB67"
         component={FeatureChildNoDailyTasksB67}
         durationInFrames={935}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNoRecordingAppSpeaksB63"
+        component={FeatureNoRecordingAppSpeaksB63}
+        durationInFrames={850}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFamilyLinkKilledChromeB62"
+        component={FeatureFamilyLinkKilledChromeB62}
+        durationInFrames={805}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureRealSettingsScreenBuiltB61"
+        component={FeatureRealSettingsScreenBuiltB61}
+        durationInFrames={938}
         fps={30}
         width={1280}
         height={720}
