@@ -1,0 +1,7 @@
+{"id": "b60", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "With the phone in your kid's pocket, getting a new app version onto it meant texting them to tap a link and hit install — and devices quietly sat outdated for weeks."],
+  ["b2", "Now the phone checks in every few minutes and installs the update by itself."],
+  ["b3", "It reports back the whole way — downloading, waiting on a permission, stuck, or done."],
+  ["b4", "One push over FCM starts it all, no link to click, no text to send."],
+  ["b5", "Now you can see all three kids' phones — updated, downloading, or stuck — at a glance."]
+]}

@@ -1,0 +1,57 @@
+{
+ "id": "m28",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.807,
+  "b2": 4.958,
+  "b3": 4.752,
+  "b4": 4.637,
+  "b5": 3.676
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "With the phone in your pocket, fabric pressure alone could pause the music or skip a track on its own.",
+   "start_s": 0.5,
+   "end_s": 6.307,
+   "start_f": 15,
+   "end_f": 189
+  },
+  {
+   "beat": "b2",
+   "text": "Now a lock screen catches every stray touch, like a child-lock on a car door.",
+   "start_s": 6.607,
+   "end_s": 11.565,
+   "start_f": 198,
+   "end_f": 347
+  },
+  {
+   "beat": "b3",
+   "text": "Only one deliberate move gets through: holding down the unlock pill.",
+   "start_s": 11.865,
+   "end_s": 16.617,
+   "start_f": 356,
+   "end_f": 499
+  },
+  {
+   "beat": "b4",
+   "text": "A few lines of JavaScript throw up a full-screen lock the instant you tap it.",
+   "start_s": 16.917,
+   "end_s": 21.554,
+   "start_f": 508,
+   "end_f": 647
+  },
+  {
+   "beat": "b5",
+   "text": "Hold the pill for one second, and the player wakes back up.",
+   "start_s": 21.854,
+   "end_s": 25.53,
+   "start_f": 656,
+   "end_f": 766
+  }
+ ],
+ "total_s": 27.03,
+ "durationInFrames": 811,
+ "measured_track_s": 25.584,
+ "track": "/root/feature-demos/vo-m28/vo-m28.mp3"
+}

@@ -1,0 +1,7 @@
+{"id": "b59", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Parents and kids could chat inside the app, but an actual call meant leaving for a different app entirely — and losing the history."],
+  ["b2", "Now calls ring and connect right inside the same app, voice or video."],
+  ["b3", "A WebRTC layer handles the ringing, signaling and handoff behind the scenes."],
+  ["b4", "Every call gets logged too, so the history that used to vanish now stays."],
+  ["b5", "And it survives a 30-second dead spot in the network without ever dropping."]
+]}

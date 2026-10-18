@@ -1,0 +1,57 @@
+{
+ "id": "b60",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 9.265,
+  "b2": 4.464,
+  "b3": 5.629,
+  "b4": 5.573,
+  "b5": 5.859
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "With the phone in your kid's pocket, getting a new app version onto it meant texting them to tap a link and hit install \u2014 and devices quietly sat outdated for weeks.",
+   "start_s": 0.5,
+   "end_s": 9.765,
+   "start_f": 15,
+   "end_f": 293
+  },
+  {
+   "beat": "b2",
+   "text": "Now the phone checks in every few minutes and installs the update by itself.",
+   "start_s": 10.065,
+   "end_s": 14.529,
+   "start_f": 302,
+   "end_f": 436
+  },
+  {
+   "beat": "b3",
+   "text": "It reports back the whole way \u2014 downloading, waiting on a permission, stuck, or done.",
+   "start_s": 14.829,
+   "end_s": 20.458,
+   "start_f": 445,
+   "end_f": 614
+  },
+  {
+   "beat": "b4",
+   "text": "One push over FCM starts it all, no link to click, no text to send.",
+   "start_s": 20.758,
+   "end_s": 26.331,
+   "start_f": 623,
+   "end_f": 790
+  },
+  {
+   "beat": "b5",
+   "text": "Now you can see all three kids' phones \u2014 updated, downloading, or stuck \u2014 at a glance.",
+   "start_s": 26.631,
+   "end_s": 32.49,
+   "start_f": 799,
+   "end_f": 975
+  }
+ ],
+ "total_s": 33.99,
+ "durationInFrames": 1020,
+ "measured_track_s": 32.544,
+ "track": "/root/feature-demos/vo-b60/vo-b60.mp3"
+}

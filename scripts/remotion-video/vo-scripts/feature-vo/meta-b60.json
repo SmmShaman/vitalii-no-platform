@@ -1,0 +1,7 @@
+{
+  "id": "b60",
+  "file": "yt-feature-b60.mp4",
+  "title": "Auto-Update That Installs Itself, No Chasing Required | vitalii.no",
+  "description": "Three kids' phones, one dashboard — no more texting anyone to tap install.\n\nPushing a new build to kids' phones meant chasing them to open a link and tap install. Devices would silently sit on old versions for weeks, with no way to tell who had actually updated and who hadn't.\n\nA new update pusher polls the current version every 5 minutes and notifies devices over FCM. The devices table gained four new columns — update_status, update_detail, update_at, update_pushed — fed by a dedicated API endpoint that accepts one of seven states, from no_permission through downloading to installed. On first run the app asks once for install permission, then reports progress at every step.\n\nParents can now see exactly which of three kids' devices are current, mid-download, or stuck waiting on a permission, instead of guessing from a version number nobody checks.\n\n🔗 Full write-up: https://vitalii.no/features/auto-update-that-actually-installs-itself-b60\n📚 All features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#automation #androiddev #fcm #parentalcontrol #devicemanagement",
+  "tags": ["auto update system", "android app updates", "fcm push notifications", "parental control app", "device management dashboard", "nodejs backend", "mobile device monitoring", "update status tracking", "kids phone monitoring", "background app updates", "vitalii berbeha"]
+}

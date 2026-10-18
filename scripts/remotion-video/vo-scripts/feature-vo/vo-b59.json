@@ -1,0 +1,57 @@
+{
+ "id": "b59",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.332,
+  "b2": 4.729,
+  "b3": 5.475,
+  "b4": 4.832,
+  "b5": 4.545
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Parents and kids could chat inside the app, but an actual call meant leaving for a different app entirely \u2014 and losing the history.",
+   "start_s": 0.5,
+   "end_s": 7.832,
+   "start_f": 15,
+   "end_f": 235
+  },
+  {
+   "beat": "b2",
+   "text": "Now calls ring and connect right inside the same app, voice or video.",
+   "start_s": 8.132,
+   "end_s": 12.861,
+   "start_f": 244,
+   "end_f": 386
+  },
+  {
+   "beat": "b3",
+   "text": "A WebRTC layer handles the ringing, signaling and handoff behind the scenes.",
+   "start_s": 13.161,
+   "end_s": 18.636,
+   "start_f": 395,
+   "end_f": 559
+  },
+  {
+   "beat": "b4",
+   "text": "Every call gets logged too, so the history that used to vanish now stays.",
+   "start_s": 18.936,
+   "end_s": 23.768,
+   "start_f": 568,
+   "end_f": 713
+  },
+  {
+   "beat": "b5",
+   "text": "And it survives a 30-second dead spot in the network without ever dropping.",
+   "start_s": 24.068,
+   "end_s": 28.613,
+   "start_f": 722,
+   "end_f": 858
+  }
+ ],
+ "total_s": 30.113,
+ "durationInFrames": 903,
+ "measured_track_s": 28.68,
+ "track": "/root/feature-demos/vo-b59/vo-b59.mp3"
+}
