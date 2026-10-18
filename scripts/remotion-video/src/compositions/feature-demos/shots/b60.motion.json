@@ -1,0 +1,52 @@
+{
+  "id": "b60",
+  "composition": "FeatureAutoUpdateActuallyInstallsB60",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "Out of date for weeks",
+        "kicker": "bir — pushing a new build to three kids' phones meant texting each one a link"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "handoffExplain",
+      "backdrop": "page2",
+      "data": {
+        "from": "Text a link, hope they tap install",
+        "to": "Phone checks in and updates itself",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Polls version.json every 5 min", "No text message needed", "server/src/routes/devices.js"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "cornerTags",
+      "backdrop": "page3",
+      "data": {
+        "statement": "Every phone reports back",
+        "tags": ["Downloading", "Waiting on permission", "Stuck", "Installed"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "page4",
+      "data": {
+        "steps": ["Version check every 5 min", "FCM push notification", "Auto install, no tap"],
+        "result": "No link, no text needed",
+        "system": "FCM (push notifications)"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype element only: dark stage, LogWindow of real update_status states, hero number 3 (three kids' phones at a glance)"
+    }
+  ]
+}

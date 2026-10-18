@@ -256,6 +256,9 @@ import { FeatureChildNoDailyTasksB67 } from "./compositions/feature-demos/Featur
 import { FeatureNoRecordingAppSpeaksB63 } from "./compositions/feature-demos/FeatureNoRecordingAppSpeaksB63";
 import { FeatureFamilyLinkKilledChromeB62 } from "./compositions/feature-demos/FeatureFamilyLinkKilledChromeB62";
 import { FeatureRealSettingsScreenBuiltB61 } from "./compositions/feature-demos/FeatureRealSettingsScreenBuiltB61";
+import { FeatureAutoUpdateActuallyInstallsB60 } from "./compositions/feature-demos/FeatureAutoUpdateActuallyInstallsB60";
+import { FeatureCallsRingThroughVoiceB59 } from "./compositions/feature-demos/FeatureCallsRingThroughVoiceB59";
+import { FeatureHoldPillSecondPlayerM28 } from "./compositions/feature-demos/FeatureHoldPillSecondPlayerM28";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2520,6 +2523,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureRealSettingsScreenBuiltB61"
         component={FeatureRealSettingsScreenBuiltB61}
         durationInFrames={938}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureAutoUpdateActuallyInstallsB60"
+        component={FeatureAutoUpdateActuallyInstallsB60}
+        durationInFrames={1020}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureCallsRingThroughVoiceB59"
+        component={FeatureCallsRingThroughVoiceB59}
+        durationInFrames={903}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureHoldPillSecondPlayerM28"
+        component={FeatureHoldPillSecondPlayerM28}
+        durationInFrames={811}
         fps={30}
         width={1280}
         height={720}

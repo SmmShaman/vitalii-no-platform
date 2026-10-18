@@ -1,0 +1,37 @@
+{
+  "id": "b59",
+  "composition": "FeatureCallsRingThroughVoiceB59",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "Calls leave the app", "kicker": "bir — chat stayed inside, but a real call meant a different app, and the history vanished" }
+    },
+    {
+      "beat": "b2",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": { "from": "Leave bir to make the call", "to": "Call rings right inside bir", "fromLabel": "BEFORE", "toLabel": "NOW",
+        "points": ["Voice or video", "No separate app", "History stays attached"] }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "page",
+      "data": { "steps": ["Ringing", "Signaling server", "WebRTC handoff"], "result": "Call connects without the user doing anything extra", "system": "WebRTC + coturn relay" }
+    },
+    {
+      "beat": "b4",
+      "effect": "funnelAbsorption",
+      "backdrop": "hub",
+      "data": { "inputs": ["Voice call", "Video call", "Missed call"], "result": "Every call logged — history stays" }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype element only: camera zooms tight on the call screen's connection badge, hero number 30 (seconds survived through a dead spot), holds to final frame"
+    }
+  ]
+}

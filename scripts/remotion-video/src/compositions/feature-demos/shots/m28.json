@@ -1,0 +1,11 @@
+{
+  "id": "m28",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    { "name": "page", "url": "https://vitalii.no/features/hold-the-pill-for-1-second-the-player-stops-pocket-dialing-itself-m28", "frames": 342,
+      "scroll": [[0, 0], [170, 250], [341, 500]], "mouse": [[0, 500, 200], [170, 520, 250], [341, 500, 300]] },
+    { "name": "hub", "url": "https://vitalii.no/features", "frames": 153,
+      "scroll": [[0, 0], [76, 600], [152, 1100]], "mouse": [[0, 300, 200], [76, 600, 240], [152, 500, 220]] }
+  ]
+}

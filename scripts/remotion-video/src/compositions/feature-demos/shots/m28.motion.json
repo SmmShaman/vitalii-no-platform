@@ -1,0 +1,37 @@
+{
+  "id": "m28",
+  "composition": "FeatureHoldPillSecondPlayerM28",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": { "line1": "Fabric pressure alone", "line2": "could skip your track", "keywords": ["fabric pressure"] }
+    },
+    {
+      "beat": "b2",
+      "effect": "funnelAbsorption",
+      "backdrop": "page",
+      "data": { "inputs": ["Fabric pressure", "Pocket brush", "Accidental taps"], "result": "Caught by the lock screen" }
+    },
+    {
+      "beat": "b3",
+      "effect": "drawn",
+      "backdrop": "hub",
+      "note": "archetype element: hero number flips BIG from 0 (danger) to 1 (success) here; a drawn hold-pill progress ring fills as the one deliberate gesture completes; dimmed hub behind for frame-fill"
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": { "from": "Tap anywhere unlocks it", "to": "Full-screen lock appears instantly", "fromLabel": "BEFORE", "toLabel": "NOW",
+        "points": ["A few lines of JavaScript", "No settings, no setup", "Works the instant you tap"] }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype element only: hero stays BIG at 1/success; LogWindow shows the feature's own before/now facts and real file names (worker/public/app.js, sw.js); holds at full brightness to the final frame (811), past the 766 end of the spoken line"
+    }
+  ]
+}
