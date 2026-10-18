@@ -155,10 +155,29 @@ const PhoneTight: React.FC = () => {
   const P = usePalette();
   if (frame < B5) return null;
 
-  const Icon = { x: 440, y: 76, w: 400, h: 400 };
+  const Icon = { x: 400, y: 50, w: 480, h: 480 };
+  const haloScale = punchScale(sec(frame, B5, fps), 0.08);
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      <div style={{ position: "absolute", left: 50, top: 24, fontSize: 13, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>
+        BOYTASKS · LIVE STATUS
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: 640 - 380,
+          top: 290 - 380,
+          width: 760,
+          height: 760,
+          borderRadius: 380,
+          background: P.successBg,
+          opacity: 0.35,
+          transform: `scale(${haloScale})`,
+        }}
+      />
+
       <Arrive at={B5} kind="punch" box={Icon} dur={0.5}>
         <div
           style={{
@@ -170,23 +189,23 @@ const PhoneTight: React.FC = () => {
             background: P.card,
             border: `5px solid ${P.successEdge}`,
             borderRadius: 48,
-            boxShadow: "12px 12px 0 rgba(0,0,0,0.4)",
+            boxShadow: "14px 14px 0 rgba(0,0,0,0.4)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
           }}
         >
-          <div style={{ fontSize: 140 }}>📋</div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: P.ink, marginTop: 10 }}>BOYTASKS</div>
+          <div style={{ fontSize: 160 }}>📋</div>
+          <div style={{ fontSize: 24, fontWeight: 800, color: P.ink, marginTop: 12 }}>BOYTASKS</div>
           <div
             style={{
-              marginTop: 10,
-              padding: "6px 14px",
+              marginTop: 12,
+              padding: "7px 16px",
               background: P.successBg,
               border: `2px solid ${P.successEdge}`,
               borderRadius: 999,
-              fontSize: 13,
+              fontSize: 14,
               fontWeight: 800,
               color: P.success,
               letterSpacing: 1.2,
@@ -199,7 +218,7 @@ const PhoneTight: React.FC = () => {
 
       {KIDS.map((kid, i) => {
         const at = B5 + 20 + i * 12;
-        const Card = { x: 110 + i * 360, y: 540, w: 300, h: 110 };
+        const Card = { x: 80 + i * 380, y: 570, w: 340, h: 120 };
         if (frame < at) return null;
         return (
           <Arrive key={kid} at={at} kind="rise" box={Card} dur={0.4}>
@@ -220,10 +239,10 @@ const PhoneTight: React.FC = () => {
                 justifyContent: "center",
               }}
             >
-              <div style={{ fontSize: 15, fontWeight: 800, color: P.ink }}>{kid}</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6 }}>
-                <div style={{ width: 12, height: 12, borderRadius: 6, background: P.success }} />
-                <div style={{ fontSize: 13, fontWeight: 700, color: P.success }}>ONLINE</div>
+              <div style={{ fontSize: 17, fontWeight: 800, color: P.ink }}>{kid}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                <div style={{ width: 13, height: 13, borderRadius: 7, background: P.success }} />
+                <div style={{ fontSize: 14, fontWeight: 700, color: P.success }}>ONLINE</div>
               </div>
             </div>
           </Arrive>
@@ -237,7 +256,7 @@ const PhoneTight: React.FC = () => {
 const StatusChip: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
-  if (frame < B1) return null;
+  if (frame < B1 || frame >= B5) return null;
   const state = chipStateAt(frame);
 
   return (
