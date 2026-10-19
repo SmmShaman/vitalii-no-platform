@@ -1,0 +1,57 @@
+{
+  "id": "g21",
+  "composition": "FeatureMuseumArchivesAlongRouteG21",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Real history, just out of reach",
+        "tags": ["Known places too far", "History unheard", "Kilometers of silence", "Every single pass"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "targetOverrun",
+      "backdrop": "hub",
+      "data": {
+        "label": "Known places, distance off the road",
+        "value": 600,
+        "target": 150,
+        "unit": "m"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Walk the drive track", "Check DigitaltMuseum", "Match finds near track"],
+        "result": "Real history surfaces",
+        "system": "DigitaltMuseum — museum archive"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "featureMatrix",
+      "backdrop": "logWindow",
+      "data": {
+        "options": ["Near a known place", "Nothing nearby"],
+        "rows": [
+          { "label": "Becomes", "values": ["Joins its story", "New stop"] },
+          { "label": "Named after", "values": ["the existing place", "the farm"] }
+        ]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": {
+        "title": "150 meters off the road",
+        "kicker": "History, no longer out of reach"
+      }
+    }
+  ]
+}

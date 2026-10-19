@@ -1,0 +1,21 @@
+{
+  "id": "g20",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/a-farm-500-meters-off-the-road-finally-gets-its-moment-g20",
+      "frames": 191,
+      "scroll": [[0, 0], [190, 660]],
+      "mouse": [[0, 540, 200], [60, 580, 260], [130, 500, 320], [190, 560, 280]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 200,
+      "scroll": [[0, 0], [199, 1800]],
+      "mouse": [[0, 260, 200], [70, 640, 260], [140, 420, 320], [199, 700, 220]]
+    }
+  ]
+}

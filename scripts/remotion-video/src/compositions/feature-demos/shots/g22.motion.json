@@ -1,0 +1,67 @@
+{
+  "id": "g22",
+  "composition": "FeatureEveryStorySaysHouseG22",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "The story starts talking.",
+        "line2": "Never says which house.",
+        "keywords": ["which house"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": null,
+      "data": {
+        "statement": "Digits, misread every time",
+        "tags": ["House numbers", "Years", "Counts", "Every voice line"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "No address spoken",
+        "to": "Real address, spoken first",
+        "points": [
+          "Looked up via Kartverket (Norway's address registry)",
+          "Spoken in Ukrainian",
+          "Spoken in Norwegian"
+        ]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "copyCorrection",
+      "backdrop": "logWindow",
+      "data": {
+        "wrong": "17 families lived here in 1942",
+        "right": "seventeen families lived here in nineteen forty-two",
+        "label": "spelled out, not digits"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["Walk the catalog", "Rewrite stray digits", "Re-voice touched chapters"],
+        "result": "Old stories now match new ones"
+      }
+    },
+    {
+      "beat": "b6",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": {
+        "title": "Zero digits left",
+        "kicker": "Every story. Every chapter."
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "id": "g22",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/every-story-now-says-the-house-number-out-loud-in-words-g22",
+      "frames": 150,
+      "scroll": [[0, 0], [149, 620]],
+      "mouse": [[0, 540, 200], [60, 560, 260], [110, 520, 320], [149, 560, 280]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 154,
+      "scroll": [[0, 0], [153, 1800]],
+      "mouse": [[0, 240, 180], [50, 640, 260], [100, 420, 320], [153, 700, 220]]
+    }
+  ]
+}
