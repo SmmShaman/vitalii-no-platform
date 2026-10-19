@@ -1,0 +1,7 @@
+{
+  "id": "g20",
+  "file": "yt-feature-g20.mp4",
+  "title": "250 to 550 Meters: The Farm the App Finally Notices | vitalii.no",
+  "description": "On long stretches of road the app said nothing at all, even though a known place sat nearby — just not close enough. Farms sitting 250 to 550 meters off the road fell outside the 120-meter trigger radius the drive service used, so real local history went unheard every single time the car passed.\n\nDriveService.java's geofence trigger, previously fixed at a 120-meter radius hugging the road, now also fires for off-road places as the car passes directly abeam them, independent of the usual roadside places and street or village sequence. The cue generator adds a new spoken line for these moments — direction and distance together — instead of treating a farm 500 meters away as if it sat right on the route. This is runner cue schema v5.\n\nFarms 250 to 550 meters off the road that were previously silent now get their own cue, naming the direction and distance as the car passes.\n\n🔗 Full write-up: https://vitalii.no/features/a-farm-500-meters-off-the-road-finally-gets-its-moment-g20\n📚 All 346 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#geofencing #drivingapp #localhistory #android #java #audionarration #locationaware #contentpipeline #navigation #vitaliiberbeha",
+  "tags": ["geofencing", "driving app", "location aware", "android", "java backend", "local history", "audio narration", "navigation", "content pipeline", "drive service", "vitalii berbeha"]
+}

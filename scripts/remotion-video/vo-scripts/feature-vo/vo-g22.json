@@ -1,0 +1,66 @@
+{
+ "id": "g22",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.689,
+  "b2": 4.137,
+  "b3": 6.512,
+  "b4": 4.31,
+  "b5": 4.819,
+  "b6": 4.125
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Driving at night, the story starts \u2014 but never says which house it's about.",
+   "start_s": 0.5,
+   "end_s": 5.189,
+   "start_f": 15,
+   "end_f": 156
+  },
+  {
+   "beat": "b2",
+   "text": "Numbers came out as digits, and the voice misread them every time.",
+   "start_s": 5.489,
+   "end_s": 9.626,
+   "start_f": 165,
+   "end_f": 289
+  },
+  {
+   "beat": "b3",
+   "text": "Now every story opens with its real address, pulled from Kartverket, spoken in Ukrainian and Norwegian.",
+   "start_s": 9.926,
+   "end_s": 16.438,
+   "start_f": 298,
+   "end_f": 493
+  },
+  {
+   "beat": "b4",
+   "text": "And every number inside is spelled out in words, not digits.",
+   "start_s": 16.738,
+   "end_s": 21.048,
+   "start_f": 502,
+   "end_f": 631
+  },
+  {
+   "beat": "b5",
+   "text": "Even the old stories are being rewritten the same way, one chapter at a time.",
+   "start_s": 21.348,
+   "end_s": 26.167,
+   "start_f": 640,
+   "end_f": 785
+  },
+  {
+   "beat": "b6",
+   "text": "The result: a catalog with zero digits left to mishear.",
+   "start_s": 26.467,
+   "end_s": 30.592,
+   "start_f": 794,
+   "end_f": 918
+  }
+ ],
+ "total_s": 32.092,
+ "durationInFrames": 963,
+ "measured_track_s": 30.648,
+ "track": "/root/feature-demos/vo-g22/vo-g22.mp3"
+}

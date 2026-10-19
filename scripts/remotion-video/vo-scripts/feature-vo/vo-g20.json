@@ -1,0 +1,57 @@
+{
+ "id": "g20",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.078,
+  "b2": 6.363,
+  "b3": 5.467,
+  "b4": 4.621,
+  "b5": 5.934
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Some farms sat just off the road \u2014 close enough to matter, too far for the app to ever mention them.",
+   "start_s": 0.5,
+   "end_s": 6.578,
+   "start_f": 15,
+   "end_f": 197
+  },
+  {
+   "beat": "b2",
+   "text": "The trigger only fired within 120 meters, so real local history got driven straight past.",
+   "start_s": 6.878,
+   "end_s": 13.241,
+   "start_f": 206,
+   "end_f": 397
+  },
+  {
+   "beat": "b3",
+   "text": "Now the geofence fires for places off the road too, not just the ones sitting right on it.",
+   "start_s": 13.541,
+   "end_s": 19.008,
+   "start_f": 406,
+   "end_f": 570
+  },
+  {
+   "beat": "b4",
+   "text": "A new voice line gives the direction and distance as the car passes abeam.",
+   "start_s": 19.308,
+   "end_s": 23.929,
+   "start_f": 579,
+   "end_f": 718
+  },
+  {
+   "beat": "b5",
+   "text": "The reach: 250 to 550 meters off the road \u2014 now, their moment.",
+   "start_s": 24.229,
+   "end_s": 30.163,
+   "start_f": 727,
+   "end_f": 905
+  }
+ ],
+ "total_s": 31.663,
+ "durationInFrames": 950,
+ "measured_track_s": 30.216,
+ "track": "/root/feature-demos/vo-g20/vo-g20.mp3"
+}

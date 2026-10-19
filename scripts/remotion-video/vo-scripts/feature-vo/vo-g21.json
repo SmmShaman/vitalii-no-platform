@@ -1,0 +1,57 @@
+{
+ "id": "g21",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.499,
+  "b2": 4.165,
+  "b3": 6.36,
+  "b4": 8.503,
+  "b5": 3.354
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Kilometers of road went by with nothing to say \u2014 real history sat just out of reach.",
+   "start_s": 0.5,
+   "end_s": 5.999,
+   "start_f": 15,
+   "end_f": 180
+  },
+  {
+   "beat": "b2",
+   "text": "The places the app already knew were too far off to ever surface it.",
+   "start_s": 6.299,
+   "end_s": 10.464,
+   "start_f": 189,
+   "end_f": 314
+  },
+  {
+   "beat": "b3",
+   "text": "Now it checks DigitaltMuseum's archive \u2014 old photographs, museum records \u2014 for anything near the track.",
+   "start_s": 10.764,
+   "end_s": 17.124,
+   "start_f": 323,
+   "end_f": 514
+  },
+  {
+   "beat": "b4",
+   "text": "A find near a known place joins its story. A find with nothing nearby becomes a brand-new stop, named after the farm it came from.",
+   "start_s": 17.424,
+   "end_s": 25.927,
+   "start_f": 523,
+   "end_f": 778
+  },
+  {
+   "beat": "b5",
+   "text": "The reach: 150 meters off the road.",
+   "start_s": 26.227,
+   "end_s": 29.581,
+   "start_f": 787,
+   "end_f": 887
+  }
+ ],
+ "total_s": 31.081,
+ "durationInFrames": 932,
+ "measured_track_s": 29.64,
+ "track": "/root/feature-demos/vo-g21/vo-g21.mp3"
+}
