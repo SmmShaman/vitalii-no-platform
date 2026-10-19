@@ -23,7 +23,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, IconCard, StatPill } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow } from "./live-primitives";
 import { punchScale } from "../../components/effects/motion/grammar";
@@ -152,6 +152,15 @@ const Inner: React.FC = () => {
           tags: ["House numbers", "Years", "Counts", "Every voice line"],
         }}
       />
+      {/* the corner tags leave the top strip and the gap above the card deck empty —
+          fill both with the beat's own statement and tag words, nothing new. */}
+      {frame >= B2 && frame < B3 && (
+        <>
+          <StatPill x={110} y={30} emoji="🔢" text="House numbers, Years, Counts" tone="accent" />
+          <StatPill x={700} y={30} emoji="📢" text="Digits, misread every time" tone="danger" />
+          <StatPill x={470} y={540} emoji="🗣" text="Every voice line" tone="accent" />
+        </>
+      )}
 
       {/* b3 — the fix: real address, two languages, before the flash begins */}
       <MotionInsert
@@ -169,6 +178,14 @@ const Inner: React.FC = () => {
           ],
         }}
       />
+      {/* the old/new handoff panel sits mid-frame, leaving the top band empty — fill it
+          with the two real facts the panel's own points already name. */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <IconCard x={90} y={70} w={300} emoji="🏠" title="Real address" sub="spoken first" tone="accent" />
+          <IconCard x={890} y={70} w={300} emoji="🌐" title="Kartverket" sub="address registry" tone="accent" />
+        </>
+      )}
 
       {/* b4 — every number spelled out; no runtime log exists, so the worker window
           shows real behaviour paraphrased from the feature's own description. */}
@@ -225,6 +242,14 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{ title: "Zero digits left", kicker: "Every story. Every chapter." }}
       />
+      {/* the headline sits vertically centered, leaving top and lower bands empty — flank it
+          with the real before/after (already named in b2/b4), not new figures. */}
+      {frame >= B6 && (
+        <>
+          <StatPill x={110} y={100} emoji="🔢" text="Before: digits in every chapter" tone="accent" opacity={0.75} />
+          <StatPill x={740} y={100} emoji="✅" text="After: zero digits left" tone="success" />
+        </>
+      )}
 
       <CardDeck />
     </AbsoluteFill>

@@ -25,7 +25,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, IconCard, StatPill } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow } from "./live-primitives";
 import { punchScale } from "../../components/effects/motion/grammar";
@@ -48,6 +48,11 @@ const DIAL_CX = LT.x + 56;
 const DIAL_CY = LT.y + LT.h / 2;
 const DIAL_R_MAX = 34;
 const DIAL_R_MIN = 14;
+// Coordinates used by elements nested INSIDE the card div (which is itself
+// absolutely positioned at LT.x/LT.y) must be relative to the card's own
+// origin, not the full-frame origin — otherwise LT.x/LT.y gets added twice.
+const REL_CX = DIAL_CX - LT.x;
+const REL_CY = DIAL_CY - LT.y;
 
 // LogWindow sits above the zoom-dial band so the two never overlap.
 const LOG_WIN = { x: 150, y: 150, w: 980, h: 430 };
@@ -68,12 +73,13 @@ const ZoomDial: React.FC = () => {
   const stampP = final ? punchScale(sec(frame, B5 + 40, fps), 0) : 0;
   const readout = final ? "150 m" : frame >= B2 ? `${Math.round(600 - (600 - 150) * zoomP)} m` : "600 m";
 
+  // x/top here are relative to the card div's own origin (see REL_CX/REL_CY above).
   const Marker: React.FC<{ x: number; lit: boolean }> = ({ x, lit }) => (
     <div
       style={{
         position: "absolute",
         left: x,
-        top: DIAL_CY - 5,
+        top: REL_CY - 5,
         width: 10,
         height: 10,
         borderRadius: 5,
@@ -102,8 +108,8 @@ const ZoomDial: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: DIAL_CX - DIAL_R_MAX - 10,
-              top: DIAL_CY - DIAL_R_MAX - 10,
+              left: REL_CX - DIAL_R_MAX - 10,
+              top: REL_CY - DIAL_R_MAX - 10,
               width: (DIAL_R_MAX + 10) * 2,
               height: (DIAL_R_MAX + 10) * 2,
             }}
@@ -124,8 +130,8 @@ const ZoomDial: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: DIAL_CX + DIAL_R_MAX + 24,
-              top: LT.y + 14,
+              left: REL_CX + DIAL_R_MAX + 24,
+              top: 14,
               fontSize: 13,
               fontWeight: 800,
               letterSpacing: 1.6,
@@ -137,8 +143,8 @@ const ZoomDial: React.FC = () => {
           <div
             style={{
               position: "absolute",
-              left: DIAL_CX + DIAL_R_MAX + 24,
-              top: LT.y + 34,
+              left: REL_CX + DIAL_R_MAX + 24,
+              top: 34,
               fontSize: 30,
               fontWeight: 800,
               color: final ? P.success : P.ink,
@@ -146,18 +152,18 @@ const ZoomDial: React.FC = () => {
           >
             {readout}
           </div>
-          <div style={{ position: "absolute", left: DIAL_CX + 220, top: LT.y + 16, fontSize: 11, fontWeight: 800, letterSpacing: 1.4, color: found ? P.success : P.muted }}>
+          <div style={{ position: "absolute", left: REL_CX + 220, top: 16, fontSize: 11, fontWeight: 800, letterSpacing: 1.4, color: found ? P.success : P.muted }}>
             ARCHIVE CHECK
           </div>
-          <Marker x={DIAL_CX + 220} lit={found} />
-          <div style={{ position: "absolute", left: DIAL_CX + 420, top: LT.y + 16, fontSize: 11, fontWeight: 800, letterSpacing: 1.4, color: split ? P.success : P.muted }}>
+          <Marker x={REL_CX + 220} lit={found} />
+          <div style={{ position: "absolute", left: REL_CX + 420, top: 16, fontSize: 11, fontWeight: 800, letterSpacing: 1.4, color: split ? P.success : P.muted }}>
             JOIN OR NEW STOP
           </div>
-          <Marker x={DIAL_CX + 420} lit={split} />
-          <div style={{ position: "absolute", left: DIAL_CX + 620, top: LT.y + 16, fontSize: 11, fontWeight: 800, letterSpacing: 1.4, color: final ? P.success : P.muted }}>
+          <Marker x={REL_CX + 420} lit={split} />
+          <div style={{ position: "absolute", left: REL_CX + 620, top: 16, fontSize: 11, fontWeight: 800, letterSpacing: 1.4, color: final ? P.success : P.muted }}>
             REACH CONFIRMED
           </div>
-          <Marker x={DIAL_CX + 620} lit={final} />
+          <Marker x={REL_CX + 620} lit={final} />
         </div>
       </Arrive>
       {final && (
@@ -233,6 +239,14 @@ const Inner: React.FC = () => {
           system: "DigitaltMuseum — museum archive",
         }}
       />
+      {/* the pipeline chain sits compacted mid-frame, leaving the top band empty — fill it with
+          the two real actors the chain's labels already name (the compaction has no prop for size). */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <IconCard x={90} y={70} w={300} emoji="📍" title="Known places" sub="already on the map" tone="accent" />
+          <IconCard x={890} y={70} w={300} emoji="🏛" title="DigitaltMuseum" sub="museum archive" tone="accent" />
+        </>
+      )}
 
       {/* b4 — join existing place or become a new stop; no runtime log exists, so the worker
           window shows real behaviour paraphrased from the feature's own description. */}
@@ -277,6 +291,14 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{ title: "150 meters off the road", kicker: "History, no longer out of reach" }}
       />
+      {/* the headline sits vertically centered, leaving top and lower bands empty — flank it with
+          the real before/after numbers (already used in b2) as labelled callouts, not new figures. */}
+      {frame >= B5 && (
+        <>
+          <StatPill x={110} y={100} emoji="📍" text="Old reach: 600 m" tone="accent" opacity={0.75} />
+          <StatPill x={760} y={100} emoji="✅" text="New reach: 150 m" tone="success" />
+        </>
+      )}
 
       <ZoomDial />
     </AbsoluteFill>
