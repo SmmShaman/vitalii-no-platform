@@ -69,7 +69,10 @@ const CallTight: React.FC = () => {
   const P = usePalette();
   if (frame < B5) return null;
 
-  const Badge = { x: 400, y: 70, w: 480, h: 440 };
+  const Badge = { x: 140, y: 90, w: 1000, h: 560 };
+  const haloCx = Badge.x + Badge.w / 2;
+  const haloCy = Badge.y + Badge.h / 2;
+  const haloR = 460;
   const haloScale = punchScale(sec(frame, B5, fps), 0.08);
   const at = B5 + 90;
   const sc = frame >= at ? punchScale(sec(frame, at, fps), 0) : 0;
@@ -83,11 +86,11 @@ const CallTight: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: 640 - 360,
-          top: 290 - 360,
-          width: 720,
-          height: 720,
-          borderRadius: 360,
+          left: haloCx - haloR,
+          top: haloCy - haloR,
+          width: haloR * 2,
+          height: haloR * 2,
+          borderRadius: haloR,
           background: P.successBg,
           opacity: 0.35,
           transform: `scale(${haloScale})`,
@@ -112,22 +115,25 @@ const CallTight: React.FC = () => {
             justifyContent: "center",
           }}
         >
-          <div style={{ fontSize: 120, transform: `scale(${sc || 1})`, color: P.success, fontWeight: 800, lineHeight: 1 }}>30</div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: P.muted, marginTop: 4 }}>seconds of dead network</div>
+          <div style={{ fontSize: 200, transform: `scale(${sc || 1})`, color: P.success, fontWeight: 800, lineHeight: 1 }}>30</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: P.muted, marginTop: 10 }}>seconds of dead network</div>
           <div
             style={{
-              marginTop: 16,
-              padding: "7px 16px",
+              marginTop: 24,
+              padding: "12px 28px",
               background: P.successBg,
               border: `2px solid ${P.successEdge}`,
               borderRadius: 999,
-              fontSize: 14,
+              fontSize: 20,
               fontWeight: 800,
               color: P.success,
               letterSpacing: 1.2,
             }}
           >
             CALL NEVER DROPPED
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: P.muted, marginTop: 20 }}>
+            bir · WebRTC + coturn relay — reconnects without ending the call
           </div>
         </div>
       </Arrive>
@@ -172,6 +178,70 @@ const CallBand: React.FC = () => {
       />
       <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: state.ok ? P.success : P.danger }}>
         {state.label}
+      </div>
+    </div>
+  );
+};
+
+/** b3: pipelineFlow's own chain compacts into the vertical middle of the frame,
+    leaving the top strip and the right-bottom corner empty — this fills both
+    with real facts from the feature's own mechanism (client state machine,
+    coturn relay) instead of enlarging the shared effect itself. */
+const MechanismFooter: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B3, B4) !== 1) return null;
+  const t = tween(sec(frame, B3 + 6, fps), 0, 0.35, ease.power3Out);
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 50,
+          top: 40,
+          opacity: t,
+          transform: `translateY(${(1 - t) * -12}px)`,
+          fontSize: 15,
+          fontWeight: 800,
+          letterSpacing: 2,
+          color: P.accent,
+        }}
+      >
+        BIR · CALL INFRASTRUCTURE — RINGING → SIGNALING → WEBRTC HANDOFF
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: 500,
+          top: 540,
+          width: 680,
+          padding: 24,
+          borderRadius: 10,
+          background: "rgba(7,20,15,0.88)",
+          border: `2px solid ${P.successEdge}`,
+          boxShadow: "8px 8px 0 rgba(0,0,0,0.4)",
+          opacity: t,
+          transform: `translateY(${(1 - t) * 20}px)`,
+          display: "flex",
+          flexDirection: "column",
+          gap: 14,
+        }}
+      >
+        <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: P.success, width: 180 }}>
+            CLIENT STATE MACHINE
+          </div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "#F5F5F2" }}>drives ringing, answering, hangup</div>
+        </div>
+        <div style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: P.success, width: 180 }}>
+            COTURN RELAY
+          </div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "#F5F5F2" }}>only kicks in if a direct P2P link fails</div>
+        </div>
       </div>
     </div>
   );
@@ -228,6 +298,7 @@ const Inner: React.FC = () => {
           system: "WebRTC + coturn relay",
         }}
       />
+      <MechanismFooter />
 
       {/* b4 — every call kind funnels into one kept history, over the hub */}
       {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} focus={{ x: 0.5, y: 0.25 }} />}

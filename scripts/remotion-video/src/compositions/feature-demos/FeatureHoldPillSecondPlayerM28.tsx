@@ -222,8 +222,37 @@ const HoldPillCard: React.FC = () => {
   );
 };
 
+/** b4 top strip — handoffExplain's own cards sit in the vertical middle (y~120-600);
+    this names the mechanism in the otherwise-empty top margin. */
+const MechanismKicker: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B4, B5) !== 1) return null;
+  const t = tween(sec(frame, B4 + 4, fps), 0, 0.3, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 50,
+        top: 30,
+        opacity: t,
+        transform: `translateY(${(1 - t) * -10}px)`,
+        fontSize: 15,
+        fontWeight: 800,
+        letterSpacing: 2,
+        color: P.accent,
+        fontFamily,
+      }}
+    >
+      MINI ELVARIKA · LOCK MECHANISM — sw.js + app.js, no settings screen
+    </div>
+  );
+};
+
 /** b4 — a supplementary, always-visible lock-screen mockup on the right half of
-    the frame, filling the space handoffExplain's own camera move leaves open. */
+    the frame, filling the space handoffExplain's own camera move leaves open.
+    Enlarged + extended down to also cover the empty bottom-right margin. */
 const PillLockPreview: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -234,9 +263,9 @@ const PillLockPreview: React.FC = () => {
     <div
       style={{
         position: "absolute",
-        left: 780,
-        top: 120,
-        width: 420,
+        left: 700,
+        top: 100,
+        width: 500,
         padding: 28,
         borderRadius: 6,
         background: "rgba(24,16,8,0.88)",
@@ -308,6 +337,22 @@ const PillLockPreview: React.FC = () => {
 
       <div style={{ fontSize: 16, fontWeight: 600, color: "rgba(250,244,232,0.75)", marginTop: 16 }}>
         up the instant you tap — no settings, no setup
+      </div>
+
+      <div
+        style={{
+          marginTop: 22,
+          paddingTop: 18,
+          borderTop: `1.5px solid ${P.border}`,
+          display: "flex",
+          gap: 14,
+          alignItems: "flex-start",
+        }}
+      >
+        <div style={{ fontSize: 12, fontWeight: 800, color: P.muted, letterSpacing: 1, width: 110 }}>
+          FILES CHANGED
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#FAF4E8" }}>sw.js · app.js · style.css</div>
       </div>
     </div>
   );
@@ -435,6 +480,7 @@ const Inner: React.FC = () => {
           toLabel: "NOW",
         }}
       />
+      <MechanismKicker />
       <PillLockPreview />
 
       {/* b5 — the result, fully drawn, holds to the end */}
