@@ -1,0 +1,55 @@
+{
+  "id": "d02",
+  "composition": "FeatureEveryDemoVideoGetsD02",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "Every finished demo video",
+        "line2": "had nowhere real to go",
+        "keywords": ["nowhere", "real", "go"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "Just local files, waiting",
+        "tags": ["No catalog page", "No version history", "No queue link", "Uploaded by hand"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Local file, upload by hand",
+        "to": "One command, its own page",
+        "points": ["demo.mjs publish command", "Registers the version", "Gets a public project page"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["R2 bucket stores it", "Timer checks queue", "Feeds video queue", "Marks version live"],
+        "result": "Ships daily",
+        "system": "Cloudflare Worker"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "copyCorrection",
+      "backdrop": null,
+      "data": {
+        "wrong": "Oversized files failed silently",
+        "right": "Blocked at exactly 95 megabytes",
+        "label": "ENFORCED NOW"
+      }
+    }
+  ]
+}

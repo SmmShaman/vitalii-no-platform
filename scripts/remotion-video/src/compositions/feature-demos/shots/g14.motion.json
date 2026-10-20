@@ -1,0 +1,54 @@
+{
+  "id": "g14",
+  "composition": "FeatureFamilyGuardKnowsWhichG14",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "funnelAbsorption",
+      "backdrop": "page",
+      "data": {
+        "inputs": ["Phone", "Laptop", "Smart TV", "Game console"],
+        "result": "Just another address on the Wi-Fi table"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "No idea who's playing",
+        "tags": ["Which kid?", "What game?", "Playing or idle?"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": "hub",
+      "data": {
+        "line1": "Checking meant walking in",
+        "line2": "and looking at the screen",
+        "keywords": ["walking", "looking"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Walk in, check the screen",
+        "to": "Script reads presence feed",
+        "points": ["psn.py — a small Python script", "Authenticates via parent account", "Reads online status + current game"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "hubRouting",
+      "backdrop": null,
+      "data": {
+        "inputs": ["Wi-Fi devices", "Android TV stick", "PlayStation"],
+        "hub": "Guard dashboard",
+        "output": "Zero walks down the hall"
+      }
+    }
+  ]
+}

@@ -25,7 +25,7 @@
     {
       "beat": "b3",
       "effect": "pipelineFlow",
-      "backdrop": "logWindow",
+      "backdrop": null,
       "data": {
         "steps": ["Walk the drive track", "Check for off-road places", "Fire the geofence anyway"],
         "result": "Local history surfaces",

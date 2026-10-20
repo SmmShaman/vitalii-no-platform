@@ -1,24 +1,25 @@
 // FeatureFarm500MetersOffG20 — feature g20 — 1280x720, 950 frames @ 30fps, VOICE-SYNCED.
-// archetype 1 timeline, mood sand. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 1 timeline, mood sand. Wave B2 fix (2026-10-20): beats and windows kept
+// exactly as measured; b3 now uses a real catalog effect staged with <MotionInsert>.
 //
-// Beat → effect (data only from the feature row, meta-g20.json, no invented numbers):
+// Beat → effect (data only from the feature row, no invented numbers):
 // b1 15-206   "Some farms sat just off the road — close enough to matter, too far for
 //             the app to ever mention them."
-//             cornerTags over the feature's own page (backdrop).
+//             cornerTags over the feature's own page (backdrop); ProductTag names
+//             the product plainly, once, as its own small plate.
 // b2 206-406  "The trigger only fired within 120 meters, so real local history got
 //             driven straight past."
 //             targetOverrun over the features hub (backdrop) — 120m old radius vs
 //             the 550m useful reach.
 // b3 406-579  "Now the geofence fires for places off the road too, not just the ones
 //             sitting right on it."
-//             pipelineFlow over a worker LogWindow (no runtime log exists for this
-//             product; lines paraphrased straight from the DriveService commit and
-//             the feature's own description, not invented).
+//             pipelineFlow, drawn on the stage base — the walk/check/fire mechanism
+//             that extends the trigger, from the feature's own DriveService commit.
 // b4 579-727  "A new voice line gives the direction and distance as the car passes
 //             abeam."
-//             featureMatrix, no page/hub behind it (base stage only).
+//             featureMatrix, drawn on the stage base (no page/hub behind it).
 // b5 727-950  "The reach: 250 to 550 meters off the road — now, their moment."
-//             titleTakeover, no page/hub behind it (gate: last beat never ends on
+//             titleTakeover, drawn on the stage base (gate: last beat never ends on
 //             the feature page or the hub) — the timeline's own final bright node
 //             carries the close.
 //
@@ -31,8 +32,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
-import { LogWindow } from "./live-primitives";
-import { punchScale } from "../../components/effects/motion/grammar";
+import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/g20.json";
 
 const B1 = 15;
@@ -57,9 +57,6 @@ const NODES = [
 ];
 const NODE_X = (i: number) => LT.x + 40 + (i / (NODES.length - 1)) * (LT.w - 80);
 const LINE_Y = LT.y + 34;
-
-// LogWindow sits above the timeline band so the two never overlap.
-const LOG_WIN = { x: 150, y: 150, w: 980, h: 430 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
@@ -167,6 +164,32 @@ const TimelineBand: React.FC = () => {
   );
 };
 
+/** b1-only credibility line: names the product plainly, away from cornerTags' own text. */
+const ProductTag: React.FC = () => {
+  const frame = useCurrentFrame();
+  if (frame < B1 || frame >= B2) return null;
+  const p = tween(sec(frame, B1 + 6, 30), 0, 0.3, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 40,
+        top: 36,
+        padding: "8px 16px",
+        borderRadius: 4,
+        background: "rgba(8,8,8,0.55)",
+        opacity: p,
+        transform: `translateY(${mix(p, -8, 0)}px)`,
+        fontFamily,
+      }}
+    >
+      <span style={{ fontSize: 15, fontWeight: 700, color: "#FFFFFF" }}>
+        Guide — Stories on the Road — a personal audio guide for driving
+      </span>
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -184,14 +207,7 @@ const Inner: React.FC = () => {
           tags: ["120m-only trigger", "Farms off the road", "History driven past", "Every single pass"],
         }}
       />
-      {/* product-line plate, carried for the length of b1 — plain text, not a competing effect */}
-      {frame >= B1 && frame < B2 && (
-        <div style={{ position: "absolute", left: 90, top: 28, fontSize: 18, fontWeight: 750, color: "#3A2A12", fontFamily }}>
-          🧭 Guide — Stories on the Road — a personal audio guide for driving: the phone knows
-          where I am and plays short stories about the places around me, in Norwegian and
-          Ukrainian side by side.
-        </div>
-      )}
+      <ProductTag />
 
       {/* b2 — the old trigger radius drove real history past, over the features hub */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
@@ -209,30 +225,13 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — the geofence now fires off the road too; no runtime log exists, so the
-          worker window shows real behaviour paraphrased from the DriveService commit. */}
-      {cut(frame, B3, B4) === 1 && (
-        <LogWindow
-          win={LOG_WIN}
-          title="DriveService geofence worker"
-          from={B3 + 10}
-          every={16}
-          opacity={1}
-          lines={[
-            { text: "scan drive track for known places", tone: "muted" },
-            { text: "nothing directly on the road nearby", tone: "muted" },
-            { text: "off-road place found, 310 m away", tone: "accent" },
-            { text: "geofence fires anyway", tone: "accent" },
-            { text: "trigger radius: 120m -> 550m", tone: "success" },
-            { text: "local history surfaces", tone: "success" },
-          ]}
-        />
-      )}
+      {/* b3 — the geofence now fires off the road too, drawn mechanism (no live page) */}
       <MotionInsert
         effect="pipelineFlow"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
+        base={STAGE}
         data={{
           steps: ["Walk the drive track", "Check for off-road places", "Fire the geofence anyway"],
           result: "Local history surfaces",
@@ -246,6 +245,7 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
+        base={STAGE}
         plate={0.7}
         data={{
           options: ["On the road", "Off the road"],
@@ -262,6 +262,7 @@ const Inner: React.FC = () => {
         from={B5}
         dur={END - B5}
         accent={ACCENT}
+        base={STAGE}
         data={{ title: "250 to 550 meters off the road", kicker: "Now, their moment." }}
       />
 

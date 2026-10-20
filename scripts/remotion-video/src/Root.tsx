@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureEveryDemoVideoGetsD02 } from "./compositions/feature-demos/FeatureEveryDemoVideoGetsD02";
+import { FeatureFamilyGuardKnowsWhichG14 } from "./compositions/feature-demos/FeatureFamilyGuardKnowsWhichG14";
 import { FeatureEveryStorySaysHouseG22 } from "./compositions/feature-demos/FeatureEveryStorySaysHouseG22";
 import { FeatureMuseumArchivesAlongRouteG21 } from "./compositions/feature-demos/FeatureMuseumArchivesAlongRouteG21";
 import { FeatureFarm500MetersOffG20 } from "./compositions/feature-demos/FeatureFarm500MetersOffG20";
@@ -2319,6 +2321,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureEveryDemoVideoGetsD02"
+        component={FeatureEveryDemoVideoGetsD02}
+        durationInFrames={873}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFamilyGuardKnowsWhichG14"
+        component={FeatureFamilyGuardKnowsWhichG14}
+        durationInFrames={811}
         fps={30}
         width={1280}
         height={720}
