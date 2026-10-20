@@ -24,6 +24,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { LogWindow, type LogLine } from "./live-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/d02.json";
 
@@ -33,6 +34,9 @@ const B3 = 286;
 const B4 = 443;
 const B5 = 641;
 const END = 873;
+
+/** Hold the raw page on screen alone before the caption lands on top of it (viewer: title card covered too fast). */
+const CAPTION_DELAY = 20;
 
 /** Accent tuned for the dark stage (mint's own #0B7A5A reads too dark on a plate). */
 const ACCENT = "#36D6A5";
@@ -168,7 +172,7 @@ const ProductTag: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
   if (frame < B1 || frame >= B2) return null;
-  const p = tween(sec(frame, B1 + 6, 30), 0, 0.3, ease.power3Out);
+  const p = tween(sec(frame, B1 + CAPTION_DELAY, 30), 0, 0.3, ease.power3Out);
   return (
     <div
       style={{
@@ -184,7 +188,7 @@ const ProductTag: React.FC = () => {
       }}
     >
       <span style={{ fontSize: 15, fontWeight: 700, color: "#FFFFFF" }}>
-        Product: Demo Video Pipeline — product demo videos, cataloged and published automatically
+        Product: Demo Video Pipeline — records the real app, adds AI narration, builds the video automatically
       </span>
     </div>
   );
@@ -198,6 +202,12 @@ const WorkerFlow: React.FC = () => {
   if (frame < B4 || frame >= B5) return null;
 
   const steps = ["R2 bucket stores it", "Timer checks queue", "Feeds video queue", "Marks version live"];
+  const stepGloss: Record<string, string> = {
+    "R2 bucket stores it": "cloud file storage",
+    "Timer checks queue": "runs on a schedule",
+    "Feeds video queue": "the shared YouTube upload list",
+    "Marks version live": "flips a status flag",
+  };
   const stepW = 250;
   const gap = 24;
   const totalW = steps.length * stepW + (steps.length - 1) * gap;
@@ -231,6 +241,7 @@ const WorkerFlow: React.FC = () => {
             >
               <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>STEP {i + 1}</div>
               <div style={{ fontSize: 16, fontWeight: 700, color: P.ink, marginTop: 6, lineHeight: 1.25 }}>{s}</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: P.muted, marginTop: 4 }}>{stepGloss[s]}</div>
             </div>
             {i < steps.length - 1 && (
               <div
@@ -266,7 +277,8 @@ const WorkerFlow: React.FC = () => {
               opacity: tween(sec(frame, footerAt, fps), 0, 0.3, ease.power3Out),
             }}
           >
-            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1, color: P.success }}>SYSTEM — Cloudflare Worker</span>
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1, color: P.success }}>SYSTEM — demo-yt-sync.timer</span>
+            <div style={{ fontSize: 11, fontWeight: 600, color: P.muted, marginTop: 2 }}>a scheduled background task, not a live server</div>
           </div>
           <div
             style={{
@@ -288,6 +300,33 @@ const WorkerFlow: React.FC = () => {
   );
 };
 
+/** b4 fill: proves the queue claim with a terminal log, built only from this feature's own problem/fix/result text. */
+const WORKER_LOG_LINES: LogLine[] = [
+  { t: "PROBLEM", text: "No home for finished videos", tone: "danger" },
+  { t: "PROBLEM", text: "Waiting to upload by hand", tone: "danger" },
+  { t: "FIX", text: "One command, one page", tone: "accent" },
+  { t: "FIX", text: "Worker feeds the daily queue", tone: "accent" },
+  { t: "RESULT", text: "95 MB limit, enforced", tone: "success" },
+];
+
+const WorkerLog: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  if (frame < B4) return null;
+  const logFrom = B4 + 90;
+  const op = tween(sec(frame, logFrom - 10, fps), 0, 0.3, ease.power3Out);
+  if (op <= 0.004) return null;
+  return (
+    <LogWindow
+      lines={WORKER_LOG_LINES}
+      title="demo_yt_sync.py — log"
+      from={logFrom}
+      opacity={op}
+      win={{ x: 360, y: 330, w: 560, h: 250 }}
+    />
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -296,8 +335,8 @@ const Inner: React.FC = () => {
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
       <MotionInsert
         effect="keywordCaption"
-        from={B1}
-        dur={B2 - B1}
+        from={B1 + CAPTION_DELAY}
+        dur={B2 - B1 - CAPTION_DELAY}
         accent={ACCENT}
         data={{
           line1: "Every finished demo video",
@@ -321,8 +360,10 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — the fix, over the public features hub the command fills in */}
-      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B3} hold={B4 - B3} />}
+      {/* b3 — the fix, over the public features hub the command fills in (zoomed off the catalog's other cards) */}
+      {cut(frame, B3, B4) === 1 && (
+        <LiveBackdrop file={shotsFile} shot="hub" from={B3} hold={B4 - B3} push={0.16} focus={{ x: 0.5, y: 0.22 }} />
+      )}
       <MotionInsert
         effect="handoffExplain"
         from={B3}
@@ -330,9 +371,9 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         plate={0.7}
         data={{
-          from: "Local file, upload by hand",
+          from: "Local file",
           to: "One command, its own page",
-          points: ["demo.mjs publish command", "Registers the version", "Gets a public project page"],
+          points: ["demo.mjs — the one command you run", "Registers the version", "Gets a public project page"],
         }}
       />
 
@@ -347,10 +388,11 @@ const Inner: React.FC = () => {
         data={{
           steps: ["R2 bucket stores it", "Timer checks queue", "Feeds video queue", "Marks version live"],
           result: "Ships daily",
-          system: "Cloudflare Worker",
+          system: "demo-yt-sync.timer",
         }}
       />
       <WorkerFlow />
+      <WorkerLog />
 
       {/* b5 — the result: drawn, holds to the end, no fade */}
       <MotionInsert
