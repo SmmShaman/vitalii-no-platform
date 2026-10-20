@@ -24,7 +24,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
-import { tween, ease, mix } from "../../components/effects/motion/grammar";
+import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/d02.json";
 
 const B1 = 15;
@@ -190,6 +190,104 @@ const ProductTag: React.FC = () => {
   );
 };
 
+/** b4 fill: the worker's own steps spelled out across the open canvas (drawn, no page to show). */
+const WorkerFlow: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B4 || frame >= B5) return null;
+
+  const steps = ["R2 bucket stores it", "Timer checks queue", "Feeds video queue", "Marks version live"];
+  const stepW = 250;
+  const gap = 24;
+  const totalW = steps.length * stepW + (steps.length - 1) * gap;
+  const startX = (1280 - totalW) / 2;
+  const y = 110;
+  const footerAt = B4 + 10 + steps.length * 12 + 10;
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      {steps.map((s, i) => {
+        const at = B4 + 10 + i * 12;
+        if (frame < at) return null;
+        const sc = punchScale(sec(frame, at, fps), 0);
+        const x = startX + i * (stepW + gap);
+        return (
+          <React.Fragment key={s}>
+            <div
+              style={{
+                position: "absolute",
+                left: x,
+                top: y,
+                width: stepW,
+                height: 100,
+                borderRadius: 6,
+                background: P.card,
+                border: `2px solid ${P.accentEdge}`,
+                boxSizing: "border-box",
+                padding: "12px 16px",
+                transform: `scale(${sc})`,
+              }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>STEP {i + 1}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: P.ink, marginTop: 6, lineHeight: 1.25 }}>{s}</div>
+            </div>
+            {i < steps.length - 1 && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: x + stepW + 2,
+                  top: y + 38,
+                  width: gap - 4,
+                  textAlign: "center",
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: P.muted,
+                }}
+              >
+                {"→"}
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
+
+      {frame >= footerAt && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              left: startX,
+              top: y + 150,
+              padding: "10px 20px",
+              borderRadius: 6,
+              background: P.successBg,
+              border: `2px solid ${P.successEdge}`,
+              opacity: tween(sec(frame, footerAt, fps), 0, 0.3, ease.power3Out),
+            }}
+          >
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1, color: P.success }}>SYSTEM — Cloudflare Worker</span>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: startX + totalW - 230,
+              top: y + 150,
+              padding: "10px 20px",
+              borderRadius: 6,
+              background: P.chipBg,
+              border: `2px solid ${P.border}`,
+              opacity: tween(sec(frame, footerAt, fps), 0, 0.3, ease.power3Out),
+            }}
+          >
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1, color: P.ink }}>RESULT — Ships daily</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -252,6 +350,7 @@ const Inner: React.FC = () => {
           system: "Cloudflare Worker",
         }}
       />
+      <WorkerFlow />
 
       {/* b5 — the result: drawn, holds to the end, no fade */}
       <MotionInsert

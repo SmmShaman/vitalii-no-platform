@@ -263,6 +263,150 @@ const ProductTag: React.FC = () => {
   );
 };
 
+/** b4 fill: the hand-off's own from/to and points, spread across the open canvas (drawn, no page to show). */
+const HandoffFill: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B4 || frame >= B5) return null;
+
+  const points = ["psn.py — a small Python script", "Authenticates via parent account", "Reads online status + current game"];
+  const bannerAt = B4 + 8;
+  const bannerP = tween(sec(frame, bannerAt, fps), 0, 0.35, ease.power3Out);
+  const cardW = 360;
+  const gap = 24;
+  const totalW = points.length * cardW + (points.length - 1) * gap;
+  const startX = (1280 - totalW) / 2;
+  const cardY = 260;
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 140,
+          top: 90,
+          width: 1000,
+          padding: "16px 24px",
+          borderRadius: 6,
+          background: P.card,
+          border: `2px solid ${P.accentEdge}`,
+          boxSizing: "border-box",
+          opacity: bannerP,
+          transform: `translateY(${mix(bannerP, -10, 0)}px)`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 18,
+        }}
+      >
+        <span style={{ fontSize: 16, fontWeight: 700, color: P.muted }}>Walk in, check the screen</span>
+        <span style={{ fontSize: 20, fontWeight: 800, color: P.accent }}>{"→"}</span>
+        <span style={{ fontSize: 18, fontWeight: 800, color: P.ink }}>Script reads presence feed</span>
+      </div>
+
+      {points.map((p, i) => {
+        const at = B4 + 30 + i * 14;
+        if (frame < at) return null;
+        const sc = punchScale(sec(frame, at, fps), 0);
+        const x = startX + i * (cardW + gap);
+        return (
+          <div
+            key={p}
+            style={{
+              position: "absolute",
+              left: x,
+              top: cardY,
+              width: cardW,
+              height: 110,
+              borderRadius: 6,
+              background: P.card,
+              border: `2px solid ${P.border}`,
+              boxSizing: "border-box",
+              padding: "12px 18px",
+              transform: `scale(${sc})`,
+            }}
+          >
+            <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>POINT {i + 1}</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: P.ink, marginTop: 8, lineHeight: 1.3 }}>{p}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/** b5 fill: the routing's own inputs and output, framing the hub diagram top and bottom. */
+const RoutingFill: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B5) return null;
+
+  const inputs = ["Wi-Fi devices", "Android TV stick", "PlayStation"];
+  const chipW = 220;
+  const gap = 30;
+  const totalW = inputs.length * chipW + (inputs.length - 1) * gap;
+  const startX = (1280 - totalW) / 2;
+  const outputAt = B5 + 50;
+  const outputP = frame >= outputAt ? tween(sec(frame, outputAt, fps), 0, 0.3, ease.power3Out) : 0;
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      {inputs.map((inp, i) => {
+        const at = B5 + 10 + i * 10;
+        if (frame < at) return null;
+        const sc = punchScale(sec(frame, at, fps), 0);
+        const x = startX + i * (chipW + gap);
+        return (
+          <div
+            key={inp}
+            style={{
+              position: "absolute",
+              left: x,
+              top: 80,
+              width: chipW,
+              height: 70,
+              borderRadius: 6,
+              background: P.card,
+              border: `2px solid ${P.accentEdge}`,
+              boxSizing: "border-box",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textAlign: "center",
+              padding: "0 10px",
+              transform: `scale(${sc})`,
+            }}
+          >
+            <span style={{ fontSize: 15, fontWeight: 700, color: P.ink }}>{inp}</span>
+          </div>
+        );
+      })}
+
+      {frame >= outputAt && (
+        <div
+          style={{
+            position: "absolute",
+            left: 340,
+            top: 500,
+            width: 600,
+            padding: "16px 24px",
+            borderRadius: 6,
+            background: P.successBg,
+            border: `2px solid ${P.successEdge}`,
+            opacity: outputP,
+            transform: `translateY(${mix(outputP, 10, 0)}px)`,
+            textAlign: "center",
+          }}
+        >
+          <span style={{ fontSize: 20, fontWeight: 800, color: P.success }}>Zero walks down the hall</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -324,6 +468,7 @@ const Inner: React.FC = () => {
           points: ["psn.py — a small Python script", "Authenticates via parent account", "Reads online status + current game"],
         }}
       />
+      <HandoffFill />
 
       {/* b5 — the result: drawn, holds to the end, no fade */}
       <MotionInsert
@@ -339,6 +484,7 @@ const Inner: React.FC = () => {
           output: "Zero walks down the hall",
         }}
       />
+      <RoutingFill />
 
       <LowerThird />
     </AbsoluteFill>

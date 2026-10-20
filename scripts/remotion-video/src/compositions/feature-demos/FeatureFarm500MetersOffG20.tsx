@@ -190,6 +190,192 @@ const ProductTag: React.FC = () => {
   );
 };
 
+/** b3 fill: the geofence worker's own steps spelled out across the open canvas (drawn, no page to show). */
+const PipelineFill: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B3 || frame >= B4) return null;
+
+  const steps = ["Walk the drive track", "Check for off-road places", "Fire the geofence anyway"];
+  const stepW = 320;
+  const gap = 24;
+  const totalW = steps.length * stepW + (steps.length - 1) * gap;
+  const startX = (1280 - totalW) / 2;
+  const y = 110;
+  const footerAt = B3 + 10 + steps.length * 12 + 10;
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      {steps.map((s, i) => {
+        const at = B3 + 10 + i * 12;
+        if (frame < at) return null;
+        const sc = punchScale(sec(frame, at, fps), 0);
+        const x = startX + i * (stepW + gap);
+        return (
+          <React.Fragment key={s}>
+            <div
+              style={{
+                position: "absolute",
+                left: x,
+                top: y,
+                width: stepW,
+                height: 100,
+                borderRadius: 6,
+                background: P.card,
+                border: `2px solid ${P.accentEdge}`,
+                boxSizing: "border-box",
+                padding: "12px 16px",
+                transform: `scale(${sc})`,
+              }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>STEP {i + 1}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: P.ink, marginTop: 6, lineHeight: 1.25 }}>{s}</div>
+            </div>
+            {i < steps.length - 1 && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: x + stepW + 2,
+                  top: y + 38,
+                  width: gap - 4,
+                  textAlign: "center",
+                  fontSize: 22,
+                  fontWeight: 800,
+                  color: P.muted,
+                }}
+              >
+                {"→"}
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
+
+      {frame >= footerAt && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              left: startX,
+              top: y + 150,
+              padding: "10px 20px",
+              borderRadius: 6,
+              background: P.successBg,
+              border: `2px solid ${P.successEdge}`,
+              opacity: tween(sec(frame, footerAt, fps), 0, 0.3, ease.power3Out),
+            }}
+          >
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1, color: P.success }}>RESULT — Local history surfaces</span>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: startX + totalW - 330,
+              top: y + 150,
+              padding: "10px 20px",
+              borderRadius: 6,
+              background: P.chipBg,
+              border: `2px solid ${P.border}`,
+              opacity: tween(sec(frame, footerAt, fps), 0, 0.3, ease.power3Out),
+            }}
+          >
+            <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1, color: P.ink }}>SYSTEM — DriveService</span>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+/** b4 fill: the matrix's own columns and rows, restated large and spread across the open canvas. */
+const MatrixFill: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B4 || frame >= B5) return null;
+
+  const rows = [
+    { label: "Voice line", values: ["Always had one", "Now gets one too"] },
+    { label: "Direction + distance", values: ["No", "Yes, as it passes abeam"] },
+  ];
+  const colW = 460;
+  const colGap = 40;
+  const totalW = 2 * colW + colGap;
+  const startX = (1280 - totalW) / 2;
+  const headerY = 90;
+  const rowY = (i: number) => 220 + i * 150;
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      {["On the road", "Off the road"].map((opt, i) => {
+        const at = B4 + 8 + i * 10;
+        if (frame < at) return null;
+        const p = tween(sec(frame, at, fps), 0, 0.3, ease.power3Out);
+        return (
+          <div
+            key={opt}
+            style={{
+              position: "absolute",
+              left: startX + i * (colW + colGap),
+              top: headerY,
+              width: colW,
+              padding: "14px 20px",
+              borderRadius: 6,
+              background: i === 1 ? P.successBg : P.chipBg,
+              border: `2px solid ${i === 1 ? P.successEdge : P.border}`,
+              textAlign: "center",
+              opacity: p,
+              transform: `translateY(${mix(p, -10, 0)}px)`,
+            }}
+          >
+            <span style={{ fontSize: 18, fontWeight: 800, color: i === 1 ? P.success : P.ink }}>{opt.toUpperCase()}</span>
+          </div>
+        );
+      })}
+
+      {rows.map((row, i) => {
+        const at = B4 + 40 + i * 20;
+        if (frame < at) return null;
+        const sc = punchScale(sec(frame, at, fps), 0);
+        return (
+          <div
+            key={row.label}
+            style={{
+              position: "absolute",
+              left: startX,
+              top: rowY(i),
+              width: totalW,
+              transform: `scale(${sc})`,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent, marginBottom: 8 }}>
+              {row.label.toUpperCase()}
+            </div>
+            <div style={{ display: "flex", gap: colGap }}>
+              {row.values.map((v, j) => (
+                <div
+                  key={v}
+                  style={{
+                    width: colW,
+                    padding: "12px 18px",
+                    borderRadius: 6,
+                    background: P.card,
+                    border: `2px solid ${j === 1 ? P.successEdge : P.border}`,
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <span style={{ fontSize: 16, fontWeight: 700, color: j === 1 ? P.success : P.muted }}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -238,6 +424,7 @@ const Inner: React.FC = () => {
           system: "DriveService — the app's background location watcher",
         }}
       />
+      <PipelineFill />
 
       {/* b4 — a new voice line gives direction and distance abeam, drawn mechanism */}
       <MotionInsert
@@ -255,6 +442,7 @@ const Inner: React.FC = () => {
           ],
         }}
       />
+      <MatrixFill />
 
       {/* b5 — the reach, no page or hub behind it */}
       <MotionInsert
