@@ -1,0 +1,30 @@
+{
+  "id": "b58",
+  "composition": "FeatureStickGuardCameraSnapshotsB58",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "One phone, every service", "kicker": "Camera, stick guard, PTZ, two tunnels — all on one phone" }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": { "line1": "Security on someone's personal cellphone", "line2": "one dead battery and it's dark", "keywords": ["personal cellphone", "dead battery"] }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": { "from": "Phone on a shelf (Termux)", "to": "Home PC, Scheduled Task", "fromLabel": "Before", "toLabel": "Now", "points": ["311-line Python script", "SYSTEM account", "Restarts itself every reboot"] }
+    },
+    {
+      "beat": "b4",
+      "effect": "cardCounter",
+      "backdrop": null,
+      "data": { "cards": [{ "label": "Camera feed", "value": 1 }, { "label": "Stick guard", "value": 1 }, { "label": "PTZ relay", "value": 1 }, { "label": "SSH tunnels", "value": 1 }], "totalLabel": "services survive a reboot", "summary": "All four, every reboot" }
+    }
+  ]
+}

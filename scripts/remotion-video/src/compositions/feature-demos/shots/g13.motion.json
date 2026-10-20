@@ -1,0 +1,36 @@
+{
+  "id": "g13",
+  "composition": "FeatureOneTapAnywhereBlocksG13",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "Family Link never saw them", "kicker": "PlayStation, TV stick, guest laptops — and the router page only worked from home" }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": { "line1": "A guest list that skips half the house", "keywords": ["guest list", "skips"] }
+    },
+    {
+      "beat": "b3",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype only: the device cards stay scattered and locked, a tiny figure walks home — the only way to reach the router menus"
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "page2",
+      "data": { "from": "Router page, home Wi-Fi only", "to": "Cloudflare Worker, every device", "points": ["Device name", "Today's usage"], "fromLabel": "Before", "toLabel": "Now" }
+    },
+    {
+      "beat": "b5",
+      "effect": "statusFocus",
+      "backdrop": null,
+      "data": { "title": "One tap, same block", "claims": [{ "text": "Home Wi-Fi", "verdict": "yes" }, { "text": "Stranger's Wi-Fi", "verdict": "yes" }, { "text": "5G", "verdict": "yes" }] }
+    }
+  ]
+}

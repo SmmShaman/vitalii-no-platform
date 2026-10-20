@@ -264,6 +264,8 @@ import { FeatureRealSettingsScreenBuiltB61 } from "./compositions/feature-demos/
 import { FeatureAutoUpdateActuallyInstallsB60 } from "./compositions/feature-demos/FeatureAutoUpdateActuallyInstallsB60";
 import { FeatureCallsRingThroughVoiceB59 } from "./compositions/feature-demos/FeatureCallsRingThroughVoiceB59";
 import { FeatureHoldPillSecondPlayerM28 } from "./compositions/feature-demos/FeatureHoldPillSecondPlayerM28";
+import { FeatureOneTapAnywhereBlocksG13 } from "./compositions/feature-demos/FeatureOneTapAnywhereBlocksG13";
+import { FeatureStickGuardCameraSnapshotsB58 } from "./compositions/feature-demos/FeatureStickGuardCameraSnapshotsB58";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2600,6 +2602,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureHoldPillSecondPlayerM28"
         component={FeatureHoldPillSecondPlayerM28}
         durationInFrames={811}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureOneTapAnywhereBlocksG13"
+        component={FeatureOneTapAnywhereBlocksG13}
+        durationInFrames={904}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureStickGuardCameraSnapshotsB58"
+        component={FeatureStickGuardCameraSnapshotsB58}
+        durationInFrames={908}
         fps={30}
         width={1280}
         height={720}
