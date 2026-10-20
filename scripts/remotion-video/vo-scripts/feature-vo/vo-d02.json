@@ -1,0 +1,57 @@
+{
+ "id": "d02",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 3.432,
+  "b2": 4.988,
+  "b3": 4.934,
+  "b4": 6.327,
+  "b5": 6.233
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I kept finishing demo videos with nowhere real to put them.",
+   "start_s": 0.5,
+   "end_s": 3.932,
+   "start_f": 15,
+   "end_f": 118
+  },
+  {
+   "beat": "b2",
+   "text": "Just local files, waiting to be uploaded to YouTube by hand, one day.",
+   "start_s": 4.232,
+   "end_s": 9.22,
+   "start_f": 127,
+   "end_f": 277
+  },
+  {
+   "beat": "b3",
+   "text": "Now every project gets its own page, and one command publishes straight to it.",
+   "start_s": 9.52,
+   "end_s": 14.454,
+   "start_f": 286,
+   "end_f": 434
+  },
+  {
+   "beat": "b4",
+   "text": "A single Cloudflare worker stores every version and feeds the same queue that already ships videos daily.",
+   "start_s": 14.754,
+   "end_s": 21.081,
+   "start_f": 443,
+   "end_f": 632
+  },
+  {
+   "beat": "b5",
+   "text": "Oversized files used to fail silently. Now the limit holds at exactly ninety five megabytes.",
+   "start_s": 21.381,
+   "end_s": 27.614,
+   "start_f": 641,
+   "end_f": 828
+  }
+ ],
+ "total_s": 29.114,
+ "durationInFrames": 873,
+ "measured_track_s": 27.672,
+ "track": "/root/feature-demos/vo-d02/vo-d02.mp3"
+}

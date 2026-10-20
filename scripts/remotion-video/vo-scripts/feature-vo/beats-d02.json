@@ -1,0 +1,7 @@
+{"id": "d02", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "I kept finishing demo videos with nowhere real to put them."],
+ ["b2", "Just local files, waiting to be uploaded to YouTube by hand, one day."],
+ ["b3", "Now every project gets its own page, and one command publishes straight to it."],
+ ["b4", "A single Cloudflare worker stores every version and feeds the same queue that already ships videos daily."],
+ ["b5", "Oversized files used to fail silently. Now the limit holds at exactly ninety five megabytes."]
+]}

@@ -1,0 +1,57 @@
+{
+ "id": "g14",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.27,
+  "b2": 3.979,
+  "b3": 3.183,
+  "b4": 5.931,
+  "b5": 6.478
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "To the router, a PlayStation is just another address on the network.",
+   "start_s": 0.5,
+   "end_s": 4.77,
+   "start_f": 15,
+   "end_f": 143
+  },
+  {
+   "beat": "b2",
+   "text": "It has no idea which kid is playing, or what game is running.",
+   "start_s": 5.07,
+   "end_s": 9.049,
+   "start_f": 152,
+   "end_f": 271
+  },
+  {
+   "beat": "b3",
+   "text": "Checking meant walking into the room and looking at the screen.",
+   "start_s": 9.349,
+   "end_s": 12.532,
+   "start_f": 280,
+   "end_f": 376
+  },
+  {
+   "beat": "b4",
+   "text": "Now a small Python script reads the console's own presence feed \u2014 who's on, and which game.",
+   "start_s": 12.832,
+   "end_s": 18.763,
+   "start_f": 385,
+   "end_f": 563
+  },
+  {
+   "beat": "b5",
+   "text": "That feed sits next to Wi-Fi and the TV stick, in one dashboard. Zero walks down the hall.",
+   "start_s": 19.063,
+   "end_s": 25.541,
+   "start_f": 572,
+   "end_f": 766
+  }
+ ],
+ "total_s": 27.041,
+ "durationInFrames": 811,
+ "measured_track_s": 25.608,
+ "track": "/root/feature-demos/vo-g14/vo-g14.mp3"
+}
