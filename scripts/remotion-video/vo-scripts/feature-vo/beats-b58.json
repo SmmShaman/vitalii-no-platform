@@ -1,0 +1,6 @@
+{"id": "b58", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "One old phone on a shelf kept the camera and stick guard alive — a dropped Wi-Fi handshake and nobody noticed until dark."],
+ ["b2", "Like running security on someone's personal cellphone — one dead battery and it's dark."],
+ ["b3", "Now a small Python script runs as a background service on the home PC itself, restarting automatically after every reboot."],
+ ["b4", "Camera feed, stick guard, PTZ, and tunnel access — all four services now survive a reboot without anyone touching a phone."]
+]}

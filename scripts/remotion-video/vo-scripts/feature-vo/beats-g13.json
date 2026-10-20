@@ -1,0 +1,7 @@
+{"id": "g13", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Family Link never saw the PlayStation or the TV stick, and the router's own page only worked from inside the house."],
+ ["b2", "It's like a guest list that skips half the house."],
+ ["b3", "The only way to cut a device off was walking home and digging through router menus."],
+ ["b4", "A Cloudflare Worker now talks to the router directly, listing every device with its name and today's usage."],
+ ["b5", "That one tap works the same from home Wi-Fi, from a stranger's Wi-Fi, or from 5G."]
+]}

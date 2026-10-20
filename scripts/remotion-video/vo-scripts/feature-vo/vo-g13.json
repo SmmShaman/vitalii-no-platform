@@ -1,0 +1,57 @@
+{
+ "id": "g13",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.741,
+  "b2": 2.839,
+  "b3": 4.947,
+  "b4": 6.505,
+  "b5": 5.916
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Family Link never saw the PlayStation or the TV stick, and the router's own page only worked from inside the house.",
+   "start_s": 0.5,
+   "end_s": 7.241,
+   "start_f": 15,
+   "end_f": 217
+  },
+  {
+   "beat": "b2",
+   "text": "It's like a guest list that skips half the house.",
+   "start_s": 7.541,
+   "end_s": 10.38,
+   "start_f": 226,
+   "end_f": 311
+  },
+  {
+   "beat": "b3",
+   "text": "The only way to cut a device off was walking home and digging through router menus.",
+   "start_s": 10.68,
+   "end_s": 15.627,
+   "start_f": 320,
+   "end_f": 469
+  },
+  {
+   "beat": "b4",
+   "text": "A Cloudflare Worker now talks to the router directly, listing every device with its name and today's usage.",
+   "start_s": 15.927,
+   "end_s": 22.432,
+   "start_f": 478,
+   "end_f": 673
+  },
+  {
+   "beat": "b5",
+   "text": "That one tap works the same from home Wi-Fi, from a stranger's Wi-Fi, or from 5G.",
+   "start_s": 22.732,
+   "end_s": 28.648,
+   "start_f": 682,
+   "end_f": 859
+  }
+ ],
+ "total_s": 30.148,
+ "durationInFrames": 904,
+ "measured_track_s": 28.704,
+ "track": "/root/feature-demos/vo-g13/vo-g13.mp3"
+}

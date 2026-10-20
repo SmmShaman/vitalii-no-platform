@@ -1,0 +1,48 @@
+{
+ "id": "b58",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.496,
+  "b2": 5.271,
+  "b3": 7.611,
+  "b4": 8.476
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One old phone on a shelf kept the camera and stick guard alive \u2014 a dropped Wi-Fi handshake and nobody noticed until dark.",
+   "start_s": 0.5,
+   "end_s": 7.996,
+   "start_f": 15,
+   "end_f": 240
+  },
+  {
+   "beat": "b2",
+   "text": "Like running security on someone's personal cellphone \u2014 one dead battery and it's dark.",
+   "start_s": 8.296,
+   "end_s": 13.567,
+   "start_f": 249,
+   "end_f": 407
+  },
+  {
+   "beat": "b3",
+   "text": "Now a small Python script runs as a background service on the home PC itself, restarting automatically after every reboot.",
+   "start_s": 13.867,
+   "end_s": 21.478,
+   "start_f": 416,
+   "end_f": 644
+  },
+  {
+   "beat": "b4",
+   "text": "Camera feed, stick guard, PTZ, and tunnel access \u2014 all four services now survive a reboot without anyone touching a phone.",
+   "start_s": 21.778,
+   "end_s": 30.254,
+   "start_f": 653,
+   "end_f": 908
+  }
+ ],
+ "total_s": 31.754,
+ "durationInFrames": 953,
+ "measured_track_s": 30.312,
+ "track": "/root/feature-demos/vo-b58/vo-b58.mp3"
+}
