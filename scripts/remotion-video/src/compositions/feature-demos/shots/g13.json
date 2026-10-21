@@ -11,11 +11,11 @@
       "mouse": [[0, 540, 220], [90, 560, 320], [179, 520, 280]]
     },
     {
-      "name": "page2",
-      "url": "https://vitalii.no/features/one-tap-from-anywhere-now-blocks-any-device-on-the-home-wi-fi-g13",
-      "frames": 180,
-      "scroll": [[0, 760], [90, 1200], [179, 1700]],
-      "mouse": [[0, 560, 260], [90, 580, 340], [179, 540, 300]]
+      "name": "commit2213b79",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/2213b79",
+      "frames": 200,
+      "scroll": [[0, 0], [100, 500], [199, 950]],
+      "mouse": [[0, 640, 220], [100, 640, 320], [199, 620, 280]]
     }
   ]
 }

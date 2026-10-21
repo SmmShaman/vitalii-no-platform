@@ -2,16 +2,26 @@
 // archetype 7 hero-number, mood slate. Motion direction v2 (feature-motion skill, 2026-10-07).
 //
 // One editorial effect per spoken sentence (shots/b58.motion.json), over the real
-// product page as evidence where a verified URL exists (only the feature's own
-// page is verified tonight — no commit page, the commit below is drawn as a
-// label, never recorded), one owner of the frame, a reading hold at the end of
-// every beat, cuts not fades.
+// product page as evidence where a verified URL exists, one owner of the frame,
+// a reading hold at the end of every beat, cuts not fades.
+//
+// WAVE D FIX 2026-10-20 (blind-viewer clarity 6 -> aims for >=7): named the
+// product once in b1 since nothing on screen did; swapped b3's two invented
+// icon cards for a real zoomed LiveWindow on commit 32f154b (the commit that
+// actually built bridge.py) plus a one-line gloss, since a verified commit URL
+// is now available; in b4, dropped the cardCounter effect — its full-bleed
+// scrim was hiding the LogWindow underneath entirely, and its centered list
+// landed directly under the hero number's "4", cutting a glyph through the
+// service names. The LogWindow is now the only "see it work" evidence (moved
+// clear of the hero, fontSize 22), and the four services are drawn as their
+// own glossed, staggered cards so nothing sits static across the beat.
 //
 // Beat → effect (data only from the feature row and commit 32f154b):
 // b1 15-249   "One old phone on a shelf kept the camera and stick guard alive —
 //             a dropped Wi-Fi handshake and nobody noticed until dark."
 //             titleTakeover over the feature's own page (backdrop "page"). The
-//             hero number opens on 1 — ONE PHONE, every service on it.
+//             hero number opens on 1 — ONE PHONE, every service on it. A plain
+//             product line names Boytasks once at the top.
 // b2 249-416  "Like running security on someone's personal cellphone — one dead
 //             battery and it's dark."
 //             keywordCaption, no backdrop (the analogy is drawn, not evidenced).
@@ -19,16 +29,18 @@
 //             BATTERY — so nothing sits unchanged across the cut.
 // b3 416-653  "Now a small Python script runs as a background service on the
 //             home PC itself, restarting automatically after every reboot."
-//             handoffExplain, drawn (commit 32f154b names bridge.py — labelled,
-//             never recorded, no verified commit URL tonight). The hero number
-//             jumps to 311 — the real line count of that script.
+//             handoffExplain carries the before/after, plus a LiveWindow zoomed
+//             onto commit 32f154b ("LAN bridge on HOME-PC replaces the XCover
+//             phone") — the one commit whose message proves this sentence. The
+//             hero number jumps to 311 — the real line count of that script.
 // b4 653-908  "Camera feed, stick guard, PTZ, and tunnel access — all four
 //             services now survive a reboot without anyone touching a phone."
-//             cardCounter draws the four services themselves (never the page or
-//             hub — gate 2), over a LogWindow built from this feature's own
-//             services (bridge.py's own job list, not a runtime log — none
-//             exists on the VPS for this product). The hero number lands on 4
-//             and holds, full brightness, to the final frame.
+//             A LogWindow (bridge.py's own job list — no runtime log exists for
+//             this product) sits clear of the hero number on the right; the
+//             four services land as their own glossed cards, staggered one by
+//             one, in the band below the hero (never the page or hub — gate 2).
+//             The hero number lands on 4 and holds, full brightness, to the
+//             final frame.
 //
 // Persistent element: the hero number (archetype 7), b1 through b5 — it owns
 // the frame at fontSize 230, left of centre, changing value and label every
@@ -40,7 +52,7 @@ import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
-import { LogWindow } from "./live-primitives";
+import { LogWindow, LiveWindow } from "./live-primitives";
 import shotsFile from "./shots/b58.json";
 
 const B1 = 15;
@@ -136,6 +148,13 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{ title: "One phone, every service", kicker: "Camera, stick guard, PTZ, two tunnels — all on one phone" }}
       />
+      {/* product name, carried for the length of b1 — fixes "no product name, logo,
+          or CTA anywhere" (names Boytasks once, plainly). */}
+      {frame >= B1 && frame < B2 && (
+        <div style={{ position: "absolute", left: 90, top: 28, fontSize: 18, fontWeight: 750, color: "#E7F5FF", fontFamily }}>
+          🧒 Boytasks — family tech project: this guard keeps the camera, stick guard and PTZ alive
+        </div>
+      )}
 
       {/* b2 — the analogy, drawn, no backdrop */}
       <MotionInsert
@@ -168,16 +187,30 @@ const Inner: React.FC = () => {
         }}
       />
       {/* the handoff diagram sits compacted left-of-centre, leaving the right band empty —
-          fill it with the same three points the diagram already names, not new claims. */}
+          fill it with the real commit that built bridge.py, zoomed onto one readable hunk,
+          instead of invented cards (a verified commit URL exists tonight: 32f154b). */}
       {frame >= B3 && frame < B4 && (
         <>
-          <IconCard x={820} y={80} w={300} emoji="🐍" title="311-line script" sub="bridge.py" tone="accent" />
-          <IconCard x={820} y={290} w={300} emoji="🖥" title="SYSTEM account" sub="runs on the PC" tone="accent" />
-          <IconCard x={820} y={500} w={300} emoji="🔁" title="Restarts itself" sub="every reboot" tone="accent" />
+          <div style={{ position: "absolute", left: 690, top: 36, fontSize: 16, fontWeight: 750, color: "#E7F5FF", fontFamily, width: 500 }}>
+            🔧 commit 32f154b — bridge.py: runs as a Windows SYSTEM account (not a login), restarts itself every reboot
+          </div>
+          <LiveWindow
+            file={shotsFile}
+            shot="commit32f154b"
+            title="github.com/SmmShaman/vitalii-no-platform · 32f154b"
+            from={B3}
+            hold={B4 - B3}
+            win={{ x: 690, y: 70, w: 500, h: 430 }}
+            opacity={1}
+            zoom={() => 2.2}
+            focus={{ x: 0.26, y: 0.18 }}
+          />
         </>
       )}
 
-      {/* b4 — the result, drawn, never the page/hub (gate 2); LogWindow built from this feature's own services */}
+      {/* b4 — the result, drawn, never the page/hub (gate 2); LogWindow built from this
+          feature's own services, moved clear of the hero number and given real estate
+          of its own (it used to sit fully hidden under cardCounter's scrim). */}
       {frame >= B4 && (
         <LogWindow
           lines={[
@@ -193,25 +226,29 @@ const Inner: React.FC = () => {
           from={B4}
           every={16}
           opacity={1}
+          win={{ x: 730, y: 40, w: 500, h: 430 }}
+          fontSize={22}
         />
       )}
-      <MotionInsert
-        effect="cardCounter"
-        from={B4}
-        dur={END - B4}
-        accent={ACCENT}
-        plate={0.72}
-        data={{
-          cards: [
-            { label: "Camera feed", value: 1 },
-            { label: "Stick guard", value: 1 },
-            { label: "PTZ relay", value: 1 },
-            { label: "SSH tunnels", value: 1 },
-          ],
-          totalLabel: "services survive a reboot",
-          summary: "All four, every reboot",
-        }}
-      />
+      {/* the four services, drawn as their own glossed cards (replaces cardCounter, whose
+          centered list landed directly under the hero number's "4") — staggered one by one
+          so the beat keeps building instead of holding one static frame. */}
+      {frame >= B4 && frame < END && (
+        <>
+          <Arrive at={B4 + 10} kind="rise" box={{ x: 90, y: 540, w: 260, h: 170 }}>
+            <IconCard x={90} y={540} w={260} emoji="📷" title="Camera feed" sub="snapshots upload to R2" tone="success" />
+          </Arrive>
+          <Arrive at={B4 + 40} kind="rise" box={{ x: 370, y: 540, w: 260, h: 170 }}>
+            <IconCard x={370} y={540} w={260} emoji="🛡" title="Stick guard" sub="watches the TV stick" tone="success" />
+          </Arrive>
+          <Arrive at={B4 + 70} kind="rise" box={{ x: 650, y: 540, w: 260, h: 170 }}>
+            <IconCard x={650} y={540} w={260} emoji="🎥" title="PTZ relay" sub="pan-tilt-zoom control" tone="success" />
+          </Arrive>
+          <Arrive at={B4 + 100} kind="rise" box={{ x: 930, y: 540, w: 260, h: 170 }}>
+            <IconCard x={930} y={540} w={260} emoji="🔒" title="SSH tunnels" sub="secure link to the cloud VM" tone="success" />
+          </Arrive>
+        </>
+      )}
 
       <HeroNumber />
     </AbsoluteFill>

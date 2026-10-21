@@ -2,16 +2,24 @@
 // archetype 3 card-deck, mood mint. Motion direction v2 (feature-motion skill, 2026-10-07).
 //
 // One editorial effect per spoken sentence (shots/g13.motion.json), over the real
-// product page as evidence where a verified URL exists (only the feature's own
-// page is verified tonight — no commit page), one owner of the frame, a reading
+// product page or a real commit as evidence, one owner of the frame, a reading
 // hold at the end of every beat, cuts not fades.
 //
-// Beat → effect (data only from the feature row; problem/solution/result):
+// WAVE D FIX 2026-10-20 (blind-viewer clarity 6 -> aims for >=7): raised b1's
+// plate so the backdrop page text stops fighting the headline, replaced the
+// dangling-pronoun title + unglossed "Family Link" kicker, named the product
+// once plainly (Guard — Family Network Guard) since nothing on screen did,
+// swapped b4's generic page2 backdrop for a zoomed LiveWindow on the actual
+// commit (2213b79) that built the device list + usage counters, and shortened
+// b5's title (viewer's contact-sheet frame showed it cropped mid-wipe).
+//
+// Beat → effect (data only from the feature row + real commits; problem/solution/result):
 // b1 15-226   "Family Link never saw the PlayStation or the TV stick, and the
 //             router's own page only worked from inside the house."
-//             titleTakeover over the feature's own page (backdrop "page"). The
+//             titleTakeover over the feature's own page (backdrop "page"), dark
+//             plate 0.82 so the page text reads as backdrop, not noise. The
 //             card-deck starts here: four device cards punch in scattered, dim,
-//             dashed — unseen. A small "GUARD" product tag names the thing.
+//             dashed — unseen. A plain product line names Guard once at the top.
 // b2 226-320  "It's like a guest list that skips half the house."
 //             keywordCaption, no backdrop (the analogy is drawn, not evidenced).
 //             Cards stay scattered; no new mover.
@@ -21,10 +29,11 @@
 //             the router card, a tiny figure rises and walks toward it.
 // b4 478-682  "A Cloudflare Worker now talks to the router directly, listing
 //             every device with its name and today's usage."
-//             handoffExplain over the feature's own page, scrolled further
-//             (backdrop "page2"). The one tech name, Cloudflare Worker, sits in
-//             the handoff data. The cards snap from scatter into an even bright
-//             row and each gets a name + usage chip — the "fan out" of the deck.
+//             handoffExplain plus a zoomed LiveWindow on commit 2213b79 ("router
+//             device list, Wi-Fi packet counters and ToD blocking") — the one
+//             beat whose claim a real commit can prove. The cards snap from
+//             scatter into an even bright row and each gets a name + usage
+//             chip — the "fan out" of the deck.
 // b5 682-904  "That one tap works the same from home Wi-Fi, from a stranger's
 //             Wi-Fi, or from 5G."
 //             statusFocus draws the three-location verdict itself (no page/hub
@@ -41,6 +50,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { LiveWindow } from "./live-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/g13.json";
 
@@ -112,31 +122,6 @@ const CardDeck: React.FC = () => {
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      {/* b1 only: names the product */}
-      {frame >= B1 && frame < B2 && (
-        <Arrive at={B1 + 4} kind="wipe" box={{ x: 40, y: 602, w: 420, h: 26 }} dur={0.4}>
-          <div
-            style={{
-              position: "absolute",
-              left: 40,
-              top: 602,
-              width: 420,
-              height: 26,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              fontSize: 15,
-              fontWeight: 800,
-              letterSpacing: 0.6,
-              color: P.accent,
-            }}
-          >
-            <span>🛡️ GUARD</span>
-            <span style={{ color: P.muted, fontWeight: 600 }}>— a private family-network guard</span>
-          </div>
-        </Arrive>
-      )}
-
       {DEVICES.map((d, i) => {
         const slotX = SLOT_X[i];
         const scatter = SCATTER[i];
@@ -250,15 +235,24 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1 — the problem, over the feature's own page */}
+      {/* b1 — the problem, over the feature's own page. Plate raised 0.66 -> 0.82: the
+          viewer read the backdrop's own page text as a smear fighting the headline. */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
       <MotionInsert
         effect="titleTakeover"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        data={{ title: "Family Link never saw them", kicker: "PlayStation, TV stick, guest laptops — and the router page only worked from home" }}
+        plate={0.82}
+        data={{ title: "Never saw the PlayStation", kicker: "Family Link (Google's parental app) missed it" }}
       />
+      {/* product name + one-line description, carried for the length of b1 — fixes "no
+          product name, logo, or CTA anywhere" (names Guard once, plainly). */}
+      {frame >= B1 && frame < B2 && (
+        <div style={{ position: "absolute", left: 90, top: 28, fontSize: 18, fontWeight: 750, color: "#D8FBF0", fontFamily }}>
+          🛡️ Guard — Family Network Guard: every device on the home Wi-Fi, named and blockable
+        </div>
+      )}
 
       {/* b2 — the analogy, drawn, no backdrop */}
       <MotionInsert
@@ -272,8 +266,10 @@ const Inner: React.FC = () => {
 
       {/* b3 — the old way, archetype only */}
 
-      {/* b4 — the Worker, over the feature's own page scrolled further */}
-      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B4} hold={B5 - B4} />}
+      {/* b4 — the Worker, proven with the actual commit that built the device list and
+          usage counters (2213b79), not the generic marketing page — fixes "reads as a
+          smear, not legible proof of a real product" where it matters most: the claim
+          this beat makes. Sits in the top band, clear of the handoff diagram below. */}
       <MotionInsert
         effect="handoffExplain"
         from={B4}
@@ -288,12 +284,22 @@ const Inner: React.FC = () => {
           points: ["Device name", "Today's usage"],
         }}
       />
-      {/* the handoff diagram sits left of centre, leaving the right band empty — fill it with
-          the two points the diagram already names (no new numbers, same data). */}
       {frame >= B4 && frame < B5 && (
         <>
-          <IconCard x={740} y={70} w={240} emoji="🏷" title="Device name" sub="every device, listed" tone="accent" />
-          <IconCard x={1000} y={70} w={240} emoji="⏱" title="Today's usage" sub="live from the Worker" tone="accent" />
+          <div style={{ position: "absolute", left: 650, top: 10, fontSize: 17, fontWeight: 750, color: "#E7FFF7", fontFamily }}>
+            🔧 the real commit — Cloudflare Worker gets the device list + usage counters
+          </div>
+          <LiveWindow
+            file={shotsFile}
+            shot="commit2213b79"
+            title="github.com/SmmShaman/vitalii-no-platform · 2213b79"
+            from={B4}
+            hold={B5 - B4}
+            win={{ x: 650, y: 40, w: 580, h: 150 }}
+            opacity={1}
+            zoom={() => 2.2}
+            focus={{ x: 0.24, y: 0.2 }}
+          />
         </>
       )}
 
@@ -305,7 +311,7 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         base={STAGE}
         data={{
-          title: "One tap, same block",
+          title: "Same block, any network",
           claims: [
             { text: "Home Wi-Fi", verdict: "yes" },
             { text: "Stranger's Wi-Fi", verdict: "yes" },

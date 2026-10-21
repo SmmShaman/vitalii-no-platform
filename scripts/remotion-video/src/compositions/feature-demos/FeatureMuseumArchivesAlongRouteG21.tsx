@@ -7,17 +7,32 @@
 // view) and continuously tightens, beat by beat, until by b5 it frames only the result —
 // the reticle never jump-cuts, it is one continuous zoom for the full 932 frames.
 //
+// WAVE D FIX 2026-10-20 (blind-viewer clarity 6 -> aims for >=7): b2's "hub" LiveBackdrop
+// is gone — the real /features page recording showed OTHER features' unrelated card art
+// ("STILL SAYS LOG IN", "Food Label"...) bleeding through behind the targetOverrun stat,
+// which read as random, off-brand clutter; b2 now plays on the base stage only, same
+// treatment already working in b3, plus a `note` line explaining the 600m/150m track so
+// the before/after isn't just two numbers. b3's pipelineFlow `system` caption was silently
+// truncated by that component's own 22-char clip() to "DigitaltMuseum — muse…" — never a
+// real gloss at all; shortened to the bare name "DigitaltMuseum" (fits whole) and the full
+// explanation now lives in a separate caption line we control. b4 unchanged (LogWindow +
+// featureMatrix already read as the strongest beat). b5's two StatPills used to both pop in
+// on the same frame and then hold dead still for the whole beat; they now land staggered
+// (Arrive, rise) so the closing beat visibly builds instead of freezing on one frame.
+//
 // Beat → effect (data only from the feature row, meta-g21.json, no invented numbers):
 // b1 15-189   "Kilometers of road went by with nothing to say — real history sat just out
 //             of reach." cornerTags over the feature's own page (LiveBackdrop, strong
 //             push-in — the camera is already moving). Reticle: wide open, near full frame.
 // b2 189-323  "The places the app already knew were too far off to ever surface it."
-//             targetOverrun over the features hub (LiveBackdrop, strong push-in).
+//             targetOverrun, base stage only (no hub backdrop — its unrelated card art was
+//             bleeding through), with a note line spelling out the 600m-vs-150m gap.
 //             Reticle: first tightening, now a large center-right box.
 // b3 323-523  "Now it checks DigitaltMuseum's archive — old photographs, museum records —
 //             for anything near the track." pipelineFlow, no page/hub behind it (base stage
-//             only) — system caption glosses DigitaltMuseum inline. Reticle: tighter still,
-//             framing the pipeline chain.
+//             only) — short "DigitaltMuseum" frame title (long form was being silently
+//             truncated) plus a dedicated gloss caption spelling out what it is. Reticle:
+//             tighter still, framing the pipeline chain.
 // b4 523-787  "A find near a known place joins its story. A find with nothing nearby becomes
 //             a brand-new stop, named after the farm it came from." featureMatrix over a
 //             worker LogWindow (no runtime log exists for this product; lines paraphrased
@@ -25,7 +40,8 @@
 // b5 787-932  "The reach: 150 meters off the road." titleTakeover, no page/hub behind it
 //             (gate: last beat never ends on the feature page or the hub) — the reticle
 //             closes all the way down onto the headline and holds there, full brightness,
-//             to the final frame: the camera has zoomed all the way into the one answer.
+//             to the final frame, while the two reach callouts land staggered so the beat
+//             still visibly builds as it holds.
 //
 // Persistent element: the zoom reticle (archetype 2) — four corner brackets plus a live
 // "×" readout, continuously interpolated across all five beats (one camera move, not five
@@ -35,7 +51,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily, IconCard, StatPill } from "./bright-primitives";
-import { MotionInsert, LiveBackdrop, cut } from "./motion-primitives";
+import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow, track } from "./live-primitives";
 import shotsFile from "./shots/g21.json";
 
@@ -130,8 +146,9 @@ const Inner: React.FC = () => {
         </div>
       )}
 
-      {/* b2 — known places were too far off to ever surface it, over the features hub */}
-      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} push={0.14} />}
+      {/* b2 — known places were too far off to ever surface it, base stage only
+          (the "hub" page recording used to sit behind this, but it showed OTHER
+          features' unrelated card art bleeding through — dropped). */}
       <MotionInsert
         effect="targetOverrun"
         from={B2}
@@ -143,6 +160,7 @@ const Inner: React.FC = () => {
           value: 600,
           target: 150,
           unit: "m",
+          note: "Up to 600m off the road — too far for the 150m reach",
         }}
       />
 
@@ -156,9 +174,16 @@ const Inner: React.FC = () => {
         data={{
           steps: ["Walk the drive track", "Check DigitaltMuseum", "Match finds near track"],
           result: "Real history surfaces",
-          system: "DigitaltMuseum — museum archive",
+          system: "DigitaltMuseum",
         }}
       />
+      {/* a legible gloss, outside pipelineFlow's own frame-title clip() (which silently
+          truncated the long form to "DigitaltMuseum — muse…" — never a real gloss at all). */}
+      {frame >= B3 && frame < B4 && (
+        <div style={{ position: "absolute", left: 90, top: 28, fontSize: 18, fontWeight: 750, color: "#E7E2FB", fontFamily, width: 900 }}>
+          🏛 DigitaltMuseum — Norway's national museum archive of old photographs and local records
+        </div>
+      )}
       {/* the pipeline chain sits compacted mid-frame, leaving the top and bottom bands empty —
           fill them with the chain's own step/result text, not new claims (no prop for size). */}
       {frame >= B3 && frame < B4 && (
@@ -216,11 +241,17 @@ const Inner: React.FC = () => {
         data={{ title: "150 meters off the road", kicker: "History, no longer out of reach" }}
       />
       {/* the headline sits vertically centered, leaving top and lower bands empty — flank it with
-          the real before/after numbers (already used in b2) as labelled callouts, not new figures. */}
-      {frame >= B5 && (
+          the real before/after numbers (already used in b2) as labelled callouts, not new figures.
+          Staggered (Arrive, rise) instead of both popping in on the same frame, so the closing
+          beat visibly builds rather than freezing on one frame. */}
+      {frame >= B5 && frame < END && (
         <>
-          <StatPill x={110} y={100} emoji="📍" text="Old reach: 600 m" tone="accent" opacity={0.75} />
-          <StatPill x={760} y={100} emoji="✅" text="New reach: 150 m" tone="success" />
+          <Arrive at={B5 + 15} kind="rise" box={{ x: 110, y: 100, w: 320, h: 56 }}>
+            <StatPill x={110} y={100} emoji="📍" text="Old reach: 600 m" tone="accent" opacity={0.75} />
+          </Arrive>
+          <Arrive at={B5 + 45} kind="rise" box={{ x: 760, y: 100, w: 320, h: 56 }}>
+            <StatPill x={760} y={100} emoji="✅" text="New reach: 150 m" tone="success" />
+          </Arrive>
         </>
       )}
 
