@@ -1,0 +1,7 @@
+{"id": "e03", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every lesson check and playlist leaned on three outside services — if one broke, a lesson stalled mid-word, and a gap let some requests skip payment entirely."],
+ ["b2", "Now one VPS we control does the whole job."],
+ ["b3", "Like closing every back door to a shop, so every sale has to pass the till."],
+ ["b4", "Three fragile dependencies became one steady process, billing only on our own server."],
+ ["b5", "The payoff: roughly eighteen hundred lines of fragile code, deleted for good."]
+]}

@@ -1,0 +1,57 @@
+{
+ "id": "e02",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.109,
+  "b2": 5.463,
+  "b3": 6.275,
+  "b4": 5.108,
+  "b5": 5.962
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Elvarika lived only in a browser tab \u2014 no lock-screen play, pause or skip, exactly when walking or commuting.",
+   "start_s": 0.5,
+   "end_s": 7.609,
+   "start_f": 15,
+   "end_f": 228
+  },
+  {
+   "beat": "b2",
+   "text": "Now it installs like a real Android app, with lock-screen controls that actually work.",
+   "start_s": 7.909,
+   "end_s": 13.372,
+   "start_f": 237,
+   "end_f": 401
+  },
+  {
+   "beat": "b3",
+   "text": "Under the hood, the Media Session API wires play, pause, next and stop into the lock screen.",
+   "start_s": 13.672,
+   "end_s": 19.947,
+   "start_f": 410,
+   "end_f": 598
+  },
+  {
+   "beat": "b4",
+   "text": "Every push to the app's code automatically builds and tests a fresh, signed version.",
+   "start_s": 20.247,
+   "end_s": 25.355,
+   "start_f": 607,
+   "end_f": 761
+  },
+  {
+   "beat": "b5",
+   "text": "No Play Store review, no waiting \u2014 zero store steps between a push and a working app.",
+   "start_s": 25.655,
+   "end_s": 31.617,
+   "start_f": 770,
+   "end_f": 949
+  }
+ ],
+ "total_s": 33.117,
+ "durationInFrames": 994,
+ "measured_track_s": 31.68,
+ "track": "/root/feature-demos/vo-e02/vo-e02.mp3"
+}

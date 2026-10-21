@@ -1,0 +1,57 @@
+{
+ "id": "e03",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 9.889,
+  "b2": 3.362,
+  "b3": 4.964,
+  "b4": 5.766,
+  "b5": 5.236
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every lesson check and playlist leaned on three outside services \u2014 if one broke, a lesson stalled mid-word, and a gap let some requests skip payment entirely.",
+   "start_s": 0.5,
+   "end_s": 10.389,
+   "start_f": 15,
+   "end_f": 312
+  },
+  {
+   "beat": "b2",
+   "text": "Now one VPS we control does the whole job.",
+   "start_s": 10.689,
+   "end_s": 14.051,
+   "start_f": 321,
+   "end_f": 422
+  },
+  {
+   "beat": "b3",
+   "text": "Like closing every back door to a shop, so every sale has to pass the till.",
+   "start_s": 14.351,
+   "end_s": 19.315,
+   "start_f": 431,
+   "end_f": 579
+  },
+  {
+   "beat": "b4",
+   "text": "Three fragile dependencies became one steady process, billing only on our own server.",
+   "start_s": 19.615,
+   "end_s": 25.381,
+   "start_f": 588,
+   "end_f": 761
+  },
+  {
+   "beat": "b5",
+   "text": "The payoff: roughly eighteen hundred lines of fragile code, deleted for good.",
+   "start_s": 25.681,
+   "end_s": 30.917,
+   "start_f": 770,
+   "end_f": 928
+  }
+ ],
+ "total_s": 32.417,
+ "durationInFrames": 973,
+ "measured_track_s": 30.984,
+ "track": "/root/feature-demos/vo-e03/vo-e03.mp3"
+}

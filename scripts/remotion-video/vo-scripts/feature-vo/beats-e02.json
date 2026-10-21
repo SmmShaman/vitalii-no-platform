@@ -1,0 +1,7 @@
+{"id": "e02", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Elvarika lived only in a browser tab — no lock-screen play, pause or skip, exactly when walking or commuting."],
+ ["b2", "Now it installs like a real Android app, with lock-screen controls that actually work."],
+ ["b3", "Under the hood, the Media Session API wires play, pause, next and stop into the lock screen."],
+ ["b4", "Every push to the app's code automatically builds and tests a fresh, signed version."],
+ ["b5", "No Play Store review, no waiting — zero store steps between a push and a working app."]
+]}
