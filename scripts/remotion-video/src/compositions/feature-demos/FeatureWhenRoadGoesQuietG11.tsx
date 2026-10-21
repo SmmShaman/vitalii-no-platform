@@ -32,6 +32,7 @@ import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { punchScale } from "../../components/effects/motion/grammar";
+import { LogWindow, LogLine } from "./live-primitives";
 import shotsFile from "./shots/g11.json";
 
 const B1 = 15;
@@ -62,6 +63,16 @@ const DIM_TAGS: Record<number, string> = { 2: "Old roads", 4: "Railways", 6: "Tr
 
 const LABEL_BOX = { x: 40, y: 606, w: 320, h: 80 };
 const PLATE_BOX = { x: 700, y: 606, w: 540, h: 96 };
+
+// b4's evidence window — built from the feature row's real sources, never a
+// fabricated runtime log (this product keeps no log on the VPS).
+const B4_LOG_LINES: LogLine[] = [
+  { t: "source", text: "Helland, 1913 — Toten district guidebook", tone: "accent" },
+  { t: "source", text: "Rygh, 1902 — farm-name register", tone: "accent" },
+  { t: "scan", text: "OCR'd, matched to the route ahead", tone: "muted" },
+  { t: "write", text: "Claude drafts the chapter — NO + UA", tone: "ink" },
+  { t: "result", text: "up to 8 chapters per quiet stretch", tone: "success" },
+];
 
 const Ribbon: React.FC = () => {
   const frame = useCurrentFrame();
@@ -344,9 +355,9 @@ const Ribbon: React.FC = () => {
               style={{
                 position: "absolute",
                 left: 340,
-                top: 560,
+                top: 530,
                 width: 600,
-                height: 130,
+                height: 160,
                 borderRadius: 10,
                 background: P.accentBg,
                 border: `3px solid ${P.accent}`,
@@ -359,7 +370,10 @@ const Ribbon: React.FC = () => {
             >
               <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>DISTRICT GUIDE</div>
               <div style={{ fontSize: 20, fontWeight: 700, marginTop: 8, lineHeight: 1.3 }}>
-                Quiet stretches now get up to 8 chapters about the area, not silence.
+                Quiet stretches now get up to 8 chapters about the district, not silence.
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 700, marginTop: 10, color: P.muted, letterSpacing: 0.4 }}>
+                🛣 Guide — Stories on the Road
               </div>
             </div>
           )}
@@ -431,7 +445,7 @@ const ProductPlate: React.FC = () => {
           fontFamily,
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>GUIDE — STORIES ON THE ROAD</div>
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>🛣 GUIDE — STORIES ON THE ROAD</div>
         <div style={{ fontSize: 13, color: P.muted, marginTop: 4, lineHeight: 1.3 }}>
           The phone knows where I am and plays short stories about the places around me — in Norwegian and Ukrainian side by side.
         </div>
@@ -462,7 +476,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.72}
+        plate={0.85}
         data={{
           statement: "The land between has its own history",
           tags: ["Old roads", "Railways", "Trades", "Never tied to a spot"],
@@ -480,7 +494,7 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         plate={0.72}
         data={{
-          steps: ["Checks the road ahead", "Nothing specific due", "commit 8390983 → starts a chapter"],
+          steps: ["Checks the road ahead", "Nothing specific due", "Starts a chapter instead"],
           result: "Fills the quiet stretch",
           system: "Route check",
         }}
@@ -495,15 +509,29 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.72}
+        plate={0.85}
         data={{
           from: "Never narrated",
           to: "Claude writes the chapter",
           fromLabel: "BEFORE",
           toLabel: "NOW",
-          points: ["Claude — AI that reads old text", "Even 1902 & 1913 books", "commit abdec83 · threads"],
+          points: ["Claude — AI that reads old text", "Even 1902 & 1913 books", "Chapters linked as one thread"],
         }}
       />
+      {/* evidence window — the two real OCR'd sources behind the chapter, so the
+          claim isn't just an overlay card on a dimmed screenshot (viewer: "no
+          legible real UI evidence"). Sits in the empty lower band, clear of the
+          ribbon, the OLD SOURCES card above, and the side label at left. */}
+      {cut(frame, B4, B5) === 1 && (
+        <LogWindow
+          title="sources.log"
+          from={B4 + 30}
+          every={45}
+          opacity={1}
+          win={{ x: 430, y: 500, w: 600, h: 200 }}
+          lines={B4_LOG_LINES}
+        />
+      )}
 
       {/* b5 — the result, drawn only (no page/hub), holds to the end */}
 
