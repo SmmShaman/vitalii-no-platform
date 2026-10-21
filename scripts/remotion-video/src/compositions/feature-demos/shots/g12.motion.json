@@ -1,0 +1,10 @@
+{
+ "id": "g12", "composition": "FeatureMissedEndStoryGuideG12",
+ "beats": [
+  {"beat":"b1","effect":"titleTakeover","backdrop":"page","data":{"title":"A story cut short","kicker":"The drive moves on before it finishes"}},
+  {"beat":"b2","effect":"cornerTags","backdrop":"hub","data":{"statement":"Interrupted once, gone for good","tags":["No way to resume","Street names repeat","Every single pass","Lost mid-sentence"]}},
+  {"beat":"b3","effect":"pipelineFlow","backdrop":"page2","data":{"steps":["Check next 40s of road","Nothing due ahead","commit 8390983 → resumes"],"result":"Fills the empty road ahead","system":"GPS"}},
+  {"beat":"b4","effect":"handoffExplain","backdrop":"hub2","data":{"from":"No resume cue","to":"\"Back to the story\" cue","points":["Says it out loud first","Picks up right where it stopped","commit abdec83 · threads"],"fromLabel":"BEFORE","toLabel":"NOW"}},
+  {"beat":"b5","effect":null,"backdrop":null,"data":{"note":"drawn-only card-fan result, ends on real number 2 (hours)"}}
+ ]
+}

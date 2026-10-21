@@ -1,20 +1,18 @@
-// FeatureStickGuardCameraSnapshotsB58 — feature b58 — 1280x720, 908 frames @ 30fps, VOICE-SYNCED.
+// FeatureStickGuardCameraSnapshotsB58 — feature b58 — 1280x720, 953 frames @ 30fps, VOICE-SYNCED.
 // archetype 7 hero-number, mood slate. Motion direction v2 (feature-motion skill, 2026-10-07).
 //
 // One editorial effect per spoken sentence (shots/b58.motion.json), over the real
 // product page as evidence where a verified URL exists, one owner of the frame,
 // a reading hold at the end of every beat, cuts not fades.
 //
-// WAVE D FIX 2026-10-20 (blind-viewer clarity 6 -> aims for >=7): named the
-// product once in b1 since nothing on screen did; swapped b3's two invented
-// icon cards for a real zoomed LiveWindow on commit 32f154b (the commit that
-// actually built bridge.py) plus a one-line gloss, since a verified commit URL
-// is now available; in b4, dropped the cardCounter effect — its full-bleed
-// scrim was hiding the LogWindow underneath entirely, and its centered list
-// landed directly under the hero number's "4", cutting a glyph through the
-// service names. The LogWindow is now the only "see it work" evidence (moved
-// clear of the hero, fontSize 22), and the four services are drawn as their
-// own glossed, staggered cards so nothing sits static across the beat.
+// RE-SHOOT 2026-10-21 (narration kept, picture rewritten): no commit URL is
+// verified tonight, so b3's LiveWindow on commit 32f154b is gone — the commit
+// is instead drawn as a small before/after schematic with its real names
+// (Termux phone → HOME-PC SYSTEM task), the one thing the digest skill asks
+// for when no recording proves the sentence. Duration grew 908 → 953: the
+// measured b4 window is still 653-908, but the clip now holds that same
+// result four seconds longer before the final frame (gate: last beat holds
+// at full brightness to the end, not just to its own measured window).
 //
 // Beat → effect (data only from the feature row and commit 32f154b):
 // b1 15-249   "One old phone on a shelf kept the camera and stick guard alive —
@@ -29,18 +27,20 @@
 //             BATTERY — so nothing sits unchanged across the cut.
 // b3 416-653  "Now a small Python script runs as a background service on the
 //             home PC itself, restarting automatically after every reboot."
-//             handoffExplain carries the before/after, plus a LiveWindow zoomed
-//             onto commit 32f154b ("LAN bridge on HOME-PC replaces the XCover
-//             phone") — the one commit whose message proves this sentence. The
-//             hero number jumps to 311 — the real line count of that script.
-// b4 653-908  "Camera feed, stick guard, PTZ, and tunnel access — all four
+//             handoffExplain carries the before/after, plus a drawn schematic
+//             (no verified commit URL tonight) naming commit 32f154b ("LAN
+//             bridge on HOME-PC replaces the XCover phone") — the one commit
+//             whose message proves this sentence. The hero number jumps to
+//             311 — the real line count of that script.
+// b4 653-953  "Camera feed, stick guard, PTZ, and tunnel access — all four
 //             services now survive a reboot without anyone touching a phone."
 //             A LogWindow (bridge.py's own job list — no runtime log exists for
 //             this product) sits clear of the hero number on the right; the
 //             four services land as their own glossed cards, staggered one by
 //             one, in the band below the hero (never the page or hub — gate 2).
-//             The hero number lands on 4 and holds, full brightness, to the
-//             final frame.
+//             The hero number lands on 4 and holds, full brightness, through
+//             the final frame (the measured line ends at 908; the clip holds
+//             the same result to 953).
 //
 // Persistent element: the hero number (archetype 7), b1 through b5 — it owns
 // the frame at fontSize 230, left of centre, changing value and label every
@@ -52,14 +52,14 @@ import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
-import { LogWindow, LiveWindow } from "./live-primitives";
+import { LogWindow } from "./live-primitives";
 import shotsFile from "./shots/b58.json";
 
 const B1 = 15;
 const B2 = 249;
 const B3 = 416;
 const B4 = 653;
-const END = 908;
+const END = 953;
 
 /** Bright slate accent tuned to read on the dark plate. */
 const ACCENT = "#7FC4FF";
@@ -187,24 +187,57 @@ const Inner: React.FC = () => {
         }}
       />
       {/* the handoff diagram sits compacted left-of-centre, leaving the right band empty —
-          fill it with the real commit that built bridge.py, zoomed onto one readable hunk,
-          instead of invented cards (a verified commit URL exists tonight: 32f154b). */}
+          fill it with the real commit's before/after, drawn (no verified commit URL
+          tonight, so this is a schematic with the real names, not a recording). */}
       {frame >= B3 && frame < B4 && (
         <>
-          <div style={{ position: "absolute", left: 690, top: 36, fontSize: 16, fontWeight: 750, color: "#E7F5FF", fontFamily, width: 500 }}>
-            🔧 commit 32f154b — bridge.py: runs as a Windows SYSTEM account (not a login), restarts itself every reboot
-          </div>
-          <LiveWindow
-            file={shotsFile}
-            shot="commit32f154b"
-            title="github.com/SmmShaman/vitalii-no-platform · 32f154b"
-            from={B3}
-            hold={B4 - B3}
-            win={{ x: 690, y: 70, w: 500, h: 430 }}
-            opacity={1}
-            zoom={() => 2.2}
-            focus={{ x: 0.26, y: 0.18 }}
-          />
+          <Arrive at={B3 + 8} kind="rise" box={{ x: 690, y: 70, w: 500, h: 150 }}>
+            <div
+              style={{
+                position: "absolute",
+                left: 690,
+                top: 70,
+                width: 500,
+                height: 150,
+                borderRadius: 10,
+                background: "#1A2430",
+                border: "3px solid #3A4A5C",
+                boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
+                boxSizing: "border-box",
+                padding: "16px 22px",
+                fontFamily,
+                color: "#9FB2C2",
+              }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6 }}>BEFORE</div>
+              <div style={{ fontSize: 20, fontWeight: 700, marginTop: 8, color: "#D7E2EA" }}>XCover phone, Termux script</div>
+              <div style={{ fontSize: 14, marginTop: 6 }}>One shelf, one Wi-Fi handshake</div>
+            </div>
+          </Arrive>
+          <Arrive at={B3 + 50} kind="punch" box={{ x: 690, y: 290, w: 500, h: 170 }}>
+            <div
+              style={{
+                position: "absolute",
+                left: 690,
+                top: 290,
+                width: 500,
+                height: 170,
+                borderRadius: 10,
+                background: "#163049",
+                border: "3px solid #7FC4FF",
+                boxShadow: "0 0 0 6px rgba(127,196,255,0.25), 8px 8px 0 rgba(0,0,0,0.35)",
+                boxSizing: "border-box",
+                padding: "18px 22px",
+                fontFamily,
+                color: "#E7F5FF",
+              }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: "#7FC4FF" }}>NOW</div>
+              <div style={{ fontSize: 20, fontWeight: 700, marginTop: 8 }}>HOME-PC, SYSTEM scheduled task</div>
+              <div style={{ fontSize: 14, marginTop: 6, color: "#9FB2C2" }}>bridge.py — restarts itself every reboot</div>
+              <div style={{ fontSize: 13, marginTop: 6, color: "#6E8198" }}>commit 32f154b</div>
+            </div>
+          </Arrive>
         </>
       )}
 

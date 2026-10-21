@@ -1,0 +1,154 @@
+{
+  "id": "g12",
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "dsf": 1.5,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/missed-the-end-of-a-story-the-guide-replays-it-the-moment-the-road-ahead-goes-qu-g12",
+      "frames": 90,
+      "scroll": [
+        [
+          0,
+          0
+        ],
+        [
+          45,
+          220
+        ],
+        [
+          89,
+          420
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          640,
+          120
+        ],
+        [
+          45,
+          640,
+          300
+        ],
+        [
+          89,
+          620,
+          420
+        ]
+      ]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 80,
+      "scroll": [
+        [
+          0,
+          0
+        ],
+        [
+          40,
+          160
+        ],
+        [
+          79,
+          300
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          300,
+          200
+        ],
+        [
+          40,
+          500,
+          260
+        ],
+        [
+          79,
+          700,
+          300
+        ]
+      ]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/missed-the-end-of-a-story-the-guide-replays-it-the-moment-the-road-ahead-goes-qu-g12",
+      "frames": 70,
+      "scroll": [
+        [
+          0,
+          420
+        ],
+        [
+          35,
+          560
+        ],
+        [
+          69,
+          700
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          620,
+          420
+        ],
+        [
+          35,
+          600,
+          500
+        ],
+        [
+          69,
+          580,
+          600
+        ]
+      ]
+    },
+    {
+      "name": "hub2",
+      "url": "https://vitalii.no/features",
+      "frames": 70,
+      "scroll": [
+        [
+          0,
+          300
+        ],
+        [
+          35,
+          450
+        ],
+        [
+          69,
+          600
+        ]
+      ],
+      "mouse": [
+        [
+          0,
+          700,
+          300
+        ],
+        [
+          35,
+          650,
+          400
+        ],
+        [
+          69,
+          600,
+          500
+        ]
+      ]
+    }
+  ]
+}

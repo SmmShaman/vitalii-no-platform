@@ -1,0 +1,10 @@
+{
+ "id": "g11", "composition": "FeatureWhenRoadGoesQuietG11",
+ "beats": [
+  {"beat":"b1","effect":"titleTakeover","backdrop":"page","data":{"title":"Long stretches, no story","kicker":"The guide only spoke at one pinned point"}},
+  {"beat":"b2","effect":"cornerTags","backdrop":"hub","data":{"statement":"The land between has its own history","tags":["Old roads","Railways","Trades","Never tied to a spot"]}},
+  {"beat":"b3","effect":"pipelineFlow","backdrop":"page2","data":{"steps":["Checks the road ahead","Nothing specific due","commit 8390983 → starts a chapter"],"result":"Fills the quiet stretch","system":"Route check"}},
+  {"beat":"b4","effect":"handoffExplain","backdrop":"hub2","data":{"from":"Never narrated","to":"Claude writes the chapter","fromLabel":"BEFORE","toLabel":"NOW","points":["Claude — AI that reads old text","Even 1902 & 1913 books","commit abdec83 · threads"]}},
+  {"beat":"b5","effect":null,"backdrop":null,"data":{"note":"drawn-only timeline-ribbon result, ends on real number 8 (chapters)"}}
+ ]
+}

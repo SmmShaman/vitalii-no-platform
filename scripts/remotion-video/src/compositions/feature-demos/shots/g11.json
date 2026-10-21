@@ -1,0 +1,35 @@
+{
+ "id": "g11",
+ "viewport": {"width": 1280, "height": 800},
+ "dsf": 1.5,
+ "shots": [
+  {
+   "name": "page",
+   "url": "https://vitalii.no/features/when-the-road-goes-quiet-the-guide-starts-a-multi-chapter-story-about-the-whole--g11",
+   "frames": 183,
+   "scroll": [[0, 0], [90, 220], [182, 420]],
+   "mouse": [[0, 640, 120], [90, 640, 300], [182, 620, 420]]
+  },
+  {
+   "name": "hub",
+   "url": "https://vitalii.no/features",
+   "frames": 219,
+   "scroll": [[0, 0], [110, 160], [218, 300]],
+   "mouse": [[0, 300, 200], [110, 500, 260], [218, 700, 300]]
+  },
+  {
+   "name": "page2",
+   "url": "https://vitalii.no/features/when-the-road-goes-quiet-the-guide-starts-a-multi-chapter-story-about-the-whole--g11",
+   "frames": 169,
+   "scroll": [[0, 420], [84, 560], [168, 700]],
+   "mouse": [[0, 620, 420], [84, 600, 500], [168, 580, 600]]
+  },
+  {
+   "name": "hub2",
+   "url": "https://vitalii.no/features",
+   "frames": 230,
+   "scroll": [[0, 300], [115, 450], [229, 600]],
+   "mouse": [[0, 700, 300], [115, 650, 400], [229, 600, 500]]
+  }
+ ]
+}

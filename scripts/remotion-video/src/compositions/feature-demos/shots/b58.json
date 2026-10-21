@@ -6,16 +6,9 @@
     {
       "name": "page",
       "url": "https://vitalii.no/features/stick-guard-camera-snapshots-and-ptz-just-lost-their-dependency-on-an-aging-phon-b58",
-      "frames": 180,
-      "scroll": [[0, 0], [90, 380], [179, 760]],
-      "mouse": [[0, 540, 220], [90, 560, 320], [179, 520, 280]]
-    },
-    {
-      "name": "commit32f154b",
-      "url": "https://github.com/SmmShaman/vitalii-no-platform/commit/32f154b",
-      "frames": 200,
-      "scroll": [[0, 0], [100, 500], [199, 950]],
-      "mouse": [[0, 640, 220], [100, 640, 320], [199, 620, 280]]
+      "frames": 234,
+      "scroll": [[0, 0], [115, 380], [233, 760]],
+      "mouse": [[0, 540, 220], [115, 560, 320], [233, 520, 280]]
     }
   ]
 }

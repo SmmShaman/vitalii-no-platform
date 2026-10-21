@@ -266,6 +266,8 @@ import { FeatureCallsRingThroughVoiceB59 } from "./compositions/feature-demos/Fe
 import { FeatureHoldPillSecondPlayerM28 } from "./compositions/feature-demos/FeatureHoldPillSecondPlayerM28";
 import { FeatureOneTapAnywhereBlocksG13 } from "./compositions/feature-demos/FeatureOneTapAnywhereBlocksG13";
 import { FeatureStickGuardCameraSnapshotsB58 } from "./compositions/feature-demos/FeatureStickGuardCameraSnapshotsB58";
+import { FeatureMissedEndStoryGuideG12 } from "./compositions/feature-demos/FeatureMissedEndStoryGuideG12";
+import { FeatureWhenRoadGoesQuietG11 } from "./compositions/feature-demos/FeatureWhenRoadGoesQuietG11";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2619,7 +2621,25 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeatureStickGuardCameraSnapshotsB58"
         component={FeatureStickGuardCameraSnapshotsB58}
-        durationInFrames={908}
+        durationInFrames={953}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureMissedEndStoryGuideG12"
+        component={FeatureMissedEndStoryGuideG12}
+        durationInFrames={942}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureWhenRoadGoesQuietG11"
+        component={FeatureWhenRoadGoesQuietG11}
+        durationInFrames={1006}
         fps={30}
         width={1280}
         height={720}

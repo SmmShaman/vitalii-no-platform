@@ -22,9 +22,9 @@
     },
     {
       "beat": "b4",
-      "effect": "cardCounter",
+      "effect": null,
       "backdrop": null,
-      "data": { "cards": [{ "label": "Camera feed", "value": 1 }, { "label": "Stick guard", "value": 1 }, { "label": "PTZ relay", "value": 1 }, { "label": "SSH tunnels", "value": 1 }], "totalLabel": "services survive a reboot", "summary": "All four, every reboot" }
+      "data": { "note": "drawn-only result beat (gate 2): LogWindow from the feature's own services + four glossed cards, holds to the end" }
     }
   ]
 }
