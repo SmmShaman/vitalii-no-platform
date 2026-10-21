@@ -67,12 +67,15 @@ const STAGE = "#0D1620";
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-type HeroState = { value: string; label: string; kicker: string; tone: "danger" | "accent" | "success" };
+type HeroState = { value: string; label: string; kicker: string; tone: "danger" | "accent" | "success"; note?: string };
 
 function heroFor(frame: number): HeroState {
   if (frame < B2) return { value: "1", label: "ONE PHONE", kicker: "SINGLE POINT OF FAILURE", tone: "danger" };
-  if (frame < B3) return { value: "1", label: "ONE BATTERY", kicker: "AND THE WHOLE CHAIN WENT DARK", tone: "danger" };
-  if (frame < B4) return { value: "311", label: "LINES OF PYTHON", kicker: "COMMIT 32f154b · bridge.py", tone: "accent" };
+  // Same digit as b1 on purpose (it's the same single point of failure, just named
+  // differently) — a viewer read the repeat as a numbering bug, so `note` spells
+  // out that it's deliberate.
+  if (frame < B3) return { value: "1", label: "ONE BATTERY", kicker: "AND THE WHOLE CHAIN WENT DARK", tone: "danger", note: "still the same weak link" };
+  if (frame < B4) return { value: "311", label: "LINES OF PYTHON", kicker: "LAN BRIDGE REPLACES THE PHONE", tone: "accent" };
   return { value: "4", label: "SERVICES SURVIVE A REBOOT", kicker: "GUARD · FRAMES · PTZ · TUNNELS", tone: "success" };
 }
 
@@ -126,6 +129,14 @@ const HeroNumber: React.FC = () => {
         {hero.value}
       </div>
 
+      {hero.note && (
+        <Arrive at={changeAt + 8} kind="rise" box={{ x: 290, y: 330, w: 320, h: 30 }}>
+          <div style={{ position: "absolute", left: 290, top: 330, fontSize: 18, fontWeight: 700, fontStyle: "italic", color: P.muted }}>
+            {hero.note}
+          </div>
+        </Arrive>
+      )}
+
       <Arrive at={changeAt + 14} kind="rise" box={{ x: 70, y: 470, w: 600, h: 40 }}>
         <div style={{ position: "absolute", left: 70, top: 470, fontSize: 27, fontWeight: 700, color: P.ink }}>
           {hero.label}
@@ -146,6 +157,7 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
+        plate={0.85}
         data={{ title: "One phone, every service", kicker: "Camera, stick guard, PTZ, two tunnels — all on one phone" }}
       />
       {/* product name, carried for the length of b1 — fixes "no product name, logo,
@@ -183,7 +195,7 @@ const Inner: React.FC = () => {
           to: "Home PC, Scheduled Task",
           fromLabel: "Before",
           toLabel: "Now",
-          points: ["311-line Python script", "SYSTEM account", "Restarts itself every reboot"],
+          points: ["311-line Python script", "Runs as Windows' own background service", "Restarts itself every reboot"],
         }}
       />
       {/* the handoff diagram sits compacted left-of-centre, leaving the right band empty —
@@ -235,7 +247,7 @@ const Inner: React.FC = () => {
               <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: "#7FC4FF" }}>NOW</div>
               <div style={{ fontSize: 20, fontWeight: 700, marginTop: 8 }}>HOME-PC, SYSTEM scheduled task</div>
               <div style={{ fontSize: 14, marginTop: 6, color: "#9FB2C2" }}>bridge.py — restarts itself every reboot</div>
-              <div style={{ fontSize: 13, marginTop: 6, color: "#6E8198" }}>commit 32f154b</div>
+              <div style={{ fontSize: 13, marginTop: 6, color: "#6E8198" }}>A LAN bridge replaces the old phone</div>
             </div>
           </Arrive>
           {/* bottom third was empty beside the two right-side cards — a wide
@@ -284,7 +296,7 @@ const Inner: React.FC = () => {
           ]}
           title="bridge.py"
           from={B4}
-          every={16}
+          every={36}
           opacity={1}
           win={{ x: 730, y: 40, w: 500, h: 430 }}
           fontSize={22}
@@ -296,7 +308,7 @@ const Inner: React.FC = () => {
       {frame >= B4 && frame < END && (
         <>
           <Arrive at={B4 + 10} kind="rise" box={{ x: 90, y: 540, w: 260, h: 170 }}>
-            <IconCard x={90} y={540} w={260} emoji="📷" title="Camera feed" sub="snapshots upload to R2" tone="success" />
+            <IconCard x={90} y={540} w={260} emoji="📷" title="Camera feed" sub="snapshots upload to cloud storage" tone="success" />
           </Arrive>
           <Arrive at={B4 + 40} kind="rise" box={{ x: 370, y: 540, w: 260, h: 170 }}>
             <IconCard x={370} y={540} w={260} emoji="🛡" title="Stick guard" sub="watches the TV stick" tone="success" />
