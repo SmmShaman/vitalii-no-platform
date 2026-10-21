@@ -37,7 +37,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
 import { LogWindow } from "./live-primitives";
@@ -167,6 +167,15 @@ const Inner: React.FC = () => {
           points: ["311-line Python script", "SYSTEM account", "Restarts itself every reboot"],
         }}
       />
+      {/* the handoff diagram sits compacted left-of-centre, leaving the right band empty —
+          fill it with the same three points the diagram already names, not new claims. */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <IconCard x={820} y={80} w={300} emoji="🐍" title="311-line script" sub="bridge.py" tone="accent" />
+          <IconCard x={820} y={290} w={300} emoji="🖥" title="SYSTEM account" sub="runs on the PC" tone="accent" />
+          <IconCard x={820} y={500} w={300} emoji="🔁" title="Restarts itself" sub="every reboot" tone="accent" />
+        </>
+      )}
 
       {/* b4 — the result, drawn, never the page/hub (gate 2); LogWindow built from this feature's own services */}
       {frame >= B4 && (

@@ -39,7 +39,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/g13.json";
@@ -77,6 +77,19 @@ const SCATTER = [
   { dx: -22, dy: 16, rot: 6 },
   { dx: 18, dy: -12, rot: -5 },
   { dx: -14, dy: 14, rot: 8 },
+];
+
+// b3: the walk-home path, house to the locked router card — fixed dots so the
+// route itself (not just the mover) occupies the empty top of the frame.
+const WALK_DOTS: [number, number][] = [
+  [170, 260],
+  [285, 304],
+  [401, 349],
+  [516, 393],
+  [631, 437],
+  [747, 481],
+  [862, 526],
+  [978, 570],
 ];
 
 const CardDeck: React.FC = () => {
@@ -173,11 +186,44 @@ const CardDeck: React.FC = () => {
         );
       })}
 
-      {/* b3: a tiny figure rises and walks toward the locked router — the only way in used to be on foot */}
-      {frame >= B3 + 30 && frame < B4 && (
-        <Arrive at={B3 + 30} kind="rise" box={{ x: SLOT_X[3] - 50, y: BAND_Y - 36, w: 36, h: 36 }}>
-          <div style={{ position: "absolute", left: SLOT_X[3] - 50, top: BAND_Y - 36, fontSize: 28 }}>🚶</div>
-        </Arrive>
+      {/* b3: archetype only — the deck's own scene is the walk home, since the only way to
+          cut a device off used to be standing at the router. The dotted route (fixed, not
+          just the mover) is what fills the otherwise-empty top of the frame for this beat. */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <Arrive at={B3 + 4} kind="wipe" box={{ x: 140, y: 150, w: 620, h: 40 }} dur={0.4}>
+            <div style={{ position: "absolute", left: 140, top: 150, fontSize: 23, fontWeight: 800, color: P.muted }}>
+              🏠 Only fixable by walking home, menu by menu
+            </div>
+          </Arrive>
+          <div style={{ position: "absolute", left: 130, top: 206, fontSize: 60 }}>🏠</div>
+          {WALK_DOTS.map(([dx, dy], i) => (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left: dx,
+                top: dy,
+                width: 10,
+                height: 10,
+                borderRadius: 5,
+                background: P.muted,
+                opacity: 0.5,
+              }}
+            />
+          ))}
+          <div
+            style={{
+              position: "absolute",
+              left: mix(tween(sec(frame, B3 + 10, fps), 0, 4.2, ease.sineInOut), 170, 978) - 20,
+              top: mix(tween(sec(frame, B3 + 10, fps), 0, 4.2, ease.sineInOut), 260, 570) - 20,
+              fontSize: 40,
+            }}
+          >
+            🚶
+          </div>
+          <div style={{ position: "absolute", left: SLOT_X[3] + CARD_W - 54, top: BAND_Y - 70, fontSize: 40 }}>🔒</div>
+        </>
       )}
 
       {/* b5: the tap itself */}
@@ -233,7 +279,7 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.5}
         data={{
           from: "Router page, home Wi-Fi only",
           to: "Cloudflare Worker, every device",
@@ -242,6 +288,14 @@ const Inner: React.FC = () => {
           points: ["Device name", "Today's usage"],
         }}
       />
+      {/* the handoff diagram sits left of centre, leaving the right band empty — fill it with
+          the two points the diagram already names (no new numbers, same data). */}
+      {frame >= B4 && frame < B5 && (
+        <>
+          <IconCard x={740} y={70} w={240} emoji="🏷" title="Device name" sub="every device, listed" tone="accent" />
+          <IconCard x={1000} y={70} w={240} emoji="⏱" title="Today's usage" sub="live from the Worker" tone="accent" />
+        </>
+      )}
 
       {/* b5 — the verdict, drawn (never the page/hub — gate 2), holds to the end */}
       <MotionInsert
@@ -259,6 +313,15 @@ const Inner: React.FC = () => {
           ],
         }}
       />
+      {/* the verdict list sits mid-frame, leaving the top band empty — fill it with the same
+          three contexts the claims already name, as icons (no new claims, same three). */}
+      {frame >= B5 && (
+        <>
+          <IconCard x={140} y={60} w={260} emoji="🏠" title="Home Wi-Fi" sub="still works" tone="success" />
+          <IconCard x={510} y={60} w={260} emoji="🚪" title="Stranger's Wi-Fi" sub="still works" tone="success" />
+          <IconCard x={880} y={60} w={260} emoji="📶" title="5G" sub="still works" tone="success" />
+        </>
+      )}
 
       <CardDeck />
     </AbsoluteFill>

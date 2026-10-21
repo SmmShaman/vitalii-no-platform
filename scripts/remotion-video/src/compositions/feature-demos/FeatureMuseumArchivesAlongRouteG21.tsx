@@ -159,12 +159,15 @@ const Inner: React.FC = () => {
           system: "DigitaltMuseum — museum archive",
         }}
       />
-      {/* the pipeline chain sits compacted mid-frame, leaving the top band empty — fill it with
-          the two real actors the chain's labels already name (the compaction has no prop for size). */}
+      {/* the pipeline chain sits compacted mid-frame, leaving the top and bottom bands empty —
+          fill them with the chain's own step/result text, not new claims (no prop for size). */}
       {frame >= B3 && frame < B4 && (
         <>
           <IconCard x={90} y={70} w={300} emoji="📍" title="Known places" sub="already on the map" tone="accent" />
+          <IconCard x={640} y={70} w={300} emoji="🚶" title="Walk the drive track" sub="step one" tone="accent" />
           <IconCard x={890} y={70} w={300} emoji="🏛" title="DigitaltMuseum" sub="museum archive" tone="accent" />
+          <StatPill x={110} y={590} emoji="🗺" text="Match finds near track" tone="accent" />
+          <StatPill x={700} y={590} emoji="✅" text="Real history surfaces" tone="success" />
         </>
       )}
 
