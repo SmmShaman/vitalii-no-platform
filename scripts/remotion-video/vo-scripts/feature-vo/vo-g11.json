@@ -1,0 +1,57 @@
+{
+ "id": "g11",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.808,
+  "b2": 7.001,
+  "b3": 5.335,
+  "b4": 7.363,
+  "b5": 4.824
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Long stretches of road had no story \u2014 the guide only spoke at places pinned to one point.",
+   "start_s": 0.5,
+   "end_s": 6.308,
+   "start_f": 15,
+   "end_f": 189
+  },
+  {
+   "beat": "b2",
+   "text": "But the land between has its own history: old roads, railways, trades \u2014 just not tied to a spot.",
+   "start_s": 6.608,
+   "end_s": 13.609,
+   "start_f": 198,
+   "end_f": 408
+  },
+  {
+   "beat": "b3",
+   "text": "Now when nothing specific is due, the guide starts a chapter about the area instead.",
+   "start_s": 13.909,
+   "end_s": 19.244,
+   "start_f": 417,
+   "end_f": 577
+  },
+  {
+   "beat": "b4",
+   "text": "Using Claude, it pulls from old sources \u2014 even two 1902 and 1913 books never narrated before.",
+   "start_s": 19.544,
+   "end_s": 26.907,
+   "start_f": 586,
+   "end_f": 807
+  },
+  {
+   "beat": "b5",
+   "text": "Quiet stretches now get up to 8 chapters about the district, not silence.",
+   "start_s": 27.207,
+   "end_s": 32.031,
+   "start_f": 816,
+   "end_f": 961
+  }
+ ],
+ "total_s": 33.531,
+ "durationInFrames": 1006,
+ "measured_track_s": 32.088,
+ "track": "/root/feature-demos/vo-g11/vo-g11.mp3"
+}

@@ -1,0 +1,57 @@
+{
+ "id": "g12",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.862,
+  "b2": 7.399,
+  "b3": 5.232,
+  "b4": 5.218,
+  "b5": 4.493
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Driving past a place, a quick story starts \u2014 then the drive moves on before it finishes.",
+   "start_s": 0.5,
+   "end_s": 6.362,
+   "start_f": 15,
+   "end_f": 191
+  },
+  {
+   "beat": "b2",
+   "text": "Get interrupted by another place, and that story is gone for good. Street names also repeated on every single pass.",
+   "start_s": 6.662,
+   "end_s": 14.061,
+   "start_f": 200,
+   "end_f": 422
+  },
+  {
+   "beat": "b3",
+   "text": "Now when GPS shows nothing ahead, the guide picks the last story back up.",
+   "start_s": 14.361,
+   "end_s": 19.593,
+   "start_f": 431,
+   "end_f": 588
+  },
+  {
+   "beat": "b4",
+   "text": "It says so first \u2014 back to the story \u2014 then resumes right where it stopped.",
+   "start_s": 19.893,
+   "end_s": 25.111,
+   "start_f": 597,
+   "end_f": 753
+  },
+  {
+   "beat": "b5",
+   "text": "Street names now repeat once every two hours, not every pass.",
+   "start_s": 25.411,
+   "end_s": 29.904,
+   "start_f": 762,
+   "end_f": 897
+  }
+ ],
+ "total_s": 31.404,
+ "durationInFrames": 942,
+ "measured_track_s": 29.976,
+ "track": "/root/feature-demos/vo-g12/vo-g12.mp3"
+}
