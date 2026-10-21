@@ -127,6 +127,55 @@ const Timeline: React.FC = () => {
   );
 };
 
+// Wave C fill-fix: hubRouting/pipelineFlow leave the top and bottom margins empty until
+// late in their own internal reveal. These bands restate data the beat already carries
+// (never new facts) in the top/bottom thirds the effects don't use.
+const FillCaption: React.FC<{
+  from: number;
+  dur: number;
+  y: number;
+  label?: string;
+  chips: string[];
+  tone?: "accent" | "success" | "danger";
+}> = ({ from, dur, y, label, chips, tone = "accent" }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= from + dur) return null;
+  const opacity = tween(sec(frame, from, fps), 0, 0.3, ease.power2Out);
+  const bg = tone === "success" ? P.successBg : tone === "danger" ? P.dangerBg : P.accentBg;
+  const edge = tone === "success" ? P.successEdge : tone === "danger" ? P.dangerEdge : P.accentEdge;
+  const fg = tone === "success" ? P.success : tone === "danger" ? P.danger : P.accent;
+  return (
+    <div style={{ position: "absolute", left: 60, top: y, width: 1160, opacity }}>
+      {label && (
+        <div style={{ fontFamily, fontSize: 28, fontWeight: 800, color: P.ink, marginBottom: 18 }}>{label}</div>
+      )}
+      <div style={{ display: "flex", justifyContent: chips.length > 1 ? "space-between" : "flex-start", gap: 16 }}>
+        {chips.map((c) => (
+          <div
+            key={c}
+            style={{
+              padding: "16px 22px",
+              borderRadius: 8,
+              background: bg,
+              border: `1px solid ${edge}`,
+              color: fg,
+              fontFamily,
+              fontSize: 20,
+              fontWeight: 700,
+              lineHeight: 1.2,
+              textAlign: "center",
+            }}
+          >
+            {c}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   const logOpacity = tween(sec(frame, B5, 30), 0, 0.3, ease.power2Out);
@@ -174,6 +223,8 @@ const Inner: React.FC = () => {
           output: "App playback",
         }}
       />
+      <FillCaption from={B3} dur={B4 - B3} y={40} label="Four lock-screen actions, one API" chips={["Play", "Pause", "Next track", "Stop"]} tone="accent" />
+      <FillCaption from={B3} dur={B4 - B3} y={500} chips={["Routes straight to app playback"]} tone="success" />
 
       {/* b4 — the CI mechanism, drawn */}
       <MotionInsert
@@ -187,6 +238,8 @@ const Inner: React.FC = () => {
           system: "GitHub Actions",
         }}
       />
+      <FillCaption from={B4} dur={B5 - B4} y={40} label="GitHub Actions, every push" chips={["android.yml — build APK", "android-e2e.yml — emulator test"]} tone="accent" />
+      <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Signed APK ready"]} tone="success" />
 
       {/* b5 — show it running, holds to the true end */}
       {frame >= B5 && (

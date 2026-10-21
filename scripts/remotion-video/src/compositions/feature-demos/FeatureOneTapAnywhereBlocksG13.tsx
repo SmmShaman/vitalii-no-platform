@@ -123,6 +123,100 @@ const CardDeck: React.FC = () => {
   );
 };
 
+// Wave C fill-fix: hubRouting leaves the top/bottom margins empty until late in its own
+// internal reveal; funnelAbsorption's funnel silhouette spans nearly full height but stays
+// narrow at the sides. These restate data the beat already carries (never new facts) in
+// the margins each effect doesn't use.
+const FillCaption: React.FC<{
+  from: number;
+  dur: number;
+  y: number;
+  label?: string;
+  chips: string[];
+  tone?: "accent" | "success" | "danger";
+}> = ({ from, dur, y, label, chips, tone = "accent" }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= from + dur) return null;
+  const opacity = tween(sec(frame, from, fps), 0, 0.3, ease.power2Out);
+  const bg = tone === "success" ? P.successBg : tone === "danger" ? P.dangerBg : P.accentBg;
+  const edge = tone === "success" ? P.successEdge : tone === "danger" ? P.dangerEdge : P.accentEdge;
+  const fg = tone === "success" ? P.success : tone === "danger" ? P.danger : P.accent;
+  return (
+    <div style={{ position: "absolute", left: 60, top: y, width: 1160, opacity }}>
+      {label && (
+        <div style={{ fontFamily, fontSize: 28, fontWeight: 800, color: P.ink, marginBottom: 18 }}>{label}</div>
+      )}
+      <div style={{ display: "flex", justifyContent: chips.length > 1 ? "space-between" : "flex-start", gap: 16 }}>
+        {chips.map((c) => (
+          <div
+            key={c}
+            style={{
+              padding: "16px 22px",
+              borderRadius: 8,
+              background: bg,
+              border: `1px solid ${edge}`,
+              color: fg,
+              fontFamily,
+              fontSize: 20,
+              fontWeight: 700,
+              lineHeight: 1.2,
+              textAlign: "center",
+            }}
+          >
+            {c}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Side columns, outside the funnel's narrow mid-width — safe for the funnelAbsorption beat only.
+const FunnelFlank: React.FC<{
+  from: number;
+  dur: number;
+  side: "left" | "right";
+  label: string;
+  chips: string[];
+  tone?: "accent" | "success" | "danger";
+}> = ({ from, dur, side, label, chips, tone = "danger" }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= from + dur) return null;
+  const opacity = tween(sec(frame, from, fps), 0, 0.3, ease.power2Out);
+  const bg = tone === "success" ? P.successBg : tone === "danger" ? P.dangerBg : P.accentBg;
+  const edge = tone === "success" ? P.successEdge : tone === "danger" ? P.dangerEdge : P.accentEdge;
+  const fg = tone === "success" ? P.success : tone === "danger" ? P.danger : P.accent;
+  return (
+    <div style={{ position: "absolute", left: side === "left" ? 60 : 970, top: 250, width: 250, opacity }}>
+      <div style={{ fontFamily, fontSize: 20, fontWeight: 800, color: P.ink, marginBottom: 14 }}>{label}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {chips.map((c) => (
+          <div
+            key={c}
+            style={{
+              padding: "12px 16px",
+              borderRadius: 8,
+              background: bg,
+              border: `1px solid ${edge}`,
+              color: fg,
+              fontFamily,
+              fontSize: 16,
+              fontWeight: 700,
+              lineHeight: 1.25,
+            }}
+          >
+            {c}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   const logOpacity = tween(sec(frame, B5, 30), 0, 0.3, ease.power2Out);
@@ -175,6 +269,8 @@ const Inner: React.FC = () => {
           result: "Finally blocked",
         }}
       />
+      <FunnelFlank from={B3} dur={B4 - B3} side="left" label="On foot" chips={["Walk home first", "Open the router admin page"]} tone="danger" />
+      <FunnelFlank from={B3} dur={B4 - B3} side="right" label="The result" chips={["Finally blocked"]} tone="success" />
 
       {/* b4 — the mechanism, drawn */}
       <MotionInsert
@@ -188,6 +284,8 @@ const Inner: React.FC = () => {
           output: "Live device list",
         }}
       />
+      <FillCaption from={B4} dur={B5 - B4} y={40} label="Three inputs, one worker" chips={["Router agent", "Device name + MAC", "Today's usage"]} tone="accent" />
+      <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Routes straight to the live device list"]} tone="success" />
 
       {/* b5 — the payoff, holds to the true end */}
       {frame >= B5 && (
