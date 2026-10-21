@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureOneVpsRunnerReplacedE03 } from "./compositions/feature-demos/FeatureOneVpsRunnerReplacedE03";
+import { FeatureElvarikaRealAndroidAppE02 } from "./compositions/feature-demos/FeatureElvarikaRealAndroidAppE02";
 import { FeatureEveryDemoVideoGetsD02 } from "./compositions/feature-demos/FeatureEveryDemoVideoGetsD02";
 import { FeatureFamilyGuardKnowsWhichG14 } from "./compositions/feature-demos/FeatureFamilyGuardKnowsWhichG14";
 import { FeatureEveryStorySaysHouseG22 } from "./compositions/feature-demos/FeatureEveryStorySaysHouseG22";
@@ -2640,6 +2642,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureWhenRoadGoesQuietG11"
         component={FeatureWhenRoadGoesQuietG11}
         durationInFrames={1006}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureOneVpsRunnerReplacedE03"
+        component={FeatureOneVpsRunnerReplacedE03}
+        durationInFrames={973}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureElvarikaRealAndroidAppE02"
+        component={FeatureElvarikaRealAndroidAppE02}
+        durationInFrames={994}
         fps={30}
         width={1280}
         height={720}

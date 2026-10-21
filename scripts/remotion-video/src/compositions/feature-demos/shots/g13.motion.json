@@ -4,33 +4,60 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "titleTakeover",
+      "effect": "statusFocus",
       "backdrop": "page",
-      "data": { "title": "Family Link never saw them", "kicker": "PlayStation, TV stick, guest laptops — and the router page only worked from home" }
+      "data": {
+        "title": "Family Link blind spots",
+        "claims": [
+          { "text": "Sees the PlayStation", "verdict": "no" },
+          { "text": "Sees the Android TV stick", "verdict": "no" },
+          { "text": "Router page works outside the house", "verdict": "no" }
+        ]
+      }
     },
     {
       "beat": "b2",
-      "effect": "keywordCaption",
-      "backdrop": null,
-      "data": { "line1": "A guest list that skips half the house", "keywords": ["guest list", "skips"] }
+      "effect": "quoteMarker",
+      "backdrop": "hub",
+      "data": {
+        "quote": "It's like a guest list that skips half the house.",
+        "highlight": "skips half the house"
+      }
     },
     {
       "beat": "b3",
-      "effect": "drawn",
+      "effect": "funnelAbsorption",
       "backdrop": null,
-      "note": "archetype only: the device cards stay scattered and locked, a tiny figure walks home — the only way to reach the router menus"
+      "data": {
+        "inputs": ["Notice a device acting up", "Walk home first", "Open the router admin page", "Hunt the device list for a MAC"],
+        "result": "Finally blocked"
+      }
     },
     {
       "beat": "b4",
-      "effect": "handoffExplain",
-      "backdrop": "page2",
-      "data": { "from": "Router page, home Wi-Fi only", "to": "Cloudflare Worker, every device", "points": ["Device name", "Today's usage"], "fromLabel": "Before", "toLabel": "Now" }
+      "effect": "hubRouting",
+      "backdrop": null,
+      "data": {
+        "inputs": ["Router agent", "Device name + MAC", "Today's usage"],
+        "hub": "Cloudflare Worker",
+        "output": "Live device list"
+      }
     },
     {
       "beat": "b5",
-      "effect": "statusFocus",
+      "effect": "drawn",
       "backdrop": null,
-      "data": { "title": "One tap, same block", "claims": [{ "text": "Home Wi-Fi", "verdict": "yes" }, { "text": "Stranger's Wi-Fi", "verdict": "yes" }, { "text": "5G", "verdict": "yes" }] }
+      "data": {
+        "logTitle": "guard worker",
+        "lines": [
+          { "t": "00:00", "text": "tap -> block device", "tone": "accent" },
+          { "t": "00:01", "text": "worker/src/index.js: route to router agent", "tone": "ink" },
+          { "t": "00:02", "text": "guard_agent.py + router.py apply block", "tone": "ink" },
+          { "t": "00:03", "text": "protected devices skip (300 pkts/30s threshold)", "tone": "ink" },
+          { "t": "00:04", "text": "same tap: home Wi-Fi, stranger's Wi-Fi, 5G", "tone": "success" },
+          { "t": "00:05", "text": "block confirmed", "tone": "success" }
+        ]
+      }
     }
   ]
 }

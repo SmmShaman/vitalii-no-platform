@@ -1,0 +1,21 @@
+{
+  "id": "e03",
+  "viewport": { "width": 1280, "height": 800 },
+  "dsf": 1,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/one-vps-runner-replaced-azure-zvukogram-and-stanza-and-closed-a-free-credits-hol-e03",
+      "frames": 90,
+      "scroll": [[0, 0], [45, 260], [89, 520]],
+      "mouse": [[0, 640, 120], [45, 640, 300], [89, 640, 480]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 90,
+      "scroll": [[0, 0], [45, 180], [89, 360]],
+      "mouse": [[0, 640, 120], [45, 640, 300], [89, 640, 480]]
+    }
+  ]
+}

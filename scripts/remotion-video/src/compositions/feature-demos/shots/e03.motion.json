@@ -1,0 +1,58 @@
+{
+  "id": "e03",
+  "composition": "FeatureOneVpsRunnerReplacedE03",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Three outside services — one failure stalled a lesson",
+        "tags": ["Any service breaks it", "Billing ran in browser", "Replay = free ride", "Cost on every request"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Three outside services",
+        "to": "One VPS runner",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Analysis + playlist, one process", "Credits charged only server-side", "Jobs queue, Postgres trigger wakes it"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Every back door closed — every sale passes the till.",
+        "keywords": ["door", "till"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "hubRouting",
+      "backdrop": null,
+      "data": {
+        "inputs": ["Azure analysis", "Zvukogram TTS", "Stanza NLP"],
+        "hub": "VPS runner",
+        "outputs": ["Analysis", "Playlist gen", "Billing"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "ratioBars",
+      "backdrop": null,
+      "data": {
+        "a": { "label": "Old edge functions", "value": 1796 },
+        "b": { "label": "New runner", "value": 682 },
+        "unit": "lines",
+        "title": "Code deleted",
+        "caption": "Three services, one file"
+      }
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "id": "e02",
+  "composition": "FeatureElvarikaRealAndroidAppE02",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Elvarika — text becomes a lesson",
+        "tags": ["No lock-screen play", "Browser tab only", "Stuck mid-walk", "Tab must stay open"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Browser tab only",
+        "to": "Real Android app",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Installs like a native app", "Lock-screen controls work", "Play, pause, skip, stop"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "hubRouting",
+      "backdrop": null,
+      "data": {
+        "inputs": ["Play", "Pause", "Next track", "Stop"],
+        "hub": "Media Session API",
+        "output": "App playback"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Push code", "Build APK", "Test on emulator"],
+        "result": "Signed APK ready",
+        "system": "GitHub Actions"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": {
+        "logTitle": "android.yml",
+        "lines": [
+          { "t": "00:00", "text": "push -> main", "tone": "accent" },
+          { "t": "00:04", "text": "android.yml: build APK", "tone": "ink" },
+          { "t": "00:41", "text": "APK signed", "tone": "success" },
+          { "t": "00:42", "text": "android-e2e.yml: emulator boot", "tone": "ink" },
+          { "t": "01:58", "text": "play / pause / stop on lock screen OK", "tone": "success" },
+          { "t": "02:10", "text": "0 manual steps, 0 store review", "tone": "success" }
+        ]
+      }
+    }
+  ]
+}
