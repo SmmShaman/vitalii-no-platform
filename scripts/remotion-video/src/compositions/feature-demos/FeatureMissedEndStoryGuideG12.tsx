@@ -86,10 +86,16 @@ const Deck: React.FC = () => {
   const interruptPunch = showInterrupt ? punchScale(sec(frame, B2 + 20, fps), 0) : 1;
   const showRepeatBadge = frame >= B2 + 60 && frame < B3;
 
-  // b3: the lost card slides back into the deck from the edge.
+  // b3: the lost card slides back into the deck from the edge, enlarged and
+  // parked low so it doesn't just restate the pipelineFlow band above it.
   const showRecalled = frame >= B3 + 10 && frame < B5;
   const recallSlide = showRecalled ? tween(sec(frame, B3 + 10, fps), 0, 0.4, ease.power3Out) : 0;
-  const recalledX = DECK_CX - CARD_W / 2 + 28 + (1 - recallSlide) * 420;
+  const RECALL_W = 440;
+  const RECALL_H = 140;
+  const recalledLeft = DECK_CX - RECALL_W / 2 + (1 - recallSlide) * 420;
+  // b3: a GPS status ribbon up top — otherwise the frame's top third sits empty
+  // while pipelineFlow's compacted diagram occupies only the middle band.
+  const showGpsStatus = frame >= B3 + 30 && frame < B4;
 
   // b4: the recalled card punches up to full size and glows "resumed".
   const resumed = frame >= B4 + 10 && frame < B5;
@@ -157,14 +163,49 @@ const Deck: React.FC = () => {
           {showRecalled && !resumed && (
             <div
               style={{
-                ...cardStyle(2, true),
-                left: recalledX,
+                position: "absolute",
+                left: recalledLeft,
+                top: 560,
+                width: RECALL_W,
+                height: RECALL_H,
+                borderRadius: 10,
                 background: P.accentBg,
+                border: `3px solid ${P.accent}`,
+                boxShadow: `0 0 0 6px ${P.accentEdge}, 8px 8px 0 rgba(0,0,0,0.35)`,
+                boxSizing: "border-box",
+                padding: "18px 24px",
+                color: P.ink,
+                fontFamily,
               }}
             >
-              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>RECALLED</div>
-              <div style={{ fontSize: 17, fontWeight: 700, marginTop: 6 }}>Picked back up</div>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>RECALLED</div>
+              <div style={{ fontSize: 20, fontWeight: 700, marginTop: 8, lineHeight: 1.25 }}>Picked back up — right where it stopped</div>
             </div>
+          )}
+          {showGpsStatus && (
+            <Arrive at={B3 + 30} kind="wipe" box={{ x: 140, y: 64, w: 1000, h: 110 }} dur={0.3}>
+              <div
+                style={{
+                  position: "absolute",
+                  left: 140,
+                  top: 64,
+                  width: 1000,
+                  height: 110,
+                  borderRadius: 10,
+                  background: P.card,
+                  border: `3px solid ${P.border}`,
+                  boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
+                  boxSizing: "border-box",
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "0 32px",
+                  fontFamily,
+                }}
+              >
+                <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.6, color: P.accent, marginRight: 24 }}>GPS</div>
+                <div style={{ fontSize: 24, fontWeight: 700, color: P.ink }}>Nothing due ahead — safe to resume</div>
+              </div>
+            </Arrive>
           )}
 
           {resumed && (
@@ -193,64 +234,70 @@ const Deck: React.FC = () => {
             <div
               style={{
                 position: "absolute",
-                left: 280,
-                top: 230,
-                width: 220,
-                height: 260,
+                left: 120,
+                top: 150,
+                width: 320,
+                height: 420,
                 borderRadius: 10,
                 background: P.card,
                 border: `3px solid ${P.border}`,
                 boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
                 boxSizing: "border-box",
-                padding: 20,
+                padding: 28,
                 fontFamily,
                 color: P.ink,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
                 transform: `scale(${fanPunch(B5 + 10)})`,
-                transformOrigin: "390px 360px",
+                transformOrigin: "280px 360px",
               }}
             >
-              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>STORIES</div>
-              <div style={{ fontSize: 19, fontWeight: 700, marginTop: 10, lineHeight: 1.25 }}>Resumed, not lost</div>
+              <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>STORIES</div>
+              <div style={{ fontSize: 24, fontWeight: 700, marginTop: 14, lineHeight: 1.3 }}>Resumed, not lost</div>
             </div>
           )}
           {fan1 && (
             <div
               style={{
                 position: "absolute",
-                left: 530,
-                top: 230,
-                width: 220,
-                height: 260,
+                left: 480,
+                top: 150,
+                width: 320,
+                height: 420,
                 borderRadius: 10,
                 background: P.card,
                 border: `3px solid ${P.border}`,
                 boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
                 boxSizing: "border-box",
-                padding: 20,
+                padding: 28,
                 fontFamily,
                 color: P.ink,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
                 transform: `scale(${fanPunch(B5 + 40)})`,
                 transformOrigin: "640px 360px",
               }}
             >
-              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>STREET NAMES</div>
-              <div style={{ fontSize: 19, fontWeight: 700, marginTop: 10, lineHeight: 1.25 }}>Once, not every pass</div>
+              <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>STREET NAMES</div>
+              <div style={{ fontSize: 24, fontWeight: 700, marginTop: 14, lineHeight: 1.3 }}>Once, not every pass</div>
             </div>
           )}
           {fan2 && (
             <div
               style={{
                 position: "absolute",
-                left: 780,
-                top: 230,
-                width: 220,
-                height: 260,
+                left: 840,
+                top: 150,
+                width: 320,
+                height: 420,
                 borderRadius: 10,
                 background: P.accent,
                 border: `3px solid ${P.accentEdge}`,
                 boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
                 boxSizing: "border-box",
-                padding: 20,
+                padding: 28,
                 fontFamily,
                 color: "#fff",
                 display: "flex",
@@ -258,11 +305,11 @@ const Deck: React.FC = () => {
                 justifyContent: "center",
                 alignItems: "center",
                 transform: `scale(${fanPunch(B5 + 70)})`,
-                transformOrigin: "890px 360px",
+                transformOrigin: "1000px 360px",
               }}
             >
-              <div style={{ fontSize: 64, fontWeight: 800, lineHeight: 1 }}>2</div>
-              <div style={{ fontSize: 15, fontWeight: 700, marginTop: 8, textAlign: "center" }}>hours between repeats</div>
+              <div style={{ fontSize: 96, fontWeight: 800, lineHeight: 1 }}>2</div>
+              <div style={{ fontSize: 19, fontWeight: 700, marginTop: 14, textAlign: "center" }}>hours between repeats</div>
             </div>
           )}
         </>

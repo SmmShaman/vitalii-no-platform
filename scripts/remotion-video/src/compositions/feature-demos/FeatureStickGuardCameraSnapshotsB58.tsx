@@ -238,6 +238,33 @@ const Inner: React.FC = () => {
               <div style={{ fontSize: 13, marginTop: 6, color: "#6E8198" }}>commit 32f154b</div>
             </div>
           </Arrive>
+          {/* bottom third was empty beside the two right-side cards — a wide
+              strip spells out why the move matters, low in the frame */}
+          <Arrive at={B3 + 90} kind="rise" box={{ x: 140, y: 560, w: 1000, h: 120 }}>
+            <div
+              style={{
+                position: "absolute",
+                left: 140,
+                top: 560,
+                width: 1000,
+                height: 120,
+                borderRadius: 10,
+                background: "#1A2430",
+                border: "3px solid #3A4A5C",
+                boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
+                boxSizing: "border-box",
+                display: "flex",
+                alignItems: "center",
+                padding: "0 32px",
+                fontFamily,
+              }}
+            >
+              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.6, color: "#7FC4FF", marginRight: 24 }}>WHY</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#E7F5FF" }}>
+                Same script, now supervised by Windows — restarts itself, no phone required
+              </div>
+            </div>
+          </Arrive>
         </>
       )}
 

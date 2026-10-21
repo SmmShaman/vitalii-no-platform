@@ -115,6 +115,23 @@ const Ribbon: React.FC = () => {
     transformOrigin: `${x}px ${RIBBON_Y}px`,
   });
 
+  // b5 only: the land slots zigzag above/below the line so the result reads
+  // across three rows of the frame, not one thin band.
+  const landDotStyle = (x: number, y: number, scale: number): React.CSSProperties => ({
+    position: "absolute",
+    left: x - 22,
+    top: y - 22,
+    width: 44,
+    height: 44,
+    borderRadius: "50%",
+    background: P.accent,
+    border: `3px solid ${P.accentEdge}`,
+    boxShadow: `0 0 0 8px ${P.accentEdge}`,
+    boxSizing: "border-box",
+    transform: `scale(${scale})`,
+    transformOrigin: `${x}px ${y}px`,
+  });
+
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720 }}>
       {/* the band itself, always on once drawn */}
@@ -122,10 +139,10 @@ const Ribbon: React.FC = () => {
         style={{
           position: "absolute",
           left: RIBBON_X0,
-          top: RIBBON_Y - 4,
+          top: RIBBON_Y - (resultMode ? 14 : 4),
           width: RIBBON_X1 - RIBBON_X0,
-          height: 8,
-          borderRadius: 4,
+          height: resultMode ? 28 : 8,
+          borderRadius: resultMode ? 14 : 4,
           background: resultMode ? P.accentBg : P.border,
         }}
       />
@@ -193,6 +210,54 @@ const Ribbon: React.FC = () => {
           >
             CHAPTER STARTS
           </div>
+          {/* status ribbon up top — otherwise the top third sits empty while
+              pipelineFlow's compacted diagram occupies only the middle band */}
+          <Arrive at={B3 + 30} kind="wipe" box={{ x: 140, y: 64, w: 1000, h: 110 }} dur={0.3}>
+            <div
+              style={{
+                position: "absolute",
+                left: 140,
+                top: 64,
+                width: 1000,
+                height: 110,
+                borderRadius: 10,
+                background: P.card,
+                border: `3px solid ${P.border}`,
+                boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
+                boxSizing: "border-box",
+                display: "flex",
+                alignItems: "center",
+                padding: "0 32px",
+                fontFamily,
+              }}
+            >
+              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.6, color: P.accent, marginRight: 24 }}>ROUTE CHECK</div>
+              <div style={{ fontSize: 24, fontWeight: 700, color: P.ink }}>Nothing specific due — starts a chapter instead</div>
+            </div>
+          </Arrive>
+          {/* a bigger card low in the frame, not just a label under the node */}
+          <Arrive at={B3 + 40} kind="rise" box={{ x: 420, y: 560, w: 440, h: 140 }} dur={0.3}>
+            <div
+              style={{
+                position: "absolute",
+                left: 420,
+                top: 560,
+                width: 440,
+                height: 140,
+                borderRadius: 10,
+                background: P.accentBg,
+                border: `3px solid ${P.accent}`,
+                boxShadow: `0 0 0 6px ${P.accentEdge}, 8px 8px 0 rgba(0,0,0,0.35)`,
+                boxSizing: "border-box",
+                padding: "18px 24px",
+                color: P.ink,
+                fontFamily,
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>CHAPTER, NOT A PIN</div>
+              <div style={{ fontSize: 20, fontWeight: 700, marginTop: 8, lineHeight: 1.25 }}>About the area, not one pinned point</div>
+            </div>
+          </Arrive>
         </>
       )}
 
@@ -224,46 +289,80 @@ const Ribbon: React.FC = () => {
         </>
       )}
 
-      {/* b5 — every land slot lights up, ending on the hero number 8 */}
+      {/* b5 — every land slot lights up in a zigzag across three rows, ending
+          on the hero number 8 inside a card, with a result card below */}
       {resultMode && (
         <>
-          {LAND.map((i, idx) => (
-            <div key={i} style={litStyle(slotX(i), resultPunch(B5 + 8 + idx * 10))} />
-          ))}
-          {frame >= B5 + 8 + (LAND.length - 1) * 10 && (
-            <div
-              style={{
-                position: "absolute",
-                left: slotX(ACTIVE_INDEX) - 60,
-                top: RIBBON_Y - 48,
-                width: 120,
-                textAlign: "center",
-                fontSize: 13,
-                fontWeight: 800,
-                letterSpacing: 1.1,
-                color: P.accent,
-                fontFamily,
-              }}
-            >
-              NOW
-            </div>
-          )}
+          {LAND.map((i, idx) => {
+            const x = slotX(i);
+            const yOff = [-80, 0, 80][idx % 3];
+            const y = RIBBON_Y + yOff;
+            const scale = resultPunch(B5 + 8 + idx * 10);
+            return (
+              <React.Fragment key={i}>
+                {yOff !== 0 && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      left: x - 2,
+                      top: Math.min(y, RIBBON_Y) + 14,
+                      width: 4,
+                      height: Math.max(Math.abs(yOff) - 14, 1),
+                      background: P.accentEdge,
+                    }}
+                  />
+                )}
+                <div style={landDotStyle(x, y, scale)} />
+              </React.Fragment>
+            );
+          })}
           <div
             style={{
               position: "absolute",
-              left: 490,
-              top: 120,
-              width: 300,
+              left: 400,
+              top: 50,
+              width: 480,
+              height: 160,
+              borderRadius: 10,
+              background: P.card,
+              border: `3px solid ${P.border}`,
+              boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
+              boxSizing: "border-box",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              justifyContent: "center",
               fontFamily,
               color: P.ink,
             }}
           >
-            <div style={{ fontSize: 108, fontWeight: 800, lineHeight: 1 }}>8</div>
-            <div style={{ fontSize: 17, fontWeight: 700, marginTop: 6, letterSpacing: 1.2 }}>CHAPTERS, NOT SILENCE</div>
+            <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1 }}>8</div>
+            <div style={{ fontSize: 16, fontWeight: 700, marginTop: 8, letterSpacing: 1.2 }}>CHAPTERS, NOT SILENCE</div>
           </div>
+          {frame >= B5 + 8 + (LAND.length - 1) * 10 && (
+            <div
+              style={{
+                position: "absolute",
+                left: 340,
+                top: 560,
+                width: 600,
+                height: 130,
+                borderRadius: 10,
+                background: P.accentBg,
+                border: `3px solid ${P.accent}`,
+                boxShadow: `0 0 0 6px ${P.accentEdge}, 8px 8px 0 rgba(0,0,0,0.35)`,
+                boxSizing: "border-box",
+                padding: "16px 28px",
+                fontFamily,
+                color: P.ink,
+              }}
+            >
+              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>DISTRICT GUIDE</div>
+              <div style={{ fontSize: 20, fontWeight: 700, marginTop: 8, lineHeight: 1.3 }}>
+                Quiet stretches now get up to 8 chapters about the area, not silence.
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
