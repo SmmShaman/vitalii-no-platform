@@ -1,0 +1,57 @@
+{
+ "id": "e01",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.159,
+  "b2": 5.602,
+  "b3": 4.115,
+  "b4": 5.48,
+  "b5": 5.569
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A client's app sat on a database I didn't control the server of \u2014 one quota freeze from going dark, same as my own site already had.",
+   "start_s": 0.5,
+   "end_s": 8.659,
+   "start_f": 15,
+   "end_f": 260
+  },
+  {
+   "beat": "b2",
+   "text": "So I moved it: a self-hosted Supabase stack on my own machine, behind a tunnel.",
+   "start_s": 8.959,
+   "end_s": 14.561,
+   "start_f": 269,
+   "end_f": 437
+  },
+  {
+   "beat": "b3",
+   "text": "Same login, same keys \u2014 nobody even noticed the switch.",
+   "start_s": 14.861,
+   "end_s": 18.976,
+   "start_f": 446,
+   "end_f": 569
+  },
+  {
+   "beat": "b4",
+   "text": "I also found a security hole: a user could grant themselves admin rights through signup.",
+   "start_s": 19.276,
+   "end_s": 24.756,
+   "start_f": 578,
+   "end_f": 743
+  },
+  {
+   "beat": "b5",
+   "text": "Closed it, and dropped one old piece of the stack \u2014 freeing 500 megabytes of RAM.",
+   "start_s": 25.056,
+   "end_s": 30.625,
+   "start_f": 752,
+   "end_f": 919
+  }
+ ],
+ "total_s": 32.125,
+ "durationInFrames": 964,
+ "measured_track_s": 30.696,
+ "track": "/root/feature-demos/vo-e01/vo-e01.mp3"
+}

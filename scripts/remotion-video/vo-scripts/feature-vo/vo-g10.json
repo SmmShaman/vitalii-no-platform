@@ -1,0 +1,57 @@
+{
+ "id": "g10",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.064,
+  "b2": 6.738,
+  "b3": 4.204,
+  "b4": 5.051,
+  "b5": 5.651
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A Ukrainian story mentions a Norwegian town, and the name comes out wrong \u2014 forced into Cyrillic, nothing like a Norwegian would say it.",
+   "start_s": 0.5,
+   "end_s": 8.564,
+   "start_f": 15,
+   "end_f": 257
+  },
+  {
+   "beat": "b2",
+   "text": "Odd \u2014 the app already had a real Norwegian voice saying that same name correctly, elsewhere in the story.",
+   "start_s": 8.864,
+   "end_s": 15.602,
+   "start_f": 266,
+   "end_f": 468
+  },
+  {
+   "beat": "b3",
+   "text": "Now the AI marks every Norwegian name instead of translating it.",
+   "start_s": 15.902,
+   "end_s": 20.106,
+   "start_f": 477,
+   "end_f": 603
+  },
+  {
+   "beat": "b4",
+   "text": "The audio pipeline splices that real recording right into the Ukrainian sentence.",
+   "start_s": 20.406,
+   "end_s": 25.457,
+   "start_f": 612,
+   "end_f": 764
+  },
+  {
+   "beat": "b5",
+   "text": "The fix went back into every story already published too \u2014 rewritten in batches of eight.",
+   "start_s": 25.757,
+   "end_s": 31.408,
+   "start_f": 773,
+   "end_f": 942
+  }
+ ],
+ "total_s": 32.908,
+ "durationInFrames": 987,
+ "measured_track_s": 31.464,
+ "track": "/root/feature-demos/vo-g10/vo-g10.mp3"
+}

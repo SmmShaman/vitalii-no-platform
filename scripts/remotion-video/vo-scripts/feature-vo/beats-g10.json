@@ -1,0 +1,7 @@
+{"id": "g10", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "A Ukrainian story mentions a Norwegian town, and the name comes out wrong — forced into Cyrillic, nothing like a Norwegian would say it."],
+  ["b2", "Odd — the app already had a real Norwegian voice saying that same name correctly, elsewhere in the story."],
+  ["b3", "Now the AI marks every Norwegian name instead of translating it."],
+  ["b4", "The audio pipeline splices that real recording right into the Ukrainian sentence."],
+  ["b5", "The fix went back into every story already published too — rewritten in batches of eight."]
+]}

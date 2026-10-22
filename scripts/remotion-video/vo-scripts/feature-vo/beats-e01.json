@@ -1,0 +1,7 @@
+{"id": "e01", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "A client's app sat on a database I didn't control the server of — one quota freeze from going dark, same as my own site already had."],
+  ["b2", "So I moved it: a self-hosted Supabase stack on my own machine, behind a tunnel."],
+  ["b3", "Same login, same keys — nobody even noticed the switch."],
+  ["b4", "I also found a security hole: a user could grant themselves admin rights through signup."],
+  ["b5", "Closed it, and dropped one old piece of the stack — freeing 500 megabytes of RAM."]
+]}
