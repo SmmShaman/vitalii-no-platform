@@ -1,0 +1,54 @@
+{
+  "id": "e01",
+  "composition": "FeatureElvarikaLeftManagedSupabaseE01",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "No control of the server",
+        "tags": ["Managed host, not mine", "One quota freeze away", "Already hit vitalii.no", "Stuck with their tools"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "copyCorrection",
+      "backdrop": "hub",
+      "data": {
+        "wrong": "A database I don't control",
+        "right": "My own server, same keys",
+        "label": "Supabase, self-hosted"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Same login. Same keys.",
+        "line2": "Nobody even noticed the switch.",
+        "keywords": ["Same login", "noticed"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["New user signs up", "Client sends a role field", "Server trusted it blindly"],
+        "result": "Self-granted admin access",
+        "system": "Signup endpoint"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": {
+        "title": "500MB of RAM freed",
+        "kicker": "Two new triggers closed the hole for good"
+      }
+    }
+  ]
+}

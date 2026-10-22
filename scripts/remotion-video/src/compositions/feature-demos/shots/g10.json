@@ -1,0 +1,21 @@
+{
+  "id": "g10",
+  "viewport": { "width": 1280, "height": 800 },
+  "dsf": 1,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/norwegian-names-inside-ukrainian-sentences-are-now-spoken-by-an-actual-norwegian-g10",
+      "frames": 90,
+      "scroll": [[0, 0], [45, 260], [89, 520]],
+      "mouse": [[0, 640, 120], [45, 640, 300], [89, 640, 480]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 90,
+      "scroll": [[0, 0], [45, 180], [89, 360]],
+      "mouse": [[0, 640, 120], [45, 640, 300], [89, 640, 480]]
+    }
+  ]
+}

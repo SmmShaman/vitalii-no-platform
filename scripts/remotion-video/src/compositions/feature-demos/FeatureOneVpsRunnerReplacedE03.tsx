@@ -1,19 +1,21 @@
 // FeatureOneVpsRunnerReplacedE03 — feature e03 — 1280x720, 973 frames @ 30fps, VOICE-SYNCED.
-// archetype 0 split-duel, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 1 timeline ribbon, mood slate. RE-SHOOT (feature-motion skill, 2026-10-22):
+// same beats, same sentences, same page/hub backdrops as the original split-duel
+// cut — only the picture changed.
 //
-// Split Duel lives in the bottom band: three red "chaos" tags (Azure / Zvukogram /
-// Stanza) on the left, one steady green "VPS RUNNER (systemd)" block on the right —
-// the clip's one tech-credibility caption — with a divider between them that slides
-// from mostly-chaos to mostly-order across the whole clip. Effects own the frame
-// above; the band stays alive throughout via the continuous slide + tag jitter, so
-// nothing in it holds a single pose for more than a beat.
+// Timeline ribbon lives center-stage: five slots run left→right, one per beat,
+// each landing as a stamp the instant its beat starts — "3 SERVICES" (red) →
+// "VPS RUNNER" (green, the three merge into it) → "DOORS CLOSED" → "ONE HUB" →
+// the hero number "682". A connecting line fills in behind the lit stamps as
+// time passes, so the ribbon always reads as one continuous timeline, never a
+// static row — deleting it leaves no timeline to read. Headline stays small,
+// bottom-left, never centered, per the archetype.
 //
-// No LogWindow: there is no runtime log for this product on the VPS, and the real
-// page/hub backdrops in b1/b2 already cover "play the real product" — a synthetic
-// log would have cost a beat better spent on the hubRouting mechanism and the
-// ratioBars payoff.
+// No LogWindow: there is no runtime log for this product on the VPS, and the
+// real page/hub backdrops in b1/b2 already cover "play the real product" — a
+// synthetic log would have cost a beat better spent on the ribbon itself.
 //
-// Beat → effect (data only from the feature row and commit fef7168):
+// Beat → effect (unchanged from the split-duel cut — only the staging changed):
 // b1 15-321   problem: three outside services, a credits bypass running client-side.
 //             cornerTags over the feature's own page (backdrop) — central claim
 //             plus four short problem tags.
@@ -33,7 +35,7 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { MotionInsert, LiveBackdrop, cut } from "./motion-primitives";
+import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/e03.json";
 
@@ -44,103 +46,250 @@ const B4 = 588;
 const B5 = 770;
 const END = 973;
 
-const ACCENT = "#2563EB"; // dawn's native accent — reads fine on the dark stage, no retune needed
-const STAGE = "#0B1220";
-
-// Lower band geometry (1280x720, below the effects' safe bottom at y≈587).
-const LT = { x: 40, y: 606, w: 1200, h: 92 };
+/** slate's native accent (#0E7490) reads muddy on a dark stage — brightened for it. */
+const ACCENT = "#38BDF8";
+const STAGE = "#0B1420";
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-const SplitDuel: React.FC = () => {
+// Ribbon geometry — a horizontal band dominating the frame; five slots, one per
+// beat, landing left→right as the story moves forward.
+const RIBBON_Y = 330;
+const RIBBON_X0 = 140;
+const RIBBON_X1 = 1140;
+const SLOT_COUNT = 5;
+const slotX = (i: number) => RIBBON_X0 + (i * (RIBBON_X1 - RIBBON_X0)) / (SLOT_COUNT - 1);
+
+type Tone = "danger" | "success" | "accent";
+const STAMPS: { at: number; end: number; label: string; tone: Tone; hero?: boolean }[] = [
+  { at: B1, end: B2, label: "3 SERVICES", tone: "danger" },
+  { at: B2, end: B3, label: "VPS RUNNER", tone: "success" },
+  { at: B3, end: B4, label: "DOORS CLOSED", tone: "accent" },
+  { at: B4, end: B5, label: "ONE HUB", tone: "accent" },
+  { at: B5, end: END, label: "682", tone: "success", hero: true },
+];
+
+const LABEL_BOX = { x: 40, y: 606, w: 320, h: 80 };
+const PLATE_BOX = { x: 700, y: 606, w: 540, h: 96 };
+
+const Ribbon: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B1) return null;
 
-  const bandOpacity = tween(sec(frame, B1, fps), 0, 0.3, ease.power2Out);
+  const toneColor = (tone: Tone) => (tone === "danger" ? P.danger : tone === "success" ? P.success : P.accent);
+  const toneBg = (tone: Tone) => (tone === "danger" ? P.dangerBg : tone === "success" ? P.successBg : P.accentBg);
+  const toneEdge = (tone: Tone) => (tone === "danger" ? P.dangerEdge : tone === "success" ? P.successEdge : P.accentEdge);
 
-  // Divider slides from 78% (mostly chaos) to 24% (mostly order) across the whole clip.
-  const slide = tween(sec(frame, B1, fps), 0, (END - B1) / fps, ease.sineInOut);
-  const frac = mix(slide, 0.78, 0.24);
-  const dividerX = LT.w * frac;
+  // active slot index + progress fill from it towards the next slot
+  let active = 0;
+  for (let i = 0; i < STAMPS.length; i++) if (frame >= STAMPS[i].at) active = i;
+  const nextX = active + 1 < SLOT_COUNT ? slotX(active + 1) : slotX(active);
+  const segProgress = active + 1 < SLOT_COUNT ? tween(sec(frame, STAMPS[active].at, fps), 0, (STAMPS[active].end - STAMPS[active].at) / fps, ease.sineInOut) : 1;
+  const fillX = mix(segProgress, slotX(active), nextX);
 
   const t = sec(frame, B1, fps);
   const jitter = (seed: number) => Math.sin(t * 2.4 + seed) * 2.5;
-  const pulse = 0.6 + 0.4 * (0.5 + 0.5 * Math.sin(t * 1.6));
 
-  const tags = [
+  const subChips = [
     { label: "AZURE", seed: 0 },
     { label: "ZVUKOGRAM", seed: 2.1 },
     { label: "STANZA", seed: 4.4 },
   ];
-
-  const orderArrive = frame >= B2 ? punchScale(sec(frame, B2, fps), 0) : 0;
+  const chipsDimmed = frame >= B2;
 
   return (
-    <div style={{ position: "absolute", left: LT.x, top: LT.y, width: LT.w, height: LT.h, opacity: bandOpacity }}>
-      {/* chaos zone */}
-      <div style={{ position: "absolute", left: 0, top: 0, width: dividerX, height: LT.h, overflow: "hidden" }}>
-        {tags.map((tg, i) => (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720 }}>
+      {/* the band itself, always on once drawn */}
+      <div style={{ position: "absolute", left: RIBBON_X0, top: RIBBON_Y - 4, width: RIBBON_X1 - RIBBON_X0, height: 8, borderRadius: 4, background: P.border }} />
+      <div style={{ position: "absolute", left: RIBBON_X0, top: RIBBON_Y - 4, width: Math.max(fillX - RIBBON_X0, 0), height: 8, borderRadius: 4, background: P.accentEdge }} />
+
+      {/* stamps land left→right, one per beat, and stay lit once they land */}
+      {STAMPS.map((s, i) => {
+        if (frame < s.at) return null;
+        const x = slotX(i);
+        const scale = s.hero ? 1 : punchScale(sec(frame, s.at, fps), 0);
+        if (s.hero) {
+          // b5 — the hero number, bigger and higher so the frame's top third fills too
+          const heroScale = punchScale(sec(frame, s.at, fps), 0);
+          return (
+            <React.Fragment key={s.label}>
+              <div
+                style={{
+                  position: "absolute",
+                  left: x - 16,
+                  top: RIBBON_Y - 16,
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background: toneColor(s.tone),
+                  border: `3px solid ${toneEdge(s.tone)}`,
+                  boxShadow: `0 0 0 6px ${toneEdge(s.tone)}`,
+                  transform: `scale(${heroScale})`,
+                  transformOrigin: `${x}px ${RIBBON_Y}px`,
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  left: x - 220,
+                  top: 70,
+                  width: 440,
+                  height: 160,
+                  borderRadius: 10,
+                  background: P.card,
+                  border: `3px solid ${P.border}`,
+                  boxShadow: "8px 8px 0 rgba(0,0,0,0.3)",
+                  boxSizing: "border-box",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily,
+                  color: P.ink,
+                  transform: `scale(${heroScale})`,
+                  transformOrigin: `${x}px 150px`,
+                }}
+              >
+                <div style={{ fontSize: 88, fontWeight: 800, lineHeight: 1 }}>682</div>
+                <div style={{ fontSize: 16, fontWeight: 700, marginTop: 8, letterSpacing: 1.2, color: P.muted }}>LINES, DOWN FROM 1,796</div>
+              </div>
+            </React.Fragment>
+          );
+        }
+        return (
+          <React.Fragment key={s.label}>
+            <div
+              style={{
+                position: "absolute",
+                left: x - 15,
+                top: RIBBON_Y - 15,
+                width: 30,
+                height: 30,
+                borderRadius: "50%",
+                background: toneColor(s.tone),
+                border: `3px solid ${toneEdge(s.tone)}`,
+                boxShadow: `0 0 0 6px ${toneEdge(s.tone)}`,
+                transform: `scale(${scale})`,
+                transformOrigin: `${x}px ${RIBBON_Y}px`,
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: x - 80,
+                top: RIBBON_Y + 26,
+                width: 160,
+                textAlign: "center",
+                fontSize: 13,
+                fontWeight: 800,
+                letterSpacing: 1.0,
+                color: toneColor(s.tone),
+                fontFamily,
+              }}
+            >
+              {s.label}
+            </div>
+          </React.Fragment>
+        );
+      })}
+
+      {/* b1's three services, stacked under slot 0, grey out once they merge into VPS RUNNER */}
+      {frame < B3 &&
+        subChips.map((c, i) => (
           <div
-            key={tg.label}
+            key={c.label}
             style={{
               position: "absolute",
-              left: 18 + i * 128,
-              top: 30 + jitter(tg.seed),
-              padding: "7px 12px",
-              borderRadius: 6,
-              background: P.dangerBg,
-              border: `1px solid ${P.dangerEdge}`,
-              color: P.danger,
+              left: slotX(0) - 52,
+              top: RIBBON_Y - 108 + i * 30 + jitter(i),
+              padding: "5px 10px",
+              borderRadius: 5,
+              background: chipsDimmed ? P.chipBg : P.dangerBg,
+              border: `1px solid ${chipsDimmed ? P.border : P.dangerEdge}`,
+              color: chipsDimmed ? P.muted : P.danger,
               fontFamily,
-              fontSize: 15,
+              fontSize: 12,
               fontWeight: 700,
-              letterSpacing: 0.4,
+              opacity: chipsDimmed ? 0.5 : 1,
             }}
           >
-            {tg.label}
+            {c.label}
           </div>
         ))}
-      </div>
+    </div>
+  );
+};
 
-      {/* divider */}
+const SideLabel: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  const label =
+    cut(frame, B1, B2) === 1
+      ? "THREE SERVICES, ONE FAILURE"
+      : cut(frame, B2, B3) === 1
+      ? "ONE RUNNER REPLACES THEM"
+      : cut(frame, B3, B4) === 1
+      ? "EVERY DOOR CLOSED"
+      : cut(frame, B4, B5) === 1
+      ? "ONE HUB, THREE JOBS"
+      : frame >= B5
+      ? "RESULT"
+      : null;
+  if (!label) return null;
+  const at = frame >= B5 ? B5 : frame >= B4 ? B4 : frame >= B3 ? B3 : frame >= B2 ? B2 : B1;
+  return (
+    <Arrive at={at} kind="wipe" box={LABEL_BOX} dur={0.3}>
       <div
         style={{
           position: "absolute",
-          left: dividerX - 1,
-          top: 0,
-          width: 2,
-          height: LT.h,
-          background: P.ink,
-          opacity: 0.5,
+          left: LABEL_BOX.x,
+          top: LABEL_BOX.y,
+          width: LABEL_BOX.w,
+          height: LABEL_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 20px",
+          fontFamily,
         }}
-      />
+      >
+        <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>{label}</div>
+      </div>
+    </Arrive>
+  );
+};
 
-      {/* order zone — the clip's one tech-credibility caption */}
-      <div style={{ position: "absolute", left: dividerX + 14, top: 0, width: LT.w - dividerX - 14, height: LT.h, overflow: "hidden" }}>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            padding: "10px 16px",
-            marginTop: 24,
-            borderRadius: 6,
-            background: P.successBg,
-            border: `1px solid ${P.successEdge}`,
-            boxShadow: `0 0 ${6 + 6 * pulse}px ${P.successEdge}`,
-            color: P.success,
-            fontFamily,
-            fontSize: 16,
-            fontWeight: 800,
-            letterSpacing: 0.3,
-            transform: `scale(${Math.max(orderArrive, frame >= B2 ? 1 : 0)})`,
-          }}
-        >
-          VPS RUNNER (systemd)
+const ProductPlate: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B1, B2) !== 1) return null;
+  return (
+    <Arrive at={B1 + 4} kind="wipe" box={PLATE_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: PLATE_BOX.x,
+          top: PLATE_BOX.y,
+          width: PLATE_BOX.w,
+          height: PLATE_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          boxSizing: "border-box",
+          padding: "10px 20px",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>🛠 ELVARIKA — TEXT BECOMES A LESSON</div>
+        <div style={{ fontSize: 13, color: P.muted, marginTop: 4, lineHeight: 1.3 }}>
+          Paste or upload any text — Elvarika turns it into vocabulary and audio playlists.
         </div>
       </div>
-    </div>
+    </Arrive>
   );
 };
 
@@ -272,13 +421,15 @@ const Inner: React.FC = () => {
       <FillCaption from={B5} dur={END - B5} y={40} label="1,796 lines → 682 lines" chips={["Old edge functions", "New runner"]} tone="accent" />
       <FillCaption from={B5} dur={END - B5} y={500} chips={["≈2.6× smaller — three services, one file"]} tone="success" />
 
-      <SplitDuel />
+      <Ribbon />
+      <SideLabel />
+      <ProductPlate />
     </AbsoluteFill>
   );
 };
 
 export const FeatureOneVpsRunnerReplacedE03: React.FC = () => (
-  <PaletteProvider value={MOODS.dawn}>
+  <PaletteProvider value={MOODS.slate}>
     <Inner />
   </PaletteProvider>
 );

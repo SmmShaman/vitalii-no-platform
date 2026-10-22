@@ -1,0 +1,57 @@
+{
+  "id": "g10",
+  "composition": "FeatureNorwegianNamesInsideUkrainianG10",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "A Norwegian name just got forced into Cyrillic",
+        "line2": "Nothing like a Norwegian would say it",
+        "keywords": ["Cyrillic", "wrong"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "copyCorrection",
+      "backdrop": "hub",
+      "data": {
+        "wrong": "Guess how a Ukrainian voice says it",
+        "right": "The real Norwegian recording already existed",
+        "label": "Already there"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Transliterate the name",
+        "to": "Mark the name instead",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["AI wraps Norwegian names in brackets", "Spelling stays Norwegian, not guessed", "Audio pipeline reads the marker"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["AI marks the Norwegian name", "Pipeline finds that name's own recording", "Splices it into the Ukrainian sentence"],
+        "result": "One sentence, two real voices",
+        "system": "Audio splicing"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": {
+        "title": "8 stories at a time",
+        "kicker": "Every published story rewritten, not just new ones"
+      }
+    }
+  ]
+}
