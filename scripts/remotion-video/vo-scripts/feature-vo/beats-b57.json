@@ -1,0 +1,7 @@
+{"id": "b57", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My kids wanted to draw with a real tablet, not squint at a tiny phone screen."],
+ ["b2", "The tablet plugs into a phone, but nothing reached the TV in real time."],
+ ["b3", "So phone and TV now talk directly, over WebRTC — like a wire across the room."],
+ ["b4", "Every stroke streams live to the screen, with a backup relay if the link drops."],
+ ["b5", "Now the kids draw with a real tablet on the big screen — for a $30 pen."]
+]}

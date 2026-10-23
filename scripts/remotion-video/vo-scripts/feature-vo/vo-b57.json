@@ -1,0 +1,57 @@
+{
+ "id": "b57",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.856,
+  "b2": 4.831,
+  "b3": 6.151,
+  "b4": 5.059,
+  "b5": 4.989
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My kids wanted to draw with a real tablet, not squint at a tiny phone screen.",
+   "start_s": 0.5,
+   "end_s": 5.356,
+   "start_f": 15,
+   "end_f": 161
+  },
+  {
+   "beat": "b2",
+   "text": "The tablet plugs into a phone, but nothing reached the TV in real time.",
+   "start_s": 5.656,
+   "end_s": 10.487,
+   "start_f": 170,
+   "end_f": 315
+  },
+  {
+   "beat": "b3",
+   "text": "So phone and TV now talk directly, over WebRTC \u2014 like a wire across the room.",
+   "start_s": 10.787,
+   "end_s": 16.938,
+   "start_f": 324,
+   "end_f": 508
+  },
+  {
+   "beat": "b4",
+   "text": "Every stroke streams live to the screen, with a backup relay if the link drops.",
+   "start_s": 17.238,
+   "end_s": 22.297,
+   "start_f": 517,
+   "end_f": 669
+  },
+  {
+   "beat": "b5",
+   "text": "Now the kids draw with a real tablet on the big screen \u2014 for a $30 pen.",
+   "start_s": 22.597,
+   "end_s": 27.586,
+   "start_f": 678,
+   "end_f": 828
+  }
+ ],
+ "total_s": 29.086,
+ "durationInFrames": 873,
+ "measured_track_s": 27.648,
+ "track": "/root/feature-demos/vo-b57/vo-b57.mp3"
+}
