@@ -1,0 +1,28 @@
+{
+  "id": "g08",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page-top",
+      "url": "https://vitalii.no/features/a-one-sentence-flash-now-plays-before-the-full-story-and-only-real-drives-get-on-g08",
+      "frames": 161,
+      "scroll": [[0, 0], [160, 100]],
+      "mouse": [[0, 560, 220], [100, 560, 260], [160, 540, 300]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 142,
+      "scroll": [[0, 40], [141, 200]],
+      "mouse": [[0, 300, 140], [80, 560, 260], [141, 760, 320]]
+    },
+    {
+      "name": "page-mid",
+      "url": "https://vitalii.no/features/a-one-sentence-flash-now-plays-before-the-full-story-and-only-real-drives-get-on-g08",
+      "frames": 165,
+      "scroll": [[0, 420], [164, 540]],
+      "mouse": [[0, 500, 200], [164, 500, 240]]
+    }
+  ]
+}

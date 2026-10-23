@@ -52,13 +52,16 @@
     },
     {
       "beat": "b6",
-      "effect": "heroNumberCustom",
+      "kind": "drawn",
+      "effect": null,
       "backdrop": null,
+      "description": "Hand-built hero figure (archetype 7), not a catalog effect: fontSize 240, '8s' over 'DWELL REACHED', holds to the end.",
       "data": {
         "value": "8s",
         "label": "DWELL REACHED",
         "sub": "Full narration begins."
-      }
+      },
+      "hero": "full-size (fontSize 240), value '8s', success tone, holds to final frame"
     }
   ]
 }

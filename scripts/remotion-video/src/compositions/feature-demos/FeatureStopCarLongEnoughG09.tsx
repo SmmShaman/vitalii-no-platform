@@ -191,6 +191,44 @@ const ProductPlate: React.FC = () => {
   );
 };
 
+/**
+ * Beat 5 only: ratioBars' own bracket+ratio tag don't draw in until ~4.1s into
+ * the 7s beat, so the right third of the frame sits empty through the midpoint
+ * (measured, contact sheet). This fills it immediately with what the bigger
+ * number is made of, instead of waiting on the bars' own late reveal.
+ */
+const ResultNotes: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B5) return null;
+  const t = tween(sec(frame, B5 + 4, 30), 0, 0.4, ease.power3Out);
+  const items = ["Related pages, same place", "Same visit, nothing repeated"];
+  return (
+    <div style={{ position: "absolute", right: 80, top: 120, width: 380, opacity: t, fontFamily }}>
+      <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>
+        WHAT&apos;S IN THE 32,000
+      </div>
+      {items.map((it, i) => (
+        <div
+          key={it}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            marginTop: i === 0 ? 16 : 12,
+            fontSize: 18,
+            fontWeight: 600,
+            color: "#E8F4F1",
+          }}
+        >
+          <div style={{ width: 8, height: 8, borderRadius: 4, background: P.accent, flexShrink: 0 }} />
+          {it}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -275,6 +313,7 @@ const Inner: React.FC = () => {
           caption: "Once a snippet, now the whole piece",
         }}
       />
+      <ResultNotes />
 
       <LowerThird />
     </AbsoluteFill>
