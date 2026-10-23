@@ -15,6 +15,19 @@
 // real page/hub backdrops in b1/b2 already cover "play the real product" — a
 // synthetic log would have cost a beat better spent on the ribbon itself.
 //
+// Wave D viewer fix (2026-10-22): a blind viewer scored clarity 6/9 on this
+// cut. Four changes, no beat windows/duration/palette/archetype/narration
+// touched: (1) b1/b2 plate raised 0.66 -> 0.85 — the live page's own body
+// text was bleeding through behind the CornerTags/HandoffExplain callouts
+// and reading as noise; (2) b4's "three jobs" label now says "NEW" and
+// spells out old-vs-new explicitly — the viewer conflated it with the
+// earlier three OLD services; (3) ProductPlate text enlarged (13->17/14)
+// and given its own accent border — it was the only place the product name
+// appeared and was too small to register; (4) b3 gets a drawn
+// DoorTillSchematic (three doors swinging shut, then a till) so the spoken
+// shop/till analogy has a literal picture instead of only restating itself
+// in text.
+//
 // Beat → effect (unchanged from the split-duel cut — only the staging changed):
 // b1 15-321   problem: three outside services, a credits bypass running client-side.
 //             cornerTags over the feature's own page (backdrop) — central claim
@@ -70,7 +83,7 @@ const STAMPS: { at: number; end: number; label: string; tone: Tone; hero?: boole
 ];
 
 const LABEL_BOX = { x: 40, y: 606, w: 320, h: 80 };
-const PLATE_BOX = { x: 700, y: 606, w: 540, h: 96 };
+const PLATE_BOX = { x: 672, y: 598, w: 568, h: 110 };
 
 const Ribbon: React.FC = () => {
   const frame = useCurrentFrame();
@@ -233,7 +246,7 @@ const SideLabel: React.FC = () => {
       : cut(frame, B3, B4) === 1
       ? "EVERY DOOR CLOSED"
       : cut(frame, B4, B5) === 1
-      ? "ONE HUB, THREE JOBS"
+      ? "SAME RUNNER, 3 NEW JOBS"
       : frame >= B5
       ? "RESULT"
       : null;
@@ -278,14 +291,15 @@ const ProductPlate: React.FC = () => {
           height: PLATE_BOX.h,
           background: P.card,
           borderRadius: 4,
+          border: `2px solid ${P.accentEdge}`,
           boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
           boxSizing: "border-box",
-          padding: "10px 20px",
+          padding: "12px 22px",
           fontFamily,
         }}
       >
-        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>🛠 ELVARIKA — TEXT BECOMES A LESSON</div>
-        <div style={{ fontSize: 13, color: P.muted, marginTop: 4, lineHeight: 1.3 }}>
+        <div style={{ fontSize: 17, fontWeight: 800, letterSpacing: 1.2, color: P.accent }}>🛠 ELVARIKA — TEXT BECOMES A LESSON</div>
+        <div style={{ fontSize: 14, color: P.muted, marginTop: 5, lineHeight: 1.3 }}>
           Paste or upload any text — Elvarika turns it into vocabulary and audio playlists.
         </div>
       </div>
@@ -342,6 +356,97 @@ const FillCaption: React.FC<{
   );
 };
 
+// Wave D fix: the shop/till analogy (b3) was only spoken and captioned — this draws
+// it literally: three labeled doors swing shut in sequence, then a till appears.
+const DoorTillSchematic: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (cut(frame, B3, B4) !== 1) return null;
+  const t = sec(frame, B3, fps);
+  const doors = ["AZURE", "ZVUKOGRAM", "STANZA"];
+  const centerX = 640;
+  const doorW = 150;
+  const gap = 36;
+  const totalW = doors.length * doorW + (doors.length - 1) * gap;
+  const startX = centerX - totalW / 2;
+  const doorY = 190;
+  const doorH = 110;
+  const tillCloseAt = 0.4 + (doors.length - 1) * 0.5 + 0.5;
+  const tillP = tween(t, tillCloseAt, 0.35, ease.power3Out);
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720 }}>
+      {doors.map((label, i) => {
+        const closeAt = 0.4 + i * 0.5;
+        const closeP = tween(t, closeAt, 0.4, ease.power3Out);
+        const x = startX + i * (doorW + gap);
+        return (
+          <div key={label} style={{ position: "absolute", left: x, top: doorY, width: doorW, height: doorH }}>
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                borderRadius: 8,
+                border: `3px solid ${closeP > 0.5 ? P.border : P.dangerEdge}`,
+                background: closeP > 0.5 ? P.chipBg : P.dangerBg,
+                boxSizing: "border-box",
+                transform: `scaleX(${mix(closeP, 1, 0.08)})`,
+                transformOrigin: "left center",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: -26,
+                textAlign: "center",
+                fontFamily,
+                fontSize: 13,
+                fontWeight: 800,
+                letterSpacing: 1,
+                color: closeP > 0.5 ? P.muted : P.danger,
+              }}
+            >
+              {label}
+            </div>
+            {closeP > 0.85 && (
+              <div style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", fontSize: 18 }}>
+                🔒
+              </div>
+            )}
+          </div>
+        );
+      })}
+
+      <div
+        style={{
+          position: "absolute",
+          left: centerX - 110,
+          top: 405,
+          width: 220,
+          height: 70,
+          borderRadius: 8,
+          background: P.successBg,
+          border: `3px solid ${P.successEdge}`,
+          boxSizing: "border-box",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+          opacity: tillP,
+          transform: `scale(${mix(tillP, 0.85, 1)})`,
+          fontFamily,
+        }}
+      >
+        <span style={{ fontSize: 22 }}>🧾</span>
+        <span style={{ fontSize: 14, fontWeight: 800, color: P.success, letterSpacing: 0.8 }}>EVERY SALE → TILL</span>
+      </div>
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -353,6 +458,7 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
+        plate={0.85}
         data={{
           statement: "Three outside services — one failure stalled a lesson",
           tags: ["Any service breaks it", "Billing ran in browser", "Replay = free ride", "Cost on every request"],
@@ -366,6 +472,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
+        plate={0.85}
         data={{
           from: "Three outside services",
           to: "One VPS runner",
@@ -387,6 +494,7 @@ const Inner: React.FC = () => {
         }}
       />
       <FillCaption from={B3} dur={B4 - B3} y={40} label="Three doors, closed" chips={["Azure analysis", "Zvukogram TTS", "Stanza NLP"]} tone="danger" />
+      <DoorTillSchematic />
       <FillCaption from={B3} dur={B4 - B3} y={500} chips={["Every sale passes the VPS runner"]} tone="success" />
 
       {/* b4 — the mechanism, drawn */}
@@ -401,7 +509,7 @@ const Inner: React.FC = () => {
           outputs: ["Analysis", "Playlist gen", "Billing"],
         }}
       />
-      <FillCaption from={B4} dur={B5 - B4} y={40} label="One runner, three jobs out" chips={["Analysis", "Playlist gen", "Billing"]} tone="success" />
+      <FillCaption from={B4} dur={B5 - B4} y={40} label="Old 3 services → 3 new internal jobs" chips={["Analysis", "Playlist gen", "Billing"]} tone="success" />
       <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Postgres trigger wakes it — no idle cost"]} tone="accent" />
 
       {/* b5 — the payoff, drawn, holds to the true end */}
