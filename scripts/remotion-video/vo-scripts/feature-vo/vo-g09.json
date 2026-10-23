@@ -1,0 +1,57 @@
+{
+ "id": "g09",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.517,
+  "b2": 5.455,
+  "b3": 4.948,
+  "b4": 5.341,
+  "b5": 5.515
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "You park by an old farm, walk around \u2014 but the story already ended on the way in.",
+   "start_s": 0.5,
+   "end_s": 6.017,
+   "start_f": 15,
+   "end_f": 181
+  },
+  {
+   "beat": "b2",
+   "text": "Every place only ever told one short clip, cut from a tiny slice of its history.",
+   "start_s": 6.317,
+   "end_s": 11.772,
+   "start_f": 190,
+   "end_f": 353
+  },
+  {
+   "beat": "b3",
+   "text": "Now the app notices when you actually stop, not just slow down for a corner.",
+   "start_s": 12.072,
+   "end_s": 17.02,
+   "start_f": 362,
+   "end_f": 511
+  },
+  {
+   "beat": "b4",
+   "text": "Its AI then reads the full local history article, skipping anything you already heard.",
+   "start_s": 17.32,
+   "end_s": 22.661,
+   "start_f": 520,
+   "end_f": 680
+  },
+  {
+   "beat": "b5",
+   "text": "The story that was once a snippet is now the whole piece \u2014 up to twelve thousand characters.",
+   "start_s": 22.961,
+   "end_s": 28.476,
+   "start_f": 689,
+   "end_f": 854
+  }
+ ],
+ "total_s": 29.976,
+ "durationInFrames": 899,
+ "measured_track_s": 28.536,
+ "track": "/root/feature-demos/vo-g09/vo-g09.mp3"
+}

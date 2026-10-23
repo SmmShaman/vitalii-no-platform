@@ -1,0 +1,66 @@
+{
+ "id": "g08",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.382,
+  "b2": 4.717,
+  "b3": 5.507,
+  "b4": 5.482,
+  "b5": 3.846,
+  "b6": 4.128
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Driving through a valley, you'd hear a story about a farm you were never actually headed toward.",
+   "start_s": 0.5,
+   "end_s": 5.882,
+   "start_f": 15,
+   "end_f": 176
+  },
+  {
+   "beat": "b2",
+   "text": "And every story just started mid-sentence, no warning before it began.",
+   "start_s": 6.182,
+   "end_s": 10.899,
+   "start_f": 185,
+   "end_f": 327
+  },
+  {
+   "beat": "b3",
+   "text": "GPS now checks whether your road actually passes the place, not just nearby it.",
+   "start_s": 11.199,
+   "end_s": 16.706,
+   "start_f": 336,
+   "end_f": 501
+  },
+  {
+   "beat": "b4",
+   "text": "You get a short heads-up first \u2014 'in 200 metres, right' \u2014 before anything plays.",
+   "start_s": 17.006,
+   "end_s": 22.488,
+   "start_f": 510,
+   "end_f": 675
+  },
+  {
+   "beat": "b5",
+   "text": "Only a one-line flash follows \u2014 full narration waits.",
+   "start_s": 22.788,
+   "end_s": 26.634,
+   "start_f": 684,
+   "end_f": 799
+  },
+  {
+   "beat": "b6",
+   "text": "Full narration only starts once you've stayed close for eight seconds.",
+   "start_s": 26.934,
+   "end_s": 31.062,
+   "start_f": 808,
+   "end_f": 932
+  }
+ ],
+ "total_s": 32.562,
+ "durationInFrames": 977,
+ "measured_track_s": 31.128,
+ "track": "/root/feature-demos/vo-g08/vo-g08.mp3"
+}
