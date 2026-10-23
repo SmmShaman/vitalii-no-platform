@@ -24,10 +24,11 @@
 // Persistent element: the left sidebar column (archetype 6), b1 through b5.
 
 import React from "react";
-import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { tween, ease } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/e01.json";
 
 const B1 = 15;
@@ -36,6 +37,7 @@ const B3 = 446;
 const B4 = 578;
 const B5 = 752;
 const END = 964;
+const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
 /** Tuned for the dark MotionInsert plate (dawn's #2563EB reads muddy there). */
 const ACCENT = "#F08A4B";
@@ -81,6 +83,75 @@ const Sidebar: React.FC = () => {
   );
 };
 
+// Wave C fill-fix: pipelineFlow leaves the top/bottom margins empty until late in its own
+// internal reveal. These bands restate data the beat already carries (never new facts).
+const FillCaption: React.FC<{
+  from: number;
+  dur: number;
+  y: number;
+  label?: string;
+  chips: string[];
+  tone?: "accent" | "success" | "danger";
+}> = ({ from, dur, y, label, chips, tone = "accent" }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= from + dur) return null;
+  const opacity = tween(sec(frame, from, fps), 0, 0.3, ease.power2Out);
+  const bg = tone === "success" ? P.successBg : tone === "danger" ? P.dangerBg : P.accentBg;
+  const edge = tone === "success" ? P.successEdge : tone === "danger" ? P.dangerEdge : P.accentEdge;
+  const fg = tone === "success" ? P.success : tone === "danger" ? P.danger : P.accent;
+  return (
+    <div style={{ position: "absolute", left: SIDEBAR_W + 40, top: y, width: 1280 - SIDEBAR_W - 80, opacity }}>
+      {label && (
+        <div style={{ fontFamily, fontSize: 24, fontWeight: 800, color: P.ink, marginBottom: 14 }}>{label}</div>
+      )}
+      <div style={{ display: "flex", justifyContent: chips.length > 1 ? "space-between" : "flex-start", gap: 12 }}>
+        {chips.map((c) => (
+          <div
+            key={c}
+            style={{
+              padding: "12px 18px",
+              borderRadius: 8,
+              background: bg,
+              border: `1px solid ${edge}`,
+              color: fg,
+              fontFamily,
+              fontSize: 17,
+              fontWeight: 700,
+              lineHeight: 1.2,
+              textAlign: "center",
+            }}
+          >
+            {c}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/** Wave C sidebar-occlusion fix: shrinks + shifts a MotionInsert into the area right of the
+ * sidebar so the effect's centered content never renders underneath it (b2, b5 — the hero
+ * text in each sat partly behind the opaque sidebar at full width). */
+const RIGHT_STAGE_SCALE = (1280 - SIDEBAR_W) / 1280;
+const RightStage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: SIDEBAR_W,
+      top: (720 - 720 * RIGHT_STAGE_SCALE) / 2,
+      width: 1280 - SIDEBAR_W,
+      height: 720 * RIGHT_STAGE_SCALE,
+      overflow: "hidden",
+    }}
+  >
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, transform: `scale(${RIGHT_STAGE_SCALE})`, transformOrigin: "0 0" }}>
+      {children}
+    </div>
+  </div>
+);
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -101,18 +172,20 @@ const Inner: React.FC = () => {
 
       {/* b2 — the move, over the features hub. The clip's one tech caption lives here. */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
-      <MotionInsert
-        effect="copyCorrection"
-        from={B2}
-        dur={B3 - B2}
-        accent={ACCENT}
-        plate={0.7}
-        data={{
-          wrong: "A database I don't control",
-          right: "My own server, same keys",
-          label: "Supabase, self-hosted",
-        }}
-      />
+      <RightStage>
+        <MotionInsert
+          effect="copyCorrection"
+          from={B2}
+          dur={B3 - B2}
+          accent={ACCENT}
+          plate={0.7}
+          data={{
+            wrong: "A database I don't control",
+            right: "My own server, same keys",
+            label: "Supabase, self-hosted",
+          }}
+        />
+      </RightStage>
 
       {/* b3 — same login, same keys: drawn, nothing visibly changed for the user */}
       <MotionInsert
@@ -141,19 +214,23 @@ const Inner: React.FC = () => {
           system: "Signup endpoint",
         }}
       />
+      <FillCaption from={B4} dur={B5 - B4} y={40} label="Signup endpoint, unchecked" chips={["New user signs up", "Client sends a role field", "Server trusted it blindly"]} tone="accent" />
+      <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Self-granted admin access"]} tone="danger" />
 
       {/* b5 — the verdict: closed, and the real number. Holds to the end, no fade. */}
-      <MotionInsert
-        effect="titleTakeover"
-        from={B5}
-        dur={END - B5}
-        accent={ACCENT}
-        base={STAGE}
-        data={{
-          title: "500MB of RAM freed",
-          kicker: "Two new triggers closed the hole for good",
-        }}
-      />
+      <RightStage>
+        <MotionInsert
+          effect="titleTakeover"
+          from={B5}
+          dur={END - B5}
+          accent={ACCENT}
+          base={STAGE}
+          data={{
+            title: "500MB of RAM freed",
+            kicker: "Two new triggers closed the hole for good",
+          }}
+        />
+      </RightStage>
 
       <Sidebar />
     </AbsoluteFill>

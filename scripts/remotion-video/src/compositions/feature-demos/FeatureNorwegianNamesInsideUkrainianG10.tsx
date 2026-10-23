@@ -162,20 +162,20 @@ const FillCaption: React.FC<{
   return (
     <div style={{ position: "absolute", left: 60, top: y, width: 1160, opacity }}>
       {label && (
-        <div style={{ fontFamily, fontSize: 28, fontWeight: 800, color: P.ink, marginBottom: 18 }}>{label}</div>
+        <div style={{ fontFamily, fontSize: 32, fontWeight: 800, color: P.ink, marginBottom: 20 }}>{label}</div>
       )}
       <div style={{ display: "flex", justifyContent: chips.length > 1 ? "space-between" : "flex-start", gap: 16 }}>
         {chips.map((c) => (
           <div
             key={c}
             style={{
-              padding: "16px 22px",
+              padding: "20px 28px",
               borderRadius: 8,
               background: bg,
               border: `1px solid ${edge}`,
               color: fg,
               fontFamily,
-              fontSize: 20,
+              fontSize: 24,
               fontWeight: 700,
               lineHeight: 1.2,
               textAlign: "center",
@@ -237,7 +237,7 @@ const Inner: React.FC = () => {
         }}
       />
       <FillCaption from={B3} dur={B4 - B3} y={40} label="One prompt rule, changed" chips={["Transliterate", "Mark instead"]} tone="accent" />
-      <FillCaption from={B3} dur={B4 - B3} y={500} chips={["Every Norwegian name keeps its own spelling"]} tone="success" />
+      <FillCaption from={B3} dur={B4 - B3} y={500} chips={["Spelling stays Norwegian, not guessed", "Audio pipeline reads the marker"]} tone="success" />
 
       {/* b4 — the splice mechanism, drawn */}
       <MotionInsert
@@ -253,7 +253,7 @@ const Inner: React.FC = () => {
         }}
       />
       <FillCaption from={B4} dur={B5 - B4} y={40} label="The name keeps its own voice" chips={["Marked name", "Real recording", "Spliced in"]} tone="success" />
-      <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Same sentence, two real voices"]} tone="accent" />
+      <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Same sentence, two real voices", "Audio splicing"]} tone="accent" />
 
       {/* b5 — the verdict: every published story, fixed too. Holds to the end, no fade. */}
       <MotionInsert
