@@ -12,8 +12,10 @@
 // b1 15-269   "didn't control the server... one quota freeze from going dark"
 //             cornerTags over the feature's own page (backdrop "page").
 // b2 269-446  "moved it: a self-hosted Supabase stack... behind a tunnel"
-//             copyCorrection over the features hub (backdrop "hub"). The ONE tech
-//             caption of this clip ("Supabase, self-hosted") sits in its label.
+//             copyCorrection, drawn. The ONE tech caption of this clip ("Supabase,
+//             self-hosted") sits in its label; FillCaptions (Wave D) name the real
+//             containers (elvarika-db/rest/auth/storage/functions/gateway) and the
+//             real domain + tunnel id (api.elvarika.com, b5c0ecc5).
 // b3 446-578  "same login, same keys — nobody even noticed" — keywordCaption, drawn
 //             (nothing to record: the point is that nothing visibly changed).
 // b4 578-752  "a user could grant themselves admin rights through signup" —
@@ -62,16 +64,16 @@ const Sidebar: React.FC = () => {
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: SIDEBAR_W, height: 720, background: P.ink, fontFamily }}>
       <div style={{ position: "absolute", left: 28, top: 36, width: SIDEBAR_W - 56 }}>
-        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>ELVARIKA</div>
-        <div style={{ fontSize: 16, fontWeight: 600, color: "#EAF0FF", marginTop: 6, lineHeight: 1.35 }}>
+        <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>ELVARIKA</div>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#EAF0FF", marginTop: 6, lineHeight: 1.35 }}>
           Your text becomes a language lesson
         </div>
       </div>
       <div style={{ position: "absolute", left: 28, top: 170, width: SIDEBAR_W - 56, height: 2, background: "rgba(255,255,255,0.14)" }} />
       <Arrive key={idx} at={STARTS[idx]} kind="rise" box={{ x: 28, y: 200, w: SIDEBAR_W - 56, h: 120 }}>
         <div style={{ position: "absolute", left: 28, top: 200, width: SIDEBAR_W - 56 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>{claim.kicker}</div>
-          <div style={{ fontSize: 23, fontWeight: 700, color: "#FFFFFF", marginTop: 10, lineHeight: 1.3 }}>{claim.line}</div>
+          <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>{claim.kicker}</div>
+          <div style={{ fontSize: 27, fontWeight: 700, color: "#FFFFFF", marginTop: 12, lineHeight: 1.3 }}>{claim.line}</div>
         </div>
       </Arrive>
       <div style={{ position: "absolute", left: 28, bottom: 40, display: "flex", gap: 8 }}>
@@ -170,8 +172,8 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b2 — the move, over the features hub. The clip's one tech caption lives here. */}
-      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
+      {/* b2 — the move. The clip's one tech caption lives here; the former "hub" backdrop
+          was replaced (Wave D) because it showed an unrelated blog page, not infrastructure. */}
       <RightStage>
         <MotionInsert
           effect="copyCorrection"
@@ -186,6 +188,15 @@ const Inner: React.FC = () => {
           }}
         />
       </RightStage>
+      <FillCaption
+        from={B2}
+        dur={B3 - B2}
+        y={40}
+        label="Supabase, unbundled onto my own box"
+        chips={["elvarika-db, elvarika-rest, elvarika-auth", "elvarika-storage, elvarika-functions, elvarika-gateway"]}
+        tone="accent"
+      />
+      <FillCaption from={B2} dur={B3 - B2} y={560} chips={["api.elvarika.com", "behind tunnel b5c0ecc5"]} tone="success" />
 
       {/* b3 — same login, same keys: drawn, nothing visibly changed for the user */}
       <MotionInsert
@@ -200,6 +211,15 @@ const Inner: React.FC = () => {
           keywords: ["Same login", "noticed"],
         }}
       />
+      <FillCaption
+        from={B3}
+        dur={B4 - B3}
+        y={40}
+        label="Nothing to redo on the client"
+        chips={["Same JWT secret, reused", "Same anon key, same sessions"]}
+        tone="success"
+      />
+      <FillCaption from={B3} dur={B4 - B3} y={140} chips={["Old: omlmcjulkwphhlgzojgw (paused)", "New: api.elvarika.com"]} tone="accent" />
 
       {/* b4 — the security hole: drawn, invisible plumbing (the exploit path) */}
       <MotionInsert
@@ -231,6 +251,14 @@ const Inner: React.FC = () => {
           }}
         />
       </RightStage>
+      <FillCaption
+        from={B5}
+        dur={END - B5}
+        y={40}
+        label="The two guards"
+        chips={["guard_auth_user_role", "guard_users_protected_columns"]}
+        tone="accent"
+      />
 
       <Sidebar />
     </AbsoluteFill>
