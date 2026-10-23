@@ -1,0 +1,64 @@
+{
+  "id": "g08",
+  "composition": "FeatureOneSentenceFlashPlaysG08",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "quoteMarker",
+      "backdrop": "page-top",
+      "data": {
+        "quote": "Driving through a valley, you'd hear a story about a farm you were never actually headed toward.",
+        "highlight": "never actually headed toward",
+        "source": "Every drive, before today"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "No warning. It just began mid-sentence.",
+        "tags": ["Any nearby place", "On your road or not", "No heads-up first", "Full story, every time"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "page-mid",
+      "data": {
+        "steps": ["Live GPS position", "Match to road path", "Check distance to place"],
+        "result": "On-route only",
+        "system": "0437e5f DriveService"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": {
+        "title": "200M",
+        "kicker": "Heads-up first — before anything plays."
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Only a one-line flash follows.",
+        "line2": "Full narration waits.",
+        "keywords": ["one-line", "waits"]
+      }
+    },
+    {
+      "beat": "b6",
+      "effect": "heroNumberCustom",
+      "backdrop": null,
+      "data": {
+        "value": "8s",
+        "label": "DWELL REACHED",
+        "sub": "Full narration begins."
+      }
+    }
+  ]
+}

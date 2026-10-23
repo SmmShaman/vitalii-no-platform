@@ -1,0 +1,62 @@
+{
+  "id": "g09",
+  "composition": "FeatureStopCarLongEnoughG09",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "quoteMarker",
+      "backdrop": "page-top",
+      "data": {
+        "quote": "You park by the farm. Walk around. The story already ended on the way in.",
+        "highlight": "already ended",
+        "source": "Every stop, before today"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "One short clip. One tiny slice of history.",
+        "tags": ["Same clip every time", "Built from a short excerpt", "No matter how long you stay", "Nothing deeper offered"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "statusFocus",
+      "backdrop": "page-mid",
+      "data": {
+        "title": "Is this a real stop?",
+        "claims": [
+          { "text": "Driving past at speed", "verdict": "no" },
+          { "text": "Slowing for a corner", "verdict": "unclear" },
+          { "text": "Parked, walking around", "verdict": "yes" }
+        ]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "page-mid2",
+      "data": {
+        "from": "Short excerpt (first story)",
+        "to": "Full local-history article",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Up to 12,000 characters read", "Related pages folded in too", "Skips what you already heard", "dossier.py, deep=True"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "ratioBars",
+      "backdrop": null,
+      "data": {
+        "title": "Characters built into the deep story",
+        "a": { "label": "Main article alone", "value": 12000 },
+        "b": { "label": "With related pages", "value": 32000 },
+        "unit": "chars",
+        "caption": "Once a snippet, now the whole piece"
+      }
+    }
+  ]
+}

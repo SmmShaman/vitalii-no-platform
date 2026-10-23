@@ -233,6 +233,7 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureStopCarLongEnoughG09 } from "./compositions/feature-demos/FeatureStopCarLongEnoughG09";
 import { FeatureElvarikaLeftManagedSupabaseE01 } from "./compositions/feature-demos/FeatureElvarikaLeftManagedSupabaseE01";
 import { FeatureNorwegianNamesInsideUkrainianG10 } from "./compositions/feature-demos/FeatureNorwegianNamesInsideUkrainianG10";
 import { FeatureOneVpsRunnerReplacedE03 } from "./compositions/feature-demos/FeatureOneVpsRunnerReplacedE03";
@@ -2333,6 +2334,16 @@ export const RemotionRoot: React.FC = () => {
         width={1280}
         height={720}
       />
+
+      <Composition
+        id="FeatureStopCarLongEnoughG09"
+        component={FeatureStopCarLongEnoughG09}
+        durationInFrames={899}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
 
       <Composition
         id="FeatureElvarikaLeftManagedSupabaseE01"
