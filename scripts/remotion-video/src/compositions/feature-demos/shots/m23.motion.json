@@ -1,0 +1,55 @@
+{
+  "id": "m23",
+  "composition": "FeatureTopicLessonsFollowCoverageM23",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "Same point,",
+        "line2": "every section repeated it",
+        "keywords": ["Same point", "every section"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "pipelineFlow",
+      "backdrop": "page2",
+      "data": {
+        "steps": ["List distinct angles", "Assign one per section", "Write that angle only"],
+        "result": "No angle repeats",
+        "system": "Coverage plan = angles outlined like chapters"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "funnelAbsorption",
+      "backdrop": "hub",
+      "data": {
+        "inputs": ["Section 1", "Section 2", "Section 3"],
+        "result": "No sentence repeats"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "First draft of a section",
+        "to": "Automatic rewrite if thin",
+        "points": ["Checks target-word count", "Rewrites if below target", "Section stays strong"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "ratioBars",
+      "backdrop": null,
+      "data": {
+        "a": { "label": "Lines with target word", "value": 10 },
+        "b": { "label": "Total lines per section", "value": 16 },
+        "unit": "lines"
+      }
+    }
+  ]
+}

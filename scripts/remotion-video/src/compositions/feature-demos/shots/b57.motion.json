@@ -1,0 +1,49 @@
+{
+  "id": "b57",
+  "composition": "FeatureAnyPhoneBecomesDrawingB57",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "Stuck on a Tiny Screen",
+        "kicker": "Kids wanted a real drawing tablet, not a phone"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "No link from phone to TV",
+        "tags": ["Tablet → phone only", "Pen stuck on phone", "TV in another room", "No live link"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["Phone captures stroke", "WebRTC links the TV", "Canvas mirrors live"],
+        "result": "Draws appear instantly",
+        "system": "WebRTC = direct peer link"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Direct WebRTC link",
+        "to": "Server relay takes over",
+        "points": ["Strokes keep streaming", "Switches automatically", "Drawing never stops"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "archetype sidebar + a drawn result panel: $30 tablet hero figure, 'real TV canvas' label, two delivered-feature chips (direct link / backup relay). No live page, per gate 2."
+    }
+  ]
+}

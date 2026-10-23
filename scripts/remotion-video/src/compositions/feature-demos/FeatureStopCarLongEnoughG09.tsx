@@ -1,5 +1,8 @@
 // FeatureStopCarLongEnoughG09 — feature g09 — 1280x720, 899 frames @ 30fps, VOICE-SYNCED.
-// archetype 2 zoom-in, mood mint. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 1 timeline ribbon, mood mint. Motion direction v2 (feature-motion skill, 2026-10-07).
+// Rebuilt 2026-10-23 (directing gate): the clip was staged as a camera zoom (archetype 2)
+// under an archetype-1 header. Restaged as an actual timeline ribbon — beats, windows,
+// palette and narration all unchanged.
 //
 // Voice-synced beat windows (measured, immutable): b1 15-190, b2 190-362,
 // b3 362-520, b4 520-689, b5 689-899 (holds to end).
@@ -7,27 +10,29 @@
 // Beat -> effect (data only from the feature row and commit 721f400):
 // b1 15-190   "the story already ended on the way in"
 //             quoteMarker over the feature's own write-up page (backdrop).
-//             The lower third (archetype 2) is wide: a small map-and-card
-//             mock of the whole app, zoom x1, labelled "WIDE VIEW".
+//             The ribbon draws in with its first stamp landing: DROVE PAST.
 // b2 190-362  "every place only ever told one short clip"
 //             cornerTags: the claim + four facts from problem_en, over the hub.
+//             Second stamp lands: ONE SHORT CLIP.
 // b3 362-520  "the app notices when you actually stop"
 //             statusFocus over the write-up scrolled to the dwell paragraph.
-//             The lower third zooms to x2 on the speed badge.
+//             Third stamp lands: DWELL CHECK.
 // b4 520-689  "its AI reads the full local history article"
 //             handoffExplain (short excerpt -> full article, dossier.py)
 //             over the write-up scrolled to the deep-dive paragraph.
-//             The lower third zooms to x4 on the article panel.
+//             Fourth stamp lands: FULL ARTICLE.
 // b5 689-899  "once a snippet, now the whole piece, 12,000 characters"
 //             ratioBars: 12,000 (main article) vs 32,000 (with related pages).
 //             No live backdrop here (gate: last beat must be the feature's
-//             own result, not its page or the hub). Lower third zooms to x6
-//             on the character counter — the clip ends on this number.
+//             own result, not its page or the hub). Fifth stamp lands:
+//             32,000 CHARS — the ribbon ends fully filled, holding to the end.
 //
-// Persistent element: the "camera" lower third (archetype 2), b1 through b5 —
-// a miniature map-and-card mock whose viewfinder rectangle shrinks and moves
-// deeper into one element every beat, with a zoom-factor readout. It owns
-// y>=606; the motion effects above keep the frame above that line.
+// Persistent element: the timeline ribbon (archetype 1), b1 through b5 — a
+// horizontal time band spanning the frame (x 110-1170, y 330) that fills as
+// the clip progresses and gains one landed stamp per beat, left to right.
+// It is the largest, most central, longest-lived object on screen; the
+// running claim sits bottom-left, small, never centered. Deleting the ribbon
+// leaves no story to read.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -48,125 +53,173 @@ const END = 899;
 const ACCENT = "#2BB3A3";
 const STAGE = "#0F1A17";
 
-// Lower third geometry (1280x720, below the effects' safe bottom at y~=600).
-const LT = { x: 40, y: 606, w: 1200, h: 92 };
-const MAP_X = 70;
-const MAP_Y = LT.y + 10;
-const MAP_W = 150;
-const MAP_H = 72;
-
-// Viewfinder targets inside the mini map, one per beat (x,y,w,h in map-local px).
-const TARGETS = [
-  { x: 4, y: 4, w: MAP_W - 8, h: MAP_H - 8, zoom: 1, label: "WIDE VIEW" }, // b1
-  { x: 14, y: 10, w: 60, h: 26, zoom: 2, label: "ONE PLACE" }, // b2
-  { x: 90, y: 12, w: 40, h: 20, zoom: 2, label: "SPEED CHECK" }, // b3
-  { x: 18, y: 36, w: 70, h: 28, zoom: 4, label: "FULL ARTICLE" }, // b4
-  { x: 44, y: 48, w: 30, h: 16, zoom: 6, label: "12,000 -> 32,000 CHARS" }, // b5
-];
-
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-const LowerThird: React.FC = () => {
+// Ribbon geometry — a horizontal band dominating the frame; five stamps land
+// on it left-to-right, one per beat, as that beat starts.
+const RIBBON_Y = 330;
+const RIBBON_X0 = 110;
+const RIBBON_X1 = 1170;
+const BEAT_STARTS = [B1, B2, B3, B4, B5];
+const slotX = (i: number) => RIBBON_X0 + (i * (RIBBON_X1 - RIBBON_X0)) / (BEAT_STARTS.length - 1);
+
+const STAMPS = [
+  { label: "DROVE PAST", sub: "Story already over" },
+  { label: "ONE SHORT CLIP", sub: "Same clip, every place" },
+  { label: "DWELL CHECK", sub: "Parked, not just passing" },
+  { label: "FULL ARTICLE", sub: "12,000 characters read" },
+  { label: "32,000 CHARS", sub: "Main + related pages" },
+];
+
+const LABEL_BOX = { x: 40, y: 606, w: 360, h: 80 };
+
+const Ribbon: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B1) return null;
 
-  const beatStarts = [B1, B2, B3, B4, B5];
   let idx = 0;
-  for (let i = 0; i < beatStarts.length; i++) if (frame >= beatStarts[i]) idx = i;
-  const prevIdx = Math.max(0, idx - 1);
-  const at = beatStarts[idx];
-  const p = tween(sec(frame, at, fps), 0, 0.6, ease.power3InOut);
-  const from = TARGETS[prevIdx];
-  const to = TARGETS[idx];
-  const vx = idx === prevIdx ? to.x : mix(p, from.x, to.x);
-  const vy = idx === prevIdx ? to.y : mix(p, from.y, to.y);
-  const vw = idx === prevIdx ? to.w : mix(p, from.w, to.w);
-  const vh = idx === prevIdx ? to.h : mix(p, from.h, to.h);
-  const zoom = idx === prevIdx ? to.zoom : mix(p, from.zoom, to.zoom);
+  for (let i = 0; i < BEAT_STARTS.length; i++) if (frame >= BEAT_STARTS[i]) idx = i;
+  const at = BEAT_STARTS[idx];
+  const p = tween(sec(frame, at, fps), 0, 0.5, ease.power2Out);
+  const prevFillW = idx > 0 ? slotX(idx - 1) - RIBBON_X0 : 0;
+  const curFillW = slotX(idx) - RIBBON_X0;
+  const fillWidth = mix(p, prevFillW, curFillW);
+  const landPunch = punchScale(sec(frame, at, fps), 0);
 
   return (
-    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      <Arrive at={B1 + 4} kind="wipe" box={LT} dur={0.45}>
-        <div
-          style={{
-            position: "absolute",
-            left: LT.x,
-            top: LT.y,
-            width: LT.w,
-            height: LT.h,
-            background: P.card,
-            borderRadius: 4,
-            boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
-          }}
-        />
-      </Arrive>
-
-      {/* miniature map-and-card mock: a wide view the camera zooms into */}
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720 }}>
+      {/* the band itself — the archetype's one persistent object, spanning the frame */}
       <div
         style={{
           position: "absolute",
-          left: MAP_X,
-          top: MAP_Y,
-          width: MAP_W,
-          height: MAP_H,
-          background: P.successBg,
-          border: `2px solid ${P.successEdge}`,
+          left: RIBBON_X0,
+          top: RIBBON_Y - 4,
+          width: RIBBON_X1 - RIBBON_X0,
+          height: 8,
           borderRadius: 4,
-          overflow: "hidden",
+          background: P.border,
         }}
-      >
-        {[1, 2, 3, 4].map((n) => (
-          <div
-            key={n}
-            style={{
-              position: "absolute",
-              left: 10 + (n % 2) * 70,
-              top: 8 + Math.floor(n / 2) * 30,
-              width: 16,
-              height: 16,
-              borderRadius: 8,
-              background: P.ink,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* viewfinder brackets: scale+move onto the active target */}
+      />
       <div
         style={{
           position: "absolute",
-          left: MAP_X + vx,
-          top: MAP_Y + vy,
-          width: vw,
-          height: vh,
-          border: `3px solid ${P.accent}`,
-          boxShadow: "0 0 0 2px rgba(0,0,0,0.3)",
+          left: RIBBON_X0,
+          top: RIBBON_Y - 4,
+          width: fillWidth,
+          height: 8,
+          borderRadius: 4,
+          background: P.accent,
         }}
       />
 
-      <div style={{ position: "absolute", left: MAP_X + MAP_W + 28, top: LT.y + 14, width: 420 }}>
-        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>
-          ZOOM &times;{Math.round(zoom)}
-        </div>
-        <div style={{ fontSize: 17, fontWeight: 700, color: P.ink, marginTop: 4 }}>{to.label}</div>
-      </div>
-
-      <div style={{ position: "absolute", left: 760, top: LT.y + 16, width: 400, textAlign: "right" }}>
-        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>GUIDE</div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.2 }}>
-          Stories on the Road
-        </div>
-      </div>
+      {STAMPS.map((s, i) => {
+        const landed = i < idx;
+        const active = i === idx;
+        if (!landed && !active) {
+          return (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left: slotX(i) - 13,
+                top: RIBBON_Y - 13,
+                width: 26,
+                height: 26,
+                borderRadius: "50%",
+                border: `3px dashed ${P.muted}`,
+                boxSizing: "border-box",
+              }}
+            />
+          );
+        }
+        const scale = active ? landPunch : 1;
+        return (
+          <React.Fragment key={i}>
+            <div
+              style={{
+                position: "absolute",
+                left: slotX(i) - 17,
+                top: RIBBON_Y - 17,
+                width: 34,
+                height: 34,
+                borderRadius: "50%",
+                background: P.accent,
+                border: `3px solid ${P.accentEdge}`,
+                boxShadow: active ? `0 0 0 7px ${P.accentEdge}` : "none",
+                boxSizing: "border-box",
+                transform: `scale(${scale})`,
+                transformOrigin: `${slotX(i)}px ${RIBBON_Y}px`,
+              }}
+            />
+            {active && (
+              <div
+                style={{
+                  position: "absolute",
+                  left: Math.min(Math.max(slotX(i) - 110, 20), 1280 - 240),
+                  top: RIBBON_Y - 86,
+                  width: 220,
+                  textAlign: "center",
+                  fontFamily,
+                }}
+              >
+                <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.4, color: P.accent }}>{s.label}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#E8F4F1", marginTop: 4 }}>{s.sub}</div>
+              </div>
+            )}
+          </React.Fragment>
+        );
+      })}
     </div>
+  );
+};
+
+/** Running claim, bottom-left, small, never centered (archetype 1's headline rule). */
+const SideLabel: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  const label =
+    cut(frame, B1, B2) === 1
+      ? "STORY ALREADY OVER"
+      : cut(frame, B2, B3) === 1
+      ? "ONE CLIP, EVERY PLACE"
+      : cut(frame, B3, B4) === 1
+      ? "DWELL CHECK"
+      : cut(frame, B4, B5) === 1
+      ? "FULL ARTICLE, NOT A SNIPPET"
+      : frame >= B5
+      ? "RESULT"
+      : null;
+  if (!label) return null;
+  const at = frame >= B5 ? B5 : frame >= B4 ? B4 : frame >= B3 ? B3 : frame >= B2 ? B2 : B1;
+  return (
+    <Arrive at={at} kind="wipe" box={LABEL_BOX} dur={0.3}>
+      <div
+        style={{
+          position: "absolute",
+          left: LABEL_BOX.x,
+          top: LABEL_BOX.y,
+          width: LABEL_BOX.w,
+          height: LABEL_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          display: "flex",
+          alignItems: "center",
+          padding: "0 20px",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>{label}</div>
+      </div>
+    </Arrive>
   );
 };
 
 /** Beat 1 only: names the product in one plain line (owner rule, STEP 0e). */
 const ProductPlate: React.FC = () => {
   const frame = useCurrentFrame();
-  const P = usePalette();
   if (frame < B1 || frame >= B2) return null;
   const t = tween(sec(frame, B1 + 2, 30), 0, 0.35, ease.power3Out);
   return (
@@ -181,7 +234,7 @@ const ProductPlate: React.FC = () => {
         fontFamily,
       }}
     >
-      <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2, color: P.accent }}>
+      <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2, color: ACCENT }}>
         GUIDE — STORIES ON THE ROAD
       </div>
       <div style={{ fontSize: 15, fontWeight: 600, color: "#E8F4F1", marginTop: 2 }}>
@@ -315,7 +368,8 @@ const Inner: React.FC = () => {
       />
       <ResultNotes />
 
-      <LowerThird />
+      <SideLabel />
+      <Ribbon />
     </AbsoluteFill>
   );
 };

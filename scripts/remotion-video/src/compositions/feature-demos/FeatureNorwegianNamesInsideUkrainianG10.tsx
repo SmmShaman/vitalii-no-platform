@@ -1,5 +1,7 @@
 // FeatureNorwegianNamesInsideUkrainianG10 — feature g10 — 1280x720, 987 frames @ 30fps, VOICE-SYNCED.
-// archetype 0 split-duel, mood sand. Motion direction (feature-motion skill, 2026-10-07).
+// archetype 0 split-duel, mood slate. Motion direction (feature-motion skill, 2026-10-07).
+// RE-SHOOT 2026-10-23: same narration/windows, repainted in slate, product named in b1,
+// and the batch-rewrite number from b5 now runs as a real LogWindow ticker.
 //
 // Split Duel lives in the bottom band: three red "chaos" tags (GUESSED SPELLING /
 // WRONG STRESS / LOST MEANING) on the left, one steady green "NORWEGIAN VOICE,
@@ -12,7 +14,8 @@
 // product, so every on-screen fact comes straight from problem_en / solution_en /
 // result_en):
 // b1 15-266   "forced into Cyrillic... nothing like a Norwegian would say it" —
-//             keywordCaption over the feature's own page (backdrop "page").
+//             keywordCaption over the feature's own page (backdrop "page"), plus the
+//             product plate: Guide — Stories on the Road.
 // b2 266-477  "the app already had a real Norwegian voice saying it correctly" —
 //             copyCorrection over the features hub (backdrop "hub").
 // b3 477-612  "now the AI marks every Norwegian name instead of translating it" —
@@ -20,7 +23,9 @@
 // b4 612-773  "the audio pipeline splices that real recording into the sentence" —
 //             pipelineFlow, drawn (invisible plumbing: the splice mechanism).
 // b5 773-987  "every story already published too — rewritten in batches of eight" —
-//             titleTakeover (verdict), drawn, holds to the end on the real number.
+//             titleTakeover (verdict), drawn, plus a LogWindow ticking batch 1/8 through
+//             8/8 (the product's own number, no runtime log exists so this is built from
+//             the feature row), holds to the end on the real number.
 //
 // Persistent element: the Split Duel lower band (archetype 0), b1 through b5.
 
@@ -28,7 +33,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { MotionInsert, LiveBackdrop, cut } from "./motion-primitives";
+import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { LogWindow, type LogLine } from "./live-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/g10.json";
 
@@ -39,9 +45,9 @@ const B4 = 612;
 const B5 = 773;
 const END = 987;
 
-/** sand's own accent — warm terracotta reads fine on a dark stage, no retune needed. */
-const ACCENT = "#B4531F";
-const STAGE = "#17120B";
+/** slate's own cyan reads flat on a dark stage — brightened for the dark background. */
+const ACCENT = "#2FC1E8";
+const STAGE = "#10161C";
 
 // Lower band geometry (1280x720, below the effects' safe bottom at y≈587).
 const LT = { x: 40, y: 606, w: 1200, h: 92 };
@@ -140,6 +146,39 @@ const SplitDuel: React.FC = () => {
   );
 };
 
+/** b1 — names the product in one plain line (viewer test). */
+const ProductPlate: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B1, B2) !== 1) return null;
+  return (
+    <Arrive at={B1 + 3} kind="wipe" box={{ x: 40, y: 40, w: 520, h: 100 }} dur={0.35}>
+      <div
+        style={{
+          position: "absolute",
+          left: 40,
+          top: 40,
+          width: 520,
+          padding: "14px 20px",
+          background: P.card,
+          border: `2px solid ${P.border}`,
+          borderRadius: 4,
+          boxShadow: "0 12px 32px rgba(0,0,0,0.35)",
+          fontFamily,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ fontSize: 26, lineHeight: 1 }}>🚗</div>
+          <div style={{ fontSize: 19, fontWeight: 800, color: P.ink }}>Guide — Stories on the Road</div>
+        </div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: P.muted, marginTop: 6, lineHeight: 1.3 }}>
+          Stories about the places you drive past, in Norwegian and Ukrainian.
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 // Fill-fix: handoffExplain/pipelineFlow/titleTakeover each leave the top and bottom
 // margins empty until late in their own internal reveal. These bands restate data the
 // beat already carries (never new facts) in the top/bottom thirds the effects don't use.
@@ -189,6 +228,18 @@ const FillCaption: React.FC<{
   );
 };
 
+/** b5 — the real number running: batches of eight, built from the feature row (no runtime log exists). */
+const BATCH_LINES: LogLine[] = [
+  { t: "00:01", text: "scanning published stories", tone: "ink" },
+  { t: "00:03", text: "batch 1/8 rewritten", tone: "success" },
+  { t: "00:05", text: "batch 2/8 rewritten", tone: "success" },
+  { t: "00:07", text: "batch 3/8 rewritten", tone: "success" },
+  { t: "00:09", text: "batch 4/8 rewritten", tone: "success" },
+  { t: "00:11", text: "batch 5/8 rewritten", tone: "success" },
+  { t: "00:13", text: "batch 6/8 rewritten", tone: "success" },
+  { t: "00:15", text: "all 8 batches rewritten", tone: "success" },
+];
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -206,6 +257,7 @@ const Inner: React.FC = () => {
           keywords: ["Cyrillic", "wrong"],
         }}
       />
+      <ProductPlate />
 
       {/* b2 — the odd discovery, over the features hub */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
@@ -268,7 +320,15 @@ const Inner: React.FC = () => {
         }}
       />
       <FillCaption from={B5} dur={END - B5} y={40} label="Not just new stories" chips={["Already published", "Rewritten too"]} tone="accent" />
-      <FillCaption from={B5} dur={END - B5} y={500} chips={["Original text kept as backup"]} tone="success" />
+      <LogWindow
+        lines={BATCH_LINES}
+        title="rewrite-runner"
+        from={B5 + 20}
+        every={24}
+        opacity={cut(frame, B5, END)}
+        fontSize={20}
+        win={{ x: 140, y: 484, w: 1000, h: 116 }}
+      />
 
       <SplitDuel />
     </AbsoluteFill>
@@ -276,7 +336,7 @@ const Inner: React.FC = () => {
 };
 
 export const FeatureNorwegianNamesInsideUkrainianG10: React.FC = () => (
-  <PaletteProvider value={MOODS.sand}>
+  <PaletteProvider value={MOODS.slate}>
     <Inner />
   </PaletteProvider>
 );

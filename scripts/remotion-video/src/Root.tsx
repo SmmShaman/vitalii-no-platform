@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureAnyPhoneBecomesDrawingB57 } from "./compositions/feature-demos/FeatureAnyPhoneBecomesDrawingB57";
+import { FeatureTopicLessonsFollowCoverageM23 } from "./compositions/feature-demos/FeatureTopicLessonsFollowCoverageM23";
 import { FeatureOneSentenceFlashPlaysG08 } from "./compositions/feature-demos/FeatureOneSentenceFlashPlaysG08";
 import { FeatureStopCarLongEnoughG09 } from "./compositions/feature-demos/FeatureStopCarLongEnoughG09";
 import { FeatureElvarikaLeftManagedSupabaseE01 } from "./compositions/feature-demos/FeatureElvarikaLeftManagedSupabaseE01";
@@ -2701,6 +2703,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureElvarikaRealAndroidAppE02"
         component={FeatureElvarikaRealAndroidAppE02}
         durationInFrames={994}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureAnyPhoneBecomesDrawingB57"
+        component={FeatureAnyPhoneBecomesDrawingB57}
+        durationInFrames={873}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTopicLessonsFollowCoverageM23"
+        component={FeatureTopicLessonsFollowCoverageM23}
+        durationInFrames={901}
         fps={30}
         width={1280}
         height={720}
