@@ -74,6 +74,20 @@ serve(async (req) => {
       }
     }
 
+    // Comment notifications come through this bot when no separate comments bot is configured:
+    // hand their buttons and edit-replies to comments-bot-webhook
+    const commentCallback = /^(reply_comment_|edit_reply_|ignore_comment_|engage_post_|skip_post_)/.test(update.callback_query?.data || '')
+    const commentEdit = /editReply:[a-f0-9-]+/.test(update.message?.reply_to_message?.text || '')
+    if (commentCallback || commentEdit) {
+      const fwd = await fetch(`${SUPABASE_URL}/functions/v1/comments-bot-webhook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}` },
+        body: JSON.stringify(update),
+      })
+      console.log(`💬 Forwarded comment update to comments-bot-webhook: ${fwd.status}`)
+      return new Response('OK', { status: 200 })
+    }
+
     // =================================================================
     // 🆕 НОВИЙ HANDLER: Channel Post (пости з каналів)
     // =================================================================

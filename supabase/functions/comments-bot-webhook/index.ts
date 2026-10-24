@@ -19,7 +19,8 @@ import {
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const TELEGRAM_COMMENTS_BOT_TOKEN = Deno.env.get('TELEGRAM_COMMENTS_BOT_TOKEN')
+// Falls back to the main bot, whose telegram-webhook forwards comment updates here
+const TELEGRAM_COMMENTS_BOT_TOKEN = Deno.env.get('TELEGRAM_COMMENTS_BOT_TOKEN') || Deno.env.get('TELEGRAM_BOT_TOKEN')
 
 serve(async (req) => {
   if (!TELEGRAM_COMMENTS_BOT_TOKEN) {

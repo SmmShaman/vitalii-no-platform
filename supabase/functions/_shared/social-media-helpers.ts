@@ -381,8 +381,9 @@ export async function sendToCommentsBot(
     replyMarkup?: any;
   }
 ): Promise<{ success: boolean; messageId?: number; error?: string }> {
-  const botToken = Deno.env.get("TELEGRAM_COMMENTS_BOT_TOKEN");
-  const chatId = Deno.env.get("TELEGRAM_COMMENTS_CHAT_ID");
+  // Without a dedicated comments bot, fall back to the main bot (its webhook forwards comment buttons)
+  const botToken = Deno.env.get("TELEGRAM_COMMENTS_BOT_TOKEN") || Deno.env.get("TELEGRAM_BOT_TOKEN");
+  const chatId = Deno.env.get("TELEGRAM_COMMENTS_CHAT_ID") || Deno.env.get("TELEGRAM_CHAT_ID");
 
   if (!botToken || !chatId) {
     console.warn("⚠️ Comments bot not configured");
