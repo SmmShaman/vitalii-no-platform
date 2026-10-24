@@ -234,6 +234,8 @@ import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/F
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
 import { FeatureAnyPhoneBecomesDrawingB57 } from "./compositions/feature-demos/FeatureAnyPhoneBecomesDrawingB57";
+import { FeatureAppKeepsNarratingEvenG07 } from "./compositions/feature-demos/FeatureAppKeepsNarratingEvenG07";
+import { FeatureEveryStreetNameBecomesG06 } from "./compositions/feature-demos/FeatureEveryStreetNameBecomesG06";
 import { FeatureTopicLessonsFollowCoverageM23 } from "./compositions/feature-demos/FeatureTopicLessonsFollowCoverageM23";
 import { FeatureOneSentenceFlashPlaysG08 } from "./compositions/feature-demos/FeatureOneSentenceFlashPlaysG08";
 import { FeatureStopCarLongEnoughG09 } from "./compositions/feature-demos/FeatureStopCarLongEnoughG09";
@@ -2721,6 +2723,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureTopicLessonsFollowCoverageM23"
         component={FeatureTopicLessonsFollowCoverageM23}
         durationInFrames={901}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureAppKeepsNarratingEvenG07"
+        component={FeatureAppKeepsNarratingEvenG07}
+        durationInFrames={1057}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureEveryStreetNameBecomesG06"
+        component={FeatureEveryStreetNameBecomesG06}
+        durationInFrames={908}
         fps={30}
         width={1280}
         height={720}

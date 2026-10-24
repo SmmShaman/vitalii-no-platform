@@ -1,5 +1,7 @@
 // FeatureTopicLessonsFollowCoverageM23 — feature m23 — 1280x720, 901 frames @ 30fps, VOICE-SYNCED.
-// archetype 2 zoom-in, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 2 zoom-in, mood slate. Motion direction v2 (feature-motion skill, 2026-10-07).
+// RE-SHOOT 2026-10-24: narration unchanged, mood dawn -> slate, b1 effect changed from
+// keywordCaption (repeat of a recent opener) to titleTakeover.
 //
 // A single camera keeps pushing in across the whole clip (archetype 2): beat 1 is the
 // widest view of the feature's own page, and every following beat tightens the frame a
@@ -9,7 +11,7 @@
 //
 // Beat → effect (data only from the feature row and commit 9ce565d):
 // b1 15-182   "ask for a lesson on a tricky word, and it used to repeat the same point
-//             every section" — keywordCaption over the feature's own page.
+//             every section" — titleTakeover over the feature's own page.
 // b2 182-385  "now it maps distinct angles first, like a teacher outlining chapters, then
 //             writes one angle per section" — pipelineFlow, page scrolled on. The one tech
 //             gloss of the clip sits on this frame.
@@ -39,9 +41,9 @@ const B4 = 530;
 const B5 = 713;
 const END = 901;
 
-/** Accent tuned for the dark stage (dawn's own accent reads too soft on it). */
-const ACCENT = "#F0963C";
-const STAGE = "#1C1610";
+/** Accent tuned for the dark stage (slate's own accent reads too soft on it). */
+const ACCENT = "#2DC4D6";
+const STAGE = "#0E1A22";
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
@@ -160,14 +162,13 @@ const Inner: React.FC = () => {
         {/* b1 — the human problem, over the feature's own page */}
         {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
         <MotionInsert
-          effect="keywordCaption"
+          effect="titleTakeover"
           from={B1}
           dur={B2 - B1}
           accent={ACCENT}
           data={{
-            line1: "Same point,",
-            line2: "every section repeated it",
-            keywords: ["Same point", "every section"],
+            title: "Same Point, Repeated",
+            kicker: "Every section repeated the same point",
           }}
         />
 
@@ -254,7 +255,7 @@ const Inner: React.FC = () => {
 };
 
 export const FeatureTopicLessonsFollowCoverageM23: React.FC = () => (
-  <PaletteProvider value={MOODS.dawn}>
+  <PaletteProvider value={MOODS.slate}>
     <Inner />
   </PaletteProvider>
 );

@@ -4,12 +4,11 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "keywordCaption",
+      "effect": "titleTakeover",
       "backdrop": "page",
       "data": {
-        "line1": "Same point,",
-        "line2": "every section repeated it",
-        "keywords": ["Same point", "every section"]
+        "title": "Same Point, Repeated",
+        "kicker": "Every section repeated the same point"
       }
     },
     {

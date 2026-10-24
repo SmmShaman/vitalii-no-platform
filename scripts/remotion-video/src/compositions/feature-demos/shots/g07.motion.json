@@ -1,0 +1,60 @@
+{
+  "id": "g07",
+  "composition": "FeatureAppKeepsNarratingEvenG07",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "Dead Air on the Drive",
+        "kicker": "Long dead zones used to cut narration mid-sentence"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "Stories didn't know I'd already driven past",
+        "tags": ["Signal gone for miles", "Story kept talking past the stop", "No offline cache", "Dead air or stale talk"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": {
+        "note": "Radio analogy — old cuts dead mid-song, new fades clean at the sentence boundary"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["Phone nears a dead zone", "App pre-loads the drive pack", "Audio cached on the device"],
+        "result": "Narration keeps playing offline",
+        "system": "Drive pack = bundled stories + streets"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "handoffExplain",
+      "backdrop": "hub2",
+      "data": {
+        "from": "Story ignores my position",
+        "to": "Story matches GPS to its own sentences",
+        "points": ["Checked every 100 meters", "Finishes the current sentence", "Stops cleanly, never overlaps"]
+      }
+    },
+    {
+      "beat": "b6",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": {
+        "note": "LogWindow built from feature numbers, ends on the hero result: 4 km dead zone, start to finish"
+      }
+    }
+  ]
+}

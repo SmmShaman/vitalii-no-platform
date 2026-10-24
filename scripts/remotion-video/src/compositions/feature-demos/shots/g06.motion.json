@@ -1,0 +1,51 @@
+{
+  "id": "g06",
+  "composition": "FeatureEveryStreetNameBecomesG06",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "Signs With No Story",
+        "kicker": "Street names fly past at 70 km/h, history unread"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": {
+        "line1": "No meaning without proof",
+        "line2": "nothing invented",
+        "keywords": ["proof", "invented"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": {
+        "note": "Tour-guide metaphor — only speaks when sure of the facts, no backdrop"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["Pull every named street from OpenStreetMap", "Match name to a place only if a source confirms it", "Kolbuvegen matches the village of Kolbu"],
+        "result": "Every street gets a verified story"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "cornerTags",
+      "backdrop": null,
+      "data": {
+        "statement": "Thin stubs don't get a story",
+        "tags": ["Under 60 meters: skip", "One address only: skip", "Everything else: a story"]
+      }
+    }
+  ]
+}
