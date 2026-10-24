@@ -214,7 +214,7 @@ async function tryClaude(call: LlmCall, model: string): Promise<Response | null>
       body: JSON.stringify({
         model,
         max_tokens: Math.min(call.maxTokens, 16000),
-        temperature: call.temperature,
+        // No temperature: Claude 5.x models reject it as deprecated (400)
         system: [
           { type: 'text', text: CLAUDE_IDENTITY },
           ...(systemText ? [{ type: 'text', text: systemText }] : []),
