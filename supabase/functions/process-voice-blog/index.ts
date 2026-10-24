@@ -3,59 +3,18 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 import { HUMANIZER_ARTICLE, VOICE_JOURNALISM } from '../_shared/humanizer-prompt.ts'
 import { azureFetch } from '../_shared/azure-to-gemini-shim.ts'
 import { generateImageFree } from '../_shared/free-image.ts'
+import { uploadToR2 } from '../_shared/r2-upload.ts'
+import { loadAuthorBrain } from '../_shared/author-brain.ts'
+import { generateLocalizedSlug } from '../_shared/slug-helpers.ts'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')!
-const VERSION = '2026-08-06-v2-free-llm-only'
-
-// Cloudflare R2 — primary storage (replaces Supabase Storage)
-const CF_API_TOKEN = Deno.env.get('CF_API_TOKEN') ?? ''
-const CF_ACCOUNT_ID = Deno.env.get('CF_ACCOUNT_ID') ?? '1438e8d03009209c4a82ea4c28bdb358'
-const R2_BUCKET = 'news-images'
-const R2_PUBLIC_BASE = 'https://pub-612755c33acf4a878ca21c80dcd5cbe8.r2.dev'
-
-async function uploadToR2(key: string, data: Uint8Array, contentType: string): Promise<string | null> {
-  if (!CF_API_TOKEN) {
-    console.error('❌ CF_API_TOKEN not set — cannot upload to R2')
-    return null
-  }
-  const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/r2/buckets/${R2_BUCKET}/objects/${key}`
-  try {
-    const res = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${CF_API_TOKEN}`,
-        'Content-Type': contentType,
-      },
-      body: data,
-    })
-    if (!res.ok) {
-      const err = await res.text()
-      console.error(`❌ R2 upload failed for ${key}: ${res.status} ${err.substring(0, 200)}`)
-      return null
-    }
-    return `${R2_PUBLIC_BASE}/${key}`
-  } catch (e: any) {
-    console.error(`❌ R2 upload exception for ${key}: ${e?.message}`)
-    return null
-  }
-}
+const VERSION = '2026-10-24-author-brain'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
-
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 60)
-    .replace(/-$/, '')
-    + '-' + Math.random().toString(36).slice(2, 10)
 }
 
 async function editTelegramMessage(chatId: number, messageId: number, text: string, replyMarkup?: unknown) {
@@ -118,34 +77,45 @@ serve(async (req) => {
       .limit(1)
       .single()
 
-    const basePrompt = promptData?.prompt_text || `Convert raw text into a polished trilingual blog post. Return JSON with en/no/ua titles, content, descriptions, tags, category.`
-    const rawWordCount = rawText.split(/\s+/).length
+    const basePrompt = promptData?.prompt_text || `Turn the author's dictation into a trilingual blog post for his personal blog vitalii.no.`
+    const brain = await loadAuthorBrain(supabase)
+    const today = new Date().toISOString().slice(0, 10)
     const voiceSafeguards = `
-VOICE DICTATION MODE — CRITICAL RULES:
-The text below is the author's OWN words transcribed from a voice message.
-1. Write ONLY about topics and ideas the author actually mentioned.
-2. PRESERVE ALL specific names: tools, platforms, companies, URLs, products, people. If the author said "Skyvern", "Finn.no", "Perplexity" — these MUST appear in the output.
-3. Do NOT invent details, examples, backstory, or emotional context the author did not say.
-4. Do NOT generalize specific experiences into abstract motivation. If the author described a concrete problem with a specific tool, write about THAT tool and THAT problem.
-5. Do NOT add "I remember when...", "Back in those days..." or nostalgic filler.
-6. Keep roughly the same level of detail as the original (~${rawWordCount} words ±30% per language).
-7. If unsure whether something was said — leave it out.
-8. The blog post should feel like the author's voice cleaned up, NOT a completely different text inspired by the topic.`
-    const systemPrompt = `${basePrompt}\n\n${voiceSafeguards}\n\n${HUMANIZER_ARTICLE}\n\n${VOICE_JOURNALISM}`
+TODAY: ${today}
 
-    // Blog writing is a rewrite-class task → shim `quality` route
-    // (gpt-oss-120b → gpt-oss-20b → Groq 70b → NVIDIA → free Gemini).
-    // Paid Gemini removed per owner policy 2026-08-06.
-    console.log(`📝 Calling quality LLM route with ${rawText.length} chars...`)
+TWO SOURCES OF TRUTH — nothing else:
+1. The DICTATION (user message): what the author wants to say today. It is the topic and the spine of the post.
+2. <author_brain>: verified background — who he is, his projects, and a dated journal of what really happened.
+
+RULES:
+- Every fact in the post must come from the dictation or from <author_brain>. If neither says it, it does not go in: no invented tools, frameworks, libraries, numbers, code, test setups, quotes, results or plans.
+- Use <author_brain> to understand what the dictation is about: find the project and the concrete event (journal entries near today's date are usually what he means), then tell that story with the real details from the brain.
+- The dictation decides the topic. Do not drift to other projects or journal entries unless they directly explain it.
+- Private life (children, health, home, money, job search) only if the dictation itself brings it up. Never addresses, phone numbers or e-mails.
+- Never write that he scrapes FINN or any website; job vacancies come from public job listings and official job-market APIs (NAV).
+- Never mention server IPs, file paths, tokens, keys or passwords.
+- LENGTH follows the true material. A two-sentence dictation with one matching journal entry gives 120-250 words per language. Never pad to reach a length; short is fine.
+- If the dictation is too thin to tell what it is about and <author_brain> does not resolve it, do not write a post. Return only {"clarify": "<one short question in Ukrainian asking for the missing detail>"}.
+- Write each language natively. No English phrases inside the Norwegian or Ukrainian text. Open with the concrete situation, never a hook formula ("this changes everything", "Ever wondered...?").
+
+<author_brain>
+${brain}
+</author_brain>
+
+Return ONLY valid JSON without markdown fences:
+{"en":{"title":"...","content":"...","description":"one sentence"},"no":{"title":"...","content":"...","description":"one sentence"},"ua":{"title":"...","content":"...","description":"one sentence"},"tags":["tag1","tag2"],"category":"Tech"}`
+    const systemPrompt = `${basePrompt}\n\n${HUMANIZER_ARTICLE}\n\n${VOICE_JOURNALISM}\n\n${voiceSafeguards}`
+
+    // article route = Claude subscription first, free models as fallback
+    console.log(`📝 Calling article LLM route: ${rawText.length} chars dictation, ${brain.length} chars brain...`)
     const llmRes = await azureFetch('', {
       method: 'POST',
       body: JSON.stringify({
         llm_route: 'article',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `RAW TEXT FROM VOICE MESSAGE:\n${rawText.slice(0, 5000)}` },
+          { role: 'user', content: `DICTATION:\n${rawText.slice(0, 5000)}` },
         ],
-        temperature: 0.3,
         max_tokens: 16000,
       }),
     })
@@ -157,6 +127,7 @@ The text below is the author's OWN words transcribed from a voice message.
     const cleaned = aiText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
 
     let blogData: {
+      clarify?: string
       en: { title: string; content: string; description: string }
       no: { title: string; content: string; description: string }
       ua: { title: string; content: string; description: string }
@@ -164,10 +135,23 @@ The text below is the author's OWN words transcribed from a voice message.
     }
 
     try {
-      blogData = JSON.parse(cleaned)
+      blogData = JSON.parse(cleaned.match(/\{[\s\S]*\}/)?.[0] || cleaned)
     } catch {
-      throw new Error(`Failed to parse Gemini response: ${cleaned.slice(0, 300)}`)
+      throw new Error(`Failed to parse LLM response: ${cleaned.slice(0, 300)}`)
     }
+
+    // Too little to go on — ask instead of inventing
+    if (blogData.clarify && !blogData.en) {
+      console.log(`❓ Clarify: ${blogData.clarify}`)
+      if (messageId) {
+        await editTelegramMessage(chatId, messageId,
+          `❓ <b>Замало деталей для посту</b>\n\n${blogData.clarify}\n\n<i>Надішли /blog ще раз і розкажи докладніше.</i>`)
+      }
+      return new Response(JSON.stringify({ success: false, clarify: blogData.clarify }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    if (!blogData.en || !blogData.no || !blogData.ua) throw new Error('LLM response missing en/no/ua')
 
     if (messageId) {
       await editTelegramMessage(chatId, messageId, '🖼️ <b>Генерую зображення...</b>')
@@ -210,6 +194,7 @@ The text below is the author's OWN words transcribed from a voice message.
     const readingTime = Math.max(1, Math.ceil(wordCount / 200))
 
     // Insert or update blog post
+    const slugSuffix = Date.now().toString(36)
     const postData = {
       title_en: blogData.en.title,
       title_no: blogData.no.title,
@@ -220,9 +205,9 @@ The text below is the author's OWN words transcribed from a voice message.
       description_en: blogData.en.description,
       description_no: blogData.no.description,
       description_ua: blogData.ua.description,
-      slug_en: generateSlug(blogData.en.title),
-      slug_no: generateSlug(blogData.no.title),
-      slug_ua: generateSlug(blogData.ua.title),
+      slug_en: generateLocalizedSlug(blogData.en.title, 'en', slugSuffix),
+      slug_no: generateLocalizedSlug(blogData.no.title, 'no', slugSuffix),
+      slug_ua: generateLocalizedSlug(blogData.ua.title, 'ua', slugSuffix),
       tags: blogData.tags || [],
       category: blogData.category || 'Tech',
       reading_time: readingTime,
@@ -251,9 +236,12 @@ The text below is the author's OWN words transcribed from a voice message.
     console.log(`✅ Blog draft ${postId}: ${blogData.en.title}`)
 
     // Send preview to Telegram
-    const preview = `📝 <b>Блог-пост готовий!</b>\n\n` +
-      `📌 <b>${blogData.ua.title}</b>\n\n` +
-      `${blogData.ua.description}\n\n` +
+    // The owner reads the whole draft here before publishing (Telegram caps a message at 4096 chars)
+    const escapeHtml = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    const uaBody = blogData.ua.content.length > 2600 ? blogData.ua.content.slice(0, 2600) + '…' : blogData.ua.content
+    const preview = `📝 <b>Чернетка блог-посту</b> (ще не опублікована)\n\n` +
+      `📌 <b>${escapeHtml(blogData.ua.title)}</b>\n\n` +
+      `${escapeHtml(uaBody)}\n\n` +
       `🏷 ${(blogData.tags || []).join(', ')}\n` +
       `📖 ~${readingTime} хв читання\n` +
       `🖼️ ${imageUrl ? 'Зображення ✅' : 'Без зображення'}\n\n` +
