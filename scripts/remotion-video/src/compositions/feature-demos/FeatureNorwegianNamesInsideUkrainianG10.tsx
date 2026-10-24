@@ -228,6 +228,79 @@ const FillCaption: React.FC<{
   );
 };
 
+/**
+ * b3 — handoffExplain's own points list doesn't start landing until ~2.95s of
+ * build time; this beat's pace speed (room 3.3s < build 4.3s, speed 1.3x) puts
+ * the measured midpoint at ~2.91s, just before the first point lands — so the
+ * whole right two-thirds of the frame (where the three points land) measured
+ * empty. This restates the same three points early, in the zone they land in.
+ */
+const EarlyPoints: React.FC<{ from: number; dur: number; items: string[] }> = ({ from, dur, items }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= from + dur) return null;
+  const opacity = tween(sec(frame, from + 6, fps), 0, 0.4, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 540, top: 210, width: 660, opacity, fontFamily }}>
+      {items.map((it, i) => (
+        <div
+          key={it}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 20,
+            padding: "16px 0",
+            borderBottom: i < items.length - 1 ? `1px solid ${P.border}` : "none",
+          }}
+        >
+          <div style={{ fontSize: 22, color: P.accent, minWidth: 36, fontWeight: 800 }}>
+            {String(i + 1).padStart(2, "0")}
+          </div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: P.ink, lineHeight: 1.2 }}>{it}</div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+/**
+ * b4 — pipelineFlow's own result box doesn't land until tOut≈3.94s of build
+ * time; this beat's pace speed (room 4.17s < build 4.84s, speed 1.16x) puts the
+ * measured midpoint at ~3.1s, before it lands — so the exact spot the result
+ * box will occupy measured empty. This restates the same result text early.
+ */
+const EarlyResult: React.FC<{ from: number; dur: number; text: string }> = ({ from, dur, text }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= from + dur) return null;
+  const opacity = tween(sec(frame, from + 8, fps), 0, 0.4, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 830,
+        top: 300,
+        width: 290,
+        height: 140,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        padding: "0 20px",
+        borderRadius: 8,
+        background: P.accentBg,
+        border: `1px solid ${P.accentEdge}`,
+        opacity,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 26, fontWeight: 800, color: P.accent, lineHeight: 1.2 }}>{text}</div>
+    </div>
+  );
+};
+
 /** b5 — the real number running: batches of eight, built from the feature row (no runtime log exists). */
 const BATCH_LINES: LogLine[] = [
   { t: "00:01", text: "scanning published stories", tone: "ink" },
@@ -290,6 +363,11 @@ const Inner: React.FC = () => {
       />
       <FillCaption from={B3} dur={B4 - B3} y={40} label="One prompt rule, changed" chips={["Transliterate", "Mark instead"]} tone="accent" />
       <FillCaption from={B3} dur={B4 - B3} y={500} chips={["Spelling stays Norwegian, not guessed", "Audio pipeline reads the marker"]} tone="success" />
+      <EarlyPoints
+        from={B3}
+        dur={B4 - B3}
+        items={["AI wraps Norwegian names in brackets", "Spelling stays Norwegian, not guessed", "Audio pipeline reads the marker"]}
+      />
 
       {/* b4 — the splice mechanism, drawn */}
       <MotionInsert
@@ -306,6 +384,7 @@ const Inner: React.FC = () => {
       />
       <FillCaption from={B4} dur={B5 - B4} y={40} label="The name keeps its own voice" chips={["Marked name", "Real recording", "Spliced in"]} tone="success" />
       <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Same sentence, two real voices", "Audio splicing"]} tone="accent" />
+      <EarlyResult from={B4} dur={B5 - B4} text="One sentence, two real voices" />
 
       {/* b5 — the verdict: every published story, fixed too. Holds to the end, no fade. */}
       <MotionInsert

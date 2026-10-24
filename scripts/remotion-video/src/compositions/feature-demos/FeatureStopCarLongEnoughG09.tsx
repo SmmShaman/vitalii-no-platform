@@ -246,9 +246,12 @@ const ProductPlate: React.FC = () => {
 
 /**
  * Beat 5 only: ratioBars' own bracket+ratio tag don't draw in until ~4.1s into
- * the 7s beat, so the right third of the frame sits empty through the midpoint
- * (measured, contact sheet). This fills it immediately with what the bigger
- * number is made of, instead of waiting on the bars' own late reveal.
+ * the 7s beat, measured fill at the 3.5s midpoint was still 28/48 — the bars sit
+ * left-of-center (barMax reserves room for a bracket+ratio that hasn't landed
+ * yet) so the whole right third, top to bottom, reads empty. A top-right corner
+ * note wasn't enough: this now runs a vertical accent line + two notes spanning
+ * the same y-range as the two bars (331-585px) so the right column is touched
+ * at every row, not just the top two.
  */
 const ResultNotes: React.FC = () => {
   const frame = useCurrentFrame();
@@ -257,10 +260,11 @@ const ResultNotes: React.FC = () => {
   const t = tween(sec(frame, B5 + 4, 30), 0, 0.4, ease.power3Out);
   const items = ["Related pages, same place", "Same visit, nothing repeated"];
   return (
-    <div style={{ position: "absolute", right: 80, top: 120, width: 380, opacity: t, fontFamily }}>
+    <div style={{ position: "absolute", right: 70, top: 300, width: 400, opacity: t, fontFamily }}>
       <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>
         WHAT&apos;S IN THE 32,000
       </div>
+      <div style={{ position: "absolute", left: -26, top: 26, width: 3, height: 230, background: P.border }} />
       {items.map((it, i) => (
         <div
           key={it}
@@ -268,8 +272,8 @@ const ResultNotes: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 10,
-            marginTop: i === 0 ? 16 : 12,
-            fontSize: 18,
+            marginTop: i === 0 ? 70 : 110,
+            fontSize: 20,
             fontWeight: 600,
             color: "#E8F4F1",
           }}

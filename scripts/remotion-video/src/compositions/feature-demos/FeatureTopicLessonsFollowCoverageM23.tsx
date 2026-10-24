@@ -100,6 +100,38 @@ const ProductPlate: React.FC = () => {
   );
 };
 
+/**
+ * b2 overlay — pipelineFlow's compacted chain only fills a mid-height band
+ * (roughly y 263-453 at 1x); its title and result land late (after the beat's
+ * own measured midpoint), so the empty top and bottom thirds measured 21/48 at
+ * that instant. These two bands repeat the beat's own tech gloss and result
+ * early so the frame reads full well before pipelineFlow's native reveal.
+ */
+const CoverageGloss: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B2, B3) !== 1) return null;
+  const t = tween(sec(frame, B2 + 10, 30), 0, 0.4, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 140, top: 44, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
+      <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>
+        COVERAGE PLAN = ANGLES OUTLINED LIKE CHAPTERS
+      </div>
+    </div>
+  );
+};
+
+const CoverageResult: React.FC = () => {
+  const frame = useCurrentFrame();
+  if (cut(frame, B2, B3) !== 1) return null;
+  const t = tween(sec(frame, B2 + 20, 30), 0, 0.4, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 140, bottom: 54, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
+      <div style={{ fontSize: 22, fontWeight: 700, color: "#F3E9DC" }}>No angle repeats</div>
+    </div>
+  );
+};
+
 /** b4 overlay — the product running, lines built from the feature's own 10-of-16 target. */
 const RUNNER_LINES: LogLine[] = [
   { t: "04:02", text: "section 3 drafted", tone: "ink" },
@@ -153,6 +185,8 @@ const Inner: React.FC = () => {
             system: "Coverage plan = angles outlined like chapters",
           }}
         />
+        <CoverageGloss />
+        <CoverageResult />
 
         {/* b3 — every earlier section is read back first, so nothing repeats */}
         {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B3} hold={B4 - B3} />}
@@ -191,23 +225,28 @@ const Inner: React.FC = () => {
           every={18}
           opacity={cut(frame, B4, B5)}
         />
-
-        {/* b5 — the result, drawn only (no live page, gate 2), holds to the final frame */}
-        {frame >= B5 && (
-          <MotionInsert
-            effect="ratioBars"
-            from={B5}
-            dur={END - B5}
-            accent={ACCENT}
-            base={STAGE}
-            data={{
-              a: { label: "Lines with target word", value: 10 },
-              b: { label: "Total lines per section", value: 16 },
-              unit: "lines",
-            }}
-          />
-        )}
       </div>
+
+      {/* b5 — the result, drawn only (no live page, gate 2), holds to the final frame.
+          Sits outside the camera div (like ProductPlate): by b5 the push-in has reached
+          1.38x, and ratioBars' bars+labels already span nearly the full 1280px width at
+          1x, so that zoom pushed the label starts off both edges — measured fill at the
+          midpoint was 7/48 with "Lines with..." and "Total lines..." clipped to "...th
+          target word" / "...es per section". The finale reads crisper unzoomed anyway. */}
+      {frame >= B5 && (
+        <MotionInsert
+          effect="ratioBars"
+          from={B5}
+          dur={END - B5}
+          accent={ACCENT}
+          base={STAGE}
+          data={{
+            a: { label: "Lines with target word", value: 10 },
+            b: { label: "Total lines per section", value: 16 },
+            unit: "lines",
+          }}
+        />
+      )}
 
       <ProductPlate />
     </AbsoluteFill>
