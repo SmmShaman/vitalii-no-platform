@@ -17,8 +17,10 @@ Q=queue.txt; DQ=delete-queue.txt; LOG=runner.log
 
 note() { printf '%s %s\n' "$(date -Is)" "$*" >>"$LOG"; }
 TG() {
-  BT=$(grep ^TELEGRAM_BOT_TOKEN= /home/stuar/supabase-portfolio/functions-secrets.env | cut -d= -f2-)
-  CH=$(grep ^TELEGRAM_CHAT_ID= /home/stuar/supabase-portfolio/functions-secrets.env | cut -d= -f2-)
+  # Upload reports are technical: tech bot when configured, else the main bot
+  SEC=/home/stuar/supabase-portfolio/functions-secrets.env
+  BT=$(grep ^TELEGRAM_TECH_BOT_TOKEN= $SEC | cut -d= -f2-); [ -n "$BT" ] || BT=$(grep ^TELEGRAM_BOT_TOKEN= $SEC | cut -d= -f2-)
+  CH=$(grep ^TELEGRAM_TECH_CHAT_ID= $SEC | cut -d= -f2-); [ -n "$CH" ] || CH=$(grep ^TELEGRAM_CHAT_ID= $SEC | cut -d= -f2-)
   [ -n "$BT" ] && curl -s -o /dev/null -X POST "https://api.telegram.org/bot$BT/sendMessage" \
     -d chat_id="$CH" --data-urlencode text="$1" || true
 }

@@ -24,8 +24,9 @@ psq() { docker exec portfolio-db psql -U postgres -d postgres -tA -c "$1"; }
 cenv() { docker exec portfolio-edge-functions sh -c "echo \$$1"; }
 
 KEY=$(cenv SUPABASE_SERVICE_ROLE_KEY)
-BOT=$(cenv TELEGRAM_BOT_TOKEN)
-CHAT=$(cenv TELEGRAM_CHAT_ID)
+# Technical alarm: tech bot when configured, else the main bot
+BOT=$(cenv TELEGRAM_TECH_BOT_TOKEN); [ -n "$BOT" ] || BOT=$(cenv TELEGRAM_BOT_TOKEN)
+CHAT=$(cenv TELEGRAM_TECH_CHAT_ID); [ -n "$CHAT" ] || CHAT=$(cenv TELEGRAM_CHAT_ID)
 YDATE=$(date -u -d yesterday +%F)
 
 notify() {

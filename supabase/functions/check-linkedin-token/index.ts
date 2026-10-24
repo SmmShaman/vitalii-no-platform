@@ -3,8 +3,9 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 const LINKEDIN_ACCESS_TOKEN = Deno.env.get('LINKEDIN_ACCESS_TOKEN')
 const FACEBOOK_PAGE_ACCESS_TOKEN = Deno.env.get('FACEBOOK_PAGE_ACCESS_TOKEN')
 const FACEBOOK_PAGE_ID = Deno.env.get('FACEBOOK_PAGE_ID')
-const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_BOT_TOKEN')
-const TELEGRAM_ADMIN_CHAT_ID = Deno.env.get('TELEGRAM_ADMIN_CHAT_ID') || Deno.env.get('TELEGRAM_CHAT_ID')
+// Token alarms go to the tech bot when configured, else the main bot
+const TELEGRAM_BOT_TOKEN = Deno.env.get('TELEGRAM_TECH_BOT_TOKEN') || Deno.env.get('TELEGRAM_BOT_TOKEN')
+const TELEGRAM_ADMIN_CHAT_ID = Deno.env.get('TELEGRAM_TECH_CHAT_ID') || Deno.env.get('TELEGRAM_ADMIN_CHAT_ID') || Deno.env.get('TELEGRAM_CHAT_ID')
 
 const LINKEDIN_TOKEN_URL = 'https://www.linkedin.com/developers/tools/oauth/token-generator'
 
