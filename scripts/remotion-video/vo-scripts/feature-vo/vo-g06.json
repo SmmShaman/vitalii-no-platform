@@ -1,0 +1,57 @@
+{
+ "id": "g06",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.907,
+  "b2": 3.465,
+  "b3": 3.825,
+  "b4": 9.19,
+  "b5": 4.682
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Street signs fly past at speed, and I had no way to learn the real history each name carries.",
+   "start_s": 0.5,
+   "end_s": 6.407,
+   "start_f": 15,
+   "end_f": 192
+  },
+  {
+   "beat": "b2",
+   "text": "I didn't want the app inventing meanings it couldn't actually prove.",
+   "start_s": 6.707,
+   "end_s": 10.172,
+   "start_f": 201,
+   "end_f": 305
+  },
+  {
+   "beat": "b3",
+   "text": "Like a tour guide who only speaks when they're sure of the facts.",
+   "start_s": 10.472,
+   "end_s": 14.297,
+   "start_f": 314,
+   "end_f": 429
+  },
+  {
+   "beat": "b4",
+   "text": "Now every named street pulled from OpenStreetMap gets a story \u2014 naming a place only when a source confirms it, like Kolbuvegen matching the village of Kolbu.",
+   "start_s": 14.597,
+   "end_s": 23.787,
+   "start_f": 438,
+   "end_f": 714
+  },
+  {
+   "beat": "b5",
+   "text": "Only the thinnest street stubs get skipped \u2014 anything under 60 meters.",
+   "start_s": 24.087,
+   "end_s": 28.769,
+   "start_f": 723,
+   "end_f": 863
+  }
+ ],
+ "total_s": 30.269,
+ "durationInFrames": 908,
+ "measured_track_s": 28.824,
+ "track": "/root/feature-demos/vo-g06/vo-g06.mp3"
+}

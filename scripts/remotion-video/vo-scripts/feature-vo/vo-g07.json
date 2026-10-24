@@ -1,0 +1,66 @@
+{
+ "id": "g07",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.931,
+  "b2": 3.644,
+  "b3": 4.048,
+  "b4": 6.329,
+  "b5": 6.462,
+  "b6": 5.32
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My delivery route crosses long dead zones, and a story cutting off mid-sentence felt broken.",
+   "start_s": 0.5,
+   "end_s": 6.431,
+   "start_f": 15,
+   "end_f": 193
+  },
+  {
+   "beat": "b2",
+   "text": "Worse, it kept rambling about places I'd already passed.",
+   "start_s": 6.731,
+   "end_s": 10.375,
+   "start_f": 202,
+   "end_f": 311
+  },
+  {
+   "beat": "b3",
+   "text": "Like a radio that cuts dead mid-song instead of fading out.",
+   "start_s": 10.675,
+   "end_s": 14.723,
+   "start_f": 320,
+   "end_f": 442
+  },
+  {
+   "beat": "b4",
+   "text": "Now the Android app pre-downloads stories ahead of time, so narration keeps playing with zero signal.",
+   "start_s": 15.023,
+   "end_s": 21.352,
+   "start_f": 451,
+   "end_f": 641
+  },
+  {
+   "beat": "b5",
+   "text": "It also matched the car's position to the story's sentences, so a story wrapped cleanly the moment I passed.",
+   "start_s": 21.652,
+   "end_s": 28.114,
+   "start_f": 650,
+   "end_f": 843
+  },
+  {
+   "beat": "b6",
+   "text": "A dead zone that used to go silent now plays start to finish across four kilometers.",
+   "start_s": 28.414,
+   "end_s": 33.734,
+   "start_f": 852,
+   "end_f": 1012
+  }
+ ],
+ "total_s": 35.234,
+ "durationInFrames": 1057,
+ "measured_track_s": 33.792,
+ "track": "/root/feature-demos/vo-g07/vo-g07.mp3"
+}
