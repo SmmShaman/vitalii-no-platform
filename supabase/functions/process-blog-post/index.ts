@@ -40,7 +40,8 @@ async function findSourceLink(title: string, content: string, existingUrl?: stri
     }
 
     const result = await response.json()
-    if (result.success && result.sourceUrl && result.confidence !== 'low') {
+    // Reject template URLs the model sometimes invents (e.g. ".../questions/XXXXX")
+    if (result.success && result.sourceUrl && result.confidence !== 'low' && !/X{3,}|example\.com/i.test(result.sourceUrl)) {
       console.log(`✅ Source found: ${result.sourceUrl} (${result.confidence})`)
       return result.sourceUrl
     }
@@ -188,7 +189,7 @@ serve(async (req) => {
       const res = await azureFetch('', {
         method: 'POST',
         body: JSON.stringify({
-          llm_route: 'quality',
+          llm_route: 'article',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.4,
           max_tokens: maxTokens,
@@ -395,7 +396,10 @@ ${blogPromptText}`
     // 🔍 Find original source URL (parallel with image generation)
     // 🖼️ Generate new image with AI — use allSettled so one failure doesn't block the other
     const [sourceResult, imageResult] = await Promise.allSettled([
-      findSourceLink(requestData.title, requestData.content, requestData.sourceLink || requestData.url),
+      // Dictated posts are the owner's own text — there is no external source to find
+      requestData.sourceType === 'voice'
+        ? Promise.resolve(null)
+        : findSourceLink(requestData.title, requestData.content, requestData.sourceLink || requestData.url),
       generateImage(
         supabase,
         rewrittenContent.en.title, rewrittenContent.ua.title, rewrittenContent.no.title,

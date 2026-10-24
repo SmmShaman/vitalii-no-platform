@@ -334,7 +334,7 @@ async function callTranslationAI(
     },
     body: JSON.stringify({
       // translation backfill runs on the quality route, which is deliberately Gemini-free.
-      llm_route: 'quality',
+      llm_route: 'article',
       messages: [
         {
           role: 'system',

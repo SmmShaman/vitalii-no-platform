@@ -79,7 +79,7 @@ async function callGroq(
 
   // 2026-08-19: llama-3.3-70b-versatile decommissioned by Groq (404).
   // gpt-oss-120b is the best remaining Norwegian writer (measured 2026-07-25:
-  // beats even the old 70b); qwen3.6-27b writes Danish-tinted bokmål, so it is
+  // beats even the old 70b); qwen writes Danish-tinted bokmål, so it is
   // NOT the default here — override via GROQ_MODEL_REWRITE only if 120b dies.
   const model = Deno.env.get('GROQ_MODEL_REWRITE') || 'openai/gpt-oss-120b'
   const isGptOss = model.startsWith('openai/gpt-oss')

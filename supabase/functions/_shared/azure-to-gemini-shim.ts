@@ -3,6 +3,7 @@
  * Drop-in replacement for Azure OpenAI calls.
  *
  * Routes (callers pass `llm_route` in the request body, default 'default'):
+ *   article    — Claude (subscription) → then the whole quality chain
  *   quality    — gpt-oss-120b → gpt-oss-20b → Groq qwen → CF llama-70b → CF gpt-oss-120b → NVIDIA → free-Gemini
  *   moderation — free-Gemini Lite → Groq qwen → gpt-oss-20b → CF llama-70b → NVIDIA
  *   bulk       — Groq qwen → gpt-oss-20b → free-Gemini Lite → CF llama-70b → NVIDIA
@@ -14,7 +15,8 @@
  *
  * Groq rate limits are per-model, so every model in the chain draws from its own
  * pool. 2026-08-19: every Llama chat model 404s on Groq (decommissioned) — the
- * catalog is now gpt-oss-120b / gpt-oss-20b / qwen3.6-27b only.
+ * catalog is now gpt-oss-120b / gpt-oss-20b / qwen only (3.6-27b was replaced by
+ * qwen3.8-27b — 3.6 returns 404 since ~2026-10).
  */
 
 const NVIDIA_API_KEY = Deno.env.get('NVIDIA_API_KEY') || ''
@@ -26,16 +28,24 @@ const GEMINI_DAILY_LIMIT = parseInt(Deno.env.get('GEMINI_DAILY_LIMIT') || '150',
 const NVIDIA_MODEL = Deno.env.get('NVIDIA_MODEL') || 'meta/llama-3.1-70b-instruct'
 const GEMINI_MODEL = Deno.env.get('GEMINI_MODEL') || 'gemini-2.5-flash'
 // 2026-08-19: Groq decommissioned ALL Llama chat models (llama-3.3-70b-versatile,
-// llama-3.1-8b-instant, llama-4-scout → 404 model_not_found). qwen3.6-27b is the
+// llama-3.1-8b-instant, llama-4-scout → 404 model_not_found). qwen (now 3.8-27b) is the
 // only remaining general chat model besides the gpt-oss pair, and sits on its own
 // per-model pool — keeping bulk traffic off the gpt-oss 200k TPD budget.
-const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'qwen/qwen3.6-27b'
-const GROQ_MODEL_BULK = Deno.env.get('GROQ_MODEL_BULK') || 'qwen/qwen3.6-27b'
+const GROQ_MODEL = Deno.env.get('GROQ_MODEL') || 'qwen/qwen3.8-27b'
+const GROQ_MODEL_BULK = Deno.env.get('GROQ_MODEL_BULK') || 'qwen/qwen3.8-27b'
 // gpt-oss models sit on their own Groq pools and reason before answering.
 const GROQ_MODEL_REASON = Deno.env.get('GROQ_MODEL_REASON') || 'openai/gpt-oss-120b'
 const GROQ_MODEL_REASON_SMALL = Deno.env.get('GROQ_MODEL_REASON_SMALL') || 'openai/gpt-oss-20b'
 const GROQ_REASONING_EFFORT = Deno.env.get('GROQ_REASONING_EFFORT') || 'low'
 const FETCH_TIMEOUT_MS = 50_000
+
+// Article text runs on the owner's Claude subscription (owner decision 2026-10-24).
+// The token is a long-lived `claude setup-token` OAuth token; the Messages API only
+// serves Sonnet/Opus to it when the first system block is the Claude Code identity.
+const CLAUDE_CODE_OAUTH_TOKEN = Deno.env.get('CLAUDE_CODE_OAUTH_TOKEN') || ''
+const CLAUDE_MODEL_ARTICLE = Deno.env.get('CLAUDE_MODEL_ARTICLE') || 'claude-sonnet-5-5'
+const CLAUDE_IDENTITY = "You are Claude Code, Anthropic's official CLI for Claude."
+const CLAUDE_TIMEOUT_MS = 120_000
 
 // ── Second Gemini key, from a Google project with NO billing account ────────────
 // Verified 2026-07-25: quota metric is `generate_content_free_tier_requests`, so
@@ -73,7 +83,7 @@ const CF_MODEL_MAIN = Deno.env.get('CF_MODEL_MAIN') || '@cf/meta/llama-3.3-70b-i
 const CF_MODEL_REASON = Deno.env.get('CF_MODEL_REASON') || '@cf/openai/gpt-oss-120b'
 const CLOUDFLARE_DAILY_LIMIT = parseInt(Deno.env.get('CLOUDFLARE_DAILY_LIMIT') || '120', 10)
 
-export type LlmRoute = 'quality' | 'moderation' | 'bulk' | 'default'
+export type LlmRoute = 'article' | 'quality' | 'moderation' | 'bulk' | 'default'
 
 // Collect all configured Groq keys (GROQ_API_KEY, GROQ_API_KEY_2, GROQ_API_KEY_3)
 const GROQ_KEYS: string[] = [
@@ -181,6 +191,56 @@ async function tryGroq(call: LlmCall, model: string): Promise<Response | null> {
       console.warn(`⚠️ Groq error: ${msg}`)
       break
     }
+  }
+  return null
+}
+
+async function tryClaude(call: LlmCall, model: string): Promise<Response | null> {
+  if (!CLAUDE_CODE_OAUTH_TOKEN) return null
+  const systemText = call.messages.filter(m => m.role === 'system').map(m => m.content).join('\n\n')
+    + (call.expectsJson ? '\n\nRespond with the JSON object only.' : '')
+  const messages = call.messages
+    .filter(m => m.role !== 'system')
+    .map(m => ({ role: m.role === 'assistant' ? 'assistant' : 'user', content: m.content }))
+  try {
+    const res = await fetchWithTimeout('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${CLAUDE_CODE_OAUTH_TOKEN}`,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'oauth-2025-04-20',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: Math.min(call.maxTokens, 16000),
+        temperature: call.temperature,
+        system: [
+          { type: 'text', text: CLAUDE_IDENTITY },
+          ...(systemText ? [{ type: 'text', text: systemText }] : []),
+        ],
+        messages,
+      }),
+    }, CLAUDE_TIMEOUT_MS)
+
+    if (res.ok) {
+      const data = await res.json()
+      const raw = (data.content || [])
+        .filter((b: { type: string }) => b.type === 'text')
+        .map((b: { text?: string }) => b.text || '')
+        .join('')
+        .trim()
+      const text = stripFence(raw)
+      if (text) {
+        const u = data.usage || {}
+        console.log(`🟣 Claude (${model}) — ${text.length} chars | tokens: ${u.input_tokens || 0}+${u.output_tokens || 0}`)
+        return okResponse(text, { prompt_tokens: u.input_tokens, completion_tokens: u.output_tokens, total_tokens: (u.input_tokens || 0) + (u.output_tokens || 0) })
+      }
+    }
+    const errText = await res.text().catch(() => '')
+    console.warn(`⚠️ Claude ${model} failed (${res.status}): ${errText.substring(0, 200)}`)
+  } catch (e) {
+    console.warn(`⚠️ Claude error: ${(e as Error).message}`)
   }
   return null
 }
@@ -449,7 +509,7 @@ export async function azureFetch(
   options: RequestInit,
 ): Promise<Response> {
   const body = JSON.parse(options.body as string)
-  const route: LlmRoute = ['quality', 'moderation', 'bulk'].includes(body.llm_route)
+  const route: LlmRoute = ['article', 'quality', 'moderation', 'bulk'].includes(body.llm_route)
     ? body.llm_route
     : 'default'
 
@@ -466,7 +526,7 @@ export async function azureFetch(
   }
 
   let providers: Array<() => Promise<Response | null>>
-  if (route === 'quality') {
+  if (route === 'quality' || route === 'article') {
     // RULE: rewrites and translations never touch Gemini - it is a paid model on
     // this project (billing is enabled) and rewrite is the highest-volume task we
     // have. Owner decision 2026-07-25. Do not add tryGemini to this chain.
@@ -487,6 +547,9 @@ export async function azureFetch(
       // calls a day, which is why it sits behind everything else.
       () => tryGeminiFree(call, GEMINI_FREE_MODEL_FULL),
     ]
+    // Article text (rewrites, translations, blog posts) leads on the Claude
+    // subscription; when it is rate-limited the free quality chain takes over.
+    if (route === 'article') providers.unshift(() => tryClaude(call, CLAUDE_MODEL_ARTICLE))
   } else if (route === 'moderation') {
     // Pre-moderation scoring. Measured A/B over the 29 already-scored articles
     // (2026-07-25): Groq mean 5.45 / 15 approved vs Lite mean 2.97 / 2 approved.

@@ -8,6 +8,7 @@ import { classifyContentWeight, loadScheduleConfig, computeScheduledTime, format
 import { dispatchToWorker } from '../_shared/webhook-dispatch.ts'
 import { HUMANIZER_SOCIAL, VOICE_SOCIAL } from '../_shared/humanizer-prompt.ts'
 import { generateImageFree, callFreeGeminiText } from '../_shared/free-image.ts'
+import { uploadToR2 } from '../_shared/r2-upload.ts'
 
 /**
  * Extract external source links from text content
@@ -239,6 +240,7 @@ serve(async (req) => {
               // Image generation — free Cloudflare FLUX only (owner rule 2026-10-07)
               const imagePromise = (async () => {
                 try {
+                  if (post?.image_url) return post.image_url // process-blog-post already made a cover
                   console.log('🖼️ Generating blog cover via free cascade (/blog direct)...')
                   const freeImg = await generateImageFree(`Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos.`, '16:9')
                   if (!freeImg) return null
@@ -246,9 +248,8 @@ serve(async (req) => {
                   const arr = new Uint8Array(raw.length)
                   for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
                   const path = `blog-covers/direct-${Date.now()}.png`
-                  const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
-                  if (upErr) { console.error('Upload err:', upErr); return null }
-                  const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
+                  const url = await uploadToR2(path, arr, 'image/png')
+                  if (!url) { console.error('Upload err: R2 upload failed'); return null }
                   await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
                   console.log(`🖼️ Image saved (${freeImg.provider}):`, url)
                   return url
@@ -581,6 +582,7 @@ Return ONLY the cleaned request, nothing else.`,
 
           const imagePromise = (async () => {
             try {
+              if (post?.image_url) return post.image_url // process-blog-post already made a cover
               console.log('🖼️ Generating blog cover via free cascade (voice blog)...')
               const freeImg = await generateImageFree(`Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos.`, '16:9')
               if (!freeImg) return null
@@ -588,9 +590,8 @@ Return ONLY the cleaned request, nothing else.`,
               const arr = new Uint8Array(raw.length)
               for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
               const path = `blog-covers/voice-${Date.now()}.png`
-              const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
-              if (upErr) { console.error('Upload err:', upErr); return null }
-              const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
+              const url = await uploadToR2(path, arr, 'image/png')
+              if (!url) { console.error('Upload err: R2 upload failed'); return null }
               await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
               console.log(`🖼️ Image saved (${freeImg.provider}):`, url)
               return url
@@ -775,6 +776,7 @@ Return ONLY the cleaned request, nothing else.`,
               // Image generation — free Cloudflare FLUX only (owner rule 2026-10-07)
               const imagePromise = (async () => {
                 try {
+                  if (post?.image_url) return post.image_url // process-blog-post already made a cover
                   console.log('🖼️ Generating blog cover via free cascade (text blog)...')
                   const freeImg = await generateImageFree(`Professional blog cover image. Topic: ${post?.title_en || ''}. ${(post?.content_en || '').slice(0, 200)}. Dark background, modern tech aesthetic, no text, no logos.`, '16:9')
                   if (!freeImg) return null
@@ -782,9 +784,8 @@ Return ONLY the cleaned request, nothing else.`,
                   const arr = new Uint8Array(raw.length)
                   for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i)
                   const path = `blog-covers/text-${Date.now()}.png`
-                  const { error: upErr } = await supa.storage.from('news-images').upload(path, arr, { contentType: 'image/png', upsert: true })
-                  if (upErr) { console.error('Upload err:', upErr); return null }
-                  const url = `${baseUrl}/storage/v1/object/public/news-images/${path}`
+                  const url = await uploadToR2(path, arr, 'image/png')
+                  if (!url) { console.error('Upload err: R2 upload failed'); return null }
                   await supa.from('blog_posts').update({ image_url: url, processed_image_url: url }).eq('id', bpId)
                   console.log(`🖼️ Image saved (${freeImg.provider}):`, url)
                   return url

@@ -276,11 +276,11 @@ async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000
   if ((LLM_PROVIDER === "groq" || LLM_PROVIDER === "gemini") && GROQ_API_KEY) {
     // 2026-08-19: llama-4-scout decommissioned by Groq (404) — this dead fallback
     // stranded the 18.08 digest at pending_digest. Try gpt-oss-120b first (best
-    // Norwegian of the surviving catalog), then qwen3.6-27b, which sits on its
+    // Norwegian of the surviving catalog), then qwen3.8-27b, which sits on its
     // own Groq pool (independent of the gpt-oss TPD the rewrites burn).
     // Both are thinking models: give max_tokens headroom, hide/strip the thinking.
     let lastErr = "";
-    for (const model of ["openai/gpt-oss-120b", "qwen/qwen3.6-27b"]) {
+    for (const model of ["openai/gpt-oss-120b", "qwen/qwen3.8-27b"]) {
       console.log(`🤖 Using Groq (${model})`);
       const groqBody: Record<string, unknown> = {
         model,

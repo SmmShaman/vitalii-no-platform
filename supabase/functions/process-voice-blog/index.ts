@@ -140,7 +140,7 @@ The text below is the author's OWN words transcribed from a voice message.
     const llmRes = await azureFetch('', {
       method: 'POST',
       body: JSON.stringify({
-        llm_route: 'quality',
+        llm_route: 'article',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: `RAW TEXT FROM VOICE MESSAGE:\n${rawText.slice(0, 5000)}` },

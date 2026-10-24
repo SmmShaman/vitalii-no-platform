@@ -161,7 +161,7 @@ async function rewriteOneLanguageOnce(
       ],
       temperature: 0.5,
       max_tokens: 8000, // Per-provider max output. Plenty for ~500 words even in Cyrillic.
-      llm_route: 'quality', // Gemini-free chain: gpt-oss-120b leads on NO/UA quality
+      llm_route: 'article', // Claude subscription first, then the Gemini-free quality chain
     }),
   })
 

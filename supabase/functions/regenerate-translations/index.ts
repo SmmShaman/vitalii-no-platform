@@ -17,7 +17,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 // Provider configs
 // RULE (owner, 2026-07-25): translations never run on paid Gemini. This tool goes
-// through the shared LLM router on the 'quality' route, which is Gemini-free.
+// through the shared LLM router on the 'article' route (Claude subscription, then the Gemini-free chain).
 const PROVIDERS: Record<string, { call: (system: string, user: string) => Promise<string> }> = {
   router: {
     call: async (system: string, user: string) => {
@@ -25,7 +25,7 @@ const PROVIDERS: Record<string, { call: (system: string, user: string) => Promis
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          llm_route: 'quality',
+          llm_route: 'article',
           temperature: 0.5,
           max_tokens: 8000,
           messages: [
