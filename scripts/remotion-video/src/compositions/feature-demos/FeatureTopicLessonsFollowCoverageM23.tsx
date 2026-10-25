@@ -115,9 +115,20 @@ const CoverageGloss: React.FC = () => {
   if (cut(frame, B2, B3) !== 1) return null;
   const t = tween(sec(frame, B2 + 10, 30), 0, 0.4, ease.power3Out);
   return (
-    <div style={{ position: "absolute", left: 140, top: 44, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
-      <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>
-        COVERAGE PLAN = ANGLES OUTLINED LIKE CHAPTERS
+    <div style={{ position: "absolute", left: 40, top: 40, width: 1200, textAlign: "center", opacity: t, fontFamily }}>
+      <div
+        style={{
+          display: "inline-block",
+          padding: "14px 28px",
+          background: P.card,
+          border: `2px solid ${P.border}`,
+          borderRadius: 4,
+          boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+        }}
+      >
+        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>
+          COVERAGE PLAN = ANGLES OUTLINED LIKE CHAPTERS
+        </div>
       </div>
     </div>
   );
@@ -125,11 +136,22 @@ const CoverageGloss: React.FC = () => {
 
 const CoverageResult: React.FC = () => {
   const frame = useCurrentFrame();
+  const P = usePalette();
   if (cut(frame, B2, B3) !== 1) return null;
   const t = tween(sec(frame, B2 + 20, 30), 0, 0.4, ease.power3Out);
   return (
-    <div style={{ position: "absolute", left: 140, bottom: 54, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
-      <div style={{ fontSize: 22, fontWeight: 700, color: "#F3E9DC" }}>No angle repeats</div>
+    <div style={{ position: "absolute", left: 40, bottom: 40, width: 1200, textAlign: "center", opacity: t, fontFamily }}>
+      <div
+        style={{
+          display: "inline-block",
+          padding: "12px 26px",
+          background: "rgba(8,8,8,0.55)",
+          border: `2px solid ${P.accent}`,
+          borderRadius: 4,
+        }}
+      >
+        <div style={{ fontSize: 24, fontWeight: 700, color: "#F3E9DC" }}>No angle repeats</div>
+      </div>
     </div>
   );
 };
@@ -143,6 +165,37 @@ const RUNNER_LINES: LogLine[] = [
   { t: "04:06", text: "target-word check: 11/16 lines", tone: "success" },
   { t: "04:06", text: "section 3 saved", tone: "success" },
 ];
+
+/**
+ * b5 overlay — a top kicker and a bottom restatement fill the empty top/bottom thirds
+ * RatioBars leaves bare while its own bars are still growing (measured 6/48 at the
+ * beat's midpoint). Both appear early, well before that midpoint, and sit outside the
+ * camera div like the ratioBars insert itself so they stay crisp.
+ */
+const ResultHeadline: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B5) return null;
+  const t = tween(sec(frame, B5 + 6, 30), 0, 0.4, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 140, top: 70, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
+      <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>THE RESULT</div>
+    </div>
+  );
+};
+
+const ResultCaption: React.FC = () => {
+  const frame = useCurrentFrame();
+  if (frame < B5) return null;
+  const t = tween(sec(frame, B5 + 16, 30), 0, 0.4, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 140, bottom: 64, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
+      <div style={{ fontSize: 22, fontWeight: 700, color: "#F3E9DC" }}>
+        That target word now shows up in at least 10 of every 16 lines
+      </div>
+    </div>
+  );
+};
 
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
@@ -233,7 +286,9 @@ const Inner: React.FC = () => {
           1.38x, and ratioBars' bars+labels already span nearly the full 1280px width at
           1x, so that zoom pushed the label starts off both edges — measured fill at the
           midpoint was 7/48 with "Lines with..." and "Total lines..." clipped to "...th
-          target word" / "...es per section". The finale reads crisper unzoomed anyway. */}
+          target word" / "...es per section". The finale reads crisper unzoomed anyway.
+          ResultHeadline/ResultCaption fill the top/bottom thirds RatioBars' own internal
+          pacing (bars grow, bracket, ratio badge) hasn't reached yet at the midpoint. */}
       {frame >= B5 && (
         <MotionInsert
           effect="ratioBars"
@@ -248,6 +303,8 @@ const Inner: React.FC = () => {
           }}
         />
       )}
+      <ResultHeadline />
+      <ResultCaption />
 
       <ProductPlate />
     </AbsoluteFill>

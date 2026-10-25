@@ -107,7 +107,9 @@ const Sidebar: React.FC = () => {
   );
 };
 
-/** b3 — the one plain analogy: a radio that cuts dead vs. one that fades out clean. */
+/** b3 — the one plain analogy: a radio that cuts dead vs. one that fades out clean.
+ * A top kicker and a bottom tagline plus wider bars fill the empty top/bottom thirds
+ * the centered icon+bars used to leave bare (measured 24/48). */
 const AnalogyPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -116,6 +118,8 @@ const AnalogyPanel: React.FC = () => {
   const t = Math.max(0, sec(frame, B3 + 6, fps));
   const sc = punchScale(t, 0);
   const stageW = 1280 - SIDEBAR.w;
+  const kickerT = Math.min(1, Math.max(0, sec(frame, B3 + 2, fps)) / 0.35);
+  const taglineT = Math.min(1, Math.max(0, sec(frame, B3 + 60, fps)) / 0.5);
 
   const rows: { label: string; tone: "danger" | "success"; cut: boolean; delay: number }[] = [
     { label: "Radio cuts dead mid-song", tone: "danger", cut: true, delay: 24 },
@@ -128,9 +132,25 @@ const AnalogyPanel: React.FC = () => {
       <div
         style={{
           position: "absolute",
-          left: stageW / 2 - 90,
-          top: 90,
-          fontSize: 150,
+          left: 0,
+          top: 40,
+          width: stageW,
+          textAlign: "center",
+          fontSize: 18,
+          fontWeight: 800,
+          letterSpacing: 2.2,
+          color: P.accent,
+          opacity: kickerT,
+        }}
+      >
+        THE ANALOGY
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: stageW / 2 - 100,
+          top: 100,
+          fontSize: 170,
           lineHeight: 1,
           transform: `scale(${sc})`,
           transformOrigin: "center center",
@@ -142,7 +162,7 @@ const AnalogyPanel: React.FC = () => {
         const at = B3 + r.delay;
         if (frame < at) return null;
         const p = Math.min(1, sec(frame, at, fps) / 0.6);
-        const barW = 560;
+        const barW = 760;
         const bg = r.tone === "danger" ? P.dangerBg : P.successBg;
         const edge = r.tone === "danger" ? P.dangerEdge : P.successEdge;
         const fillColor = r.tone === "danger" ? P.danger : P.success;
@@ -152,14 +172,14 @@ const AnalogyPanel: React.FC = () => {
             style={{
               position: "absolute",
               left: (stageW - barW) / 2,
-              top: 360 + i * 130,
+              top: 370 + i * 140,
               width: barW,
             }}
           >
             <div
               style={{
                 width: barW,
-                height: 56,
+                height: 64,
                 borderRadius: 4,
                 background: bg,
                 border: `2px solid ${edge}`,
@@ -181,10 +201,25 @@ const AnalogyPanel: React.FC = () => {
                 }}
               />
             </div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: P.ink, marginTop: 10 }}>{r.label}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: P.ink, marginTop: 12 }}>{r.label}</div>
           </div>
         );
       })}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          bottom: 44,
+          width: stageW,
+          textAlign: "center",
+          fontSize: 22,
+          fontWeight: 700,
+          color: "#F3E9DC",
+          opacity: taglineT,
+        }}
+      >
+        One keeps playing. One goes silent.
+      </div>
     </div>
   );
 };

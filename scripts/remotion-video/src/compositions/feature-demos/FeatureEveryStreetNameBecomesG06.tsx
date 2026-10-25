@@ -194,46 +194,101 @@ const Ledger: React.FC = () => {
   );
 };
 
-/** b3 — the one plain analogy: a tour guide who only speaks when sure of the facts. */
+/** b3 — the one plain analogy: a tour guide who only speaks when sure of the facts.
+ * Two flanking cards (never guesses / confirms first) plus a top kicker fill the wide
+ * empty margins the centered emoji+badge used to leave untouched (measured 13/48). */
 const AnalogyPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B3 || frame >= B4) return null;
+  const kickerT = tween(sec(frame, B3 + 2, fps), 0, 0.3, ease.power3Out);
   const emojiT = tween(sec(frame, B3 + 6, fps), 0, 0.3, ease.power3Out);
-  const badgeT = tween(sec(frame, B3 + 18, fps), 0, 0.3, ease.power3Out);
-  return (
+  const sideT = tween(sec(frame, B3 + 14, fps), 0, 0.35, ease.power3Out);
+  const badgeT = tween(sec(frame, B3 + 24, fps), 0, 0.3, ease.power3Out);
+
+  const sideCard = (emoji: string, label: string, side: "left" | "right") => (
     <div
       style={{
         position: "absolute",
-        left: 0,
-        top: 0,
-        width: 1280,
-        height: 606,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 18,
+        [side]: 70,
+        top: 220,
+        width: 260,
+        textAlign: "center",
+        opacity: sideT,
+        transform: `translateY(${(1 - sideT) * 20}px)`,
       }}
     >
+      <div style={{ fontSize: 64, lineHeight: 1 }}>{emoji}</div>
+      <div style={{ marginTop: 10, fontSize: 18, fontWeight: 800, color: P.ink, letterSpacing: 0.3, fontFamily }}>
+        {label}
+      </div>
+    </div>
+  );
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 606 }}>
       <AbsoluteFill style={{ background: `linear-gradient(135deg, ${P.bgTop}, ${P.bgBottom})` }} />
-      <div style={{ fontSize: 150, lineHeight: 1, opacity: emojiT, transform: `scale(${0.9 + emojiT * 0.1})` }}>🧭</div>
       <div
         style={{
-          padding: "10px 22px",
-          borderRadius: 999,
-          background: P.accentBg,
-          border: `1.5px solid ${P.accentEdge}`,
-          color: P.accent,
+          position: "absolute",
+          left: 0,
+          top: 56,
+          width: 1280,
+          textAlign: "center",
           fontSize: 20,
           fontWeight: 800,
-          letterSpacing: 0.5,
-          opacity: badgeT,
+          letterSpacing: 2.4,
+          color: P.accent,
+          opacity: kickerT,
           fontFamily,
         }}
       >
-        ONLY SPEAKS WHEN THE FACTS CHECK OUT
+        THE ANALOGY
+      </div>
+      {sideCard("🚫", "Never guesses", "left")}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 213,
+          width: 1280,
+          textAlign: "center",
+          fontSize: 180,
+          lineHeight: 1,
+          opacity: emojiT,
+          transform: `scale(${0.9 + emojiT * 0.1})`,
+        }}
+      >
+        🧭
+      </div>
+      {sideCard("✅", "Confirms first", "right")}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 460,
+          width: 1280,
+          textAlign: "center",
+          opacity: badgeT,
+        }}
+      >
+        <div
+          style={{
+            display: "inline-block",
+            padding: "10px 22px",
+            borderRadius: 999,
+            background: P.accentBg,
+            border: `1.5px solid ${P.accentEdge}`,
+            color: P.accent,
+            fontSize: 20,
+            fontWeight: 800,
+            letterSpacing: 0.5,
+            fontFamily,
+          }}
+        >
+          ONLY SPEAKS WHEN THE FACTS CHECK OUT
+        </div>
       </div>
     </div>
   );
@@ -295,7 +350,12 @@ const Inner: React.FC = () => {
         plate={0.82}
         data={{
           statement: "Thin stubs don't get a story",
-          tags: ["Under 60 meters: skip", "One address only: skip", "Everything else: a story"],
+          tags: [
+            "Under 60 meters: skip",
+            "One address only: skip",
+            "Length checked first",
+            "Everything else: a story",
+          ],
         }}
       />
       <Ledger />
