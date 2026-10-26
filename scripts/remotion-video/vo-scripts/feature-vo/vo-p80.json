@@ -1,0 +1,57 @@
+{
+ "id": "p80",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.301,
+  "b2": 5.405,
+  "b3": 4.552,
+  "b4": 6.047,
+  "b5": 5.156
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every article rewrite into three languages quietly added to a metered API bill.",
+   "start_s": 0.5,
+   "end_s": 5.801,
+   "start_f": 15,
+   "end_f": 174
+  },
+  {
+   "beat": "b2",
+   "text": "Multiply that across every blog post and news rewrite, and the costs added up fast.",
+   "start_s": 6.101,
+   "end_s": 11.506,
+   "start_f": 183,
+   "end_f": 345
+  },
+  {
+   "beat": "b3",
+   "text": "It's like paying per minute for a phone line you already have unlimited minutes on.",
+   "start_s": 11.806,
+   "end_s": 16.358,
+   "start_f": 354,
+   "end_f": 491
+  },
+  {
+   "beat": "b4",
+   "text": "Now those jobs try my Claude subscription first, falling back to the paid API only if needed.",
+   "start_s": 16.658,
+   "end_s": 22.705,
+   "start_f": 500,
+   "end_f": 681
+  },
+  {
+   "beat": "b5",
+   "text": "Five content-writing paths switched over, and the per-call bill for them dropped to zero.",
+   "start_s": 23.005,
+   "end_s": 28.161,
+   "start_f": 690,
+   "end_f": 845
+  }
+ ],
+ "total_s": 29.661,
+ "durationInFrames": 890,
+ "measured_track_s": 28.224,
+ "track": "/root/feature-demos/vo-p80/vo-p80.mp3"
+}

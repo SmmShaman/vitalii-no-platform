@@ -1,0 +1,57 @@
+{
+ "id": "p81",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.555,
+  "b2": 4.563,
+  "b3": 5.47,
+  "b4": 5.532,
+  "b5": 4.6
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My inbox for approving articles was also catching every system alarm \u2014 tokens expiring, jobs failing, reports nobody asked for.",
+   "start_s": 0.5,
+   "end_s": 9.055,
+   "start_f": 15,
+   "end_f": 272
+  },
+  {
+   "beat": "b2",
+   "text": "One noisy ping could bury the actual article waiting for my yes or no.",
+   "start_s": 9.355,
+   "end_s": 13.918,
+   "start_f": 281,
+   "end_f": 418
+  },
+  {
+   "beat": "b3",
+   "text": "It's like a boss's fire drills mixed into your personal mail \u2014 you can't tell what's urgent.",
+   "start_s": 14.218,
+   "end_s": 19.688,
+   "start_f": 427,
+   "end_f": 591
+  },
+  {
+   "beat": "b4",
+   "text": "Now those alarms go to their own Telegram bot, and the content chat only carries content.",
+   "start_s": 19.988,
+   "end_s": 25.52,
+   "start_f": 600,
+   "end_f": 766
+  },
+  {
+   "beat": "b5",
+   "text": "Six kinds of alerts moved out overnight, leaving the review feed clean.",
+   "start_s": 25.82,
+   "end_s": 30.42,
+   "start_f": 775,
+   "end_f": 913
+  }
+ ],
+ "total_s": 31.92,
+ "durationInFrames": 958,
+ "measured_track_s": 30.48,
+ "track": "/root/feature-demos/vo-p81/vo-p81.mp3"
+}
