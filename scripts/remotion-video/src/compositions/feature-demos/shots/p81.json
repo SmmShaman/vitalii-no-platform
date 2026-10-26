@@ -1,0 +1,21 @@
+{
+  "id": "p81",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/technical-alarms-now-go-to-their-own-telegram-bot-not-the-content-channel-p81",
+      "frames": 260,
+      "scroll": [[0, 0], [259, 620]],
+      "mouse": [[0, 560, 200], [130, 560, 260], [259, 560, 320]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 140,
+      "scroll": [[0, 0], [139, 900]],
+      "mouse": [[0, 300, 180], [70, 620, 260], [139, 420, 300]]
+    }
+  ]
+}

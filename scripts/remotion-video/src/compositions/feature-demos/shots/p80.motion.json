@@ -1,0 +1,59 @@
+{
+  "id": "p80",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Billed per call, every rewrite",
+        "tags": ["EN", "NO", "UA", "Per API call"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "lineTrend",
+      "backdrop": "hub",
+      "data": {
+        "title": "Metered API cost",
+        "unit": "$",
+        "points": [
+          { "label": "Mon", "value": 2 },
+          { "label": "Tue", "value": 5 },
+          { "label": "Wed", "value": 9 },
+          { "label": "Thu", "value": 14 },
+          { "label": "Fri", "value": 22 }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Paying per minute",
+        "line2": "for a line you already have unlimited minutes on",
+        "keywords": ["per minute", "unlimited minutes"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Metered API first",
+        "to": "Claude subscription first",
+        "points": ["Falls back to the metered API only if needed", "One OAuth token, already paid for", "Five content paths switched over"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "funnelAbsorption",
+      "backdrop": null,
+      "data": {
+        "inputs": ["Blog rewrites", "Website publishing", "Translation backfills", "News-to-blog conversion", "Voice-blog processing"],
+        "result": "Per-call bill: $0"
+      }
+    }
+  ]
+}

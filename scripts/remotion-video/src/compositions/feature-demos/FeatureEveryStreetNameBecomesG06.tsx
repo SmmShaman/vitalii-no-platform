@@ -10,7 +10,8 @@
 // page; none of the given commits — 111c47e, 5414aba, d0311d6 — says what any
 // beat says, so no commit diff appears anywhere in this clip):
 // b1 15-201   "street names fly past at speed, history unread"
-//             titleTakeover over the feature's own page (backdrop "page").
+//             quoteMarker over the feature's own page (backdrop "page") — not
+//             titleTakeover (g07 already opened on that this wave).
 //             Ledger wipes in; the product name plate rises; first red line
 //             item "street meaning asserted without proof" posts.
 // b2 201-314  "no meaning without proof, nothing invented"
@@ -301,11 +302,12 @@ const Inner: React.FC = () => {
       {/* b1 — street signs fly past, no story, over the feature's own page */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} push={0.03} />}
       <MotionInsert
-        effect="titleTakeover"
+        effect="quoteMarker"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        data={{ title: "Signs With No Story", kicker: "Street names fly past at 70 km/h, history unread" }}
+        plate={0.7}
+        data={{ quote: "Street names fly past at 70 km/h — their history unread.", highlight: "history unread" }}
       />
 
       {/* b2 — no meaning without proof, nothing invented, page scrolled on */}

@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureTechnicalAlarmsGoTheirP81 } from "./compositions/feature-demos/FeatureTechnicalAlarmsGoTheirP81";
+import { FeatureBlogNewsRewritesRunP80 } from "./compositions/feature-demos/FeatureBlogNewsRewritesRunP80";
 import { FeatureAnyPhoneBecomesDrawingB57 } from "./compositions/feature-demos/FeatureAnyPhoneBecomesDrawingB57";
 import { FeatureAppKeepsNarratingEvenG07 } from "./compositions/feature-demos/FeatureAppKeepsNarratingEvenG07";
 import { FeatureEveryStreetNameBecomesG06 } from "./compositions/feature-demos/FeatureEveryStreetNameBecomesG06";
@@ -2335,6 +2337,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTechnicalAlarmsGoTheirP81"
+        component={FeatureTechnicalAlarmsGoTheirP81}
+        durationInFrames={958}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureBlogNewsRewritesRunP80"
+        component={FeatureBlogNewsRewritesRunP80}
+        durationInFrames={890}
         fps={30}
         width={1280}
         height={720}

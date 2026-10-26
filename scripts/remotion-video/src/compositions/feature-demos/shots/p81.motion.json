@@ -1,0 +1,54 @@
+{
+  "id": "p81",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "One Feed, Too Many Alarms",
+        "kicker": "Where I approve every article"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "One ping can bury the real article",
+        "tags": ["Token alerts", "Discovery reports", "Rewrite stats", "Watchdog pings"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Like a boss's fire drills",
+        "line2": "mixed into your personal mail",
+        "keywords": ["fire drills", "personal mail"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "from": "Alarms → content bot",
+        "to": "Alarms → tech bot",
+        "points": ["Two secrets, that's it", "Content chat stays content-only", "Six places switch automatically"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "funnelAbsorption",
+      "backdrop": null,
+      "data": {
+        "inputs": ["check-linkedin-token", "discover-features", "publish-feature-social", "rewrite-features", "send-top-social", "2 VPS shell scripts"],
+        "result": "Content chat: 0 tech alarms"
+      }
+    }
+  ]
+}

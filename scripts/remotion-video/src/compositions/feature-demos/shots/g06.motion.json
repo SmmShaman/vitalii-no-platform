@@ -4,11 +4,11 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "titleTakeover",
+      "effect": "quoteMarker",
       "backdrop": "page",
       "data": {
-        "title": "Signs With No Story",
-        "kicker": "Street names fly past at 70 km/h, history unread"
+        "quote": "Street names fly past at 70 km/h — their history unread.",
+        "highlight": "history unread"
       }
     },
     {
