@@ -197,16 +197,20 @@ const Ledger: React.FC = () => {
 
 /** b3 — the one plain analogy: a tour guide who only speaks when sure of the facts.
  * Two flanking cards (never guesses / confirms first) plus a top kicker fill the wide
- * empty margins the centered emoji+badge used to leave untouched (measured 13/48). */
+ * empty margins the centered emoji+badge used to leave untouched (measured 13/48 →
+ * 24/48). Still under the 31/48 line: a labelled chip row under the kicker and a
+ * footer caption above the ledger close the remaining top/bottom margins. */
 const AnalogyPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B3 || frame >= B4) return null;
   const kickerT = tween(sec(frame, B3 + 2, fps), 0, 0.3, ease.power3Out);
+  const chipsT = tween(sec(frame, B3 + 9, fps), 0, 0.3, ease.power3Out);
   const emojiT = tween(sec(frame, B3 + 6, fps), 0, 0.3, ease.power3Out);
   const sideT = tween(sec(frame, B3 + 14, fps), 0, 0.35, ease.power3Out);
   const badgeT = tween(sec(frame, B3 + 24, fps), 0, 0.3, ease.power3Out);
+  const footerT = tween(sec(frame, B3 + 30, fps), 0, 0.3, ease.power3Out);
 
   const sideCard = (emoji: string, label: string, side: "left" | "right") => (
     <div
@@ -246,6 +250,26 @@ const AnalogyPanel: React.FC = () => {
         }}
       >
         THE ANALOGY
+      </div>
+      <div style={{ position: "absolute", left: 0, top: 96, width: 1280, display: "flex", justifyContent: "center", gap: 16, opacity: chipsT }}>
+        {["Checks the source", "Confirms the place", "Only then speaks"].map((t, i) => (
+          <div
+            key={i}
+            style={{
+              padding: "8px 18px",
+              borderRadius: 999,
+              background: P.card,
+              border: `1.5px solid ${P.border}`,
+              color: P.ink,
+              fontSize: 15,
+              fontWeight: 800,
+              letterSpacing: 0.3,
+              fontFamily,
+            }}
+          >
+            {t}
+          </div>
+        ))}
       </div>
       {sideCard("🚫", "Never guesses", "left")}
       <div
@@ -291,12 +315,37 @@ const AnalogyPanel: React.FC = () => {
           ONLY SPEAKS WHEN THE FACTS CHECK OUT
         </div>
       </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 40,
+          top: 528,
+          width: 1200,
+          height: 60,
+          background: P.accentBg,
+          border: `1px solid ${P.accentEdge}`,
+          borderRadius: 4,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily,
+          fontSize: 17,
+          fontWeight: 800,
+          letterSpacing: 0.4,
+          color: P.ink,
+          textAlign: "center",
+          opacity: footerT,
+        }}
+      >
+        Same check applied to every street name on the map
+      </div>
     </div>
   );
 };
 
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
+  const P = usePalette();
   return (
     <AbsoluteFill style={{ background: STAGE, fontFamily }}>
       {/* b1 — street signs fly past, no story, over the feature's own page */}
@@ -360,6 +409,41 @@ const Inner: React.FC = () => {
           ],
         }}
       />
+
+      {/* b5 fill — with 4 corner tags the bottom-left and bottom-right ones (slots
+          2 and 3) don't land until t≈2.46-2.76 of BUILD=2.76, i.e. the last ~11% of
+          the beat; these two restate the same tags from early on so the lower
+          canvas isn't bare for most of the beat. */}
+      {frame >= B5 && frame < END && (
+        <Arrive at={B5 + 10} kind="rise" box={{ x: 40, y: 522, w: 1200, h: 66 }}>
+          <div
+            style={{
+              position: "absolute",
+              left: 40,
+              top: 522,
+              width: 1200,
+              height: 66,
+              background: P.accentBg,
+              border: `1px solid ${P.accentEdge}`,
+              borderRadius: 4,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 24,
+              fontFamily,
+              fontSize: 18,
+              fontWeight: 800,
+              letterSpacing: 0.4,
+              color: P.ink,
+              textAlign: "center",
+            }}
+          >
+            <span>Length checked first</span>
+            <span style={{ color: P.accent }}>·</span>
+            <span>Everything else: a story</span>
+          </div>
+        </Arrive>
+      )}
       <Ledger />
     </AbsoluteFill>
   );

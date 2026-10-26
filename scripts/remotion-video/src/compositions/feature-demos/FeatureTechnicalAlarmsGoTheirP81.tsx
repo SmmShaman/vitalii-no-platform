@@ -150,6 +150,7 @@ const Timeline: React.FC = () => {
 
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
+  const P = usePalette();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       {/* b1 — the problem, over the feature's own page */}
@@ -206,6 +207,63 @@ const Inner: React.FC = () => {
         }}
       />
 
+      {/* b4 fill — handoffExplain's own points land late (t~2.95 of 4.3) and its camera
+          is still mid-pan at the beat's midpoint, leaving the canvas sparse; these two
+          bands restate the same real facts from early in the beat so the frame reads
+          full throughout, not just once the pan settles. */}
+      {frame >= B4 && frame < B5 && (
+        <>
+          <Arrive at={B4 + 6} kind="wipe" box={{ x: 40, y: 40, w: 1200, h: 120 }} dur={0.4}>
+            <div style={{ position: "absolute", left: 40, top: 40, width: 1200, height: 120, display: "flex", gap: 16 }}>
+              {["2 Supabase secrets", "Content chat stays content-only", "6 places switch automatically"].map((t, i) => (
+                <div
+                  key={i}
+                  style={{
+                    flex: 1,
+                    background: P.card,
+                    borderRadius: 4,
+                    boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
+                    padding: "18px 22px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    gap: 6,
+                    fontFamily,
+                  }}
+                >
+                  <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, color: P.accent }}>{`STEP ${i + 1}`}</div>
+                  <div style={{ fontSize: 17, fontWeight: 700, color: P.ink, lineHeight: 1.22 }}>{t}</div>
+                </div>
+              ))}
+            </div>
+          </Arrive>
+          <Arrive at={B4 + 12} kind="rise" box={{ x: 40, y: 528, w: 1200, h: 60 }}>
+            <div
+              style={{
+                position: "absolute",
+                left: 40,
+                top: 528,
+                width: 1200,
+                height: 60,
+                background: P.accentBg,
+                border: `1px solid ${P.accentEdge}`,
+                borderRadius: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily,
+                fontSize: 18,
+                fontWeight: 800,
+                letterSpacing: 0.6,
+                color: P.ink,
+              }}
+            >
+              BEFORE: Alarms → content bot&nbsp;&nbsp;·&nbsp;&nbsp;NOW: Alarms → tech bot
+            </div>
+          </Arrive>
+        </>
+      )}
+
       {/* b5 — the six real call sites converging into the result, holds to the end */}
       <MotionInsert
         effect="funnelAbsorption"
@@ -225,6 +283,64 @@ const Inner: React.FC = () => {
           result: "Content chat: 0 tech alarms",
         }}
       />
+
+      {/* b5 fill — the funnel silhouette reads low-contrast against this dark stage
+          and its result text only arrives at t~2.95 of 3.3; these two bands keep the
+          mid and lower canvas legible with the same real routes and result all beat. */}
+      {frame >= B5 && frame < END && (
+        <>
+          <Arrive at={B5 + 6} kind="wipe" box={{ x: 190, y: 270, w: 900, h: 90 }} dur={0.4}>
+            <div
+              style={{
+                position: "absolute",
+                left: 190,
+                top: 270,
+                width: 900,
+                height: 90,
+                background: P.card,
+                borderRadius: 4,
+                boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily,
+                fontSize: 22,
+                fontWeight: 800,
+                letterSpacing: 1,
+                color: P.ink,
+                textAlign: "center",
+              }}
+            >
+              SIX ROUTES, ONE SWITCH
+            </div>
+          </Arrive>
+          <Arrive at={B5 + 12} kind="rise" box={{ x: 40, y: 486, w: 1200, h: 96 }}>
+            <div
+              style={{
+                position: "absolute",
+                left: 40,
+                top: 486,
+                width: 1200,
+                height: 96,
+                background: P.successBg,
+                border: `1px solid ${P.successEdge}`,
+                borderRadius: 4,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontFamily,
+                fontSize: 26,
+                fontWeight: 800,
+                letterSpacing: 0.4,
+                color: P.ink,
+                textAlign: "center",
+              }}
+            >
+              Content chat: 0 tech alarms
+            </div>
+          </Arrive>
+        </>
+      )}
 
       <Timeline />
     </AbsoluteFill>
