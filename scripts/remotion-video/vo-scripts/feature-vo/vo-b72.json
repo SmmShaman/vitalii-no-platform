@@ -1,0 +1,57 @@
+{
+ "id": "b72",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.119,
+  "b2": 6.019,
+  "b3": 3.838,
+  "b4": 6.798,
+  "b5": 4.677
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A kid opened the Play Store, reinstalled the TV app, and wiped every parental setting in one tap.",
+   "start_s": 0.5,
+   "end_s": 6.619,
+   "start_f": 15,
+   "end_f": 199
+  },
+  {
+   "beat": "b2",
+   "text": "The guard already blocked YouTube and Spotify \u2014 but nothing stopped the Store or Settings themselves.",
+   "start_s": 6.919,
+   "end_s": 12.938,
+   "start_f": 208,
+   "end_f": 388
+  },
+  {
+   "beat": "b3",
+   "text": "It's like locking the fridge but leaving the kitchen door wide open.",
+   "start_s": 13.238,
+   "end_s": 17.076,
+   "start_f": 397,
+   "end_f": 512
+  },
+  {
+   "beat": "b4",
+   "text": "Now a home-PC script written in Python locks the Store, Settings and every install screen the same way.",
+   "start_s": 17.376,
+   "end_s": 24.174,
+   "start_f": 521,
+   "end_f": 725
+  },
+  {
+   "beat": "b5",
+   "text": "One gap left in a system with an override for everything \u2014 now zero.",
+   "start_s": 24.474,
+   "end_s": 29.151,
+   "start_f": 734,
+   "end_f": 875
+  }
+ ],
+ "total_s": 30.651,
+ "durationInFrames": 920,
+ "measured_track_s": 29.208,
+ "track": "/root/feature-demos/vo-b72/vo-b72.mp3"
+}

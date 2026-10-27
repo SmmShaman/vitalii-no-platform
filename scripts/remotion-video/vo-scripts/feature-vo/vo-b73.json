@@ -1,0 +1,57 @@
+{
+ "id": "b73",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.746,
+  "b2": 6.984,
+  "b3": 4.251,
+  "b4": 6.225,
+  "b5": 4.607
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A parent wants YouTube and Spotify off, right now, no arguments.",
+   "start_s": 0.5,
+   "end_s": 5.246,
+   "start_f": 15,
+   "end_f": 157
+  },
+  {
+   "beat": "b2",
+   "text": "But the kiosk already had three ways back in: a timed pass, a finished bonus quiz, a free-viewing mode.",
+   "start_s": 5.546,
+   "end_s": 12.53,
+   "start_f": 166,
+   "end_f": 376
+  },
+  {
+   "beat": "b3",
+   "text": "Like a house with a master key and spare keys hidden all over it.",
+   "start_s": 12.83,
+   "end_s": 17.081,
+   "start_f": 385,
+   "end_f": 512
+  },
+  {
+   "beat": "b4",
+   "text": "One button now sends a single flag through Cloudflare Workers that outranks every spare key at once.",
+   "start_s": 17.381,
+   "end_s": 23.606,
+   "start_f": 521,
+   "end_f": 708
+  },
+  {
+   "beat": "b5",
+   "text": "The parent's switch finally wins over all of them \u2014 with just one tap.",
+   "start_s": 23.906,
+   "end_s": 28.513,
+   "start_f": 717,
+   "end_f": 855
+  }
+ ],
+ "total_s": 30.013,
+ "durationInFrames": 900,
+ "measured_track_s": 28.584,
+ "track": "/root/feature-demos/vo-b73/vo-b73.mp3"
+}
