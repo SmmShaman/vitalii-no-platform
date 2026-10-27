@@ -7,8 +7,8 @@
       "effect": "quoteMarker",
       "backdrop": "page",
       "data": {
-        "quote": "Street names fly past at 70 km/h — their history unread.",
-        "highlight": "history unread"
+        "quote": "Street signs fly past — the real history behind each name goes unread.",
+        "highlight": "history behind each name"
       }
     },
     {
@@ -16,9 +16,9 @@
       "effect": "keywordCaption",
       "backdrop": "page2",
       "data": {
-        "line1": "No meaning without proof",
-        "line2": "nothing invented",
-        "keywords": ["proof", "invented"]
+        "line1": "Never invents a meaning",
+        "line2": "it can't actually prove",
+        "keywords": ["invents", "prove"]
       }
     },
     {
@@ -26,7 +26,7 @@
       "effect": "drawn",
       "backdrop": null,
       "data": {
-        "note": "Tour-guide metaphor — only speaks when sure of the facts, no backdrop"
+        "note": "Tour-guide signpost metaphor — speaks only once the source check lights up, no backdrop"
       }
     },
     {
@@ -34,8 +34,9 @@
       "effect": "pipelineFlow",
       "backdrop": "hub",
       "data": {
-        "steps": ["Pull every named street from OpenStreetMap", "Match name to a place only if a source confirms it", "Kolbuvegen matches the village of Kolbu"],
-        "result": "Every street gets a verified story"
+        "steps": ["Pull every named street from OpenStreetMap", "Match the name to a place only if a source confirms it", "Kolbuvegen matches the village of Kolbu"],
+        "result": "Every street gets a verified story",
+        "system": "OpenStreetMap = free, crowd-mapped street data"
       }
     },
     {
@@ -43,8 +44,8 @@
       "effect": "cornerTags",
       "backdrop": null,
       "data": {
-        "statement": "Thin stubs don't get a story",
-        "tags": ["Under 60 meters: skip", "One address only: skip", "Everything else: a story"]
+        "statement": "Under 60 meters, no story",
+        "tags": ["One address only: skip", "Length checked first", "Everything else: a story"]
       }
     }
   ]

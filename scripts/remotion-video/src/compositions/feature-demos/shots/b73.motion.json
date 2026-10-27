@@ -1,0 +1,7 @@
+{"id": "b73", "composition": "FeatureOneButtonShutsYoutubeB73", "beats": [
+  {"beat": "b1", "effect": "keywordCaption", "backdrop": "page", "data": {"line1": "Off. Right now.", "line2": "No matter which override is live.", "keywords": ["Off.", "Right now."]}},
+  {"beat": "b2", "effect": "cornerTags", "backdrop": "page2", "data": {"statement": "Three ways back in, all working fine", "tags": ["Free-viewing mode", "Timed QR pass", "Finished bonus quiz"]}},
+  {"beat": "b3", "effect": "drawn", "backdrop": null, "data": {"note": "house + spare-keys analogy, no catalog effect — custom HouseKeysAnalogy component"}},
+  {"beat": "b4", "effect": "copyCorrection", "backdrop": null, "data": {"wrong": "Remember and undo each override by hand", "right": "One flag now outranks every override", "label": "via Cloudflare Workers"}},
+  {"beat": "b5", "effect": "funnelAbsorption", "backdrop": null, "data": {"inputs": ["Free-viewing mode", "QR pass", "Finished bonus quiz"], "result": "One tap wins — every time"}}
+]}

@@ -1,37 +1,41 @@
 // FeatureEveryStreetNameBecomesG06 — feature g06 — 1280x720, 908 frames @ 30fps, VOICE-SYNCED.
 // archetype 5 ledger, mood dawn. Motion direction (feature-motion skill, 2026-10-07).
+// RE-SHOOT (2026-10-27): same narration/beat windows as before — the picture is redrawn.
+// Fix vs the previous cut: ACCENT/STAGE were borrowed from the "sand" mood by mistake
+// (#B4531F/#1C140C) while the tree renders MOODS.dawn — every effect tinted a warm
+// terracotta against a navy-palette ledger. Now ACCENT=#2563EB/STAGE=#0F1626, the
+// values every other dawn clip in this repo uses.
 //
-// Ledger lower third: a receipt-style ticket in the y>=606 band carries two risk
-// line items that post in red as the problem beats land, then each is struck
-// through and rewritten in green once its fix arrives — same geometry and
-// mechanic as d09/p75's lower third (feature-motion skill convention).
+// Ledger lower third: a receipt-style ticket in the y>=606 band — dashed tear line
+// under the header, monospace running total — carries two risk line items that post
+// in red as the problem beats land, then each is struck through and rewritten in
+// green once its fix arrives (same mechanic as d09/p75's lower third).
 //
-// Beat → picture (data only from the feature row and the feature's own live
-// page; none of the given commits — 111c47e, 5414aba, d0311d6 — says what any
-// beat says, so no commit diff appears anywhere in this clip):
-// b1 15-201   "street names fly past at speed, history unread"
+// Beat → picture (data only from the feature row and the feature's own live page;
+// none of the given commits — 111c47e, 5414aba, d0311d6 — says what any beat says,
+// so no commit diff appears anywhere in this clip):
+// b1 15-201   "street signs fly past, the real history behind each name unread"
 //             quoteMarker over the feature's own page (backdrop "page") — not
-//             titleTakeover (g07 already opened on that this wave).
-//             Ledger wipes in; the product name plate rises; first red line
-//             item "street meaning asserted without proof" posts.
-// b2 201-314  "no meaning without proof, nothing invented"
+//             titleTakeover (g07 already opened on that this wave) and not
+//             cornerTags (p80's opener). Ledger wipes in; the product plate
+//             "GUIDE — STORIES ON THE ROAD" rises; first red line item posts.
+// b2 201-314  "never invents a meaning it can't actually prove"
 //             keywordCaption over the page scrolled on (backdrop "page2").
 //             Second red line item "thin stubs risk a forced story" posts.
-// b3 314-438  "like a tour guide who only speaks when sure of the facts"
-//             drawn (no catalog effect, no backdrop) — the metaphor beat.
+// b3 314-438  "like a tour guide who only speaks once sure of the facts"
+//             drawn (no catalog effect, no backdrop) — a signpost stands lit but
+//             silent until a source-check animates in, then a speech bubble pops.
 //             Ledger holds at two red items while the claim lands.
-// b4 438-723  "every named street pulled from OpenStreetMap gets a story,
-//             naming a place only when a source confirms it — Kolbuvegen
-//             matches the village of Kolbu"
+// b4 438-723  "every named street pulled from OpenStreetMap gets a story, naming
+//             a place only when a source confirms it — Kolbuvegen matches Kolbu"
 //             pipelineFlow over the hub (backdrop "hub"). The clip's one tech
-//             name — OpenStreetMap — gets its gloss here. First ledger line
-//             item strikes through and rewrites green.
+//             name — OpenStreetMap — gets its gloss here. First ledger line item
+//             strikes through and rewrites green.
 // b5 723-908  "only the thinnest stubs get skipped, under 60 meters"
 //             cornerTags, drawn only (no backdrop, per gate 2 — the last beat
-//             never plays the feature page or hub); the real "60 meters"
-//             number is one of its own corner tags. Holds bright to the final
-//             frame. Second ledger line item strikes through and rewrites
-//             green.
+//             never plays the feature page or hub); a 60M hero number anchors
+//             the frame as its own big mover. Holds bright to the final frame.
+//             Second ledger line item strikes through and rewrites green.
 //
 // Persistent element: the ledger lower third (archetype 5), b1 through b5, y>=606.
 
@@ -40,7 +44,7 @@ import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
-import { tween, ease } from "../../components/effects/motion/grammar";
+import { tween, ease, mix } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/g06.json";
 
 const B1 = 15;
@@ -50,10 +54,10 @@ const B4 = 438;
 const B5 = 723;
 const END = 908;
 
-const ACCENT = "#B4531F";
-const STAGE = "#1C140C";
+const ACCENT = "#2563EB";
+const STAGE = "#0F1626";
 
-// Ledger geometry — same band as the other archetype-5 references (y>=606).
+// Ledger geometry — same band as the other archetype lower-thirds (y>=606).
 const LT = { x: 40, y: 606, w: 1200, h: 92 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
@@ -81,10 +85,11 @@ const Ledger: React.FC = () => {
   const strike1 = tween(sec(frame, B4, fps), 0, STRIKE_DUR / fps, ease.power3InOut);
   const strike2 = tween(sec(frame, B5, fps), 0, STRIKE_DUR / fps, ease.power3InOut);
 
+  const resolvedCount = (row1 === "resolved" ? 1 : 0) + (row2 === "resolved" ? 1 : 0);
   const openCount = (row1 === "red" || row1 === "striking" ? 1 : 0) + (row2 === "red" || row2 === "striking" ? 1 : 0);
-  const allResolved = row1 === "resolved" && row2 === "resolved" && openCount === 0;
+  const allResolved = resolvedCount === 2;
   const badgeColor = openCount > 0 ? P.danger : P.success;
-  const badgeText = openCount > 0 ? `${openCount} open` : "0 open";
+  const badgeText = `${resolvedCount}/2 confirmed`;
 
   const row1Text = row1 === "resolved" ? "name confirmed by source (Kolbuvegen → Kolbu)" : "street meaning asserted without proof";
   const row2Text = row2 === "resolved" ? "stubs under 60m skipped" : "thin stubs risk a forced story";
@@ -109,7 +114,7 @@ const Ledger: React.FC = () => {
           }}
         >
           <div style={{ position: "absolute", left: 16, top: 8, fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.muted, whiteSpace: "nowrap" }}>
-            🧾 LEDGER
+            🧾 STREET LEDGER
           </div>
           <div
             style={{
@@ -120,14 +125,26 @@ const Ledger: React.FC = () => {
               fontWeight: 800,
               color: badgeColor,
               fontVariantNumeric: "tabular-nums",
+              fontFamily: "monospace",
               whiteSpace: "nowrap",
             }}
           >
             {badgeText}
           </div>
+          {/* tear line under the header, receipt-style */}
+          <div
+            style={{
+              position: "absolute",
+              left: 12,
+              right: 12,
+              top: 26,
+              height: 0,
+              borderTop: `1.5px dashed ${P.border}`,
+            }}
+          />
 
           {row1 !== "hidden" && (
-            <div style={{ position: "absolute", left: 16, top: 30, fontSize: 14, fontWeight: 700, color: row1Color, whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left: 16, top: 34, fontSize: 14, fontWeight: 700, color: row1Color, whiteSpace: "nowrap" }}>
               {row1Text}
               {row1 === "striking" && (
                 <div
@@ -147,7 +164,7 @@ const Ledger: React.FC = () => {
           )}
 
           {row2 !== "hidden" && (
-            <div style={{ position: "absolute", left: 16, top: 54, fontSize: 14, fontWeight: 700, color: row2Color, whiteSpace: "nowrap" }}>
+            <div style={{ position: "absolute", left: 16, top: 58, fontSize: 14, fontWeight: 700, color: row2Color, whiteSpace: "nowrap" }}>
               {row2Text}
               {row2 === "striking" && (
                 <div
@@ -184,9 +201,9 @@ const Ledger: React.FC = () => {
               boxSizing: "border-box",
             }}
           >
-            <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.4, color: P.ink }}>STORIES ON THE ROAD</div>
+            <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.4, color: P.ink }}>GUIDE — STORIES ON THE ROAD</div>
             <div style={{ marginTop: 1, fontSize: 12, fontWeight: 600, color: P.muted }}>
-              a personal audio guide for driving, in Norwegian and Ukrainian
+              a personal audio guide for driving, Norwegian and Ukrainian side by side
             </div>
           </div>
         </Arrive>
@@ -195,39 +212,43 @@ const Ledger: React.FC = () => {
   );
 };
 
-/** b3 — the one plain analogy: a tour guide who only speaks when sure of the facts.
- * Two flanking cards (never guesses / confirms first) plus a top kicker fill the wide
- * empty margins the centered emoji+badge used to leave untouched (measured 13/48 →
- * 24/48). Still under the 31/48 line: a labelled chip row under the kicker and a
- * footer caption above the ledger close the remaining top/bottom margins. */
-const AnalogyPanel: React.FC = () => {
+/** b3 — the one plain analogy: a tour guide who only speaks once sure of the facts.
+ * A signpost stands lit but silent through the beat's first third; a source-check
+ * animates across a checklist; only then does a speech bubble pop with the line.
+ * Fills the wide margins the old emoji+badge layout left bare (measured 24/48). */
+const SignpostAnalogy: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B3 || frame >= B4) return null;
-  const kickerT = tween(sec(frame, B3 + 2, fps), 0, 0.3, ease.power3Out);
-  const chipsT = tween(sec(frame, B3 + 9, fps), 0, 0.3, ease.power3Out);
-  const emojiT = tween(sec(frame, B3 + 6, fps), 0, 0.3, ease.power3Out);
-  const sideT = tween(sec(frame, B3 + 14, fps), 0, 0.35, ease.power3Out);
-  const badgeT = tween(sec(frame, B3 + 24, fps), 0, 0.3, ease.power3Out);
-  const footerT = tween(sec(frame, B3 + 30, fps), 0, 0.3, ease.power3Out);
+  const t = sec(frame, B3, fps);
+  const signT = tween(t, 0.1, 0.35, ease.power3Out);
+  const checklistT = tween(t, 0.5, 0.3, ease.power3Out);
+  const check1 = tween(t, 0.8, 0.25, ease.power3Out);
+  const check2 = tween(t, 1.1, 0.25, ease.power3Out);
+  const bubbleT = tween(t, 1.5, 0.35, ease.power3Out);
+  const footerT = tween(t, 2.0, 0.3, ease.power3Out);
 
-  const sideCard = (emoji: string, label: string, side: "left" | "right") => (
-    <div
-      style={{
-        position: "absolute",
-        [side]: 70,
-        top: 220,
-        width: 260,
-        textAlign: "center",
-        opacity: sideT,
-        transform: `translateY(${(1 - sideT) * 20}px)`,
-      }}
-    >
-      <div style={{ fontSize: 64, lineHeight: 1 }}>{emoji}</div>
-      <div style={{ marginTop: 10, fontSize: 18, fontWeight: 800, color: P.ink, letterSpacing: 0.3, fontFamily }}>
-        {label}
+  const checkRow = (label: string, p: number, top: number) => (
+    <div style={{ position: "absolute", left: 420, top, width: 440, display: "flex", alignItems: "center", gap: 12, opacity: checklistT }}>
+      <div
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: 4,
+          background: p > 0.5 ? P.successBg : P.card,
+          border: `2px solid ${p > 0.5 ? P.successEdge : P.border}`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 16,
+          color: P.success,
+          flexShrink: 0,
+        }}
+      >
+        {p > 0.5 ? "✓" : ""}
       </div>
+      <div style={{ fontSize: 18, fontWeight: 800, color: P.ink, fontFamily }}>{label}</div>
     </div>
   );
 
@@ -238,88 +259,56 @@ const AnalogyPanel: React.FC = () => {
         style={{
           position: "absolute",
           left: 0,
-          top: 56,
+          top: 44,
           width: 1280,
           textAlign: "center",
           fontSize: 20,
           fontWeight: 800,
           letterSpacing: 2.4,
           color: P.accent,
-          opacity: kickerT,
+          opacity: signT,
           fontFamily,
         }}
       >
-        THE ANALOGY
+        THE TOUR GUIDE RULE
       </div>
-      <div style={{ position: "absolute", left: 0, top: 96, width: 1280, display: "flex", justifyContent: "center", gap: 16, opacity: chipsT }}>
-        {["Checks the source", "Confirms the place", "Only then speaks"].map((t, i) => (
-          <div
-            key={i}
-            style={{
-              padding: "8px 18px",
-              borderRadius: 999,
-              background: P.card,
-              border: `1.5px solid ${P.border}`,
-              color: P.ink,
-              fontSize: 15,
-              fontWeight: 800,
-              letterSpacing: 0.3,
-              fontFamily,
-            }}
-          >
-            {t}
-          </div>
-        ))}
+
+      {/* signpost, left third */}
+      <div style={{ position: "absolute", left: 90, top: 140, width: 280, textAlign: "center", opacity: signT, transform: `translateY(${(1 - signT) * 18}px)` }}>
+        <div style={{ fontSize: 120, lineHeight: 1 }}>🪧</div>
+        <div style={{ marginTop: 14, fontSize: 18, fontWeight: 800, color: P.ink, fontFamily }}>Stands silent</div>
+        <div style={{ marginTop: 4, fontSize: 14, fontWeight: 600, color: P.muted, fontFamily }}>until it's sure</div>
       </div>
-      {sideCard("🚫", "Never guesses", "left")}
+
+      {checkRow("Checks the source first", check1, 200)}
+      {checkRow("Confirms the real place", check2, 254)}
+
+      {/* speech bubble only pops once the checklist clears */}
       <div
         style={{
           position: "absolute",
-          left: 0,
-          top: 213,
-          width: 1280,
-          textAlign: "center",
-          fontSize: 180,
-          lineHeight: 1,
-          opacity: emojiT,
-          transform: `scale(${0.9 + emojiT * 0.1})`,
+          left: 420,
+          top: 320,
+          width: 440,
+          padding: "18px 22px",
+          background: P.card,
+          border: `2px solid ${P.accentEdge}`,
+          borderRadius: 10,
+          boxShadow: "5px 5px 0 rgba(0,0,0,0.35)",
+          opacity: bubbleT,
+          transform: `scale(${mix(bubbleT, 0.85, 1)})`,
         }}
       >
-        🧭
-      </div>
-      {sideCard("✅", "Confirms first", "right")}
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 460,
-          width: 1280,
-          textAlign: "center",
-          opacity: badgeT,
-        }}
-      >
-        <div
-          style={{
-            display: "inline-block",
-            padding: "10px 22px",
-            borderRadius: 999,
-            background: P.accentBg,
-            border: `1.5px solid ${P.accentEdge}`,
-            color: P.accent,
-            fontSize: 20,
-            fontWeight: 800,
-            letterSpacing: 0.5,
-            fontFamily,
-          }}
-        >
-          ONLY SPEAKS WHEN THE FACTS CHECK OUT
+        <div style={{ fontSize: 17, fontWeight: 800, color: P.ink, fontFamily, lineHeight: 1.35 }}>
+          "Kolbuvegen — named for the village of Kolbu."
         </div>
       </div>
+
       <div
         style={{
           position: "absolute",
           left: 40,
-          top: 528,
+          top: 520,
           width: 1200,
           height: 60,
           background: P.accentBg,
@@ -337,7 +326,29 @@ const AnalogyPanel: React.FC = () => {
           opacity: footerT,
         }}
       >
-        Same check applied to every street name on the map
+        Only speaks when the facts check out
+      </div>
+    </div>
+  );
+};
+
+/** b5 — the skip rule, drawn only (gate 2: never the feature page or hub).
+ * The number is the hero: a 60M figure owns the upper-left third while the
+ * cornerTags effect's own statement/tags carry the rest of the frame. */
+const SixtyMeterHero: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B5 || frame >= END) return null;
+  const t = sec(frame, B5, fps);
+  const numberT = tween(t, 0.15, 0.4, ease.power3Out);
+  const labelT = tween(t, 0.55, 0.3, ease.power3Out);
+
+  return (
+    <div style={{ position: "absolute", left: 60, top: 150, width: 440, opacity: numberT, transform: `scale(${mix(numberT, 0.85, 1)})` }}>
+      <div style={{ fontSize: 150, fontWeight: 800, color: P.accent, lineHeight: 1, fontFamily }}>60m</div>
+      <div style={{ marginTop: 8, fontSize: 20, fontWeight: 800, color: P.ink, fontFamily, opacity: labelT }}>
+        shorter than this — skipped
       </div>
     </div>
   );
@@ -345,7 +356,6 @@ const AnalogyPanel: React.FC = () => {
 
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
-  const P = usePalette();
   return (
     <AbsoluteFill style={{ background: STAGE, fontFamily }}>
       {/* b1 — street signs fly past, no story, over the feature's own page */}
@@ -356,10 +366,10 @@ const Inner: React.FC = () => {
         dur={B2 - B1}
         accent={ACCENT}
         plate={0.7}
-        data={{ quote: "Street names fly past at 70 km/h — their history unread.", highlight: "history unread" }}
+        data={{ quote: "Street signs fly past — the real history behind each name goes unread.", highlight: "history behind each name" }}
       />
 
-      {/* b2 — no meaning without proof, nothing invented, page scrolled on */}
+      {/* b2 — never invents a meaning it can't prove, page scrolled on */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} push={0.03} />}
       <MotionInsert
         effect="keywordCaption"
@@ -367,11 +377,11 @@ const Inner: React.FC = () => {
         dur={B3 - B2}
         accent={ACCENT}
         plate={0.7}
-        data={{ line1: "No meaning without proof", line2: "nothing invented", keywords: ["proof", "invented"] }}
+        data={{ line1: "Never invents a meaning", line2: "it can't actually prove", keywords: ["invents", "prove"] }}
       />
 
       {/* b3 — the tour-guide metaphor, drawn only, no backdrop and no commit fit */}
-      <AnalogyPanel />
+      <SignpostAnalogy />
 
       {/* b4 — the fix: OpenStreetMap harvest, source-confirmed match, over the hub */}
       {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} push={0.03} />}
@@ -384,7 +394,7 @@ const Inner: React.FC = () => {
         data={{
           steps: [
             "Pull every named street from OpenStreetMap",
-            "Match name to a place only if a source confirms it",
+            "Match the name to a place only if a source confirms it",
             "Kolbuvegen matches the village of Kolbu",
           ],
           result: "Every street gets a verified story",
@@ -400,50 +410,12 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         plate={0.82}
         data={{
-          statement: "Thin stubs don't get a story",
-          tags: [
-            "Under 60 meters: skip",
-            "One address only: skip",
-            "Length checked first",
-            "Everything else: a story",
-          ],
+          statement: "Under 60 meters, no story",
+          tags: ["One address only: skip", "Length checked first", "Everything else: a story"],
         }}
       />
+      <SixtyMeterHero />
 
-      {/* b5 fill — with 4 corner tags the bottom-left and bottom-right ones (slots
-          2 and 3) don't land until t≈2.46-2.76 of BUILD=2.76, i.e. the last ~11% of
-          the beat; these two restate the same tags from early on so the lower
-          canvas isn't bare for most of the beat. */}
-      {frame >= B5 && frame < END && (
-        <Arrive at={B5 + 10} kind="rise" box={{ x: 40, y: 522, w: 1200, h: 66 }}>
-          <div
-            style={{
-              position: "absolute",
-              left: 40,
-              top: 522,
-              width: 1200,
-              height: 66,
-              background: P.accentBg,
-              border: `1px solid ${P.accentEdge}`,
-              borderRadius: 4,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 24,
-              fontFamily,
-              fontSize: 18,
-              fontWeight: 800,
-              letterSpacing: 0.4,
-              color: P.ink,
-              textAlign: "center",
-            }}
-          >
-            <span>Length checked first</span>
-            <span style={{ color: P.accent }}>·</span>
-            <span>Everything else: a story</span>
-          </div>
-        </Arrive>
-      )}
       <Ledger />
     </AbsoluteFill>
   );

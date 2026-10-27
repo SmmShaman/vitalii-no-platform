@@ -1,0 +1,21 @@
+{
+  "id": "b72",
+  "viewport": {"width": 1120, "height": 466},
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/a-kid-reflashed-the-tv-app-from-the-play-store-now-the-store-itself-needs-a-pare-b72",
+      "frames": 193,
+      "scroll": [[0, 0], [96, 150], [192, 300]],
+      "mouse": [[0, 500, 200], [96, 540, 240], [192, 520, 260]]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/a-kid-reflashed-the-tv-app-from-the-play-store-now-the-store-itself-needs-a-pare-b72",
+      "frames": 189,
+      "scroll": [[0, 300], [94, 500], [188, 700]],
+      "mouse": [[0, 520, 260], [94, 560, 300], [188, 530, 280]]
+    }
+  ]
+}

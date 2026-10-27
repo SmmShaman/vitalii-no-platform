@@ -1,0 +1,7 @@
+{"id": "b72", "composition": "FeatureKidReflashedTvAppB72", "beats": [
+  {"beat": "b1", "effect": "keywordCaption", "backdrop": "page", "data": {"line1": "Reinstalled. Wiped.", "line2": "Every parental setting, one tap.", "keywords": ["Reinstalled.", "Wiped."]}},
+  {"beat": "b2", "effect": "cornerTags", "backdrop": "page2", "data": {"statement": "Blocked everywhere — except here", "tags": ["YouTube blocked", "Spotify blocked", "Play Store open", "Settings open"]}},
+  {"beat": "b3", "effect": "drawn", "backdrop": null, "data": {"note": "fridge lock + open kitchen door analogy, no catalog effect — custom FridgeDoorAnalogy component"}},
+  {"beat": "b4", "effect": "pipelineFlow", "backdrop": null, "data": {"steps": ["Foreground app checked each cycle", "Matched against the guard list", "Lock screen fires"], "system": "Python (home PC)", "result": "Same lock as YouTube, Spotify"}},
+  {"beat": "b5", "effect": "funnelAbsorption", "backdrop": null, "data": {"inputs": ["Play Store open", "Settings open", "Permission dialogs", "Install screens"], "result": "Zero gaps left"}}
+]}

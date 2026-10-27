@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureOneButtonShutsYoutubeB73 } from "./compositions/feature-demos/FeatureOneButtonShutsYoutubeB73";
+import { FeatureKidReflashedTvAppB72 } from "./compositions/feature-demos/FeatureKidReflashedTvAppB72";
 import { FeatureTechnicalAlarmsGoTheirP81 } from "./compositions/feature-demos/FeatureTechnicalAlarmsGoTheirP81";
 import { FeatureBlogNewsRewritesRunP80 } from "./compositions/feature-demos/FeatureBlogNewsRewritesRunP80";
 import { FeatureAnyPhoneBecomesDrawingB57 } from "./compositions/feature-demos/FeatureAnyPhoneBecomesDrawingB57";
@@ -2761,6 +2763,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureEveryStreetNameBecomesG06"
         component={FeatureEveryStreetNameBecomesG06}
         durationInFrames={908}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureOneButtonShutsYoutubeB73"
+        component={FeatureOneButtonShutsYoutubeB73}
+        durationInFrames={900}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureKidReflashedTvAppB72"
+        component={FeatureKidReflashedTvAppB72}
+        durationInFrames={920}
         fps={30}
         width={1280}
         height={720}
