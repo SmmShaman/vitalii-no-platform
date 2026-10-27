@@ -164,28 +164,60 @@ const FridgeDoorAnalogy: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = sec(frame, B3, fps);
+  const kickerP = tween(t, 0, 0.3, ease.power3Out);
   const fridgeP = tween(t, 0.1, 0.4, ease.power3Out);
   const doorP = tween(t, 0.45, 0.4, ease.power3Out);
+  const dividerP = tween(t, 0.25, 0.4, ease.power3Out);
 
   return (
-    <AbsoluteFill style={{ background: STAGE, display: "flex", alignItems: "center", justifyContent: "center", gap: 90 }}>
-      <div style={{ textAlign: "center", transform: `scale(${mix(fridgeP, 0.8, 1)})`, opacity: fridgeP }}>
+    <AbsoluteFill style={{ background: STAGE }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 46,
+          textAlign: "center",
+          fontFamily,
+          fontSize: 27,
+          fontWeight: 800,
+          letterSpacing: 2.6,
+          color: "#fff",
+          opacity: kickerP,
+        }}
+      >
+        LOCKED ON ONE SIDE. WIDE OPEN ON THE OTHER.
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: 639,
+          top: 150,
+          width: 2,
+          height: mix(dividerP, 0, 360),
+          backgroundImage: "repeating-linear-gradient(to bottom, rgba(255,255,255,0.5) 0 10px, transparent 10px 20px)",
+        }}
+      />
+
+      <div style={{ position: "absolute", left: 180, top: 170, width: 300, textAlign: "center", transform: `scale(${mix(fridgeP, 0.8, 1)})`, opacity: fridgeP }}>
         <div style={{ fontSize: 150, lineHeight: 1 }}>🔒</div>
         <div style={{ fontFamily, fontSize: 24, fontWeight: 800, color: "#fff", marginTop: 12 }}>FRIDGE — locked</div>
       </div>
-      <div style={{ textAlign: "center", transform: `scale(${mix(doorP, 0.8, 1)})`, opacity: doorP }}>
+      <div style={{ position: "absolute", left: 800, top: 170, width: 300, textAlign: "center", transform: `scale(${mix(doorP, 0.8, 1)})`, opacity: doorP }}>
         <div style={{ fontSize: 150, lineHeight: 1 }}>🚪</div>
         <div style={{ fontFamily, fontSize: 24, fontWeight: 800, color: "#fff", marginTop: 12 }}>KITCHEN DOOR — wide open</div>
       </div>
+
       <div
         style={{
           position: "absolute",
           left: 90,
           right: 90,
-          bottom: 210,
+          bottom: 190,
           textAlign: "center",
           fontFamily,
-          fontSize: 40,
+          fontSize: 38,
           fontWeight: 800,
           color: "#fff",
           opacity: tween(t, 0.3, 0.4, ease.power3Out),
@@ -194,6 +226,122 @@ const FridgeDoorAnalogy: React.FC = () => {
         Lock one thing. Leave the other wide open.
       </div>
     </AbsoluteFill>
+  );
+};
+
+/** b4 supplement: the compacted pipeline frame sits small and left-of-center with the
+ * result still off-screen — a kicker up top plus two fact chips below fill the open bands. */
+const PipelineKickerChips: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = sec(frame, B4, fps);
+  const kickerP = tween(t, 0, 0.3, ease.power3Out);
+  const leftP = tween(t, 0.3, 0.3, ease.power3Out);
+  const rightP = tween(t, 0.42, 0.3, ease.power3Out);
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 40,
+          textAlign: "center",
+          fontSize: 27,
+          fontWeight: 800,
+          letterSpacing: 2.6,
+          color: ACCENT,
+          opacity: kickerP,
+        }}
+      >
+        LOCKS EVERYTHING THE STORE CAN'T
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: 130,
+          top: 480,
+          width: 300,
+          padding: "14px 16px",
+          background: "rgba(255,255,255,0.08)",
+          border: `2px solid ${ACCENT}`,
+          borderRadius: 6,
+          opacity: leftP,
+          transform: `translateY(${mix(leftP, 16, 0)}px)`,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.3, color: ACCENT }}>CHECKED EVERY 2s</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginTop: 4 }}>foreground app</div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          right: 130,
+          top: 480,
+          width: 300,
+          padding: "14px 16px",
+          background: "rgba(255,255,255,0.08)",
+          border: `2px solid ${ACCENT}`,
+          borderRadius: 6,
+          opacity: rightP,
+          transform: `translateY(${mix(rightP, 16, 0)}px)`,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.3, color: ACCENT }}>MATCHES GUARD LIST</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginTop: 4 }}>same as YouTube, Spotify</div>
+      </div>
+    </div>
+  );
+};
+
+/** b5 supplement: the funnel's silhouette only occupies the center column — two labelled
+ * callouts in the open side wedges restate what is being absorbed and by what. */
+const FunnelSideCallouts: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = sec(frame, B5, fps);
+  const leftP = tween(t, 0.2, 0.3, ease.power3Out);
+  const rightP = tween(t, 0.35, 0.3, ease.power3Out);
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 40,
+          top: 260,
+          width: 230,
+          padding: "14px 16px",
+          background: "rgba(255,255,255,0.08)",
+          border: `2px solid ${ACCENT}`,
+          borderRadius: 6,
+          opacity: leftP,
+          transform: `translateY(${mix(leftP, 16, 0)}px)`,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.3, color: ACCENT }}>4 SURFACES</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginTop: 4 }}>all unlocked</div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          right: 40,
+          top: 260,
+          width: 230,
+          padding: "14px 16px",
+          background: "rgba(255,255,255,0.08)",
+          border: `2px solid ${ACCENT}`,
+          borderRadius: 6,
+          opacity: rightP,
+          transform: `translateY(${mix(rightP, 16, 0)}px)`,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.3, color: ACCENT }}>ONE SCRIPT</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginTop: 4 }}>locks them all</div>
+      </div>
+    </div>
   );
 };
 
@@ -240,6 +388,7 @@ const Inner: React.FC = () => {
           result: "Same lock as YouTube, Spotify",
         }}
       />
+      {frame >= B4 && frame < B5 && <PipelineKickerChips />}
 
       {/* b5 — the result, holds to the final frame */}
       <MotionInsert
@@ -251,6 +400,7 @@ const Inner: React.FC = () => {
         base={STAGE}
         data={{ inputs: ["Play Store open", "Settings open", "Permission dialogs", "Install screens"], result: "Zero gaps left" }}
       />
+      {frame >= B5 && <FunnelSideCallouts />}
 
       <CardDeck />
     </AbsoluteFill>

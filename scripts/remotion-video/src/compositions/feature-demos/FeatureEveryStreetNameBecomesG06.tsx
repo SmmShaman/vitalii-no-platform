@@ -332,6 +332,68 @@ const SignpostAnalogy: React.FC = () => {
   );
 };
 
+/** b3 supplement — fills the empty right column (x≈900-1280) that the signpost +
+ * checklist + speech-bubble layout leaves bare: a small "verified" tag up top and
+ * a source-card panel that pops once the checklist clears, restating the same
+ * proof the checklist already shows. Additive only — nothing above is touched. */
+const SignpostSourcePanel: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B3 || frame >= B4) return null;
+  const t = sec(frame, B3, fps);
+  const tagT = tween(t, 0.3, 0.3, ease.power3Out);
+  const cardT = tween(t, 1.2, 0.3, ease.power3Out);
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 606 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 940,
+          top: 56,
+          width: 280,
+          padding: "10px 16px",
+          background: P.accentBg,
+          border: `1px solid ${P.accentEdge}`,
+          borderRadius: 4,
+          textAlign: "center",
+          fontFamily,
+          fontSize: 14,
+          fontWeight: 800,
+          letterSpacing: 1.4,
+          color: P.ink,
+          opacity: tagT,
+          transform: `translateY(${(1 - tagT) * 12}px)`,
+        }}
+      >
+        VERIFIED NAMES ONLY
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 940,
+          top: 160,
+          width: 280,
+          padding: "20px 20px",
+          background: P.card,
+          border: `2px solid ${P.border}`,
+          borderRadius: 10,
+          boxShadow: "5px 5px 0 rgba(0,0,0,0.35)",
+          opacity: cardT,
+          transform: `scale(${mix(cardT, 0.88, 1)})`,
+        }}
+      >
+        <div style={{ fontSize: 44, lineHeight: 1 }}>📄</div>
+        <div style={{ marginTop: 10, fontSize: 16, fontWeight: 800, color: P.ink, fontFamily }}>SOURCE CHECKED</div>
+        <div style={{ marginTop: 6, fontSize: 13, fontWeight: 600, color: P.muted, fontFamily, lineHeight: 1.35 }}>
+          one citation per street name — no citation, no story
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /** b5 — the skip rule, drawn only (gate 2: never the feature page or hub).
  * The number is the hero: a 60M figure owns the upper-left third while the
  * cornerTags effect's own statement/tags carry the rest of the frame. */
@@ -349,6 +411,84 @@ const SixtyMeterHero: React.FC = () => {
       <div style={{ fontSize: 150, fontWeight: 800, color: P.accent, lineHeight: 1, fontFamily }}>60m</div>
       <div style={{ marginTop: 8, fontSize: 20, fontWeight: 800, color: P.ink, fontFamily, opacity: labelT }}>
         shorter than this — skipped
+      </div>
+    </div>
+  );
+};
+
+/** b5 supplement — fills the gaps the cornerTags effect's own statement box and
+ * corner tags leave open (top-middle gap between TL/TR tags, the strip right of
+ * the statement box, the band below the hero number): a small rule tag, a
+ * measuring motif clear of the statement box (box right edge ≈x1033) and the
+ * corner tags (TR ends ≈y152, BR starts ≈y504), and a cutoff bar under the hero
+ * number (hero ends ≈y340). Additive only — nothing above is touched. */
+const SkipRuleFillers: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B5 || frame >= END) return null;
+  const t = sec(frame, B5, fps);
+  const topT = tween(t, 0.05, 0.3, ease.power3Out);
+  const rightT = tween(t, 0.4, 0.3, ease.power3Out);
+  const barT = tween(t, 0.7, 0.3, ease.power3Out);
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 480,
+          top: 30,
+          width: 320,
+          textAlign: "center",
+          fontFamily,
+          fontSize: 14,
+          fontWeight: 800,
+          letterSpacing: 2,
+          color: P.accent,
+          opacity: topT,
+        }}
+      >
+        THE 60M RULE
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: 1050,
+          top: 170,
+          width: 210,
+          padding: "14px 16px",
+          background: P.card,
+          border: `2px solid ${P.border}`,
+          borderRadius: 8,
+          textAlign: "center",
+          opacity: rightT,
+          transform: `translateY(${(1 - rightT) * 14}px)`,
+        }}
+      >
+        <div style={{ fontSize: 36, lineHeight: 1 }}>📏</div>
+        <div style={{ marginTop: 6, fontSize: 13, fontWeight: 800, color: P.ink, fontFamily }}>measured first</div>
+      </div>
+
+      <div
+        style={{
+          position: "absolute",
+          left: 60,
+          top: 450,
+          width: 440,
+          padding: "12px 18px",
+          background: P.accentBg,
+          border: `1px solid ${P.accentEdge}`,
+          borderRadius: 4,
+          fontFamily,
+          fontSize: 15,
+          fontWeight: 700,
+          color: P.ink,
+          opacity: barT,
+        }}
+      >
+        under 60m → skipped
       </div>
     </div>
   );
@@ -382,6 +522,7 @@ const Inner: React.FC = () => {
 
       {/* b3 — the tour-guide metaphor, drawn only, no backdrop and no commit fit */}
       <SignpostAnalogy />
+      <SignpostSourcePanel />
 
       {/* b4 — the fix: OpenStreetMap harvest, source-confirmed match, over the hub */}
       {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} push={0.03} />}
@@ -415,6 +556,7 @@ const Inner: React.FC = () => {
         }}
       />
       <SixtyMeterHero />
+      <SkipRuleFillers />
 
       <Ledger />
     </AbsoluteFill>

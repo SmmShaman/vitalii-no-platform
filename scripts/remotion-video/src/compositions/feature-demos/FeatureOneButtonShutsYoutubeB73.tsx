@@ -200,26 +200,90 @@ const LowerThird: React.FC = () => {
 };
 
 /** b3: no public UI recorded for this beat — a drawn house/keys analogy owns the frame. */
+const HOUSE_X = 300;
+const HOUSE_Y = 330;
+const KEY_X = 980;
+const KEY_Y = [150, 330, 500];
+
 const HouseKeysAnalogy: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const P = usePalette();
   const t = sec(frame, B3, fps);
+  const kickerP = tween(t, 0, 0.3, ease.power3Out);
   const houseP = tween(t, 0.1, 0.4, ease.power3Out);
-  const keyFade = [0.6, 0.95, 1.3].map((at) => tween(t, at, 0.35, ease.power3Out));
+  const keyFade = [0.55, 0.85, 1.15].map((at) => tween(t, at, 0.35, ease.power3Out));
 
   return (
-    <AbsoluteFill style={{ background: STAGE, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ textAlign: "center", transform: `scale(${mix(houseP, 0.8, 1)})`, opacity: houseP }}>
-        <div style={{ fontSize: 220, lineHeight: 1 }}>🏠</div>
+    <AbsoluteFill style={{ background: STAGE }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 46,
+          textAlign: "center",
+          fontFamily,
+          fontSize: 28,
+          fontWeight: 800,
+          letterSpacing: 3,
+          color: ACCENT,
+          opacity: kickerP,
+        }}
+      >
+        ONE HOUSE. THREE SPARE KEYS.
       </div>
-      <div style={{ position: "absolute", left: "50%", top: 150, display: "flex", gap: 36, transform: "translateX(-50%)" }}>
-        {keyFade.map((p, i) => (
-          <div key={i} style={{ fontSize: 72, opacity: p, transform: `translateY(${mix(p, -20, 0)}px) rotate(${(i - 1) * 12}deg)` }}>
-            🔑
-          </div>
+
+      <svg width={1280} height={720} style={{ position: "absolute", left: 0, top: 0 }}>
+        {KEY_Y.map((ky, i) => (
+          <line
+            key={i}
+            x1={HOUSE_X + 95}
+            y1={HOUSE_Y}
+            x2={KEY_X - 75}
+            y2={ky}
+            stroke="rgba(255,255,255,0.4)"
+            strokeWidth={2}
+            strokeDasharray="6 8"
+            opacity={keyFade[i]}
+          />
         ))}
+      </svg>
+
+      <div
+        style={{
+          position: "absolute",
+          left: HOUSE_X - 110,
+          top: HOUSE_Y - 120,
+          width: 220,
+          textAlign: "center",
+          transform: `scale(${mix(houseP, 0.8, 1)})`,
+          opacity: houseP,
+        }}
+      >
+        <div style={{ fontSize: 190, lineHeight: 1 }}>🏠</div>
+        <div style={{ fontFamily, fontSize: 18, fontWeight: 800, color: "#fff", letterSpacing: 1.6 }}>MASTER KEY</div>
       </div>
+
+      {KEY_Y.map((ky, i) => (
+        <div
+          key={i}
+          style={{
+            position: "absolute",
+            left: KEY_X - 80,
+            top: ky - 60,
+            width: 160,
+            textAlign: "center",
+            opacity: keyFade[i],
+            transform: `translateX(${mix(keyFade[i], 30, 0)}px) rotate(${(i - 1) * 8}deg)`,
+          }}
+        >
+          <div style={{ fontSize: 76, lineHeight: 1 }}>🔑</div>
+          <div style={{ fontFamily, fontSize: 15, fontWeight: 800, letterSpacing: 1.2, color: ACCENT, marginTop: 4 }}>
+            {OVERRIDE_LABEL[i]}
+          </div>
+        </div>
+      ))}
+
       <div
         style={{
           position: "absolute",
@@ -228,7 +292,7 @@ const HouseKeysAnalogy: React.FC = () => {
           bottom: 210,
           textAlign: "center",
           fontFamily,
-          fontSize: 44,
+          fontSize: 40,
           fontWeight: 800,
           color: "#fff",
           opacity: tween(t, 0.3, 0.4, ease.power3Out),
@@ -237,6 +301,106 @@ const HouseKeysAnalogy: React.FC = () => {
         One master key. Spare keys hidden everywhere.
       </div>
     </AbsoluteFill>
+  );
+};
+
+/** b4 supplement: the copyCorrection card sits centered, leaving the top band empty —
+ * a small flow diagram there (three overrides -> one flag) restates the beat in the open space. */
+const OverrideFlagDiagram: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = sec(frame, B4, fps);
+  const kickerP = tween(t, 0, 0.3, ease.power3Out);
+  const rowP = [0.2, 0.32, 0.44].map((at) => tween(t, at, 0.3, ease.power3Out));
+  const flagP = tween(t, 0.6, 0.35, ease.power3Out);
+  const NODE_X = [150, 350, 550];
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          top: 34,
+          textAlign: "center",
+          fontSize: 26,
+          fontWeight: 800,
+          letterSpacing: 3,
+          color: ACCENT,
+          opacity: kickerP,
+        }}
+      >
+        THREE OVERRIDES — ONE FLAG
+      </div>
+
+      {NODE_X.map((x, i) => (
+        <div key={i} style={{ position: "absolute", left: x - 70, top: 110, width: 140, textAlign: "center", opacity: rowP[i] }}>
+          <div style={{ fontSize: 48, lineHeight: 1 }}>🔑</div>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: "#fff" }}>{OVERRIDE_LABEL[i]}</div>
+        </div>
+      ))}
+
+      <svg width={1280} height={720} style={{ position: "absolute", left: 0, top: 0 }}>
+        {NODE_X.map((x, i) => (
+          <line key={i} x1={x + 40} y1={135} x2={880} y2={135} stroke="rgba(255,255,255,0.4)" strokeWidth={2} strokeDasharray="6 8" opacity={rowP[i]} />
+        ))}
+      </svg>
+
+      <div style={{ position: "absolute", left: 900, top: 95, width: 160, textAlign: "center", opacity: flagP, transform: `scale(${mix(flagP, 0.8, 1)})` }}>
+        <div style={{ fontSize: 56, lineHeight: 1 }}>🚩</div>
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: ACCENT }}>CLOUDFLARE WORKERS</div>
+      </div>
+    </div>
+  );
+};
+
+/** b5 supplement: the funnel occupies the center column, leaving both side wedges empty —
+ * two labelled callouts there name the switch and what it beats, without touching the effect file. */
+const FunnelSideCallouts: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const t = sec(frame, B5, fps);
+  const leftP = tween(t, 0.2, 0.3, ease.power3Out);
+  const rightP = tween(t, 0.35, 0.3, ease.power3Out);
+
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 40,
+          top: 230,
+          width: 230,
+          padding: "14px 16px",
+          background: "rgba(255,255,255,0.08)",
+          border: `2px solid ${ACCENT}`,
+          borderRadius: 6,
+          opacity: leftP,
+          transform: `translateY(${mix(leftP, 16, 0)}px)`,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.3, color: ACCENT }}>PARENT SWITCH</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginTop: 4 }}>flips once</div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          right: 40,
+          top: 230,
+          width: 230,
+          padding: "14px 16px",
+          background: "rgba(255,255,255,0.08)",
+          border: `2px solid ${ACCENT}`,
+          borderRadius: 6,
+          opacity: rightP,
+          transform: `translateY(${mix(rightP, 16, 0)}px)`,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.3, color: ACCENT }}>3 OVERRIDES</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: "#fff", marginTop: 4 }}>lose at once</div>
+      </div>
+    </div>
   );
 };
 
@@ -280,6 +444,7 @@ const Inner: React.FC = () => {
         base={STAGE}
         data={{ wrong: "Remember and undo each override by hand", right: "One flag now outranks every override", label: "via Cloudflare Workers" }}
       />
+      {frame >= B4 && frame < B5 && <OverrideFlagDiagram />}
 
       {/* b5 — the result, holds to the final frame */}
       <MotionInsert
@@ -291,6 +456,7 @@ const Inner: React.FC = () => {
         base={STAGE}
         data={{ inputs: ["Free-viewing mode", "QR pass", "Finished bonus quiz"], result: "One tap wins — every time" }}
       />
+      {frame >= B5 && <FunnelSideCallouts />}
 
       <LowerThird />
     </AbsoluteFill>
