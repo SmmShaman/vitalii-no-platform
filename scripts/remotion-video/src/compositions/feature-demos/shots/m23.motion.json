@@ -42,13 +42,8 @@
     },
     {
       "beat": "b5",
-      "effect": "ratioBars",
-      "backdrop": null,
-      "data": {
-        "a": { "label": "Lines with target word", "value": 10 },
-        "b": { "label": "Total lines per section", "value": 16 },
-        "unit": "lines"
-      }
+      "effect": "drawn",
+      "note": "archetype closes the card deck: the fan becomes a 4x4 grid of 16 line-cards, 10 lit green for the feature's own 10-of-16 target, holds to the final frame"
     }
   ]
 }

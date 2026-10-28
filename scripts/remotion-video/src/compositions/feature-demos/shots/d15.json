@@ -1,0 +1,35 @@
+{
+  "id": "d15",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "wide",
+      "url": "https://vitalii.no/features/the-sugar-hub-can-now-fix-its-own-dead-carelink-login-with-one-command-d15",
+      "frames": 207,
+      "scroll": [[0, 0], [206, 30]],
+      "mouse": [[0, 450, 160], [100, 560, 210], [206, 500, 190]]
+    },
+    {
+      "name": "problem",
+      "url": "https://vitalii.no/features/the-sugar-hub-can-now-fix-its-own-dead-carelink-login-with-one-command-d15",
+      "frames": 160,
+      "scroll": [[0, 380], [159, 430]],
+      "mouse": [[0, 480, 220], [80, 540, 200], [159, 500, 210]]
+    },
+    {
+      "name": "fix",
+      "url": "https://vitalii.no/features/the-sugar-hub-can-now-fix-its-own-dead-carelink-login-with-one-command-d15",
+      "frames": 181,
+      "scroll": [[0, 640], [180, 690]],
+      "mouse": [[0, 470, 230], [90, 560, 215], [180, 510, 205]]
+    },
+    {
+      "name": "alert",
+      "url": "https://vitalii.no/features/the-sugar-hub-can-now-fix-its-own-dead-carelink-login-with-one-command-d15",
+      "frames": 182,
+      "scroll": [[0, 760], [181, 810]],
+      "mouse": [[0, 460, 225], [90, 540, 210], [181, 500, 200]]
+    }
+  ]
+}

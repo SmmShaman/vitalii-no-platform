@@ -1,36 +1,39 @@
 // FeatureTopicLessonsFollowCoverageM23 — feature m23 — 1280x720, 901 frames @ 30fps, VOICE-SYNCED.
-// archetype 2 zoom-in, mood slate. Motion direction v2 (feature-motion skill, 2026-10-07).
-// RE-SHOOT 2026-10-24: narration unchanged, mood dawn -> slate, b1 effect changed from
-// keywordCaption (repeat of a recent opener) to titleTakeover.
+// archetype 3 card-deck, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// RE-SHOOT 2026-10-28: narration and beat windows unchanged from the previous pass
+// (archetype 2 zoom-in / mood slate); only the picture changes to a real card deck.
 //
-// A single camera keeps pushing in across the whole clip (archetype 2): beat 1 is the
-// widest view of the feature's own page, and every following beat tightens the frame a
-// little further until b5 fills the screen with one number. There is no fixed chrome —
-// the escalating push-in IS the recurring element. The real page/hub recordings and the
-// motion-effect stages sit under the same camera, so the zoom reads as one continuous move.
+// Four cards ARE the story: b1 they sit in an identical, overlapping pile (the same
+// point, repeated); b2 they fan out into a labelled row, one angle per card; b3 each
+// gets a read-back checkmark in turn; b4 the thin one visibly flips to "Rewritten".
+// At b5 the deck becomes a new, bigger grid of 16 line-cards, 10 lit, for the
+// feature's own 10-of-16 result — the same "cards" language carried to its finale
+// (gate 2: drawn only, never the feature page or hub, holds to the final frame).
 //
 // Beat → effect (data only from the feature row and commit 9ce565d):
 // b1 15-182   "ask for a lesson on a tricky word, and it used to repeat the same point
-//             every section" — titleTakeover over the feature's own page.
+//             every section" — titleTakeover over the feature's own page (small proof
+//             window, corner). The deck pile dominates the centre of the frame.
 // b2 182-385  "now it maps distinct angles first, like a teacher outlining chapters, then
-//             writes one angle per section" — pipelineFlow, page scrolled on. The one tech
-//             gloss of the clip sits on this frame.
+//             writes one angle per section" — pipelineFlow + the deck fanning out. The
+//             one tech gloss of the clip sits in pipelineFlow's own system label.
 // b3 385-530  "every earlier section gets read back first, so no sentence repeats" —
-//             funnelAbsorption, over the features hub.
+//             funnelAbsorption, each fanned card gaining its checkmark in turn.
 // b4 530-713  "the AI even checks its own work, and rewrites automatically if a word lesson
-//             runs thin" — handoffExplain over the hub, with a LogWindow built from the
-//             feature's own 10-of-16 target number (no runtime log exists for this product).
-// b5 713-901  "that target word now shows up in at least 10 of every 16 lines" — ratioBars,
-//             drawn result only (no live page, gate 2), holds to the final frame.
+//             runs thin" — handoffExplain, one card flips; a LogWindow shows the product's
+//             own target-word check running (no runtime log exists, lines built from the
+//             feature's own numbers).
+// b5 713-901  "that target word now shows up in at least 10 of every 16 lines" — the deck's
+//             final form: a 4x4 grid of line-cards, 10 lit green, holds to the final frame.
 //
-// Persistent element: the camera push-in itself (archetype 2), b1 through b5.
+// Persistent element: the card deck itself (archetype 3), b1 through b5.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
-import { LogWindow, type LogLine } from "./live-primitives";
+import { MotionInsert, Arrive, cut } from "./motion-primitives";
+import { LiveWindow, LogWindow, type LogLine } from "./live-primitives";
 import { tween, ease, mix } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/m23.json";
 
@@ -41,35 +44,15 @@ const B4 = 530;
 const B5 = 713;
 const END = 901;
 
-/** Accent tuned for the dark stage (slate's own accent reads too soft on it). */
-const ACCENT = "#2DC4D6";
-const STAGE = "#0E1A22";
+/** Accent brightened for the dark plate (dawn's own #2563EB reads a touch flat on it). */
+const ACCENT = "#4C8DFF";
+const STAGE = "#10182B";
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-/** Camera keyframes — the one element that survives every beat (archetype 2). */
-const CAMERA = [
-  { at: B1, zoom: 1, ox: 50, oy: 38 },
-  { at: B2, zoom: 1.08, ox: 54, oy: 34 },
-  { at: B3, zoom: 1.16, ox: 58, oy: 40 },
-  { at: B4, zoom: 1.26, ox: 62, oy: 36 },
-  { at: B5, zoom: 1.38, ox: 50, oy: 50 },
-];
+const PROOF_WIN = { x: 760, y: 420, w: 460, h: 260 };
 
-const useCamera = (frame: number, fps: number) => {
-  let idx = 0;
-  for (let i = 0; i < CAMERA.length; i++) if (frame >= CAMERA[i].at) idx = i;
-  const cur = CAMERA[idx];
-  const prev = idx > 0 ? CAMERA[idx - 1] : { zoom: 1, ox: cur.ox, oy: cur.oy };
-  const p = tween(sec(frame, cur.at, fps), 0, 0.7, ease.power3Out);
-  return {
-    zoom: mix(p, prev.zoom, cur.zoom),
-    ox: mix(p, prev.ox, cur.ox),
-    oy: mix(p, prev.oy, cur.oy),
-  };
-};
-
-/** b1 — names the product in one plain line, sits outside the camera so it stays crisp. */
+/** b1 — names the product in one plain line. */
 const ProductPlate: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
@@ -102,57 +85,121 @@ const ProductPlate: React.FC = () => {
   );
 };
 
-/**
- * b2 overlay — pipelineFlow's compacted chain only fills a mid-height band
- * (roughly y 263-453 at 1x); its title and result land late (after the beat's
- * own measured midpoint), so the empty top and bottom thirds measured 21/48 at
- * that instant. These two bands repeat the beat's own tech gloss and result
- * early so the frame reads full well before pipelineFlow's native reveal.
- */
-const CoverageGloss: React.FC = () => {
+/** b2-b4 — a short top ribbon restating what changes this beat, keeps the frame full. */
+const TopRibbon: React.FC<{ text: string; from: number; dur: number }> = ({ text, from, dur }) => {
   const frame = useCurrentFrame();
   const P = usePalette();
-  if (cut(frame, B2, B3) !== 1) return null;
-  const t = tween(sec(frame, B2 + 10, 30), 0, 0.4, ease.power3Out);
+  if (cut(frame, from, from + dur) !== 1) return null;
   return (
-    <div style={{ position: "absolute", left: 40, top: 40, width: 1200, textAlign: "center", opacity: t, fontFamily }}>
+    <Arrive at={from + 3} kind="wipe" box={{ x: 140, y: 40, w: 1000, h: 56 }} dur={0.3}>
       <div
         style={{
-          display: "inline-block",
-          padding: "14px 28px",
+          position: "absolute",
+          left: 140,
+          top: 40,
+          width: 1000,
+          height: 56,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
           background: P.card,
           border: `2px solid ${P.border}`,
-          borderRadius: 4,
-          boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+          borderRadius: 28,
+          boxShadow: "0 6px 18px rgba(0,0,0,0.25)",
         }}
       >
-        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>
-          COVERAGE PLAN = ANGLES OUTLINED LIKE CHAPTERS
-        </div>
+        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 1.2, color: P.ink, fontFamily }}>{text}</div>
       </div>
-    </div>
+    </Arrive>
   );
 };
 
-const CoverageResult: React.FC = () => {
+/** The archetype itself: 4 cards, pile → fan → checked → one flips. b1 through b4. */
+const CARD_W = 170;
+const CARD_H = 110;
+const FAN_X = [264, 458, 652, 846];
+const FAN_Y = 260;
+const FAN_LABELS = ["Morning routine", "Ordering food", "Travel & transit", "Work & study"];
+
+const AngleDeck: React.FC<{ fps: number }> = ({ fps }) => {
   const frame = useCurrentFrame();
   const P = usePalette();
-  if (cut(frame, B2, B3) !== 1) return null;
-  const t = tween(sec(frame, B2 + 20, 30), 0, 0.4, ease.power3Out);
+  if (frame < B1 || frame >= B5) return null;
+
+  const moveP = tween(sec(frame, B2, fps), 0, 0.6, ease.power3Out);
+
   return (
-    <div style={{ position: "absolute", left: 40, bottom: 40, width: 1200, textAlign: "center", opacity: t, fontFamily }}>
-      <div
-        style={{
-          display: "inline-block",
-          padding: "12px 26px",
-          background: "rgba(8,8,8,0.55)",
-          border: `2px solid ${P.accent}`,
-          borderRadius: 4,
-        }}
-      >
-        <div style={{ fontSize: 24, fontWeight: 700, color: "#F3E9DC" }}>No angle repeats</div>
-      </div>
-    </div>
+    <>
+      {[0, 1, 2, 3].map((i) => {
+        const k = i - 1.5;
+        const pileX = 640 - CARD_W / 2 + k * 14;
+        const pileY = 295 - CARD_H / 2 + k * 10;
+        const pileRot = k * 6;
+
+        const x = mix(moveP, pileX, FAN_X[i]);
+        const y = mix(moveP, pileY, FAN_Y);
+        const rot = mix(moveP, pileRot, 0);
+
+        const label = frame >= B2 ? FAN_LABELS[i] : "Same point";
+        const checkT = tween(sec(frame, B3 + 10 + i * 34, fps), 0, 0.3, ease.power2Out);
+
+        let flipScale = 1;
+        let shownLabel = label;
+        if (i === 1 && frame >= B4) {
+          const fp = tween(sec(frame, B4 + 15, fps), 0, 0.8, ease.power3InOut);
+          flipScale = fp < 0.5 ? 1 - 2 * fp : 2 * (fp - 0.5);
+          shownLabel = fp < 0.5 ? label : "Rewritten ✓";
+        }
+
+        return (
+          <div
+            key={i}
+            style={{ position: "absolute", left: x, top: y, width: CARD_W, height: CARD_H, transform: `rotate(${rot}deg)` }}
+          >
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                transform: `scaleX(${flipScale})`,
+                background: P.card,
+                border: `2px solid ${P.border}`,
+                borderRadius: 8,
+                boxShadow: "0 10px 24px rgba(0,0,0,0.35)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 10,
+                textAlign: "center",
+              }}
+            >
+              <div style={{ fontSize: 16, fontWeight: 800, color: P.ink, fontFamily, lineHeight: 1.25 }}>{shownLabel}</div>
+            </div>
+            {checkT > 0.01 && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: -10,
+                  top: -10,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  background: P.success,
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 18,
+                  fontWeight: 900,
+                  opacity: checkT,
+                }}
+              >
+                ✓
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
   );
 };
 
@@ -166,19 +213,65 @@ const RUNNER_LINES: LogLine[] = [
   { t: "04:06", text: "section 3 saved", tone: "success" },
 ];
 
-/**
- * b5 overlay — a top kicker and a bottom restatement fill the empty top/bottom thirds
- * RatioBars leaves bare while its own bars are still growing (measured 6/48 at the
- * beat's midpoint). Both appear early, well before that midpoint, and sit outside the
- * camera div like the ratioBars insert itself so they stay crisp.
- */
+/** b5 — the deck's final form: a 4x4 grid of 16 line-cards, 10 lit. Drawn only (gate 2). */
+const GCARD_W = 170;
+const GCARD_H = 105;
+const GGAP = 20;
+const GRID_X = (1280 - (4 * GCARD_W + 3 * GGAP)) / 2;
+const GRID_Y = 120;
+
+const LineGrid: React.FC<{ fps: number }> = ({ fps }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B5) return null;
+  return (
+    <>
+      {Array.from({ length: 16 }).map((_, i) => {
+        const row = Math.floor(i / 4);
+        const col = i % 4;
+        const x = GRID_X + col * (GCARD_W + GGAP);
+        const y = GRID_Y + row * (GCARD_H + GGAP);
+        const appearAt = B5 + 6 + i * 8;
+        const p = tween(sec(frame, appearAt, fps), 0, 0.3, ease.power3Out);
+        if (p <= 0.001) return null;
+        const hit = i < 10;
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: x,
+              top: y + (1 - p) * 16,
+              width: GCARD_W,
+              height: GCARD_H,
+              opacity: p,
+              background: hit ? P.successBg : P.card,
+              border: `2px solid ${hit ? P.success : P.border}`,
+              borderRadius: 8,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 30,
+              fontWeight: 900,
+              color: hit ? P.success : P.muted,
+              fontFamily,
+            }}
+          >
+            {hit ? "✓" : "—"}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
 const ResultHeadline: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
   if (frame < B5) return null;
   const t = tween(sec(frame, B5 + 6, 30), 0, 0.4, ease.power3Out);
   return (
-    <div style={{ position: "absolute", left: 140, top: 70, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
+    <div style={{ position: "absolute", left: 140, top: 50, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
       <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>THE RESULT</div>
     </div>
   );
@@ -186,11 +279,12 @@ const ResultHeadline: React.FC = () => {
 
 const ResultCaption: React.FC = () => {
   const frame = useCurrentFrame();
+  const P = usePalette();
   if (frame < B5) return null;
   const t = tween(sec(frame, B5 + 16, 30), 0, 0.4, ease.power3Out);
   return (
-    <div style={{ position: "absolute", left: 140, bottom: 64, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
-      <div style={{ fontSize: 22, fontWeight: 700, color: "#F3E9DC" }}>
+    <div style={{ position: "absolute", left: 140, top: 640, width: 1000, textAlign: "center", opacity: t, fontFamily }}>
+      <div style={{ fontSize: 22, fontWeight: 700, color: P.ink }}>
         That target word now shows up in at least 10 of every 16 lines
       </div>
     </div>
@@ -200,109 +294,96 @@ const ResultCaption: React.FC = () => {
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const cam = useCamera(frame, fps);
 
   return (
     <AbsoluteFill style={{ background: STAGE, fontFamily }}>
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          transform: `scale(${cam.zoom})`,
-          transformOrigin: `${cam.ox}% ${cam.oy}%`,
+      {/* b1 — the human problem: a pile of identical cards, same point repeated */}
+      {cut(frame, B1, B2) === 1 && (
+        <LiveWindow file={shotsFile} shot="page" title="vitalii.no/features" from={B1} hold={B2 - B1} opacity={1} win={PROOF_WIN} />
+      )}
+      <MotionInsert
+        effect="titleTakeover"
+        from={B1}
+        dur={B2 - B1}
+        accent={ACCENT}
+        data={{ title: "Same Point, Repeated", kicker: "Every section repeated the same point" }}
+      />
+
+      {/* b2 — the fix: the deck fans into distinct angles, one tech gloss on the frame */}
+      {cut(frame, B2, B3) === 1 && (
+        <LiveWindow file={shotsFile} shot="page2" title="vitalii.no/features" from={B2} hold={B3 - B2} opacity={1} win={PROOF_WIN} />
+      )}
+      <MotionInsert
+        effect="pipelineFlow"
+        from={B2}
+        dur={B3 - B2}
+        accent={ACCENT}
+        plate={0.7}
+        data={{
+          steps: ["List distinct angles", "Assign one per section", "Write that angle only"],
+          result: "No angle repeats",
+          system: "Coverage plan = angles outlined like chapters",
         }}
-      >
-        {/* b1 — the human problem, over the feature's own page */}
-        {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
-        <MotionInsert
-          effect="titleTakeover"
-          from={B1}
-          dur={B2 - B1}
-          accent={ACCENT}
-          data={{
-            title: "Same Point, Repeated",
-            kicker: "Every section repeated the same point",
-          }}
-        />
+      />
+      <TopRibbon text="COVERAGE PLAN: ONE ANGLE PER SECTION" from={B2} dur={B3 - B2} />
 
-        {/* b2 — the fix: a coverage plan of distinct angles, one tech gloss on the frame */}
-        {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
-        <MotionInsert
-          effect="pipelineFlow"
-          from={B2}
-          dur={B3 - B2}
-          accent={ACCENT}
-          plate={0.7}
-          data={{
-            steps: ["List distinct angles", "Assign one per section", "Write that angle only"],
-            result: "No angle repeats",
-            system: "Coverage plan = angles outlined like chapters",
-          }}
-        />
-        <CoverageGloss />
-        <CoverageResult />
+      {/* b3 — every earlier section is read back first, each card checked in turn */}
+      {cut(frame, B3, B4) === 1 && (
+        <LiveWindow file={shotsFile} shot="hub" title="vitalii.no/features" from={B3} hold={B4 - B3} opacity={1} win={PROOF_WIN} />
+      )}
+      <MotionInsert
+        effect="funnelAbsorption"
+        from={B3}
+        dur={B4 - B3}
+        accent={ACCENT}
+        plate={0.7}
+        data={{ inputs: ["Section 1", "Section 2", "Section 3"], result: "No sentence repeats" }}
+      />
+      <TopRibbon text="READ-BACK CHECK: NO REPEATED SENTENCES" from={B3} dur={B4 - B3} />
 
-        {/* b3 — every earlier section is read back first, so nothing repeats */}
-        {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B3} hold={B4 - B3} />}
-        <MotionInsert
-          effect="funnelAbsorption"
-          from={B3}
-          dur={B4 - B3}
-          accent={ACCENT}
-          plate={0.7}
-          data={{
-            inputs: ["Section 1", "Section 2", "Section 3"],
-            result: "No sentence repeats",
-          }}
-        />
-
-        {/* b4 — the self-check and automatic rewrite, with the product's own run shown live */}
-        {cut(frame, B4, B5) === 1 && (
-          <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} focus={{ x: 0.6, y: 0.4 }} />
-        )}
-        <MotionInsert
-          effect="handoffExplain"
+      {/* b4 — the self-check and automatic rewrite; one card flips, the runner shown live */}
+      {cut(frame, B4, B5) === 1 && (
+        <LiveWindow
+          file={shotsFile}
+          shot="hub"
+          title="vitalii.no/features"
           from={B4}
-          dur={B5 - B4}
-          accent={ACCENT}
-          plate={0.7}
-          data={{
-            from: "First draft of a section",
-            to: "Automatic rewrite if thin",
-            points: ["Checks target-word count", "Rewrites if below target", "Section stays strong"],
-          }}
+          hold={B5 - B4}
+          focus={{ x: 0.6, y: 0.4 }}
+          opacity={1}
+          win={PROOF_WIN}
         />
+      )}
+      <MotionInsert
+        effect="handoffExplain"
+        from={B4}
+        dur={B5 - B4}
+        accent={ACCENT}
+        plate={0.7}
+        data={{
+          from: "First draft of a section",
+          to: "Automatic rewrite if thin",
+          points: ["Checks target-word count", "Rewrites if below target", "Section stays strong"],
+        }}
+      />
+      <TopRibbon text="SELF-CHECK: REWRITE IF A SECTION RUNS THIN" from={B4} dur={B5 - B4} />
+      {cut(frame, B4, B5) === 1 && (
         <LogWindow
           lines={RUNNER_LINES}
           title="lesson-runner"
           from={B4 + 10}
           every={18}
-          opacity={cut(frame, B4, B5)}
-        />
-      </div>
-
-      {/* b5 — the result, drawn only (no live page, gate 2), holds to the final frame.
-          Sits outside the camera div (like ProductPlate): by b5 the push-in has reached
-          1.38x, and ratioBars' bars+labels already span nearly the full 1280px width at
-          1x, so that zoom pushed the label starts off both edges — measured fill at the
-          midpoint was 7/48 with "Lines with..." and "Total lines..." clipped to "...th
-          target word" / "...es per section". The finale reads crisper unzoomed anyway.
-          ResultHeadline/ResultCaption fill the top/bottom thirds RatioBars' own internal
-          pacing (bars grow, bracket, ratio badge) hasn't reached yet at the midpoint. */}
-      {frame >= B5 && (
-        <MotionInsert
-          effect="ratioBars"
-          from={B5}
-          dur={END - B5}
-          accent={ACCENT}
-          base={STAGE}
-          data={{
-            a: { label: "Lines with target word", value: 10 },
-            b: { label: "Total lines per section", value: 16 },
-            unit: "lines",
-          }}
+          opacity={1}
+          win={{ x: 40, y: 420, w: 460, h: 260 }}
+          fontSize={20}
         />
       )}
+
+      {/* the archetype: 4 cards, pile → fan → checked → flip, b1 through b4 */}
+      <AngleDeck fps={fps} />
+
+      {/* b5 — the deck's final form, drawn only (gate 2), holds to the final frame */}
+      <LineGrid fps={fps} />
       <ResultHeadline />
       <ResultCaption />
 
@@ -312,7 +393,7 @@ const Inner: React.FC = () => {
 };
 
 export const FeatureTopicLessonsFollowCoverageM23: React.FC = () => (
-  <PaletteProvider value={MOODS.slate}>
+  <PaletteProvider value={MOODS.dawn}>
     <Inner />
   </PaletteProvider>
 );

@@ -235,6 +235,8 @@ import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/Featu
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
 import { FeatureOneButtonShutsYoutubeB73 } from "./compositions/feature-demos/FeatureOneButtonShutsYoutubeB73";
 import { FeatureKidReflashedTvAppB72 } from "./compositions/feature-demos/FeatureKidReflashedTvAppB72";
+import { FeatureSugarHubCanFixD15 } from "./compositions/feature-demos/FeatureSugarHubCanFixD15";
+import { FeatureNewSugarHubFinallyD14 } from "./compositions/feature-demos/FeatureNewSugarHubFinallyD14";
 import { FeatureTechnicalAlarmsGoTheirP81 } from "./compositions/feature-demos/FeatureTechnicalAlarmsGoTheirP81";
 import { FeatureBlogNewsRewritesRunP80 } from "./compositions/feature-demos/FeatureBlogNewsRewritesRunP80";
 import { FeatureAnyPhoneBecomesDrawingB57 } from "./compositions/feature-demos/FeatureAnyPhoneBecomesDrawingB57";
@@ -2781,6 +2783,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureKidReflashedTvAppB72"
         component={FeatureKidReflashedTvAppB72}
         durationInFrames={920}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureSugarHubCanFixD15"
+        component={FeatureSugarHubCanFixD15}
+        durationInFrames={936}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNewSugarHubFinallyD14"
+        component={FeatureNewSugarHubFinallyD14}
+        durationInFrames={972}
         fps={30}
         width={1280}
         height={720}

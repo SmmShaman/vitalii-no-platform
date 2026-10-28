@@ -1,0 +1,35 @@
+{
+  "id": "d14",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "wide",
+      "url": "https://vitalii.no/features/a-new-sugar-hub-finally-lets-other-apps-see-artems-real-carelink-glucose-d14",
+      "frames": 169,
+      "scroll": [[0, 0], [168, 30]],
+      "mouse": [[0, 450, 160], [80, 560, 210], [168, 500, 190]]
+    },
+    {
+      "name": "problem",
+      "url": "https://vitalii.no/features/a-new-sugar-hub-finally-lets-other-apps-see-artems-real-carelink-glucose-d14",
+      "frames": 175,
+      "scroll": [[0, 380], [174, 430]],
+      "mouse": [[0, 480, 220], [90, 540, 200], [174, 500, 210]]
+    },
+    {
+      "name": "build",
+      "url": "https://vitalii.no/features/a-new-sugar-hub-finally-lets-other-apps-see-artems-real-carelink-glucose-d14",
+      "frames": 190,
+      "scroll": [[0, 640], [189, 690]],
+      "mouse": [[0, 470, 230], [100, 560, 215], [189, 510, 205]]
+    },
+    {
+      "name": "feed",
+      "url": "https://vitalii.no/features/a-new-sugar-hub-finally-lets-other-apps-see-artems-real-carelink-glucose-d14",
+      "frames": 192,
+      "scroll": [[0, 760], [191, 810]],
+      "mouse": [[0, 460, 225], [100, 540, 210], [191, 500, 200]]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "d14",
+  "composition": "FeatureNewSugarHubFinallyD14",
+  "beats": [
+    {"beat": "b1", "effect": "titleTakeover", "backdrop": "wide",
+     "data": {"title": "A feed trapped in one app",
+               "kicker": "Diabet — tools built for my son Artem"}},
+    {"beat": "b2", "effect": "statusFocus", "backdrop": "problem",
+     "data": {"title": "Who could see Artem's sugar?",
+               "claims": [
+                 {"text": "CareLink's own app", "verdict": "yes"},
+                 {"text": "The family kiosk", "verdict": "no"},
+                 {"text": "A future alert", "verdict": "no"}
+               ]}},
+    {"beat": "b3", "effect": "pipelineFlow", "backdrop": "build",
+     "data": {"steps": ["Poll CareLink on schedule", "Cache the reading", "Back off on failure"],
+               "result": "No hammering CareLink's API"}},
+    {"beat": "b4", "effect": "handoffExplain", "backdrop": "feed",
+     "data": {"fromLabel": "BEFORE", "toLabel": "NOW",
+               "from": "Locked inside one app",
+               "to": "Read-only feed, any app can call",
+               "points": ["Even a kiosk badge can call it", "No admin access needed"]}},
+    {"beat": "b5", "effect": "drawn",
+     "note": "archetype closes on the fix running: dark LogWindow for bridge/sugar_hub.py, ending on the four numbers (value, trend, level, age)"}
+  ]
+}

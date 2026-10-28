@@ -1,0 +1,21 @@
+{
+  "id": "d15",
+  "composition": "FeatureSugarHubCanFixD15",
+  "beats": [
+    {"beat": "b1", "effect": "titleTakeover", "backdrop": "wide",
+     "data": {"title": "A feed that died, silently",
+               "kicker": "Diabet — tools built for my son Artem"}},
+    {"beat": "b2", "effect": "cornerTags", "backdrop": "problem",
+     "data": {"statement": "A failed login refresh could corrupt the session",
+               "tags": ["No warning sent", "Fix: log in by hand", "Risk: feed gone for good", "No alert"]}},
+    {"beat": "b3", "effect": "handoffExplain", "backdrop": "fix",
+     "data": {"fromLabel": "BEFORE", "toLabel": "NOW",
+               "from": "Direct overwrite",
+               "to": "Temp file, then safe rename",
+               "points": ["A failed write can't corrupt it", "Old token kept until the swap"]}},
+    {"beat": "b4", "effect": "copyCorrection",
+     "data": {"wrong": "Broken, and no one told", "right": "Telegram alert, the moment it fails", "label": "NOW"}},
+    {"beat": "b5", "effect": "drawn",
+     "note": "archetype closes on the fix running: dark LogWindow for bridge/relogin.sh, ending on 'one command'"}
+  ]
+}
