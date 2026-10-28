@@ -1,0 +1,7 @@
+{"id": "d14", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Artem's blood sugar lived only inside one app on his phone — nothing else could see it."],
+  ["b2", "Not the family kiosk, not a future alert — nothing outside that app could reach the number."],
+  ["b3", "Now a systemd service polls the reading on a schedule, backing off instead of hammering the server."],
+  ["b4", "It opens a read-only feed any authorized app can call — even one scoped to a single device."],
+  ["b5", "That feed now reports four numbers every time: value, trend, level, and age."]
+]}

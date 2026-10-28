@@ -1,0 +1,57 @@
+{
+ "id": "d15",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.6,
+  "b2": 5.035,
+  "b3": 5.745,
+  "b4": 5.766,
+  "b5": 4.853
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "When Artem's glucose feed quietly died, nobody noticed \u2014 fixing it meant logging into the server by hand.",
+   "start_s": 0.5,
+   "end_s": 7.1,
+   "start_f": 15,
+   "end_f": 213
+  },
+  {
+   "beat": "b2",
+   "text": "Worse: a failed login refresh could corrupt the saved session for good.",
+   "start_s": 7.4,
+   "end_s": 12.435,
+   "start_f": 222,
+   "end_f": 373
+  },
+  {
+   "beat": "b3",
+   "text": "Now the refresh writes safely to a temp file first, so a failed attempt can't corrupt it.",
+   "start_s": 12.735,
+   "end_s": 18.48,
+   "start_f": 382,
+   "end_f": 554
+  },
+  {
+   "beat": "b4",
+   "text": "The moment a refresh fails, Telegram sends an alert instead of staying silently broken.",
+   "start_s": 18.78,
+   "end_s": 24.546,
+   "start_f": 563,
+   "end_f": 736
+  },
+  {
+   "beat": "b5",
+   "text": "Reviving a dead login used to mean doing it by hand. Now it's one command.",
+   "start_s": 24.846,
+   "end_s": 29.699,
+   "start_f": 745,
+   "end_f": 891
+  }
+ ],
+ "total_s": 31.199,
+ "durationInFrames": 936,
+ "measured_track_s": 29.76,
+ "track": "/root/feature-demos/vo-d15/vo-d15.mp3"
+}

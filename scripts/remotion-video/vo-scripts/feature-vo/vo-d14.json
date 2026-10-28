@@ -1,0 +1,57 @@
+{
+ "id": "d14",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.321,
+  "b2": 5.556,
+  "b3": 6.022,
+  "b4": 6.106,
+  "b5": 6.211
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Artem's blood sugar lived only inside one app on his phone \u2014 nothing else could see it.",
+   "start_s": 0.5,
+   "end_s": 5.821,
+   "start_f": 15,
+   "end_f": 175
+  },
+  {
+   "beat": "b2",
+   "text": "Not the family kiosk, not a future alert \u2014 nothing outside that app could reach the number.",
+   "start_s": 6.121,
+   "end_s": 11.677,
+   "start_f": 184,
+   "end_f": 350
+  },
+  {
+   "beat": "b3",
+   "text": "Now a systemd service polls the reading on a schedule, backing off instead of hammering the server.",
+   "start_s": 11.977,
+   "end_s": 17.999,
+   "start_f": 359,
+   "end_f": 540
+  },
+  {
+   "beat": "b4",
+   "text": "It opens a read-only feed any authorized app can call \u2014 even one scoped to a single device.",
+   "start_s": 18.299,
+   "end_s": 24.405,
+   "start_f": 549,
+   "end_f": 732
+  },
+  {
+   "beat": "b5",
+   "text": "That feed now reports four numbers every time: value, trend, level, and age.",
+   "start_s": 24.705,
+   "end_s": 30.916,
+   "start_f": 741,
+   "end_f": 927
+  }
+ ],
+ "total_s": 32.416,
+ "durationInFrames": 972,
+ "measured_track_s": 30.984,
+ "track": "/root/feature-demos/vo-d14/vo-d14.mp3"
+}

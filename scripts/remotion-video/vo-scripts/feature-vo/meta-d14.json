@@ -1,0 +1,7 @@
+{
+  "id": "d14",
+  "file": "yt-feature-d14.mp4",
+  "title": "One App Had Artem's Glucose. Now Any App Can | vitalii.no",
+  "description": "Artem's real glucose readings lived only inside the CareLink app on his own device. Any other tool that wanted to show his sugar — the family kiosk, a future alert, anything — had no way to get at that data at all.\n\nbridge/sugar_hub.py now runs as its own systemd service (bridge/sugar-hub.service), logging into CareLink and polling it on a schedule, then exposing a small read-only endpoint returning value, arrow, level and age as JSON. A kiosk-scoped route lets a specific consumer, like the Boytasks badge, pull just that data, and the polling loop backs off automatically instead of hammering CareLink's servers on every failed check.\n\nArtem's glucose is now available as a live, polled JSON feed carrying four data points — value, trend arrow, level and age — to any authorized consumer on the network, where before it existed only inside his own app with no way out.\n\n🔗 Full write-up: https://vitalii.no/features/a-new-sugar-hub-finally-lets-other-apps-see-artems-real-carelink-glucose-d14\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#automation #python #systemd #api #iot",
+  "tags": ["systemd services", "json api", "health data", "glucose monitoring", "carelink api", "read only endpoints", "rate limiting", "python automation", "home automation", "data sharing", "backoff strategy", "vitalii berbeha"]
+}

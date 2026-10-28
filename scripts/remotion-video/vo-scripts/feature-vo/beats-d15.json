@@ -1,0 +1,7 @@
+{"id": "d15", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "When Artem's glucose feed quietly died, nobody noticed — fixing it meant logging into the server by hand."],
+  ["b2", "Worse: a failed login refresh could corrupt the saved session for good."],
+  ["b3", "Now the refresh writes safely to a temp file first, so a failed attempt can't corrupt it."],
+  ["b4", "The moment a refresh fails, Telegram sends an alert instead of staying silently broken."],
+  ["b5", "Reviving a dead login used to mean doing it by hand. Now it's one command."]
+]}
