@@ -50,7 +50,7 @@ const STAGE = "#10182B";
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-const PROOF_WIN = { x: 760, y: 420, w: 460, h: 260 };
+const PROOF_WIN = { x: 740, y: 430, w: 460, h: 270 };
 
 /** b1 — names the product in one plain line. */
 const ProductPlate: React.FC = () => {
@@ -115,10 +115,10 @@ const TopRibbon: React.FC<{ text: string; from: number; dur: number }> = ({ text
 };
 
 /** The archetype itself: 4 cards, pile → fan → checked → one flips. b1 through b4. */
-const CARD_W = 170;
-const CARD_H = 110;
-const FAN_X = [264, 458, 652, 846];
-const FAN_Y = 260;
+const CARD_W = 210;
+const CARD_H = 190;
+const FAN_X = [55, 375, 695, 1015];
+const FAN_Y = 230;
 const FAN_LABELS = ["Morning routine", "Ordering food", "Travel & transit", "Work & study"];
 
 const AngleDeck: React.FC<{ fps: number }> = ({ fps }) => {
@@ -172,23 +172,23 @@ const AngleDeck: React.FC<{ fps: number }> = ({ fps }) => {
                 textAlign: "center",
               }}
             >
-              <div style={{ fontSize: 16, fontWeight: 800, color: P.ink, fontFamily, lineHeight: 1.25 }}>{shownLabel}</div>
+              <div style={{ fontSize: 20, fontWeight: 800, color: P.ink, fontFamily, lineHeight: 1.3 }}>{shownLabel}</div>
             </div>
             {checkT > 0.01 && (
               <div
                 style={{
                   position: "absolute",
-                  right: -10,
-                  top: -10,
-                  width: 30,
-                  height: 30,
-                  borderRadius: 15,
+                  right: -12,
+                  top: -12,
+                  width: 38,
+                  height: 38,
+                  borderRadius: 19,
                   background: P.success,
                   color: "#fff",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: 18,
+                  fontSize: 22,
                   fontWeight: 900,
                   opacity: checkT,
                 }}
@@ -214,11 +214,11 @@ const RUNNER_LINES: LogLine[] = [
 ];
 
 /** b5 — the deck's final form: a 4x4 grid of 16 line-cards, 10 lit. Drawn only (gate 2). */
-const GCARD_W = 170;
-const GCARD_H = 105;
-const GGAP = 20;
+const GCARD_W = 235;
+const GCARD_H = 100;
+const GGAP = 36;
 const GRID_X = (1280 - (4 * GCARD_W + 3 * GGAP)) / 2;
-const GRID_Y = 120;
+const GRID_Y = 130;
 
 const LineGrid: React.FC<{ fps: number }> = ({ fps }) => {
   const frame = useCurrentFrame();
@@ -231,7 +231,7 @@ const LineGrid: React.FC<{ fps: number }> = ({ fps }) => {
         const col = i % 4;
         const x = GRID_X + col * (GCARD_W + GGAP);
         const y = GRID_Y + row * (GCARD_H + GGAP);
-        const appearAt = B5 + 6 + i * 8;
+        const appearAt = B5 + 4 + i * 5;
         const p = tween(sec(frame, appearAt, fps), 0, 0.3, ease.power3Out);
         if (p <= 0.001) return null;
         const hit = i < 10;
