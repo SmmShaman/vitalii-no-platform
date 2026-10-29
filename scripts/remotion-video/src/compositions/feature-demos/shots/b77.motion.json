@@ -48,7 +48,8 @@
       "effect": "pipelineFlow",
       "data": {
         "steps": ["White = in range", "Red = low", "Yellow = high"],
-        "result": "Room reads his day at a glance"
+        "result": "Room reads his day at a glance",
+        "system": "KioskFrame.tsx"
       }
     },
     {

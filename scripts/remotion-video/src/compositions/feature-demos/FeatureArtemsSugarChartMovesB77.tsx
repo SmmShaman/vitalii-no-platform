@@ -22,13 +22,24 @@
 //             lands, order finally gets half the frame.
 // b4 500-688  "white = in range, red = low, yellow = high — the room reads his day at a
 //             glance" — pipelineFlow over the result paragraph (shot "result"). Divider
-//             continues to 260px: order now dominates.
+//             continues to 260px: order now dominates. data.system is set explicitly
+//             ("KioskFrame.tsx") — PipelineFlow falls back to a hard-coded Norwegian
+//             "Prosessen" title when system is omitted, which a WAVE D blind viewer caught.
 // b5 688-868  "four redesigns in one evening, before the shape finally felt right" — breaks
 //             the pattern on purpose (gate: last beat is never the feature page or the hub):
 //             no runtime log exists for a kiosk display, so the terminal log is drawn from
 //             the feature's own commit history (number-only -> full chart under calendar ->
 //             line over the camera photo -> hours/limit values + sharper separators). The
-//             divider resolves to 0 at the same moment — order wins the whole frame.
+//             divider resolves to 0 at the same moment — order wins the whole frame. A border
+//             pulse starts once the log finishes revealing (B5+140) so the last ~1.3s keeps
+//             moving instead of holding one static frame (WAVE D blind viewer: "three
+//             near-identical frames" at the end).
+//
+// WAVE D fix (same day): plate raised 0.66/0.7 -> 0.82-0.85 on b1-b4 so the live page's own
+// background prose (sugarCameraLine(), KioskFrame.tsx, Cloudflare Worker gateway, daily
+// request budget) stops competing with the drawn captions, and so b1's live page headline
+// ("...Onto the Camera Picture Itself") no longer reveals the fix while the line is still
+// describing the old problem.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -212,6 +223,7 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
+        plate={0.85}
         data={{
           line1: "The room's TV showed just his number",
           line2: "not whether it had moved all day",
@@ -238,7 +250,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.82}
         data={{
           statement: "A first chart ate the whole screen",
           tags: ["Full calendar strip", "Hard to read", "Screen gone", "Try again"],
@@ -263,7 +275,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.82}
         data={{
           fromLabel: "BEFORE",
           toLabel: "NOW",
@@ -295,9 +307,11 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
+        plate={0.85}
         data={{
           steps: ["White = in range", "Red = low", "Yellow = high"],
           result: "Room reads his day at a glance",
+          system: "KioskFrame.tsx",
         }}
       />
 
@@ -328,11 +342,29 @@ const Inner: React.FC = () => {
             lines={resultLines}
             title="KioskFrame.tsx"
             from={B5 + 14}
-            every={16}
+            every={20}
             opacity={1}
             win={{ x: 110, y: 130, w: 1060, h: 430 }}
             fontSize={24}
           />
+          {/* once the last log line has landed (B5+140), pulse the window's border so the
+              final ~1.3s of the beat keeps moving instead of sitting on a static frame — the
+              closest frame to a blind viewer's "three near-identical frames" complaint. */}
+          {frame >= B5 + 140 && (
+            <div
+              style={{
+                position: "absolute",
+                left: 106,
+                top: 126,
+                width: 1068,
+                height: 438,
+                borderRadius: 10,
+                border: `2px solid ${ACCENT}`,
+                opacity: 0.35 + 0.25 * Math.sin((frame - (B5 + 140)) / 8),
+                pointerEvents: "none",
+              }}
+            />
+          )}
         </>
       )}
       <SplitDuel />
