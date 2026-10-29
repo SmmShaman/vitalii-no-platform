@@ -1,0 +1,7 @@
+{"id": "d16", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "The kiosk screen could only show one number — never whether it was climbing or falling."],
+ ["b2", "That limit was built into the system — the display was walled off from history entirely."],
+ ["b3", "I found the wall inside the API and moved it — kiosk screens could finally look backward."],
+ ["b4", "Every reading from the last day now shows up as a trend, not a snapshot."],
+ ["b5", "One dot became a full day: the kiosk now sees 24 hours of history."]
+]}

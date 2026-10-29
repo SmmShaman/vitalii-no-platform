@@ -1,0 +1,57 @@
+{
+ "id": "b77",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.703,
+  "b2": 4.359,
+  "b3": 4.203,
+  "b4": 5.952,
+  "b5": 4.511
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Artem's sugar trend lived only in his CareLink app \u2014 the room's TV showed just his number, not whether it moved.",
+   "start_s": 0.5,
+   "end_s": 7.203,
+   "start_f": 15,
+   "end_f": 216
+  },
+  {
+   "beat": "b2",
+   "text": "A first fix crammed a full chart under the calendar and it ate the screen.",
+   "start_s": 7.503,
+   "end_s": 11.862,
+   "start_f": 225,
+   "end_f": 356
+  },
+  {
+   "beat": "b3",
+   "text": "I redrew the line across the bottom of his own camera photo instead.",
+   "start_s": 12.162,
+   "end_s": 16.365,
+   "start_f": 365,
+   "end_f": 491
+  },
+  {
+   "beat": "b4",
+   "text": "White means in range, red low, yellow high \u2014 the room reads his day at a glance.",
+   "start_s": 16.665,
+   "end_s": 22.617,
+   "start_f": 500,
+   "end_f": 679
+  },
+  {
+   "beat": "b5",
+   "text": "Four redesigns in one evening, before the shape finally felt right.",
+   "start_s": 22.917,
+   "end_s": 27.428,
+   "start_f": 688,
+   "end_f": 823
+  }
+ ],
+ "total_s": 28.928,
+ "durationInFrames": 868,
+ "measured_track_s": 27.48,
+ "track": "/root/feature-demos/vo-b77/vo-b77.mp3"
+}
