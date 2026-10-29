@@ -24,6 +24,8 @@
 // b3 324-517  "so phone and TV now talk directly, over WebRTC — like a wire across the room" —
 //             pipelineFlow: capture -> WebRTC link -> mirror, over the page's fix section
 //             (backdrop "fix"). The one tech name of the clip, with its gloss on the frame.
+//             A wipe-in headline fills the empty band above the chain and restates step 1
+//             (its card sits under the sidebar column, x<320 — pipelineFlow has no sidebar offset).
 // b4 517-678  "every stroke streams live, with a backup relay if the link drops" —
 //             handoffExplain: direct link -> server relay, over the page's result section
 //             (backdrop "result").
@@ -211,8 +213,32 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — how the fix works; the one tech name of the clip, with its gloss */}
+      {/* b3 — how the fix works; the one tech name of the clip, with its gloss.
+          Top wipe-in caption fills the empty band above pipelineFlow's chain AND
+          restates step 1 ("Phone captures stroke"), whose card sits at x<320 and
+          is hidden under Sidebar — pipelineFlow has no sidebar-offset. */}
       {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="fix" from={B3} hold={B4 - B3} />}
+      <Arrive at={B3 + 3} kind="wipe" box={{ x: 320, y: 40, w: 960, h: 86 }} dur={0.4}>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(8,8,8,0.88)",
+            color: "#fff",
+            fontFamily,
+            fontWeight: 800,
+            fontSize: 32,
+            letterSpacing: 0.2,
+            textAlign: "center",
+            padding: "0 32px",
+          }}
+        >
+          Phone and TV now talk directly — like a wire across the room
+        </div>
+      </Arrive>
       <MotionInsert
         effect="pipelineFlow"
         from={B3}

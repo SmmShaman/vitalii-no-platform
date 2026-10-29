@@ -17,16 +17,17 @@
 // b4 530-678  "every reading ... shows up as a trend" — pipelineFlow over the result
 //             paragraph (shot "result"). TREND node lights up here.
 // b5 678-883  "one dot became a full day" — breaks the pattern on purpose (gate: last beat
-//             is never the feature page or the hub): ratioBars draws the clamp itself,
-//             single reading (1h) vs full day (24h) — the feature's own before/after facts,
-//             no invented numbers. STAMP lands "24h" in the flow map at the same moment, the
-//             two endings read as one result instead of two.
+//             is never the feature page or the hub): a wipe-in headline over the empty top
+//             band, then ratioBars draws the clamp itself, single reading (1h) vs full day
+//             (24h) — the feature's own before/after facts, no invented numbers. STAMP lands
+//             "24h" in the flow map at the same moment, the two endings read as one result
+//             instead of two.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { MotionInsert, cut } from "./motion-primitives";
+import { MotionInsert, Arrive, cut } from "./motion-primitives";
 import { tween, ease, mix } from "../../components/effects/motion/grammar";
 import { LiveShot, recSize } from "./live-primitives";
 import shotsFile from "./shots/d16.json";
@@ -346,6 +347,26 @@ const Inner: React.FC = () => {
       />
 
       {/* b5 — one dot became a full day (never the feature page or the hub) */}
+      <Arrive at={B5 + 2} kind="wipe" box={{ x: 0, y: 40, w: 1280, h: 92 }} dur={0.4}>
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: "rgba(8,8,8,0.7)",
+            color: "#fff",
+            fontFamily,
+            fontWeight: 800,
+            fontSize: 40,
+            letterSpacing: 0.2,
+            textAlign: "center",
+          }}
+        >
+          One dot became a full day
+        </div>
+      </Arrive>
       <MotionInsert
         effect="ratioBars"
         from={B5}
