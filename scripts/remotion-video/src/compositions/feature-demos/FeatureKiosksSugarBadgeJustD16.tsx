@@ -12,10 +12,17 @@
 // b2 180-351  "walled off from history entirely" — keywordCaption over the problem paragraph
 //             (shot "problem"), the word "rejected" picked out.
 // b3 351-530  "found the wall inside the API and moved it" — handoffExplain over the fix
-//             paragraph (shot "fix"); one point glosses "API" in plain words. HISTORY flips
+//             paragraph (shot "fix"); this is the beat whose sentence the commit 0fcd5f0
+//             ("kiosk tokens may read the last 24h of history", bridge/sugar_hub.py) proves —
+//             no public commit page exists for this repo, so the fallback is a drawn schematic
+//             naming the real file; one point glosses "API" in plain words. HISTORY flips
 //             red -> green here.
 // b4 530-678  "every reading ... shows up as a trend" — pipelineFlow over the result
-//             paragraph (shot "result"). TREND node lights up here.
+//             paragraph (shot "result"). TREND node lights up here. data.system is set
+//             explicitly ("sugar_hub.py") — PipelineFlow falls back to a hard-coded Norwegian
+//             "Prosessen" title when system is omitted, which a WAVE D1 blind viewer caught.
+// Plate raised to 0.8-0.82 on b1-b4 (was 0.66-0.7) so the live page's own background text
+// never competes with the drawn captions — same fix as b57 (WAVE D1 viewer verdict).
 // b5 678-883  "one dot became a full day" — breaks the pattern on purpose (gate: last beat
 //             is never the feature page or the hub): a wipe-in headline over the empty top
 //             band, then ratioBars draws the clamp itself, single reading (1h) vs full day
@@ -257,7 +264,7 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.8}
         data={{
           statement: "The kiosk screen could only ever show one number",
           tags: ["No history", "No trend", "Just now", "One dot"],
@@ -283,6 +290,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
+        plate={0.82}
         data={{
           line1: "The history route rejected every kiosk-scoped request outright",
           line2: "The kiosk only ever saw a single reading, never a trend",
@@ -308,7 +316,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.82}
         data={{
           fromLabel: "BEFORE",
           toLabel: "NOW",
@@ -316,8 +324,8 @@ const Inner: React.FC = () => {
           to: "History route resolves first, clamped to 24h",
           points: [
             "Reorder the route checks in the API",
-            "API = bridge/sugar_hub.py's request handler",
-            "Kiosk tokens capped at 24h, not refused",
+            "API = the code that decides what the kiosk is allowed to see",
+            "File: bridge/sugar_hub.py — kiosk tokens capped at 24h, not refused",
           ],
         }}
       />
@@ -340,9 +348,11 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
+        plate={0.82}
         data={{
           steps: ["Every 5-min reading", "History route", "Clamped to 24h"],
           result: "Trend, not snapshot",
+          system: "sugar_hub.py",
         }}
       />
 

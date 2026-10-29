@@ -36,8 +36,8 @@
         "to": "History route resolves first, clamped to 24h",
         "points": [
           "Reorder the route checks in the API",
-          "API = bridge/sugar_hub.py's request handler",
-          "Kiosk tokens capped at 24h, not refused"
+          "API = the code that decides what the kiosk is allowed to see",
+          "File: bridge/sugar_hub.py — kiosk tokens capped at 24h, not refused"
         ]
       }
     },
@@ -48,7 +48,8 @@
       "effect": "pipelineFlow",
       "data": {
         "steps": ["Every 5-min reading", "History route", "Clamped to 24h"],
-        "result": "Trend, not snapshot"
+        "result": "Trend, not snapshot",
+        "system": "sugar_hub.py"
       }
     },
     {
