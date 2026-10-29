@@ -1,0 +1,67 @@
+{
+  "id": "d16",
+  "archetype": "4 flow-map",
+  "mood": "mint",
+  "beats": [
+    {
+      "id": "b1",
+      "frames": [15, 180],
+      "shot": "wide",
+      "effect": "cornerTags",
+      "data": {
+        "statement": "The kiosk screen could only ever show one number",
+        "tags": ["No history", "No trend", "Just now", "One dot"]
+      }
+    },
+    {
+      "id": "b2",
+      "frames": [180, 351],
+      "shot": "problem",
+      "effect": "keywordCaption",
+      "data": {
+        "line1": "The history route rejected every kiosk-scoped request outright",
+        "line2": "The kiosk only ever saw a single reading, never a trend",
+        "keywords": ["rejected"]
+      }
+    },
+    {
+      "id": "b3",
+      "frames": [351, 530],
+      "shot": "fix",
+      "effect": "handoffExplain",
+      "data": {
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "from": "History route: reject kiosk tokens",
+        "to": "History route resolves first, clamped to 24h",
+        "points": [
+          "Reorder the route checks in the API",
+          "API = bridge/sugar_hub.py's request handler",
+          "Kiosk tokens capped at 24h, not refused"
+        ]
+      }
+    },
+    {
+      "id": "b4",
+      "frames": [530, 678],
+      "shot": "result",
+      "effect": "pipelineFlow",
+      "data": {
+        "steps": ["Every 5-min reading", "History route", "Clamped to 24h"],
+        "result": "Trend, not snapshot"
+      }
+    },
+    {
+      "id": "b5",
+      "frames": [678, 883],
+      "shot": null,
+      "effect": "ratioBars",
+      "data": {
+        "title": "Kiosk history window",
+        "a": { "label": "Single reading", "value": 1 },
+        "b": { "label": "Full day", "value": 24 },
+        "unit": "h"
+      }
+    }
+  ]
+}

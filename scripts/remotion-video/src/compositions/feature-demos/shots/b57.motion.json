@@ -4,26 +4,27 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "titleTakeover",
-      "backdrop": "page",
+      "effect": "keywordCaption",
+      "backdrop": "top",
       "data": {
-        "title": "Stuck on a Tiny Screen",
-        "kicker": "Kids wanted a real drawing tablet, not a phone"
+        "line1": "My kids wanted to draw with a real tablet",
+        "line2": "not squint at a tiny phone screen",
+        "keywords": ["tablet"]
       }
     },
     {
       "beat": "b2",
       "effect": "cornerTags",
-      "backdrop": "page2",
+      "backdrop": "problem",
       "data": {
         "statement": "No link from phone to TV",
-        "tags": ["Tablet → phone only", "Pen stuck on phone", "TV in another room", "No live link"]
+        "tags": ["Tablet -> phone only", "Pen stuck on phone", "TV in another room", "No live link"]
       }
     },
     {
       "beat": "b3",
       "effect": "pipelineFlow",
-      "backdrop": "hub",
+      "backdrop": "fix",
       "data": {
         "steps": ["Phone captures stroke", "WebRTC links the TV", "Canvas mirrors live"],
         "result": "Draws appear instantly",
@@ -33,7 +34,7 @@
     {
       "beat": "b4",
       "effect": "handoffExplain",
-      "backdrop": "hub",
+      "backdrop": "result",
       "data": {
         "from": "Direct WebRTC link",
         "to": "Server relay takes over",
@@ -43,7 +44,7 @@
     {
       "beat": "b5",
       "effect": "drawn",
-      "note": "archetype sidebar + a drawn result panel: $30 tablet hero figure, 'real TV canvas' label, two delivered-feature chips (direct link / backup relay). No live page, per gate 2."
+      "note": "archetype sidebar + a drawn result panel: $30 tablet hero figure, 'real TV canvas' label, three delivered chips (direct link / backup relay / works with any phone) staggered through the full beat so the ending reads as alive, not frozen. No live page, per gate 2."
     }
   ]
 }

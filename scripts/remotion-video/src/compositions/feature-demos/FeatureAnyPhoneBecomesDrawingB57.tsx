@@ -1,24 +1,36 @@
 // FeatureAnyPhoneBecomesDrawingB57 — feature b57 — 1280x720, 873 frames @ 30fps, VOICE-SYNCED.
 // archetype 6 sidebar narrative, mood sand. Motion direction v2 (feature-motion skill, 2026-10-07).
+// RE-SHOOT (2026-10-29): narration/beat windows unchanged; picture rewritten after the
+// viewer verdict (waveD1-20261023-2300-b57.done) flagged unrelated-product text bleeding
+// through the "hub" backdrop and a frozen b5 ending.
 //
 // A fixed left column (0-320px) carries the product plate and a running claim that
-// updates once per beat; the big stage on the right is full-bleed MotionInsert/
-// LiveBackdrop, the way the digest stages its effects. The column is the only element
-// that survives every beat (archetype 6); the stage swaps content under it.
+// updates once per beat; the big stage on the right is full-bleed MotionInsert/LiveBackdrop.
+// The column is the only element that survives every beat (archetype 6); the stage swaps
+// content under it.
 //
-// Beat → effect (data only from the feature row and commit 6e708ac):
-// b1 15-170   "my kids wanted to draw with a real tablet, not squint at a tiny screen"
-//             titleTakeover over the feature's own page (backdrop "page").
-// b2 170-324  "the tablet plugs into a phone, but nothing reached the TV in real time"
-//             cornerTags: the gap + four facts from problem_en, over the page scrolled on.
-// b3 324-517  "so phone and TV now talk directly, over WebRTC — like a wire across the room"
-//             pipelineFlow: capture -> WebRTC link -> mirror, over the features hub.
-//             The one tech name of the clip, with its gloss on the frame.
-// b4 517-678  "every stroke streams live, with a backup relay if the link drops"
-//             handoffExplain: direct link -> server relay, over the hub.
-// b5 678-873  "now the kids draw with a real tablet on the big screen — for a $30 pen"
-//             drawn result only (no live page, per gate 2): a $30 hero figure and the
-//             two delivered guarantees as chips, holds to the final frame.
+// Fix vs the previous pass: every live beat now scrolls the feature's OWN article page
+// only (never the features hub, which carried other projects' headlines into frame), and
+// the backdrop plate is raised to 0.82 so the real page's own background text (Durable
+// Object, wrangler.toml, etc.) never competes with the drawn caption.
+//
+// Beat -> effect (data only from the feature row and commit 6e708ac):
+// b1 15-170   "my kids wanted to draw with a real tablet, not squint at a tiny screen" —
+//             keywordCaption over the feature's own page top (backdrop "top"). Opener is
+//             NOT titleTakeover (m23/d15/d14 and the previous b57 pass all opened with it).
+// b2 170-324  "the tablet plugs into a phone, but nothing reached the TV in real time" —
+//             cornerTags: the gap + four facts, over the page scrolled to the problem text
+//             (backdrop "problem").
+// b3 324-517  "so phone and TV now talk directly, over WebRTC — like a wire across the room" —
+//             pipelineFlow: capture -> WebRTC link -> mirror, over the page's fix section
+//             (backdrop "fix"). The one tech name of the clip, with its gloss on the frame.
+// b4 517-678  "every stroke streams live, with a backup relay if the link drops" —
+//             handoffExplain: direct link -> server relay, over the page's result section
+//             (backdrop "result").
+// b5 678-873  "now the kids draw with a real tablet on the big screen — for a $30 pen" —
+//             drawn result only (no live page, per gate 2): a $30 hero figure and three
+//             delivered chips staggered across the whole beat so the ending holds alive,
+//             not frozen, through the final frame.
 //
 // Persistent element: the left sidebar column (archetype 6), b1 through b5.
 
@@ -40,6 +52,8 @@ const END = 873;
 /** Accent tuned for the dark stage (sand's #B4531F is too dark on a plate). */
 const ACCENT = "#F08A4B";
 const STAGE = "#1C1610";
+/** Raised from the default 0.66 so the real page's own background text never competes. */
+const PLATE = 0.82;
 
 const SIDEBAR = { x: 0, y: 0, w: 320, h: 720 };
 
@@ -48,13 +62,12 @@ const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 /** The running claim in the fixed left column — the only element that survives every beat. */
 const Sidebar: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
   const P = usePalette();
 
   const claims: { at: number; eyebrow: string; line: string }[] = [
     { at: B1, eyebrow: "THE ASK", line: "A real tablet, not a phone" },
     { at: B2, eyebrow: "THE GAP", line: "No link to the TV" },
-    { at: B3, eyebrow: "THE FIX", line: "WebRTC links phone ↔ TV" },
+    { at: B3, eyebrow: "THE FIX", line: "WebRTC links phone <-> TV" },
     { at: B4, eyebrow: "BACKUP", line: "Relay takes over if it drops" },
     { at: B5, eyebrow: "RESULT", line: "$30 tablet, real TV canvas" },
   ];
@@ -119,7 +132,7 @@ const ResultPanel: React.FC = () => {
         style={{
           position: "absolute",
           left: 90,
-          top: 150,
+          top: 130,
           transform: `scale(${sc})`,
           transformOrigin: "left center",
         }}
@@ -128,8 +141,9 @@ const ResultPanel: React.FC = () => {
         <div style={{ fontSize: 26, fontWeight: 700, color: P.accent, marginTop: 4 }}>pen, real TV canvas</div>
       </div>
       {[
-        { label: "Direct WebRTC link", tone: "success" as const, delay: 50 },
-        { label: "Backup relay if it drops", tone: "success" as const, delay: 68 },
+        { label: "Direct WebRTC link", delay: 50 },
+        { label: "Backup relay if it drops", delay: 85 },
+        { label: "Works with any phone at home", delay: 125 },
       ].map((chip, i) => {
         const at = B5 + chip.delay;
         if (frame < at) return null;
@@ -140,8 +154,8 @@ const ResultPanel: React.FC = () => {
             style={{
               position: "absolute",
               left: 90,
-              top: 420 + i * 70,
-              width: 620,
+              top: 400 + i * 68,
+              width: 650,
               height: 56,
               borderRadius: 4,
               background: P.successBg,
@@ -168,38 +182,43 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE, fontFamily }}>
-      {/* b1 — the human problem, over the feature's own page */}
-      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
+      {/* b1 — the human problem, over the feature's own page top */}
+      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="top" from={B1} hold={B2 - B1} />}
       <MotionInsert
-        effect="titleTakeover"
+        effect="keywordCaption"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        data={{ title: "Stuck on a Tiny Screen", kicker: "Kids wanted a real drawing tablet, not a phone" }}
+        plate={PLATE}
+        data={{
+          line1: "My kids wanted to draw with a real tablet",
+          line2: "not squint at a tiny phone screen",
+          keywords: ["tablet"],
+        }}
       />
 
-      {/* b2 — the gap (problem_en facts), page scrolled on */}
-      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
+      {/* b2 — the gap, page scrolled to the problem text */}
+      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="problem" from={B2} hold={B3 - B2} />}
       <MotionInsert
         effect="cornerTags"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.7}
+        plate={PLATE}
         data={{
           statement: "No link from phone to TV",
-          tags: ["Tablet → phone only", "Pen stuck on phone", "TV in another room", "No live link"],
+          tags: ["Tablet -> phone only", "Pen stuck on phone", "TV in another room", "No live link"],
         }}
       />
 
       {/* b3 — how the fix works; the one tech name of the clip, with its gloss */}
-      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B3} hold={B4 - B3} />}
+      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="fix" from={B3} hold={B4 - B3} />}
       <MotionInsert
         effect="pipelineFlow"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.7}
+        plate={PLATE}
         data={{
           steps: ["Phone captures stroke", "WebRTC links the TV", "Canvas mirrors live"],
           result: "Draws appear instantly",
@@ -208,15 +227,13 @@ const Inner: React.FC = () => {
       />
 
       {/* b4 — the fallback: direct link hands off to a server relay */}
-      {frame >= B4 && frame < B5 && (
-        <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} focus={{ x: 0.6, y: 0.4 }} />
-      )}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="result" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="handoffExplain"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.7}
+        plate={PLATE}
         data={{
           from: "Direct WebRTC link",
           to: "Server relay takes over",

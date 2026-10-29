@@ -1,0 +1,35 @@
+{
+  "id": "d16",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "wide",
+      "url": "https://vitalii.no/features/the-kiosks-sugar-badge-just-got-eyes-on-the-last-24-hours-not-just-right-now-d16",
+      "frames": 165,
+      "scroll": [[0, 0], [164, 30]],
+      "mouse": [[0, 450, 160], [80, 560, 210], [164, 500, 190]]
+    },
+    {
+      "name": "problem",
+      "url": "https://vitalii.no/features/the-kiosks-sugar-badge-just-got-eyes-on-the-last-24-hours-not-just-right-now-d16",
+      "frames": 171,
+      "scroll": [[0, 380], [170, 430]],
+      "mouse": [[0, 480, 220], [85, 540, 200], [170, 500, 210]]
+    },
+    {
+      "name": "fix",
+      "url": "https://vitalii.no/features/the-kiosks-sugar-badge-just-got-eyes-on-the-last-24-hours-not-just-right-now-d16",
+      "frames": 179,
+      "scroll": [[0, 640], [178, 690]],
+      "mouse": [[0, 470, 230], [90, 560, 215], [178, 510, 205]]
+    },
+    {
+      "name": "result",
+      "url": "https://vitalii.no/features/the-kiosks-sugar-badge-just-got-eyes-on-the-last-24-hours-not-just-right-now-d16",
+      "frames": 148,
+      "scroll": [[0, 760], [147, 810]],
+      "mouse": [[0, 460, 225], [75, 540, 210], [147, 500, 200]]
+    }
+  ]
+}

@@ -4,25 +4,32 @@
   "dsf": 1.25,
   "shots": [
     {
-      "name": "page",
+      "name": "top",
       "url": "https://vitalii.no/features/any-phone-becomes-a-drawing-tablet-for-the-living-room-tv-b57",
-      "frames": 120,
-      "scroll": [[0, 0], [119, 480]],
-      "mouse": [[0, 500, 200], [60, 560, 260], [119, 520, 300]]
+      "frames": 155,
+      "scroll": [[0, 0], [154, 20]],
+      "mouse": [[0, 460, 170], [90, 560, 200], [154, 500, 190]]
     },
     {
-      "name": "page2",
+      "name": "problem",
       "url": "https://vitalii.no/features/any-phone-becomes-a-drawing-tablet-for-the-living-room-tv-b57",
-      "frames": 120,
-      "scroll": [[0, 480], [119, 1080]],
-      "mouse": [[0, 520, 220], [60, 600, 280], [119, 540, 260]]
+      "frames": 154,
+      "scroll": [[0, 220], [153, 260]],
+      "mouse": [[0, 470, 220], [80, 550, 210], [153, 500, 200]]
     },
     {
-      "name": "hub",
-      "url": "https://vitalii.no/features",
-      "frames": 150,
-      "scroll": [[0, 0], [149, 900]],
-      "mouse": [[0, 300, 200], [75, 650, 260], [149, 420, 220]]
+      "name": "fix",
+      "url": "https://vitalii.no/features/any-phone-becomes-a-drawing-tablet-for-the-living-room-tv-b57",
+      "frames": 193,
+      "scroll": [[0, 430], [192, 470]],
+      "mouse": [[0, 460, 225], [100, 550, 205], [192, 500, 200]]
+    },
+    {
+      "name": "result",
+      "url": "https://vitalii.no/features/any-phone-becomes-a-drawing-tablet-for-the-living-room-tv-b57",
+      "frames": 161,
+      "scroll": [[0, 660], [160, 700]],
+      "mouse": [[0, 460, 230], [85, 550, 210], [160, 500, 200]]
     }
   ]
 }

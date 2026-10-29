@@ -284,6 +284,8 @@ import { FeatureOneTapAnywhereBlocksG13 } from "./compositions/feature-demos/Fea
 import { FeatureStickGuardCameraSnapshotsB58 } from "./compositions/feature-demos/FeatureStickGuardCameraSnapshotsB58";
 import { FeatureMissedEndStoryGuideG12 } from "./compositions/feature-demos/FeatureMissedEndStoryGuideG12";
 import { FeatureWhenRoadGoesQuietG11 } from "./compositions/feature-demos/FeatureWhenRoadGoesQuietG11";
+import { FeatureKiosksSugarBadgeJustD16 } from "./compositions/feature-demos/FeatureKiosksSugarBadgeJustD16";
+import { FeatureArtemsSugarChartMovesB77 } from "./compositions/feature-demos/FeatureArtemsSugarChartMovesB77";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2801,6 +2803,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureNewSugarHubFinallyD14"
         component={FeatureNewSugarHubFinallyD14}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureKiosksSugarBadgeJustD16"
+        component={FeatureKiosksSugarBadgeJustD16}
+        durationInFrames={883}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureArtemsSugarChartMovesB77"
+        component={FeatureArtemsSugarChartMovesB77}
+        durationInFrames={868}
         fps={30}
         width={1280}
         height={720}

@@ -1,0 +1,64 @@
+{
+  "id": "b77",
+  "archetype": "0 split-duel",
+  "mood": "violet",
+  "beats": [
+    {
+      "id": "b1",
+      "frames": [15, 225],
+      "shot": "wide",
+      "effect": "keywordCaption",
+      "data": {
+        "line1": "The room's TV showed just his number",
+        "line2": "not whether it had moved all day",
+        "keywords": ["number"]
+      }
+    },
+    {
+      "id": "b2",
+      "frames": [225, 365],
+      "shot": "firstfix",
+      "effect": "cornerTags",
+      "data": {
+        "statement": "A first chart ate the whole screen",
+        "tags": ["Full calendar strip", "Hard to read", "Screen gone", "Try again"]
+      }
+    },
+    {
+      "id": "b3",
+      "frames": [365, 500],
+      "shot": "fix",
+      "effect": "handoffExplain",
+      "data": {
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "from": "Full chart under the calendar",
+        "to": "Line across his camera photo",
+        "points": [
+          "Redrawn in KioskFrame.tsx",
+          "No new screen needed",
+          "Reuses his existing photo"
+        ]
+      }
+    },
+    {
+      "id": "b4",
+      "frames": [500, 688],
+      "shot": "result",
+      "effect": "pipelineFlow",
+      "data": {
+        "steps": ["White = in range", "Red = low", "Yellow = high"],
+        "result": "Room reads his day at a glance"
+      }
+    },
+    {
+      "id": "b5",
+      "frames": [688, 868],
+      "shot": null,
+      "effect": "drawn",
+      "data": {
+        "note": "Pattern break (gate 2): divider slides to 0 — order wins the frame. LogWindow built from feature row facts, no live shot, no MotionInsert."
+      }
+    }
+  ]
+}

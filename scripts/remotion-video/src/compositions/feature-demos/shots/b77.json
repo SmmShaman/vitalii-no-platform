@@ -1,0 +1,35 @@
+{
+  "id": "b77",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "wide",
+      "url": "https://vitalii.no/features/artems-sugar-chart-moves-off-the-calendar-and-onto-the-camera-picture-itself-b77",
+      "frames": 210,
+      "scroll": [[0, 0], [209, 30]],
+      "mouse": [[0, 450, 160], [100, 560, 210], [209, 500, 190]]
+    },
+    {
+      "name": "firstfix",
+      "url": "https://vitalii.no/features/artems-sugar-chart-moves-off-the-calendar-and-onto-the-camera-picture-itself-b77",
+      "frames": 140,
+      "scroll": [[0, 380], [139, 430]],
+      "mouse": [[0, 480, 220], [70, 540, 200], [139, 500, 210]]
+    },
+    {
+      "name": "fix",
+      "url": "https://vitalii.no/features/artems-sugar-chart-moves-off-the-calendar-and-onto-the-camera-picture-itself-b77",
+      "frames": 135,
+      "scroll": [[0, 560], [134, 610]],
+      "mouse": [[0, 470, 230], [65, 560, 215], [134, 510, 205]]
+    },
+    {
+      "name": "result",
+      "url": "https://vitalii.no/features/artems-sugar-chart-moves-off-the-calendar-and-onto-the-camera-picture-itself-b77",
+      "frames": 188,
+      "scroll": [[0, 820], [187, 870]],
+      "mouse": [[0, 460, 225], [95, 540, 210], [187, 500, 200]]
+    }
+  ]
+}
