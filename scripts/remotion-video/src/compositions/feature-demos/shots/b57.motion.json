@@ -27,7 +27,7 @@
       "backdrop": "fix",
       "data": {
         "steps": ["Phone captures stroke", "WebRTC links the TV", "Canvas mirrors live"],
-        "result": "Draws appear instantly",
+        "result": "Phone <-> TV linked directly",
         "system": "WebRTC = direct peer link"
       }
     },
@@ -36,6 +36,8 @@
       "effect": "handoffExplain",
       "backdrop": "result",
       "data": {
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
         "from": "Direct WebRTC link",
         "to": "Server relay takes over",
         "points": ["Strokes keep streaming", "Switches automatically", "Drawing never stops"]

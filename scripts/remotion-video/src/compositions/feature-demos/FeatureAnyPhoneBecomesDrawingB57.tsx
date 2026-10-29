@@ -28,13 +28,25 @@
 //             (its card sits under the sidebar column, x<320 — pipelineFlow has no sidebar offset).
 // b4 517-678  "every stroke streams live, with a backup relay if the link drops" —
 //             handoffExplain: direct link -> server relay, over the page's result section
-//             (backdrop "result").
+//             (backdrop "result"). data.fromLabel/toLabel are set explicitly ("BEFORE"/
+//             "NOW") — HandoffExplain falls back to Norwegian "FØR"/"NÅ" when they're
+//             omitted, which a WAVE D blind viewer caught.
 // b5 678-873  "now the kids draw with a real tablet on the big screen — for a $30 pen" —
 //             drawn result only (no live page, per gate 2): a $30 hero figure and three
 //             delivered chips staggered across the whole beat so the ending holds alive,
-//             not frozen, through the final frame.
+//             not frozen, through the final frame. A border pulse starts once the last
+//             chip has settled (B5+150) so the final ~1.9s keeps moving instead of
+//             holding one static frame (WAVE D blind viewer: "held near-identically
+//             three times" at the end).
 //
 // Persistent element: the left sidebar column (archetype 6), b1 through b5.
+//
+// WAVE D fix (same day): plate raised 0.82 -> 0.88 on all beats so the live page's own
+// background prose (pointerrawupdate, Durable Object, SQLite, R2 bucket, Cloudflare
+// Worker) stops competing with the drawn captions. b3's pipelineFlow result line changed
+// from "Draws appear instantly" (which pre-empted b4's own streaming claim) to "Phone <->
+// TV linked directly" — distinct from b4's "keeps streaming after a drop" point and
+// matching the sidebar's own b3 claim ("WebRTC links phone <-> TV").
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -54,8 +66,9 @@ const END = 873;
 /** Accent tuned for the dark stage (sand's #B4531F is too dark on a plate). */
 const ACCENT = "#F08A4B";
 const STAGE = "#1C1610";
-/** Raised from the default 0.66 so the real page's own background text never competes. */
-const PLATE = 0.82;
+/** Raised from 0.66 -> 0.82 -> 0.88: a WAVE D viewer still read jargon words
+ *  (pointerrawupdate, Durable Object, SQLite, R2 bucket) through the plate at 0.82. */
+const PLATE = 0.88;
 
 const SIDEBAR = { x: 0, y: 0, w: 320, h: 720 };
 
@@ -176,6 +189,25 @@ const ResultPanel: React.FC = () => {
           </div>
         );
       })}
+      {/* once the last chip has settled (B5+125 delay + ~12-frame punch/settle), pulse a
+          border around the whole checklist so the final ~1.9s of the beat keeps moving
+          instead of sitting on a static frame — the viewer's "held near-identically
+          three times" complaint. */}
+      {frame >= B5 + 150 && (
+        <div
+          style={{
+            position: "absolute",
+            left: 86,
+            top: 396,
+            width: 658,
+            height: 68 * 3 - 12,
+            borderRadius: 8,
+            border: `2px solid ${P.accent}`,
+            opacity: 0.3 + 0.25 * Math.sin((frame - (B5 + 150)) / 8),
+            pointerEvents: "none",
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -247,7 +279,7 @@ const Inner: React.FC = () => {
         plate={PLATE}
         data={{
           steps: ["Phone captures stroke", "WebRTC links the TV", "Canvas mirrors live"],
-          result: "Draws appear instantly",
+          result: "Phone <-> TV linked directly",
           system: "WebRTC = direct peer link",
         }}
       />
@@ -261,6 +293,8 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         plate={PLATE}
         data={{
+          fromLabel: "BEFORE",
+          toLabel: "NOW",
           from: "Direct WebRTC link",
           to: "Server relay takes over",
           points: ["Strokes keep streaming", "Switches automatically", "Drawing never stops"],
