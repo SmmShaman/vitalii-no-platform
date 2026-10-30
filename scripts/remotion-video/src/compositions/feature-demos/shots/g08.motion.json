@@ -52,16 +52,9 @@
     },
     {
       "beat": "b6",
-      "kind": "drawn",
-      "effect": null,
+      "effect": "drawn",
       "backdrop": null,
-      "description": "Hand-built hero figure (archetype 7), not a catalog effect: fontSize 240, '8s' over 'DWELL REACHED', holds to the end.",
-      "data": {
-        "value": "8s",
-        "label": "DWELL REACHED",
-        "sub": "Full narration begins."
-      },
-      "hero": "full-size (fontSize 240), value '8s', success tone, holds to final frame"
+      "note": "RE-SHOOT 2026-10-30: archetype changed 7 hero-number -> 1 timeline. Finale (gate 1): the compressed event ribbon running under b1-b5 expands to own the frame, the running line reaches its sixth and final node ('8s dwell reached'), and the result (8s / DWELL REACHED / full narration begins) sits bottom-left, tied to the ribbon by a connector line — holds to END=977. Ends on the result, never the page or hub (gate 2)."
     }
   ]
 }

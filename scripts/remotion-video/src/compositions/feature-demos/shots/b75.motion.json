@@ -1,0 +1,36 @@
+{
+  "id": "b75",
+  "composition": "FeatureArtemsBloodSugarRidesB75",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "One App, One Phone", "kicker": "Blood sugar lived apart from the kitchen calendar" }
+    },
+    {
+      "beat": "b2",
+      "effect": "handoffExplain",
+      "backdrop": "page2",
+      "data": {
+        "from": "Checked in a separate app",
+        "to": "Badge on the calendar tile",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Level, trend and age", "Pulled by the Cloudflare Worker", "No phone needed in the kitchen"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "targetOverrun",
+      "backdrop": null,
+      "data": { "label": "Badge age", "value": 16, "target": 15, "unit": "min" }
+    },
+    {
+      "beat": "b4",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype 0 split-duel finale (gate 1): divider slides from center to the far left, the order half fills the frame with the live badge (level/trend/age) + a 2-item result checklist, holds to END=889 — ends on the result, never the page or hub (gate 2)."
+    }
+  ]
+}

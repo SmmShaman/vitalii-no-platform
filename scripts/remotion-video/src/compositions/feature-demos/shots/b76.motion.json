@@ -1,0 +1,46 @@
+{
+  "id": "b76",
+  "composition": "FeatureEveryParentOverrideExpiresB76",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "One Timer, Four Buttons", "kicker": "QR pass auto-locked in 30 min — the others didn't" }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": { "line1": "One self-closing latch. Three doors left wide open.", "keywords": ["latch", "open"] }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Only the QR pass timed out",
+        "to": "All 4 admin paths time out",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Master switch", "Unlock command", "yt-on / sp-on buttons", "Cloudflare Worker — guards every lock"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["30-min timer expires", "Tier 2 access drops", "Bonus + QR rules resume"],
+        "result": "No manual reset needed",
+        "system": "Cloudflare Worker"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "hero-number archetype (gate 1): full-frame '30' + 4-of-4 checklist, fontSize>=200, no effect/backdrop, holds to END=951 — ends on the result, never the page or hub."
+    }
+  ]
+}

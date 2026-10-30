@@ -1,0 +1,21 @@
+{
+  "id": "b75",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/artems-blood-sugar-now-rides-on-his-own-calendar-photo-right-on-the-kiosk-b75",
+      "frames": 248,
+      "scroll": [[0, 0], [124, 260], [247, 520]],
+      "mouse": [[0, 640, 200], [124, 700, 260], [247, 660, 320]]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/artems-blood-sugar-now-rides-on-his-own-calendar-photo-right-on-the-kiosk-b75",
+      "frames": 216,
+      "scroll": [[0, 520], [108, 760], [215, 980]],
+      "mouse": [[0, 660, 320], [108, 700, 360], [215, 680, 400]]
+    }
+  ]
+}

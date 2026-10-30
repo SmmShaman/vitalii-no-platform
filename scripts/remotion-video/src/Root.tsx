@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureEveryParentOverrideExpiresB76 } from "./compositions/feature-demos/FeatureEveryParentOverrideExpiresB76";
+import { FeatureArtemsBloodSugarRidesB75 } from "./compositions/feature-demos/FeatureArtemsBloodSugarRidesB75";
 import { FeatureOneButtonShutsYoutubeB73 } from "./compositions/feature-demos/FeatureOneButtonShutsYoutubeB73";
 import { FeatureKidReflashedTvAppB72 } from "./compositions/feature-demos/FeatureKidReflashedTvAppB72";
 import { FeatureSugarHubCanFixD15 } from "./compositions/feature-demos/FeatureSugarHubCanFixD15";
@@ -2343,6 +2345,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureEveryParentOverrideExpiresB76"
+        component={FeatureEveryParentOverrideExpiresB76}
+        durationInFrames={951}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureArtemsBloodSugarRidesB75"
+        component={FeatureArtemsBloodSugarRidesB75}
+        durationInFrames={889}
         fps={30}
         width={1280}
         height={720}
