@@ -141,6 +141,50 @@ const DuelBar: React.FC = () => {
   );
 };
 
+/** b3 only — targetOverrun's own content sits in a centered mid-frame band; this fills the
+ *  empty top margin and the narrow gap above the persistent DuelBar the dark stage leaves around it. */
+const TargetOverrunFill: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B3 || frame >= B4) return null;
+  const t = tween(sec(frame, B3 + 6, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 60, top: 40, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 38 }}>⏱</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>WHY THIS MATTERS</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 820 }}>
+            The Worker checks the badge's own age before trusting it — commit ac7ca49
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 60,
+          top: 544,
+          width: 1160,
+          height: 46,
+          borderRadius: 6,
+          background: P.card,
+          border: `2px solid ${P.accent}`,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          paddingLeft: 20,
+          fontSize: 15,
+          fontWeight: 700,
+          color: P.ink,
+        }}
+      >
+        <span>🛡️</span>
+        <span>Past 15 minutes old → badge greys out instead of showing a number that might be wrong</span>
+      </div>
+    </div>
+  );
+};
+
 const Finale: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -277,6 +321,7 @@ const Inner: React.FC = () => {
         base={STAGE}
         data={{ label: "Badge age", value: 16, target: 15, unit: "min" }}
       />
+      <TargetOverrunFill />
 
       <DuelBar />
 

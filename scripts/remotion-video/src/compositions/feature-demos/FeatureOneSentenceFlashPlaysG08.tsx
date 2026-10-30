@@ -154,12 +154,24 @@ const Finale: React.FC = () => {
 
   const t = sec(frame, B6, fps);
   const expand = tween(t, 0, 0.9, ease.power3Out);
-  const ribbonY = BAR.y - expand * 220;
+  const ribbonY = BAR.y - expand * 540;
   const punch = punchScale(sec(frame, B6 + 14, fps), 0);
   const textIn = tween(t, 0.3, 0.8, ease.power3Out);
+  const gaugeIn = tween(t, 0.5, 1.1, ease.power3Out);
+
+  const R = 130;
+  const CX = 850;
+  const CY = 480;
 
   return (
     <AbsoluteFill style={{ background: STAGE, fontFamily, overflow: "hidden" }}>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `radial-gradient(circle at 70% 55%, ${P.accentBg} 0%, ${STAGE} 65%)`,
+        }}
+      />
       <div style={{ position: "absolute", left: BAR.x, top: ribbonY, width: BAR.w, height: BAR.h }}>
         <div
           style={{
@@ -177,8 +189,8 @@ const Finale: React.FC = () => {
           const x = ((i + 0.5) / 6) * BAR.w;
           return (
             <div key={ev.label} style={{ position: "absolute", left: x - 60, top: 0, width: 120, textAlign: "center" }}>
-              <div style={{ width: 10, height: 10, borderRadius: 5, margin: "0 auto", background: P.accent }} />
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#7A71A8", marginTop: 6 }}>{ev.icon}</div>
+              <div style={{ width: 18, height: 18, borderRadius: 9, margin: "0 auto", background: P.accent }} />
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#B2A9E0", marginTop: 8 }}>{ev.icon}</div>
             </div>
           );
         })}
@@ -186,22 +198,22 @@ const Finale: React.FC = () => {
           style={{
             position: "absolute",
             left: (5.5 / 6) * BAR.w - 90,
-            top: -6,
+            top: -8,
             width: 180,
             textAlign: "center",
             transform: `scale(${punch})`,
             transformOrigin: "center",
           }}
         >
-          <div style={{ width: 16, height: 16, borderRadius: 8, margin: "0 auto", background: P.success }} />
-          <div style={{ fontSize: 15, fontWeight: 800, color: P.success, marginTop: 6 }}>✅ 8s reached</div>
+          <div style={{ width: 22, height: 22, borderRadius: 11, margin: "0 auto", background: P.success }} />
+          <div style={{ fontSize: 17, fontWeight: 800, color: P.success, marginTop: 8 }}>✅ 8s reached</div>
         </div>
         {/* connector tying the ribbon's final node to the result below */}
         <div
           style={{
             position: "absolute",
             left: (5.5 / 6) * BAR.w,
-            top: 30,
+            top: 36,
             width: 3,
             height: Math.max(0, 640 - ribbonY - BAR.h),
             background: P.accent,
@@ -217,7 +229,170 @@ const Finale: React.FC = () => {
         </div>
         <div style={{ fontSize: 18, fontWeight: 600, color: "#9C93C9", marginTop: 8 }}>Full narration begins.</div>
       </div>
+
+      <div style={{ position: "absolute", left: CX - R - 20, top: CY - R - 20, width: (R + 20) * 2, height: (R + 20) * 2, opacity: gaugeIn }}>
+        <svg width={(R + 20) * 2} height={(R + 20) * 2}>
+          <circle cx={R + 20} cy={R + 20} r={R} fill="none" stroke="#3A3365" strokeWidth={16} />
+          <circle
+            cx={R + 20}
+            cy={R + 20}
+            r={R}
+            fill="none"
+            stroke={P.success}
+            strokeWidth={16}
+            strokeLinecap="round"
+            pathLength={1}
+            strokeDasharray={1}
+            strokeDashoffset={1 - gaugeIn}
+            transform={`rotate(-90 ${R + 20} ${R + 20})`}
+          />
+        </svg>
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ fontSize: 56, fontWeight: 800, color: "#F5F3FF" }}>8/8s</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: P.success, marginTop: 4, letterSpacing: 1 }}>DWELL COMPLETE</div>
+        </div>
+      </div>
     </AbsoluteFill>
+  );
+};
+
+/** b3 only — pipelineFlow's own chain sits in a mid-frame band; this fills the empty top
+ *  margin and the narrow gap above the persistent TimelineRibbon the dark stage leaves around it. */
+const GpsCheckFill: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B3 || frame >= B4) return null;
+  const t = tween(sec(frame, B3 + 6, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 60, top: 40, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 38 }}>🧭</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>LIVE GPS CHECK</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 820 }}>
+            Your position is matched against the road path before any story is picked — commit 0437e5f
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 60,
+          top: 544,
+          width: 1160,
+          height: 46,
+          borderRadius: 6,
+          background: P.card,
+          border: `2px solid ${P.accent}`,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          paddingLeft: 20,
+          fontSize: 15,
+          fontWeight: 700,
+          color: P.ink,
+        }}
+      >
+        <span>✅</span>
+        <span>No road match → the story is skipped, not just delayed</span>
+      </div>
+    </div>
+  );
+};
+
+/** b4 only — titleTakeover's "200M" sits centered; this fills the wide empty margins top,
+ *  left and right with the distance ladder the number is standing for. */
+const HeadsUpFill: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B4 || frame >= B5) return null;
+  const t = tween(sec(frame, B4 + 6, 30), 0, 0.35, ease.power3Out);
+  const rows = [
+    { d: "600m", note: "approaching" },
+    { d: "400m", note: "getting close" },
+    { d: "200m", note: "heads-up fires" },
+  ];
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 60, top: 40, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 38 }}>📍</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>HEADS-UP, NOT INTERRUPTION</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 820 }}>
+            The countdown ticks down as you approach the place
+          </div>
+        </div>
+      </div>
+      <div style={{ position: "absolute", left: 50, top: 230, width: 290, display: "flex", flexDirection: "column", gap: 16 }}>
+        {rows.map((row, i) => (
+          <div
+            key={row.d}
+            style={{
+              borderRadius: 6,
+              background: i === rows.length - 1 ? P.successBg : P.card,
+              border: `2px solid ${i === rows.length - 1 ? P.successEdge : P.accent}`,
+              padding: "10px 16px",
+            }}
+          >
+            <div style={{ fontSize: 22, fontWeight: 800, color: i === rows.length - 1 ? P.success : P.ink }}>{row.d}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: P.muted, marginTop: 2 }}>{row.note}</div>
+          </div>
+        ))}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 970,
+          top: 250,
+          width: 270,
+          borderRadius: 6,
+          background: P.card,
+          border: `2px solid ${P.accent}`,
+          padding: "14px 18px",
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: P.accent }}>WHY 200M</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: P.ink, marginTop: 6 }}>Enough runway to react before the story starts</div>
+      </div>
+    </div>
+  );
+};
+
+/** b5 only — keywordCaption's lower-third caption leaves the top ~60% empty; this fills it
+ *  with a preview of the one-line flash notification the caption is describing. */
+const FlashPreview: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B5 || frame >= B6) return null;
+  const t = tween(sec(frame, B5 + 6, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 60, top: 40, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 38 }}>⚡</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>WHAT APPEARS</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 820 }}>
+            A short flash notification — not the full story, not yet
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 380,
+          top: 170,
+          width: 520,
+          borderRadius: 10,
+          background: P.card,
+          border: `2px solid ${P.accent}`,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
+          padding: "18px 24px",
+        }}
+      >
+        <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 2, color: P.accent }}>📍 NEARBY</div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: P.ink, marginTop: 8 }}>A story about this valley is ready.</div>
+      </div>
+    </div>
   );
 };
 
@@ -296,6 +471,7 @@ const Inner: React.FC = () => {
           system: "0437e5f DriveService",
         }}
       />
+      <GpsCheckFill />
 
       {/* b4 — the heads-up number, drawn only */}
       <MotionInsert
@@ -310,6 +486,7 @@ const Inner: React.FC = () => {
           kicker: "Heads-up first — before anything plays.",
         }}
       />
+      <HeadsUpFill />
 
       {/* b5 — the flash-only line, drawn only, lower-third */}
       <MotionInsert
@@ -325,6 +502,7 @@ const Inner: React.FC = () => {
           keywords: ["one-line", "waits"],
         }}
       />
+      <FlashPreview />
 
       <TimelineRibbon />
 

@@ -127,6 +127,50 @@ const Badge: React.FC = () => {
   );
 };
 
+/** b3 only — handoffExplain's own content sits in a mid-frame band; this fills the
+ *  empty top/bottom margins the dark stage leaves around it. */
+const HandoffFill: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B3 || frame >= B4) return null;
+  const t = tween(sec(frame, B3 + 6, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 60, top: 40, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 38 }}>🔧</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>THE FIX</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 820 }}>
+            Same 30-minute expiry stamped inside the youtube-gate Worker for every admin path
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 60,
+          top: 548,
+          width: 1160,
+          height: 46,
+          borderRadius: 6,
+          background: P.card,
+          border: `2px solid ${P.accent}`,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          paddingLeft: 20,
+          fontSize: 15,
+          fontWeight: 700,
+          color: P.ink,
+        }}
+      >
+        <span>🛡️</span>
+        <span>Master switch • Unlock command • yt-on / sp-on — all timed now</span>
+      </div>
+    </div>
+  );
+};
+
 const Finale: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -233,6 +277,7 @@ const Inner: React.FC = () => {
           points: ["Master switch", "Unlock command", "yt-on / sp-on buttons", "Cloudflare Worker — guards every lock"],
         }}
       />
+      <HandoffFill />
 
       {/* b4 — the result mechanism, over the features hub */}
       {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} />}
