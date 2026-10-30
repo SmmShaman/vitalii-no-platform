@@ -1,0 +1,48 @@
+{
+ "id": "b75",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.963,
+  "b2": 6.887,
+  "b3": 5.636,
+  "b4": 6.259
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Artem's blood sugar lived in its own app. Checking it from the kitchen, where the family looks at the calendar screen, meant stopping for a phone.",
+   "start_s": 0.5,
+   "end_s": 8.463,
+   "start_f": 15,
+   "end_f": 254
+  },
+  {
+   "beat": "b2",
+   "text": "Now a small route on the same Cloudflare Worker pulls his level, trend and age onto a badge over the calendar tile.",
+   "start_s": 8.763,
+   "end_s": 15.65,
+   "start_f": 263,
+   "end_f": 470
+  },
+  {
+   "beat": "b3",
+   "text": "Past fifteen minutes old, the badge turns grey instead of showing a number that might be wrong.",
+   "start_s": 15.95,
+   "end_s": 21.586,
+   "start_f": 479,
+   "end_f": 648
+  },
+  {
+   "beat": "b4",
+   "text": "His sugar and trend now sit right there on the kiosk \u2014 never silently stale past fifteen minutes.",
+   "start_s": 21.886,
+   "end_s": 28.145,
+   "start_f": 657,
+   "end_f": 844
+  }
+ ],
+ "total_s": 29.645,
+ "durationInFrames": 889,
+ "measured_track_s": 28.2,
+ "track": "/root/feature-demos/vo-b75/vo-b75.mp3"
+}

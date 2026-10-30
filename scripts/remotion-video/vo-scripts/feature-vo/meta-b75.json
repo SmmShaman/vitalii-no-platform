@@ -1,0 +1,7 @@
+{
+  "id": "b75",
+  "file": "yt-feature-b75.mp4",
+  "title": "Artem's Blood Sugar Now Lives on the Family Kiosk | vitalii.no",
+  "description": "Artem's blood sugar readings already existed in the sugar hub bridge, but nobody could see them without opening a separate app. The kiosk — the screen the whole family already checks for the calendar and the camera tile — showed nothing about whether his sugar was fine or dropping, so checking meant stopping to pull out a phone.\n\nA new /sugar route on the youtube-gate Cloudflare Worker proxies the sugar hub, authenticates with a secret key, and strips the response down to only the value, trend arrow, level and age before it ever reaches the kiosk — no raw medical payload leaves the Worker. KioskFrame.tsx renders this as a small badge laid directly over Artem's existing calendar photo tile, with a built-in staleness check.\n\nIf the reading is older than 15 minutes, the badge turns grey instead of showing a number that might already be wrong.\n\n🔗 Full write-up: https://vitalii.no/features/artems-blood-sugar-now-rides-on-his-own-calendar-photo-right-on-the-kiosk-b75\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#diabetestech #cloudflareworkers #familydashboard #healthtech #typescript #homeautomation",
+  "tags": ["diabetes monitoring", "cloudflare workers", "family dashboard", "kiosk display", "real-time data", "health tech", "typescript", "react", "api proxy", "staleness detection", "home automation", "vitalii berbeha"]
+}

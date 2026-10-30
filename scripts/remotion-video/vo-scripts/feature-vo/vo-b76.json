@@ -1,0 +1,57 @@
+{
+ "id": "b76",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.93,
+  "b2": 4.592,
+  "b3": 5.978,
+  "b4": 4.232,
+  "b5": 4.761
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Unlock YouTube or Spotify with the QR pass and it shut off after half an hour. Any other button, and it could stay open all day if I forgot.",
+   "start_s": 0.5,
+   "end_s": 9.43,
+   "start_f": 15,
+   "end_f": 283
+  },
+  {
+   "beat": "b2",
+   "text": "Like one self-closing latch on a door with three others left wide open.",
+   "start_s": 9.73,
+   "end_s": 14.322,
+   "start_f": 292,
+   "end_f": 430
+  },
+  {
+   "beat": "b3",
+   "text": "Now every admin button stamps the same timer inside the Cloudflare Worker that guards access.",
+   "start_s": 14.622,
+   "end_s": 20.6,
+   "start_f": 439,
+   "end_f": 618
+  },
+  {
+   "beat": "b4",
+   "text": "When it runs out, the normal lock rules take over automatically.",
+   "start_s": 20.9,
+   "end_s": 25.132,
+   "start_f": 627,
+   "end_f": 754
+  },
+  {
+   "beat": "b5",
+   "text": "All four unlock paths now expire in thirty minutes, not just one.",
+   "start_s": 25.432,
+   "end_s": 30.193,
+   "start_f": 763,
+   "end_f": 906
+  }
+ ],
+ "total_s": 31.693,
+ "durationInFrames": 951,
+ "measured_track_s": 30.264,
+ "track": "/root/feature-demos/vo-b76/vo-b76.mp3"
+}
