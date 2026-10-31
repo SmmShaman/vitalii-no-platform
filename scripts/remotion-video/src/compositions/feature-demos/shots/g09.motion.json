@@ -4,12 +4,12 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "quoteMarker",
+      "effect": "keywordCaption",
       "backdrop": "page-top",
       "data": {
-        "quote": "You park by the farm. Walk around. The story already ended on the way in.",
-        "highlight": "already ended",
-        "source": "Every stop, before today"
+        "line1": "You stop the car —",
+        "line2": "but the story already ended.",
+        "keywords": ["already", "ended"]
       }
     },
     {

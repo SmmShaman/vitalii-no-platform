@@ -1,0 +1,47 @@
+{
+  "id": "p79",
+  "composition": "FeatureBlogWriterHasMemoryP79",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": { "line1": "Dictate into Telegram,", "line2": "it published itself, right away.", "keywords": ["published", "itself"] }
+    },
+    {
+      "beat": "b2",
+      "effect": "statusFocus",
+      "backdrop": "hub",
+      "data": {
+        "title": "Before the memory",
+        "claims": [
+          { "text": "Reads my own notes", "verdict": "no" },
+          { "text": "Checks my project list", "verdict": "no" },
+          { "text": "Invents missing details", "verdict": "yes" }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Guesses from nothing",
+        "to": "Reads notes, projects, journal",
+        "points": ["My own personal notes", "Every project I've built", "My dated journal entries"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "funnelAbsorption",
+      "backdrop": null,
+      "data": { "inputs": ["Missing a detail", "Unsure of the project", "A secret pattern found"], "result": "Asks first, saves a draft" }
+    },
+    {
+      "beat": "b5",
+      "effect": "none",
+      "backdrop": null,
+      "data": { "note": "split-duel finale + LogWindow only — last beat must not show page or hub; no commit used (none verified tonight matches this feature's story)" }
+    }
+  ]
+}

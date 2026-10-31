@@ -1,0 +1,50 @@
+{
+  "id": "b74",
+  "composition": "FeatureBersFourKidsFinallyB74",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": { "line1": "Four kids, one app — same for everyone.", "keywords": ["kids", "same"] }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "One flat green screen for everyone",
+        "tags": ["Grey avatars", "No identity", "Admin-tool look", "Same for all"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page",
+      "data": {
+        "from": "One grey circle",
+        "to": "Sun, coral, mint, grape",
+        "points": [
+          "Color tied to the person's own id",
+          "Same color in Chats, People, Conversation",
+          "Four kids, four identities"
+        ]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["Squircle avatars", "Floating tab bar", "New icons", "Android icon redrawn"],
+        "result": "Every screen matches at last"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "none",
+      "backdrop": null,
+      "data": { "note": "ledger total flip + LogWindow only — last beat must not show page or hub" }
+    }
+  ]
+}

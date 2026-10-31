@@ -3,13 +3,16 @@
 // Rebuilt 2026-10-23 (directing gate): the clip was staged as a camera zoom (archetype 2)
 // under an archetype-1 header. Restaged as an actual timeline ribbon — beats, windows,
 // palette and narration all unchanged.
+// Re-shot 2026-10-31 (wave B): opener swapped off quoteMarker — that effect had just
+// been used as tonight's g08 opener. b1 now runs keywordCaption; windows and narration
+// untouched.
 //
 // Voice-synced beat windows (measured, immutable): b1 15-190, b2 190-362,
 // b3 362-520, b4 520-689, b5 689-899 (holds to end).
 //
 // Beat -> effect (data only from the feature row and commit 721f400):
 // b1 15-190   "the story already ended on the way in"
-//             quoteMarker over the feature's own write-up page (backdrop).
+//             keywordCaption over the feature's own write-up page (backdrop).
 //             The ribbon draws in with its first stamp landing: DROVE PAST.
 // b2 190-362  "every place only ever told one short clip"
 //             cornerTags: the claim + four facts from problem_en, over the hub.
@@ -293,14 +296,14 @@ const Inner: React.FC = () => {
       {/* b1 — the problem, over the feature's own write-up */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile as any} shot="page-top" from={B1} hold={B2 - B1} />}
       <MotionInsert
-        effect="quoteMarker"
+        effect="keywordCaption"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
         data={{
-          quote: "You park by the farm. Walk around. The story already ended on the way in.",
-          highlight: "already ended",
-          source: "Every stop, before today",
+          line1: "You stop the car —",
+          line2: "but the story already ended.",
+          keywords: ["already", "ended"],
         }}
       />
       <ProductPlate />
