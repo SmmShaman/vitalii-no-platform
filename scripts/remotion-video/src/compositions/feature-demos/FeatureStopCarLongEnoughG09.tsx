@@ -6,6 +6,20 @@
 // Re-shot 2026-10-31 (wave B): opener swapped off quoteMarker — that effect had just
 // been used as tonight's g08 opener. b1 now runs keywordCaption; windows and narration
 // untouched.
+// Wave D fix 2026-10-31: a blind viewer (clarity 5, thesis 6) named five problems, all
+// fixed here without touching beat windows/duration/palette/archetype/narration:
+// (1) b5's chart auto-accents whichever number is numerically bigger (32,000), while the
+//     narration's climax line says "twelve thousand" — RatioBars.tsx is a shared effect,
+//     so the fix is a HeroRestate band that states the spoken number plainly early in the
+//     beat, plus a ResultNotes rewrite that frames 32,000 as 12,000 + related pages instead
+//     of a second, competing total. (2)/(3) b2/b3/b4 raised `plate` so the hub's unrelated
+//     nav/headlines and the write-up's raw backend strings (run_deep(), /api/drive/dwell,
+//     migration filenames) stop bleeding through the LiveBackdrop recordings. (4) b1's
+//     caption now names the actual scene the narration describes (parking by a farm,
+//     walking around) instead of the generic "stop the car". (5) a persistent BrandMark
+//     chip now names the product on every beat, not only the first ~20% of the clip, so
+//     whichever frame a viewer samples still shows what app this is. b4's jargon line is
+//     glossed in plain words next to the real filename.
 //
 // Voice-synced beat windows (measured, immutable): b1 15-190, b2 190-362,
 // b3 362-520, b4 520-689, b5 689-899 (holds to end).
@@ -248,6 +262,59 @@ const ProductPlate: React.FC = () => {
 };
 
 /**
+ * Every beat, tiny, top-right: names the product throughout the whole clip (wave D fix —
+ * the viewer's sampled frames missed the b1-only ProductPlate, so nothing told them what
+ * app this is). Sits inside the safe-area gutter every catalog effect already respects
+ * (look.safeX=96 / safeY=80), clear of CornerTags' corner slots and every other effect's
+ * centered card.
+ */
+const BrandMark: React.FC = () => {
+  const frame = useCurrentFrame();
+  if (frame < B1) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 16,
+        right: 20,
+        padding: "6px 12px",
+        background: "rgba(0,0,0,0.55)",
+        borderRadius: 999,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.2, color: ACCENT, whiteSpace: "nowrap" }}>
+        🚗 GUIDE — STORIES ON THE ROAD
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Beat 5 only, early: restates the narration's own climax number in plain text. ratioBars
+ * (a shared effect) always colors whichever bar is numerically BIGGER as the accent/hero
+ * bar — here that is 32,000, while the voiceover's climax line says "twelve thousand". A
+ * viewer reading the chart alone gets a different number than the one they hear; this band
+ * states the spoken number directly so the two no longer contradict each other.
+ */
+const HeroRestate: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B5) return null;
+  const t = tween(sec(frame, B5 + 6, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 36, width: 1280, textAlign: "center", opacity: t, fontFamily }}>
+      <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: 1.6, color: P.accent, textShadow: "0 2px 10px rgba(0,0,0,0.5)" }}>
+        UP TO 12,000 CHARACTERS
+      </div>
+      <div style={{ fontSize: 16, fontWeight: 600, color: "#E8F4F1", marginTop: 4 }}>
+        the local-history article itself — read in full, once you actually stop
+      </div>
+    </div>
+  );
+};
+
+/**
  * Beat 5 only: ratioBars' own bracket+ratio tag don't draw in until ~4.1s into
  * the 7s beat, measured fill at the 3.5s midpoint was still 28/48 — the bars sit
  * left-of-center (barMax reserves room for a bracket+ratio that hasn't landed
@@ -261,11 +328,11 @@ const ResultNotes: React.FC = () => {
   const P = usePalette();
   if (frame < B5) return null;
   const t = tween(sec(frame, B5 + 4, 30), 0, 0.4, ease.power3Out);
-  const items = ["Related pages, same place", "Same visit, nothing repeated"];
+  const items = ["12,000 — the article itself", "+20,000 — the related pages it folds in", "32,000 — total read, nothing repeated"];
   return (
     <div style={{ position: "absolute", right: 70, top: 300, width: 400, opacity: t, fontFamily }}>
       <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>
-        WHAT&apos;S IN THE 32,000
+        32,000 = 12,000 + RELATED PAGES
       </div>
       <div style={{ position: "absolute", left: -26, top: 26, width: 3, height: 230, background: P.border }} />
       {items.map((it, i) => (
@@ -275,8 +342,8 @@ const ResultNotes: React.FC = () => {
             display: "flex",
             alignItems: "center",
             gap: 10,
-            marginTop: i === 0 ? 70 : 110,
-            fontSize: 20,
+            marginTop: i === 0 ? 60 : 56,
+            fontSize: 18,
             fontWeight: 600,
             color: "#E8F4F1",
           }}
@@ -301,8 +368,8 @@ const Inner: React.FC = () => {
         dur={B2 - B1}
         accent={ACCENT}
         data={{
-          line1: "You stop the car —",
-          line2: "but the story already ended.",
+          line1: "You park by an old farm, walk around —",
+          line2: "but the story already ended on the way in.",
           keywords: ["already", "ended"],
         }}
       />
@@ -315,7 +382,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.85}
         data={{
           statement: "One short clip. One tiny slice of history.",
           tags: ["Same clip every time", "Built from a short excerpt", "No matter how long you stay", "Nothing deeper offered"],
@@ -329,7 +396,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.82}
         data={{
           title: "Is this a real stop?",
           claims: [
@@ -347,13 +414,18 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.88}
         data={{
           from: "Short excerpt (first story)",
           to: "Full local-history article",
           fromLabel: "BEFORE",
           toLabel: "NOW",
-          points: ["Up to 12,000 characters read", "Related pages folded in too", "Skips what you already heard", "dossier.py, deep=True"],
+          points: [
+            "Up to 12,000 characters read",
+            "Related pages folded in too",
+            "Skips what you already heard",
+            "dossier.py — the script that writes the long version",
+          ],
         }}
       />
 
@@ -373,10 +445,12 @@ const Inner: React.FC = () => {
           caption: "Once a snippet, now the whole piece",
         }}
       />
+      <HeroRestate />
       <ResultNotes />
 
       <SideLabel />
       <Ribbon />
+      <BrandMark />
     </AbsoluteFill>
   );
 };
