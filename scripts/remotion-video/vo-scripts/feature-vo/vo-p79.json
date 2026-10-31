@@ -1,0 +1,57 @@
+{
+ "id": "p79",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.929,
+  "b2": 5.352,
+  "b3": 4.978,
+  "b4": 4.843,
+  "b5": 5.953
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I used to dictate a blog post into Telegram and it published itself, right away.",
+   "start_s": 0.5,
+   "end_s": 5.429,
+   "start_f": 15,
+   "end_f": 163
+  },
+  {
+   "beat": "b2",
+   "text": "The writer was guessing \u2014 inventing details, or forgetting things I'd said another day.",
+   "start_s": 5.729,
+   "end_s": 11.081,
+   "start_f": 172,
+   "end_f": 332
+  },
+  {
+   "beat": "b3",
+   "text": "Now it reads my own notes and my project list first, before it writes a word.",
+   "start_s": 11.381,
+   "end_s": 16.359,
+   "start_f": 341,
+   "end_f": 491
+  },
+  {
+   "beat": "b4",
+   "text": "If something's missing, it asks \u2014 and saves a draft instead of publishing it.",
+   "start_s": 16.659,
+   "end_s": 21.502,
+   "start_f": 500,
+   "end_f": 645
+  },
+  {
+   "beat": "b5",
+   "text": "I get Publish, Edit or Cancel, and now three ways of writing a post all go through that same check.",
+   "start_s": 21.802,
+   "end_s": 27.755,
+   "start_f": 654,
+   "end_f": 833
+  }
+ ],
+ "total_s": 29.255,
+ "durationInFrames": 878,
+ "measured_track_s": 27.816,
+ "track": "/root/feature-demos/vo-p79/vo-p79.mp3"
+}

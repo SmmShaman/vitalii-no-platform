@@ -1,0 +1,57 @@
+{
+ "id": "b74",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.539,
+  "b2": 6.386,
+  "b3": 6.586,
+  "b4": 6.971,
+  "b5": 4.634
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My four kids share one app \u2014 and until now, it looked exactly the same for all of them.",
+   "start_s": 0.5,
+   "end_s": 6.039,
+   "start_f": 15,
+   "end_f": 181
+  },
+  {
+   "beat": "b2",
+   "text": "One flat green screen, the same grey circle for every avatar. No way to tell who was who.",
+   "start_s": 6.339,
+   "end_s": 12.725,
+   "start_f": 190,
+   "end_f": 382
+  },
+  {
+   "beat": "b3",
+   "text": "So I gave each kid their own name's color \u2014 sun, coral, mint, or grape \u2014 everywhere they look.",
+   "start_s": 13.025,
+   "end_s": 19.611,
+   "start_f": 391,
+   "end_f": 588
+  },
+  {
+   "beat": "b4",
+   "text": "Squircle avatars, a floating tab bar, new icons \u2014 all redrawn in Tailwind CSS.",
+   "start_s": 19.911,
+   "end_s": 26.882,
+   "start_f": 597,
+   "end_f": 806
+  },
+  {
+   "beat": "b5",
+   "text": "One redesign, four kids, four colors that are finally theirs.",
+   "start_s": 27.182,
+   "end_s": 31.816,
+   "start_f": 815,
+   "end_f": 954
+  }
+ ],
+ "total_s": 33.316,
+ "durationInFrames": 999,
+ "measured_track_s": 31.872,
+ "track": "/root/feature-demos/vo-b74/vo-b74.mp3"
+}
