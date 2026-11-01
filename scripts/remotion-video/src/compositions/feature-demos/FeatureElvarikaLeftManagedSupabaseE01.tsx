@@ -226,18 +226,20 @@ const Inner: React.FC = () => {
       <FillCaption from={B3} dur={B4 - B3} y={140} chips={["Old: omlmcjulkwphhlgzojgw (paused)", "New: api.elvarika.com"]} tone="accent" />
 
       {/* b4 — the security hole: drawn, invisible plumbing (the exploit path) */}
-      <MotionInsert
-        effect="pipelineFlow"
-        from={B4}
-        dur={B5 - B4}
-        accent={ACCENT}
-        base={STAGE}
-        data={{
-          steps: ["New user signs up", "Client sends a role field", "Server trusted it blindly"],
-          result: "Self-granted admin access",
-          system: "Signup endpoint",
-        }}
-      />
+      <RightStage>
+        <MotionInsert
+          effect="pipelineFlow"
+          from={B4}
+          dur={B5 - B4}
+          accent={ACCENT}
+          base={STAGE}
+          data={{
+            steps: ["New user signs up", "Client sends a role field", "Server trusted it blindly"],
+            result: "Self-granted admin access",
+            system: "Signup endpoint",
+          }}
+        />
+      </RightStage>
       <FillCaption from={B4} dur={B5 - B4} y={40} label="Signup endpoint, unchecked" chips={["New user signs up", "Client sends a role field", "Server trusted it blindly"]} tone="accent" />
       <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Self-granted admin access"]} tone="danger" />
 

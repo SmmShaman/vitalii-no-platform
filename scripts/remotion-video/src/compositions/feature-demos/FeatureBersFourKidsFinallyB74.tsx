@@ -179,7 +179,7 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{
           statement: "One app, four kids, one look",
-          tags: ["4 kids, 1 app", "Same look for all", "No way to tell apart"],
+          tags: ["4 kids, 1 app", "Same look for all", "No way to tell apart", "Same grey circle"],
         }}
       />
 

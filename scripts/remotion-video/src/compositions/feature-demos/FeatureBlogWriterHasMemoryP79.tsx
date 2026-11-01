@@ -69,6 +69,30 @@ const NEW_FACTS = [
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
+/** Duel-occlusion fix: every catalog effect anchors its text at safeX / width-safeX,
+ * which lands inside the OLD_BOX / NEW_BOX columns (x:20-190, x:1090-1260) and gets
+ * covered by their opaque panels. Scales + shifts a MotionInsert into the 190-1090
+ * gap between the columns so nothing it draws ends up hidden behind the duel. */
+const CENTER_LEFT = OLD_BOX.x + OLD_BOX.w;
+const CENTER_W = NEW_BOX.x - CENTER_LEFT;
+const CENTER_SCALE = CENTER_W / 1280;
+const CenterStage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: CENTER_LEFT,
+      top: (720 - 720 * CENTER_SCALE) / 2,
+      width: CENTER_W,
+      height: 720 * CENTER_SCALE,
+      overflow: "hidden",
+    }}
+  >
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, transform: `scale(${CENTER_SCALE})`, transformOrigin: "0 0" }}>
+      {children}
+    </div>
+  </div>
+);
+
 const Duel: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -174,32 +198,36 @@ const Inner: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       {/* b1 — the old behavior, drawn */}
-      <MotionInsert
-        effect="cornerTags"
-        from={B1}
-        dur={B2 - B1}
-        accent={ACCENT}
-        data={{
-          statement: "One voice note, instant publish",
-          tags: ["No memory", "No check", "Published immediately"],
-        }}
-      />
+      <CenterStage>
+        <MotionInsert
+          effect="cornerTags"
+          from={B1}
+          dur={B2 - B1}
+          accent={ACCENT}
+          data={{
+            statement: "One voice note, instant publish",
+            tags: ["No memory", "No check", "Published immediately"],
+          }}
+        />
+      </CenterStage>
 
       {/* b2 — the old writer under scrutiny, drawn */}
-      <MotionInsert
-        effect="statusFocus"
-        from={B2}
-        dur={B3 - B2}
-        accent={ACCENT}
-        data={{
-          title: "The old writer",
-          claims: [
-            { text: "Remembers earlier notes", verdict: "no" },
-            { text: "Checks my project list", verdict: "no" },
-            { text: "Confirms facts first", verdict: "no" },
-          ],
-        }}
-      />
+      <CenterStage>
+        <MotionInsert
+          effect="statusFocus"
+          from={B2}
+          dur={B3 - B2}
+          accent={ACCENT}
+          data={{
+            title: "The old writer",
+            claims: [
+              { text: "Remembers earlier notes", verdict: "no" },
+              { text: "Checks my project list", verdict: "no" },
+              { text: "Confirms facts first", verdict: "no" },
+            ],
+          }}
+        />
+      </CenterStage>
 
       {/* b3 — the fix, over the feature's own live page */}
       {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B3} hold={B4 - B3} />}
@@ -217,30 +245,34 @@ const Inner: React.FC = () => {
       />
 
       {/* b4 — publish-first vs ask-then-draft, drawn */}
-      <MotionInsert
-        effect="handoffExplain"
-        from={B4}
-        dur={B5 - B4}
-        accent={ACCENT}
-        data={{
-          from: "Publishes right away",
-          to: "Asks, then drafts",
-          points: ["Missing detail -> a question", "Draft saved, not published", "Safer by default"],
-        }}
-      />
+      <CenterStage>
+        <MotionInsert
+          effect="handoffExplain"
+          from={B4}
+          dur={B5 - B4}
+          accent={ACCENT}
+          data={{
+            from: "Publishes right away",
+            to: "Asks, then drafts",
+            points: ["Missing detail -> a question", "Draft saved, not published", "Safer by default"],
+          }}
+        />
+      </CenterStage>
 
       {/* b5 — the result, drawn (no feature page or hub on the last beat) */}
-      <MotionInsert
-        effect="hubRouting"
-        from={B5}
-        dur={END - B5}
-        accent={ACCENT}
-        data={{
-          inputs: ["Voice note", "Text chat", "Manual edit"],
-          hub: "Same check",
-          output: "Publish, Edit or Cancel",
-        }}
-      />
+      <CenterStage>
+        <MotionInsert
+          effect="hubRouting"
+          from={B5}
+          dur={END - B5}
+          accent={ACCENT}
+          data={{
+            inputs: ["Voice note", "Text chat", "Manual edit"],
+            hub: "Same check",
+            output: "Publish, Edit or Cancel",
+          }}
+        />
+      </CenterStage>
 
       <Duel />
     </AbsoluteFill>
