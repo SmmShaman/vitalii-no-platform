@@ -235,6 +235,8 @@ import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/Featu
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
 import { FeatureEveryParentOverrideExpiresB76 } from "./compositions/feature-demos/FeatureEveryParentOverrideExpiresB76";
 import { FeatureArtemsBloodSugarRidesB75 } from "./compositions/feature-demos/FeatureArtemsBloodSugarRidesB75";
+import { FeatureBersFourKidsFinallyB74 } from "./compositions/feature-demos/FeatureBersFourKidsFinallyB74";
+import { FeatureBlogWriterHasMemoryP79 } from "./compositions/feature-demos/FeatureBlogWriterHasMemoryP79";
 import { FeatureOneButtonShutsYoutubeB73 } from "./compositions/feature-demos/FeatureOneButtonShutsYoutubeB73";
 import { FeatureKidReflashedTvAppB72 } from "./compositions/feature-demos/FeatureKidReflashedTvAppB72";
 import { FeatureSugarHubCanFixD15 } from "./compositions/feature-demos/FeatureSugarHubCanFixD15";
@@ -2843,6 +2845,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureArtemsSugarChartMovesB77"
         component={FeatureArtemsSugarChartMovesB77}
         durationInFrames={868}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureBersFourKidsFinallyB74"
+        component={FeatureBersFourKidsFinallyB74}
+        durationInFrames={999}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureBlogWriterHasMemoryP79"
+        component={FeatureBlogWriterHasMemoryP79}
+        durationInFrames={878}
         fps={30}
         width={1280}
         height={720}

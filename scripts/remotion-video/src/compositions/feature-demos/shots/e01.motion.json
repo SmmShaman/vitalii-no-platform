@@ -14,7 +14,7 @@
     {
       "beat": "b2",
       "effect": "copyCorrection",
-      "backdrop": "hub",
+      "backdrop": null,
       "data": {
         "wrong": "A database I don't control",
         "right": "My own server, same keys",
@@ -47,7 +47,7 @@
       "backdrop": null,
       "data": {
         "title": "500MB of RAM freed",
-        "kicker": "Two new triggers closed the hole for good"
+        "kicker": "Closed the hole, dropped one old piece of the stack"
       }
     }
   ]

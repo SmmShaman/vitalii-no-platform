@@ -1,11 +1,16 @@
 // FeatureElvarikaLeftManagedSupabaseE01 — feature e01 — 1280x720, 964 frames @ 30fps, VOICE-SYNCED.
-// archetype 6 sidebar, mood dawn.
+// archetype 6 sidebar, mood mint.
 //
 // Elvarika moved off a managed Supabase project it didn't control the server of, onto a
 // self-hosted stack on its own VPS — same login, same keys, two new triggers closing a
-// signup self-escalation hole. Motion direction (feature-motion skill, 2026-10-07): one
-// editorial effect per beat; the left sidebar is the surviving archetype element and
-// carries the product plate + the running claim while the right stage swaps per beat.
+// signup self-escalation hole, and one old piece of the old stack dropped for 500MB of
+// freed RAM. Motion direction (feature-motion skill): one editorial effect per beat; the
+// left sidebar is the surviving archetype element and carries the product plate + the
+// running claim while the right stage swaps per beat.
+//
+// RE-SHOOT (2026-11-01): narration/beat windows kept exactly as measured; the picture is
+// rewritten for mood mint (was dawn) and the b5 payoff is corrected to match tonight's
+// narration ("dropped one old piece of the stack", not "two new triggers").
 //
 // Beat -> effect (data only from the feature row; no runtime log exists for this product,
 // so every on-screen fact comes straight from problem_en / solution_en / result_en):
@@ -13,15 +18,15 @@
 //             cornerTags over the feature's own page (backdrop "page").
 // b2 269-446  "moved it: a self-hosted Supabase stack... behind a tunnel"
 //             copyCorrection, drawn. The ONE tech caption of this clip ("Supabase,
-//             self-hosted") sits in its label; FillCaptions (Wave D) name the real
-//             containers (elvarika-db/rest/auth/storage/functions/gateway) and the
-//             real domain + tunnel id (api.elvarika.com, b5c0ecc5).
+//             self-hosted") sits in its label; FillCaptions name the real containers
+//             (elvarika-db/rest/auth/storage/functions/gateway) and the real domain +
+//             tunnel id (api.elvarika.com, b5c0ecc5).
 // b3 446-578  "same login, same keys — nobody even noticed" — keywordCaption, drawn
 //             (nothing to record: the point is that nothing visibly changed).
 // b4 578-752  "a user could grant themselves admin rights through signup" —
 //             pipelineFlow, drawn (invisible plumbing: the exploit path).
-// b5 752-964  "closed it... freeing 500 megabytes of RAM" — titleTakeover (verdict),
-//             drawn, holds to the end on the real number.
+// b5 752-964  "closed it, dropped one old piece of the stack — 500MB of RAM" —
+//             titleTakeover (verdict), drawn, holds to the end on the real number.
 //
 // Persistent element: the left sidebar column (archetype 6), b1 through b5.
 
@@ -41,9 +46,9 @@ const B5 = 752;
 const END = 964;
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-/** Tuned for the dark MotionInsert plate (dawn's #2563EB reads muddy there). */
-const ACCENT = "#F08A4B";
-const STAGE = "#14100A";
+/** Bright mint tuned to read on the dark MotionInsert plate. */
+const ACCENT = "#3FD98C";
+const STAGE = "#0D1711";
 const SIDEBAR_W = 320;
 
 const CLAIMS = [
@@ -65,7 +70,7 @@ const Sidebar: React.FC = () => {
     <div style={{ position: "absolute", left: 0, top: 0, width: SIDEBAR_W, height: 720, background: P.ink, fontFamily }}>
       <div style={{ position: "absolute", left: 28, top: 36, width: SIDEBAR_W - 56 }}>
         <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>ELVARIKA</div>
-        <div style={{ fontSize: 18, fontWeight: 700, color: "#EAF0FF", marginTop: 6, lineHeight: 1.35 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, color: "#EAFBF1", marginTop: 6, lineHeight: 1.35 }}>
           Your text becomes a language lesson
         </div>
       </div>
@@ -85,8 +90,8 @@ const Sidebar: React.FC = () => {
   );
 };
 
-// Wave C fill-fix: pipelineFlow leaves the top/bottom margins empty until late in its own
-// internal reveal. These bands restate data the beat already carries (never new facts).
+// Fill-fix: pipelineFlow/copyCorrection leave the top/bottom margins empty until late in
+// their own internal reveal. These bands restate data the beat already carries (never new facts).
 const FillCaption: React.FC<{
   from: number;
   dur: number;
@@ -133,9 +138,9 @@ const FillCaption: React.FC<{
   );
 };
 
-/** Wave C sidebar-occlusion fix: shrinks + shifts a MotionInsert into the area right of the
- * sidebar so the effect's centered content never renders underneath it (b2, b5 — the hero
- * text in each sat partly behind the opaque sidebar at full width). */
+/** Sidebar-occlusion fix: shrinks + shifts a MotionInsert into the area right of the sidebar
+ * so the effect's centered content never renders underneath it (b2, b5 — the hero text in
+ * each sat partly behind the opaque sidebar at full width). */
 const RIGHT_STAGE_SCALE = (1280 - SIDEBAR_W) / 1280;
 const RightStage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div
@@ -172,15 +177,14 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b2 — the move. The clip's one tech caption lives here; the former "hub" backdrop
-          was replaced (Wave D) because it showed an unrelated blog page, not infrastructure. */}
+      {/* b2 — the move. The clip's one tech caption lives here. */}
       <RightStage>
         <MotionInsert
           effect="copyCorrection"
           from={B2}
           dur={B3 - B2}
           accent={ACCENT}
-          plate={0.7}
+          base={STAGE}
           data={{
             wrong: "A database I don't control",
             right: "My own server, same keys",
@@ -237,7 +241,7 @@ const Inner: React.FC = () => {
       <FillCaption from={B4} dur={B5 - B4} y={40} label="Signup endpoint, unchecked" chips={["New user signs up", "Client sends a role field", "Server trusted it blindly"]} tone="accent" />
       <FillCaption from={B4} dur={B5 - B4} y={500} chips={["Self-granted admin access"]} tone="danger" />
 
-      {/* b5 — the verdict: closed, and the real number. Holds to the end, no fade. */}
+      {/* b5 — the verdict: closed, one old piece dropped, the real number. Holds to the end. */}
       <RightStage>
         <MotionInsert
           effect="titleTakeover"
@@ -247,7 +251,7 @@ const Inner: React.FC = () => {
           base={STAGE}
           data={{
             title: "500MB of RAM freed",
-            kicker: "Two new triggers closed the hole for good",
+            kicker: "Closed the hole, dropped one old piece of the stack",
           }}
         />
       </RightStage>
@@ -255,8 +259,8 @@ const Inner: React.FC = () => {
         from={B5}
         dur={END - B5}
         y={40}
-        label="The two guards"
-        chips={["guard_auth_user_role", "guard_users_protected_columns"]}
+        label="The fix"
+        chips={["Two guard triggers on signup", "One legacy container retired"]}
         tone="accent"
       />
 
@@ -266,7 +270,7 @@ const Inner: React.FC = () => {
 };
 
 export const FeatureElvarikaLeftManagedSupabaseE01: React.FC = () => (
-  <PaletteProvider value={MOODS.dawn}>
+  <PaletteProvider value={MOODS.mint}>
     <Inner />
   </PaletteProvider>
 );

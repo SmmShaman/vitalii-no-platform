@@ -1,0 +1,14 @@
+{
+  "id": "p79",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-blog-writer-now-has-a-memory-drafts-first-publishes-only-when-i-say-so-p79",
+      "frames": 159,
+      "scroll": [[0, 0], [158, 350]],
+      "mouse": [[0, 560, 220], [80, 560, 260], [158, 560, 230]]
+    }
+  ]
+}
