@@ -7,16 +7,25 @@
 // gives each kid their own color (sun, coral, mint, grape) everywhere they look,
 // redrawn in Tailwind CSS with squircle avatars, a floating tab bar and new icons.
 //
-// Beat → effect (data only from the feature row and commit e82d6de):
+// Beat → effect (data only from the feature row and commits e82d6de / 2e0f429):
 // b1 15-190   "one app, four kids, one look"
-//             cornerTags, drawn — the claim + three facts.
+//             cornerTags, drawn — the claim + three facts, plus a one-line
+//             product plate (WAVE D: the app's name/purpose was never stated).
 // b2 190-391  "one flat green screen, the same grey circle for everyone"
-//             keywordCaption, drawn — the exact before-state no longer exists on
-//             the live site, so it is stated, not screenshotted.
+//             keywordCaption, drawn, plus a row of four identical grey circles
+//             labelled with the real kid names (WAVE D: line 2 was a bare
+//             sentence on black — now the "same for everyone" claim is drawn).
 // b3 391-597  "each kid gets their own color — sun, coral, mint, grape"
-//             handoffExplain over the feature's own live page (shot "page").
+//             handoffExplain, plus four real-color squircles built from the
+//             KIDS palette below (WAVE D: replaces a LiveBackdrop of the
+//             feature's own blog-style article page, which never showed the
+//             colors and read as news coverage rather than the product).
 // b4 597-815  "squircle avatars, floating tab bar, new icons — Tailwind CSS"
-//             pipelineFlow over the same live page, scrolled on (shot "page2").
+//             pipelineFlow, plus a drawn git-log window naming the two real
+//             commits (e82d6de web redesign, 2e0f429 android icon match)
+//             (WAVE D: replaces the second LiveBackdrop of the same article
+//             page; the pipeline's text labels now have real evidence behind
+//             them instead of just re-captioning the narration).
 // b5 815-999  "four colors, finally theirs"
 //             titleTakeover, drawn — no feature page or hub on the last beat (gate 2).
 //
@@ -30,9 +39,9 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { MotionInsert, Arrive } from "./motion-primitives";
+import { LogWindow } from "./live-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
-import shotsFile from "./shots/b74.json";
 
 const B1 = 15;
 const B2 = 190;
@@ -58,6 +67,93 @@ const KIDS = [
 ];
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
+
+/** b1 fix: the app's name and purpose were never stated anywhere on screen. */
+const ProductTag: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B1 + 6 || frame >= B2) return null;
+  const p = tween(sec(frame, B1 + 6, fps), 0, 0.3, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 0,
+        top: 150,
+        width: 1280,
+        display: "flex",
+        justifyContent: "center",
+        opacity: p,
+        transform: `translateY(${(1 - p) * 10}px)`,
+      }}
+    >
+      <div style={{ background: "rgba(8,8,8,0.62)", border: `1.5px solid ${P.accent}55`, borderRadius: 10, padding: "14px 28px", textAlign: "center" }}>
+        <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.2, color: P.accent, fontFamily }}>BER — FAMILY NETWORK</div>
+        <div style={{ fontSize: 18, fontWeight: 600, color: "#F5ECE0", marginTop: 6, fontFamily }}>One shared app for parents and kids</div>
+      </div>
+    </div>
+  );
+};
+
+/** b2 fix: the line was a bare sentence on black. Draw the "same for everyone"
+ * claim it states — four identical grey circles, one per real kid name. */
+const SameCircles: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B2 || frame >= B3) return null;
+  const names = ["Emma", "Leo", "Nora", "Oskar"];
+  const d = 84;
+  const gap = 48;
+  const totalW = names.length * d + (names.length - 1) * gap;
+  const x0 = (1280 - totalW) / 2;
+  return (
+    <div style={{ position: "absolute", left: 0, top: 150, width: 1280, height: 160 }}>
+      {names.map((name, i) => {
+        const at = B2 + 10 + i * 6;
+        if (frame < at) return null;
+        const p = tween(sec(frame, at, fps), 0, 0.3, ease.power3Out);
+        const x = x0 + i * (d + gap);
+        return (
+          <div key={name} style={{ position: "absolute", left: x, top: 0, width: d, textAlign: "center", opacity: p, transform: `translateY(${(1 - p) * 10}px)` }}>
+            <div style={{ width: d, height: d, borderRadius: "50%", background: "#6B6B6B", border: `2px solid ${P.border}`, margin: "0 auto" }} />
+            <div style={{ fontSize: 14, fontWeight: 700, color: "#C9C2B8", marginTop: 10, fontFamily }}>{name.toUpperCase()}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+/** b3 fix: replaces a LiveBackdrop of the feature's own blog-style article page
+ * (read as news coverage, never showed a color) with the four real squircle
+ * colors from the KIDS palette above — the claim rendered, not just named. */
+const ColorSquircles: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  if (frame < B3 || frame >= B4) return null;
+  const d = 72;
+  const gap = 40;
+  const totalW = KIDS.length * d + (KIDS.length - 1) * gap;
+  const x0 = (1280 - totalW) / 2;
+  return (
+    <div style={{ position: "absolute", left: 0, top: 36, width: 1280, height: 110 }}>
+      {KIDS.map((kid, i) => {
+        const at = B3 + 10 + i * 16;
+        if (frame < at) return null;
+        const p = tween(sec(frame, at, fps), 0, 0.3, ease.power3Out);
+        const x = x0 + i * (d + gap);
+        return (
+          <div key={kid.name} style={{ position: "absolute", left: x, top: 0, width: d, textAlign: "center", opacity: p, transform: `scale(${0.85 + 0.15 * p})` }}>
+            <div style={{ width: d, height: d, borderRadius: 20, background: kid.hex, boxShadow: "0 4px 10px rgba(0,0,0,0.35)", margin: "0 auto" }} />
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#F5ECE0", marginTop: 8, fontFamily }}>{kid.color.toUpperCase()}</div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 const Ledger: React.FC = () => {
   const frame = useCurrentFrame();
@@ -171,7 +267,7 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1 — the claim, drawn */}
+      {/* b1 — the claim, drawn, plus the product plate (name + purpose) */}
       <MotionInsert
         effect="cornerTags"
         from={B1}
@@ -182,8 +278,9 @@ const Inner: React.FC = () => {
           tags: ["4 kids, 1 app", "Same look for all", "No way to tell apart", "Same grey circle"],
         }}
       />
+      <ProductTag />
 
-      {/* b2 — the exact before-state, drawn (no longer live to screenshot) */}
+      {/* b2 — the exact before-state, drawn, plus the four identical grey circles it names */}
       <MotionInsert
         effect="keywordCaption"
         from={B2}
@@ -195,9 +292,9 @@ const Inner: React.FC = () => {
           keywords: ["flat green", "grey circle"],
         }}
       />
+      <SameCircles />
 
-      {/* b3 — the fix, over the feature's own live page */}
-      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B3} hold={B4 - B3} />}
+      {/* b3 — the fix, plus the real squircle colors instead of a LiveBackdrop of the article page */}
       <MotionInsert
         effect="handoffExplain"
         from={B3}
@@ -212,9 +309,9 @@ const Inner: React.FC = () => {
           points: ["Sun, coral, mint, grape", "Everywhere they look", "e82d6de web redesign"],
         }}
       />
+      <ColorSquircles />
 
-      {/* b4 — the redraw, over the same live page scrolled further */}
-      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B4} hold={B5 - B4} />}
+      {/* b4 — the redraw, plus the real commit log instead of a second LiveBackdrop */}
       <MotionInsert
         effect="pipelineFlow"
         from={B4}
@@ -227,6 +324,22 @@ const Inner: React.FC = () => {
           system: "Tailwind CSS 🎨",
         }}
       />
+      {frame >= B4 && frame < B5 && (
+        <LogWindow
+          title="git log --oneline"
+          win={{ x: 140, y: 20, w: 1000, h: 216 }}
+          from={B4 + 10}
+          every={26}
+          fontSize={18}
+          opacity={1}
+          lines={[
+            { t: "e82d6de", text: "feat(web): bright family redesign", tone: "accent" },
+            { text: "new tokens, Phosphor icons, playful UI", tone: "ink" },
+            { t: "2e0f429", text: "feat(android): blue launcher icon", tone: "accent" },
+            { text: "app colours matched to the redesign", tone: "ink" },
+          ]}
+        />
+      )}
 
       {/* b5 — the result, drawn (no feature page or hub on the last beat) */}
       <MotionInsert
