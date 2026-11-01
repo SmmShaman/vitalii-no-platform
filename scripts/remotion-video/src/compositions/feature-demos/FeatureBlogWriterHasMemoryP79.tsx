@@ -8,20 +8,28 @@
 // instead of auto-publishing. Three input paths (voice note, text chat, manual edit)
 // all funnel through that same check before Publish / Edit / Cancel.
 //
-// No commit diff is shown: the only commit whose message matches this story
-// (7192ce3, "author brain for /blog posts") is not among tonight's verified URLs;
-// the two verified commits (7d81dde, 73ce018) are unrelated to this feature. Per
-// the brief's own rule, the mechanism is drawn instead of shown as a live recording.
+// WAVE D fix (2026-11-01): no commit diff / LiveWindow recording is shown — the
+// only commit whose message matches this story (7192ce3, "author brain for
+// /blog posts") is not among the verified recording URLs, so a new recording
+// cannot be made this pass. Instead the mechanism is drawn, PLUS the real
+// commit facts are shown verbatim in a drawn terminal (LogWindow, b3) and a
+// named product + Telegram plate (b1) replaces the unnamed-product problem.
 //
 // Beat → effect (data only from the feature row):
 // b1 15-172   "I used to dictate a blog post into Telegram and it published itself"
 //             cornerTags, drawn — the old behavior, stated as a claim + facts.
+//             + ProductTag: names the product and shows a Telegram glyph (the
+//             spoken word "Telegram" was never pictured before this fix).
 // b2 172-341  "The writer was guessing — inventing details, or forgetting things"
 //             statusFocus, drawn — three "no" verdicts against the old writer.
+//             + GuessExample: one concrete illustrative guess, not a recaption.
 // b3 341-500  "Now it reads my own notes and my project list first"
-//             pipelineFlow over the feature's own live page (shot "page").
+//             pipelineFlow + LogWindow showing commit 7192ce3's real hash,
+//             message and changed files — replaces the generic article-style
+//             LiveBackdrop mockup that read as someone else's blog coverage.
 // b4 500-654  "If something's missing, it asks — and saves a draft instead"
 //             handoffExplain, drawn — publish-first vs ask-then-draft.
+//             + AskExample: one concrete question the bot would actually ask.
 // b5 654-878  "Publish, Edit or Cancel — three ways of writing all go through
 //             that same check" — hubRouting, drawn — no feature page or hub
 //             on the last beat (gate 2).
@@ -34,12 +42,12 @@
 // static beside it.
 
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import { MotionInsert, Arrive } from "./motion-primitives";
+import { LogWindow, LogLine } from "./live-primitives";
 import { punchScale } from "../../components/effects/motion/grammar";
-import shotsFile from "./shots/p79.json";
 
 const B1 = 15;
 const B2 = 172;
@@ -92,6 +100,135 @@ const CenterStage: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     </div>
   </div>
 );
+
+const fadeIn = (frame: number, at: number, dur = 10) =>
+  interpolate(frame, [at, at + dur], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
+/** A real "send" glyph standing in for Telegram — the spoken word "Telegram" (b1
+ * line 1) was never pictured before this fix (viewer problem #2). */
+const TelegramGlyph: React.FC<{ size?: number }> = ({ size = 22 }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
+    <circle cx="12" cy="12" r="12" fill="#229ED9" />
+    <path
+      d="M6 12.2l12.4-5.1c.7-.3 1.3.2 1 1l-2.3 10.3c-.2.8-.8 1-1.4.5l-3.4-2.6-1.8 1.7c-.3.3-.6.2-.6-.2l.3-3 7-6.5c.3-.3-.1-.4-.4-.2l-8.6 5.5-3.6-1.1c-.7-.2-.7-.9.4-1.3z"
+      fill="#fff"
+    />
+  </svg>
+);
+
+/** Fix for problems 1+2: the product is never named, and "Telegram" is spoken
+ * but never shown. One-line plate in the global top strip (real y 8-52), free
+ * of the Duel columns in every beat — shown only while b1's claim is on screen. */
+const ProductPlate: React.FC<{ from: number; to: number }> = ({ from, to }) => {
+  const frame = useCurrentFrame();
+  if (frame < from || frame >= to) return null;
+  const a = fadeIn(frame, from);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 190,
+        top: 8,
+        width: 900,
+        height: 44,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "0 18px",
+        background: "#1F1526",
+        border: "1px solid #3A2A44",
+        borderRadius: 8,
+        opacity: a,
+        fontFamily,
+      }}
+    >
+      <TelegramGlyph size={22} />
+      <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 0.4, color: "#F5F5F2" }}>PORTFOLIO &amp; NEWS PLATFORM</div>
+      <div style={{ fontSize: 13, fontWeight: 600, color: ACCENT }}>Telegram blog bot</div>
+    </div>
+  );
+};
+
+/** Fix for problem 3 (half): b2 only recaptioned the narration as a checklist.
+ * One concrete, clearly-labelled illustrative example of a guess — not a new
+ * product fact, just a picture of the failure mode the line already states. */
+const GuessExample: React.FC<{ from: number; to: number }> = ({ from, to }) => {
+  const frame = useCurrentFrame();
+  if (frame < from || frame >= to) return null;
+  const a = fadeIn(frame, from);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 230,
+        top: 14,
+        width: 820,
+        height: 118,
+        borderRadius: 8,
+        background: "#1F1526",
+        border: "1px solid #3A2A44",
+        opacity: a,
+        padding: "14px 22px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.4, color: ACCENT }}>EXAMPLE, ONE NIGHT</div>
+      <div style={{ fontSize: 15, fontWeight: 700, color: "#F5F5F2" }}>
+        "Pushed the pricing page" — no date, no project named
+      </div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: "#E0847A" }}>Old writer guessed: published it under last week's project</div>
+    </div>
+  );
+};
+
+/** Fix for problem 4: b3's background was a generic blog/news mockup, not this
+ * product. Replaces it with the real commit that built this feature, shown
+ * verbatim in a drawn terminal (no recording exists for this commit yet). */
+const BRAIN_COMMIT_LINES: LogLine[] = [
+  { t: "commit", text: "7192ce3", tone: "accent" },
+  { text: "feat(blog): author brain for /blog posts", tone: "success" },
+  { text: "drafts before publishing, never auto-publishes", tone: "ink" },
+  { t: "M", text: "supabase/functions/_shared/author-brain.ts", tone: "muted" },
+  { t: "M", text: "supabase/functions/process-voice-blog/index.ts", tone: "muted" },
+  { t: "M", text: "supabase/functions/telegram-webhook/index.ts", tone: "muted" },
+  { t: "A", text: "supabase/migrations/20261024170000_author_brain.sql", tone: "muted" },
+  { t: "A", text: "scripts/vps/brain-add.sh", tone: "muted" },
+];
+
+/** Fix for problem 3 (other half): b4 only recaptioned "asks a question" as a
+ * bullet. One concrete example of the actual question the bot would ask. */
+const AskExample: React.FC<{ from: number; to: number }> = ({ from, to }) => {
+  const frame = useCurrentFrame();
+  if (frame < from || frame >= to) return null;
+  const a = fadeIn(frame, from);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 230,
+        top: 490,
+        width: 820,
+        height: 110,
+        borderRadius: 8,
+        background: "#1F1526",
+        border: "1px solid #3A2A44",
+        opacity: a,
+        padding: "14px 22px",
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.4, color: ACCENT }}>EXAMPLE QUESTION</div>
+      <div style={{ fontSize: 15, fontWeight: 700, color: "#F5F5F2" }}>"Which project is this for — vitalii.no or Jobbot?"</div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: "#8FD9A8" }}>Draft saved, waits for my reply before publishing</div>
+    </div>
+  );
+};
 
 const Duel: React.FC = () => {
   const frame = useCurrentFrame();
@@ -210,6 +347,7 @@ const Inner: React.FC = () => {
           }}
         />
       </CenterStage>
+      <ProductPlate from={B1 + 6} to={B2} />
 
       {/* b2 — the old writer under scrutiny, drawn */}
       <CenterStage>
@@ -228,9 +366,18 @@ const Inner: React.FC = () => {
           }}
         />
       </CenterStage>
+      <GuessExample from={B2 + 10} to={B3} />
 
-      {/* b3 — the fix, over the feature's own live page */}
-      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B3} hold={B4 - B3} />}
+      {/* b3 — the fix, evidenced by the real commit that built it */}
+      <LogWindow
+        lines={BRAIN_COMMIT_LINES}
+        title="git log --oneline"
+        from={B3 + 10}
+        every={16}
+        opacity={frame >= B3 && frame < B4 ? 1 : 0}
+        win={{ x: 200, y: 14, w: 880, h: 226 }}
+        fontSize={20}
+      />
       <MotionInsert
         effect="pipelineFlow"
         from={B3}
@@ -258,6 +405,7 @@ const Inner: React.FC = () => {
           }}
         />
       </CenterStage>
+      <AskExample from={B4 + 10} to={B5} />
 
       {/* b5 — the result, drawn (no feature page or hub on the last beat) */}
       <CenterStage>
