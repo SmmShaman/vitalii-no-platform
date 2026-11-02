@@ -1,0 +1,57 @@
+{
+ "id": "g27",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.052,
+  "b2": 4.936,
+  "b3": 5.367,
+  "b4": 6.183,
+  "b5": 5.312
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My kids' phones block bad sites, but I had no idea what they actually visited.",
+   "start_s": 0.5,
+   "end_s": 5.552,
+   "start_f": 15,
+   "end_f": 167
+  },
+  {
+   "beat": "b2",
+   "text": "It filtered blind \u2014 blocking requests, keeping no record of where they went.",
+   "start_s": 5.852,
+   "end_s": 10.788,
+   "start_f": 176,
+   "end_f": 324
+  },
+  {
+   "beat": "b3",
+   "text": "And Android uses a different kind of private DNS, so it was invisible to the guard.",
+   "start_s": 11.088,
+   "end_s": 16.455,
+   "start_f": 333,
+   "end_f": 494
+  },
+  {
+   "beat": "b4",
+   "text": "Now every device logs its sites and IPs on a new Cloudflare database, Android included.",
+   "start_s": 16.755,
+   "end_s": 22.938,
+   "start_f": 503,
+   "end_f": 688
+  },
+  {
+   "beat": "b5",
+   "text": "I pick a device on the dashboard and see exactly where it went, for the last two days.",
+   "start_s": 23.238,
+   "end_s": 28.55,
+   "start_f": 697,
+   "end_f": 857
+  }
+ ],
+ "total_s": 30.05,
+ "durationInFrames": 902,
+ "measured_track_s": 28.608,
+ "track": "/root/feature-demos/vo-g27/vo-g27.mp3"
+}

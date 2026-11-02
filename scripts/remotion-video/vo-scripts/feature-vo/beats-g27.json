@@ -1,0 +1,7 @@
+{"id": "g27", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My kids' phones block bad sites, but I had no idea what they actually visited."],
+ ["b2", "It filtered blind — blocking requests, keeping no record of where they went."],
+ ["b3", "And Android uses a different kind of private DNS, so it was invisible to the guard."],
+ ["b4", "Now every device logs its sites and IPs on a new Cloudflare database, Android included."],
+ ["b5", "I pick a device on the dashboard and see exactly where it went, for the last two days."]
+]}

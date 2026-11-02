@@ -1,0 +1,57 @@
+{
+ "id": "c08",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.495,
+  "b2": 3.91,
+  "b3": 5.541,
+  "b4": 5.813,
+  "b5": 4.162
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Say 'Hoffsvangen skole' to the bot, and it heard noise \u2014 spelling it out phonetically, wrong every time.",
+   "start_s": 0.5,
+   "end_s": 7.995,
+   "start_f": 15,
+   "end_f": 240
+  },
+  {
+   "beat": "b2",
+   "text": "It never knew the real name, just sounded it out and guessed.",
+   "start_s": 8.295,
+   "end_s": 12.205,
+   "start_f": 249,
+   "end_f": 366
+  },
+  {
+   "beat": "b3",
+   "text": "Now a SQLite table holds the real names and every wrong guess the bot has ever made.",
+   "start_s": 12.505,
+   "end_s": 18.046,
+   "start_f": 375,
+   "end_f": 541
+  },
+  {
+   "beat": "b4",
+   "text": "It checks that table first \u2014 like a notepad of corrections, not a fresh guess every time.",
+   "start_s": 18.346,
+   "end_s": 24.159,
+   "start_f": 550,
+   "end_f": 725
+  },
+  {
+   "beat": "b5",
+   "text": "Hear a name once, and it's matched correctly every time after.",
+   "start_s": 24.459,
+   "end_s": 28.621,
+   "start_f": 734,
+   "end_f": 859
+  }
+ ],
+ "total_s": 30.121,
+ "durationInFrames": 904,
+ "measured_track_s": 28.68,
+ "track": "/root/feature-demos/vo-c08/vo-c08.mp3"
+}

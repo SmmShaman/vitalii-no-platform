@@ -1,0 +1,7 @@
+{"id": "c08", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Say 'Hoffsvangen skole' to the bot, and it heard noise — spelling it out phonetically, wrong every time."],
+ ["b2", "It never knew the real name, just sounded it out and guessed."],
+ ["b3", "Now a SQLite table holds the real names and every wrong guess the bot has ever made."],
+ ["b4", "It checks that table first — like a notepad of corrections, not a fresh guess every time."],
+ ["b5", "Hear a name once, and it's matched correctly every time after."]
+]}
