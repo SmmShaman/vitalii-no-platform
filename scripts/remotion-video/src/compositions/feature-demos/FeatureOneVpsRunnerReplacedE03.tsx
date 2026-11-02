@@ -222,6 +222,74 @@ const SubChips: React.FC = () => {
   );
 };
 
+// b4/b5 drawn beats only: hubRouting/ratioBars's own content is centered and slow
+// to land, leaving the top band and the off-diagram half empty (measured fill
+// 20/48, 18/48). A fixed top-anchored badge in each half gives both zones real,
+// labelled content for the whole beat regardless of the insert's own pacing.
+const TopFlank: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < B4) return null;
+  const x = Math.max(dividerXAt(frame, fps), 0);
+  const leftText = frame < B5 ? "✕ 3 OUTSIDE CALLS" : "✕ 1,796 LINES GONE";
+  const rightText = frame < B5 ? "✓ ONE RUNNER, ALL 3 JOBS" : "✓ 682 LINES LEFT";
+  const leftW = Math.min(x - 80, 420);
+  const rightW = Math.min(1280 - x - 80, 760);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      {leftW > 140 && (
+        <div
+          style={{
+            position: "absolute",
+            left: 40,
+            top: 56,
+            width: leftW,
+            minHeight: 72,
+            display: "flex",
+            alignItems: "center",
+            borderRadius: 8,
+            background: P.dangerBg,
+            border: `2px solid ${P.dangerEdge}`,
+            boxSizing: "border-box",
+            padding: "0 20px",
+            fontSize: 16,
+            fontWeight: 800,
+            letterSpacing: 0.6,
+            color: P.danger,
+          }}
+        >
+          {leftText}
+        </div>
+      )}
+      {rightW > 140 && (
+        <div
+          style={{
+            position: "absolute",
+            left: Math.max(x + 40, 460),
+            top: 56,
+            width: rightW,
+            minHeight: 72,
+            display: "flex",
+            alignItems: "center",
+            borderRadius: 8,
+            background: P.successBg,
+            border: `2px solid ${P.successEdge}`,
+            boxSizing: "border-box",
+            padding: "0 20px",
+            fontSize: 16,
+            fontWeight: 800,
+            letterSpacing: 0.6,
+            color: P.success,
+          }}
+        >
+          {rightText}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const PLATE_BOX = { x: 60, y: 48, w: 640, h: 86 };
 
 const ProductPlate: React.FC = () => {
@@ -426,6 +494,7 @@ const Inner: React.FC = () => {
       <DividerLabels />
       <SubChips />
       <ProductPlate />
+      <TopFlank />
     </AbsoluteFill>
   );
 };
