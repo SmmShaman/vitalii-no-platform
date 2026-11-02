@@ -151,6 +151,158 @@ const Ribbon: React.FC = () => {
   );
 };
 
+// Wave D1 fix (2026-11-02), per a blind-viewer verdict (clarity 5, thesis 5):
+// b1 — the live "page" backdrop's own lead paragraph ("The guard now records
+// which domains and IPs...") describes the FIX while the headline/narration are
+// still on the OLD problem, reading as a spoiler/mismatch. Fix: a one-line
+// product plate sits over that exact top-left text block from frame 1, so the
+// viewer reads product identity there instead of the article's forward copy.
+const PLATE_BOX = { x: 48, y: 40, w: 660, h: 130 };
+const ProductPlate: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B1, B2) !== 1) return null;
+  return (
+    <Arrive at={B1 + 4} kind="wipe" box={PLATE_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: PLATE_BOX.x,
+          top: PLATE_BOX.y,
+          width: PLATE_BOX.w,
+          height: PLATE_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          border: `2px solid ${P.accentEdge}`,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          boxSizing: "border-box",
+          padding: "12px 20px",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 1.2, color: P.accent }}>
+          GUARD — FAMILY NETWORK GUARD
+        </div>
+        <div style={{ fontSize: 13, color: P.muted, marginTop: 6, lineHeight: 1.35 }}>
+          Sees every device on the Wi-Fi — phones, the Android TV stick, the
+          PlayStation — and lets a parent name, time-limit, and block each one.
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
+// b4 — the "hub2" live backdrop (features hub, scrolled lower) showed OTHER
+// features' headlines behind the "new Cloudflare database" claim: confusing
+// clutter unrelated to DNS, and the claim itself had no visual backing. No
+// GitHub URL for this product is verified in shots/g27.json, so per the
+// drawn-schematic fallback this is a small, always-legible, opaque tag naming
+// the real commit and the real migration file instead of a live recording.
+const COMMIT_BOX = { x: 700, y: 46, w: 524, h: 84 };
+const CommitEvidence: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B4, B5) !== 1) return null;
+  return (
+    <Arrive at={B4 + 4} kind="wipe" box={COMMIT_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: COMMIT_BOX.x,
+          top: COMMIT_BOX.y,
+          width: COMMIT_BOX.w,
+          height: COMMIT_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          border: `2px solid ${P.successEdge}`,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          boxSizing: "border-box",
+          padding: "10px 18px",
+          fontFamily,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            letterSpacing: 1.2,
+            color: P.success,
+            fontFamily: '"JetBrains Mono", Menlo, Consolas, monospace',
+          }}
+        >
+          COMMIT 8228598
+        </div>
+        <div style={{ fontSize: 13, color: P.ink, marginTop: 4, lineHeight: 1.3 }}>
+          worker/migrations/0007_web_log.sql — the new Cloudflare database
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
+// b5 — the narration promises picking a device on a dashboard; the beat only
+// showed a source-code window, with no device picker ever on screen. There is
+// no recorded dashboard page (gate 2: the last beat may not be the feature's
+// own page), so this is a small drawn device-picker strip above the
+// LogWindow — real device types from the product row, a Today/Yesterday
+// toggle matching "the last two days" — so the pick itself is shown, and the
+// LogWindow underneath still carries the real facts behind it.
+const DEVICES = ["Android TV", "PlayStation", "Kid's Phone"];
+const DevicePicker: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B5) return null;
+  const pickAt = B5 + 6;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 150,
+        top: 120,
+        width: 980,
+        height: 42,
+        fontFamily,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+      }}
+    >
+      <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: P.muted }}>PICK A DEVICE:</div>
+      {DEVICES.map((d, i) => {
+        const selected = i === 2;
+        if (frame < pickAt + i * 5) return null;
+        return (
+          <div
+            key={d}
+            style={{
+              fontSize: 13,
+              fontWeight: 700,
+              padding: "6px 12px",
+              borderRadius: 999,
+              background: selected ? P.accent : P.chipBg,
+              color: selected ? "#FFFFFF" : P.ink,
+              border: `1.5px solid ${selected ? P.accent : P.border}`,
+            }}
+          >
+            {d}
+          </div>
+        );
+      })}
+      <div style={{ flex: 1 }} />
+      {frame >= pickAt + 20 && (
+        <>
+          <div style={{ fontSize: 13, fontWeight: 700, padding: "6px 12px", borderRadius: 999, background: P.accent, color: "#FFFFFF" }}>
+            TODAY
+          </div>
+          <div style={{ fontSize: 13, fontWeight: 700, padding: "6px 12px", borderRadius: 999, background: P.chipBg, color: P.muted }}>
+            YESTERDAY
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -164,6 +316,7 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{ title: "Blocked, but blind", kicker: "The guard filtered every device — and kept no record of where they went" }}
       />
+      <ProductPlate />
 
       {/* b2 — what the guard never kept (problem_en) */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
@@ -194,8 +347,10 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b4 — the fix: per-device logging on a new Cloudflare database */}
-      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="hub2" from={B4} hold={B5 - B4} />}
+      {/* b4 — the fix: per-device logging on a new Cloudflare database.
+          hub2 (features hub, scrolled lower) dropped: it showed other
+          features' headlines bleeding through, unrelated clutter, with no
+          real evidence for the Cloudflare claim. CommitEvidence replaces it. */}
       <MotionInsert
         effect="handoffExplain"
         from={B4}
@@ -210,8 +365,10 @@ const Inner: React.FC = () => {
           points: ["Sites + resolved IPs", "Android included", "New Cloudflare database"],
         }}
       />
+      <CommitEvidence />
 
       {/* b5 — drawn only: no live backdrop (gate 2). Holds to the end, no fade. */}
+      <DevicePicker />
       <LogWindow
         from={B5 + 20}
         every={18}
@@ -220,10 +377,10 @@ const Inner: React.FC = () => {
         fontSize={22}
         win={{ x: 150, y: 170, w: 980, h: 420 }}
         lines={[
-          { t: "web_hits", text: "device + day + service -> ips[], hit_count++", tone: "accent" },
+          { t: "web_hits", text: "device+day+service -> ips[] (a visit, logged)", tone: "accent" },
           { t: "ip_map", text: "reverse index: ip -> device (whose IP is this)", tone: "accent" },
-          { t: "android", text: "per-device subdomain -> Private DNS (DoT)", tone: "success" },
-          { t: "dashboard", text: "Today / Yesterday toggle, per device", tone: "success" },
+          { t: "android", text: "per-device subdomain: Private DNS (DoT) seen too", tone: "success" },
+          { t: "dashboard", text: "Today / Yesterday toggle — pick a device, see it", tone: "success" },
           { t: "cleanup", text: "daily job prunes rows past the 2-day window", tone: "muted" },
           { t: "cache", text: "version bump -> old installs get the new UI", tone: "muted" },
         ]}
