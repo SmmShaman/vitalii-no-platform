@@ -1,0 +1,11 @@
+{
+  "id": "g27",
+  "viewport": {"width": 1120, "height": 466},
+  "dsf": 1.25,
+  "shots": [
+    {"name": "page", "url": "https://vitalii.no/features/the-family-dns-guard-now-keeps-a-per-device-site-log-even-on-android-g27", "frames": 90, "scroll": [[0, 0], [89, 380]], "mouse": [[0, 560, 220], [45, 600, 260], [89, 540, 300]]},
+    {"name": "page2", "url": "https://vitalii.no/features/the-family-dns-guard-now-keeps-a-per-device-site-log-even-on-android-g27", "frames": 90, "scroll": [[0, 380], [89, 900]], "mouse": [[0, 500, 250], [45, 650, 220], [89, 700, 200]]},
+    {"name": "hub", "url": "https://vitalii.no/features", "frames": 90, "scroll": [[0, 0], [89, 320]], "mouse": [[0, 300, 200], [45, 620, 150], [89, 450, 300]]},
+    {"name": "hub2", "url": "https://vitalii.no/features", "frames": 90, "scroll": [[0, 320], [89, 900]], "mouse": [[0, 450, 300], [45, 600, 240], [89, 750, 220]]}
+  ]
+}

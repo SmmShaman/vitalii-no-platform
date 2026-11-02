@@ -4,11 +4,11 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "cornerTags",
+      "effect": "titleTakeover",
       "backdrop": "page",
       "data": {
-        "statement": "Three outside services — one failure stalled a lesson",
-        "tags": ["Any service breaks it", "Billing ran in browser", "Replay = free ride", "Cost on every request"]
+        "title": "Three outside services, one point of failure",
+        "kicker": "If one broke, a lesson stalled mid-word — and a gap let requests skip payment"
       }
     },
     {

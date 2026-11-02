@@ -1,0 +1,7 @@
+{"id": "c08", "composition": "FeatureCalendarBotLearnedNorwegianC08", "beats": [
+  {"beat": "b1", "effect": "titleTakeover", "backdrop": "page", "data": {"title": "Heard noise, not a name", "kicker": "Every Norwegian place name, spelled out wrong"}},
+  {"beat": "b2", "effect": "keywordCaption", "backdrop": "hub", "data": {"line1": "Never knew the real name", "line2": "just sounded it out and guessed", "keywords": ["sounded it out", "guessed"]}},
+  {"beat": "b3", "effect": "pipelineFlow", "backdrop": "commits", "data": {"steps": ["Hears a place name", "Checks the SQLite vocab table", "Matches canonical name"], "result": "Real names, not guesses", "system": "SQLite vocab table"}},
+  {"beat": "b4", "effect": "handoffExplain", "backdrop": "commit", "data": {"from": "Fresh guess every time", "to": "Checks the notepad first", "points": ["SQLite vocab table", "Canonical name + aliases", "Written in Norwegian, not Cyrillic"]}},
+  {"beat": "b5", "effect": "drawn", "note": "no live backdrop — gate 2 forbids feature page/hub on the last beat, and commit 40cb6cd2 proves a different feature (weekly series parsing), not this one. Archetype card-deck finale + LogWindow built from real facts (vocab table, canonical+alias matching, self-learning on correction)."}
+]}

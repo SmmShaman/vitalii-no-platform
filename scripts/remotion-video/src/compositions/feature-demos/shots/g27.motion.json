@@ -1,0 +1,7 @@
+{"id": "g27", "composition": "FeatureFamilyDnsGuardKeepsG27", "beats": [
+  {"beat": "b1", "effect": "titleTakeover", "backdrop": "page", "data": {"title": "Blocked, but blind", "kicker": "The guard filtered every device — and kept no record of where they went"}},
+  {"beat": "b2", "effect": "cornerTags", "backdrop": "page2", "data": {"statement": "No visit history, anywhere", "tags": ["Blocks requests", "Keeps no record", "No device list", "Static MAC mapping"]}},
+  {"beat": "b3", "effect": "pipelineFlow", "backdrop": "hub", "data": {"steps": ["Android looks up a site", "over Private DNS (DoT)", "request skips the guard"], "result": "Invisible to the guard"}},
+  {"beat": "b4", "effect": "handoffExplain", "backdrop": "hub2", "data": {"from": "No per-device record", "to": "Every device logged", "points": ["Sites + resolved IPs", "Android included", "New Cloudflare database"]}},
+  {"beat": "b5", "effect": "drawn", "note": "no live backdrop — gate 2 forbids feature page/hub on the last beat. Archetype ribbon finale + LogWindow built from real facts (web_hits/ip_map D1 tables, Today/Yesterday toggle, two-day window)."}
+]}

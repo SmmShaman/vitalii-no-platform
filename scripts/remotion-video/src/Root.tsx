@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureFamilyDnsGuardKeepsG27 } from "./compositions/feature-demos/FeatureFamilyDnsGuardKeepsG27";
+import { FeatureCalendarBotLearnedNorwegianC08 } from "./compositions/feature-demos/FeatureCalendarBotLearnedNorwegianC08";
 import { FeatureEveryParentOverrideExpiresB76 } from "./compositions/feature-demos/FeatureEveryParentOverrideExpiresB76";
 import { FeatureArtemsBloodSugarRidesB75 } from "./compositions/feature-demos/FeatureArtemsBloodSugarRidesB75";
 import { FeatureBersFourKidsFinallyB74 } from "./compositions/feature-demos/FeatureBersFourKidsFinallyB74";
@@ -2863,6 +2865,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureBlogWriterHasMemoryP79"
         component={FeatureBlogWriterHasMemoryP79}
         durationInFrames={878}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFamilyDnsGuardKeepsG27"
+        component={FeatureFamilyDnsGuardKeepsG27}
+        durationInFrames={902}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureCalendarBotLearnedNorwegianC08"
+        component={FeatureCalendarBotLearnedNorwegianC08}
+        durationInFrames={904}
         fps={30}
         width={1280}
         height={720}
