@@ -1,0 +1,28 @@
+{
+  "id": "c07",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/one-voice-command-now-creates-a-whole-semester-of-recurring-calendar-events-c07",
+      "frames": 179,
+      "scroll": [[0, 0], [89, 280], [178, 560]],
+      "mouse": [[0, 520, 200], [89, 600, 260], [178, 560, 300]]
+    },
+    {
+      "name": "commit-a",
+      "url": "https://github.com/SmmShaman/calendar-bot/commit/40cb6cd2",
+      "frames": 182,
+      "scroll": [[0, 1200], [181, 1800]],
+      "mouse": [[0, 700, 280], [181, 640, 320]]
+    },
+    {
+      "name": "commit-b",
+      "url": "https://github.com/SmmShaman/calendar-bot/commit/40cb6cd2",
+      "frames": 185,
+      "scroll": [[0, 120], [184, 650]],
+      "mouse": [[0, 620, 260], [184, 660, 300]]
+    }
+  ]
+}

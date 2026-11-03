@@ -1,0 +1,7 @@
+{"id": "c07", "composition": "FeatureOneVoiceCommandCreatesC07", "beats": [
+  {"beat": "b1", "effect": "titleTakeover", "backdrop": "page", "data": {"title": "One sentence, one semester", "kicker": "Every date typed out by the AI, one by one"}},
+  {"beat": "b2", "effect": "cornerTags", "backdrop": "commit-a", "data": {"statement": "A six-month series broke mid-reply", "tags": ["Every date typed by AI", "JSON broke mid-reply", "Bare processing error"]}},
+  {"beat": "b3", "effect": "keywordCaption", "backdrop": null, "data": {"line1": "Like writing every Tuesday", "line2": "instead of saying 'repeat weekly'", "keywords": ["every Tuesday", "repeat weekly"]}},
+  {"beat": "b4", "effect": "handoffExplain", "backdrop": "commit-b", "data": {"from": "AI types every date", "to": "Server fills in each date", "points": ["One 'repeat' field only", "Loops day by day in UTC", "JSON never breaks"]}},
+  {"beat": "b5", "effect": "drawn", "note": "LogWindow with feature-row facts; archetype element stamps the 200-event cap"}
+]}

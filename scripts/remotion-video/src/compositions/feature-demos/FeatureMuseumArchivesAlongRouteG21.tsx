@@ -1,51 +1,38 @@
 // FeatureMuseumArchivesAlongRouteG21 — feature g21 — 1280x720, 932 frames @ 30fps, VOICE-SYNCED.
-// archetype 2 zoom-in, mood violet. Motion direction v2 (feature-motion skill, 2026-10-07).
-// RE-SHOOT 2026-10-20: narration and beat windows unchanged; the picture is rewritten
-// because the first pass staged "zoom" as a theme (a small shrinking radius dial in the
-// bottom band) instead of the archetype itself — a camera move. This pass is a real
-// camera: a viewfinder reticle opens on the whole 1280x720 frame in b1 (a wide, small-scale
-// view) and continuously tightens, beat by beat, until by b5 it frames only the result —
-// the reticle never jump-cuts, it is one continuous zoom for the full 932 frames.
-//
-// WAVE D FIX 2026-10-20 (blind-viewer clarity 6 -> aims for >=7): b2's "hub" LiveBackdrop
-// is gone — the real /features page recording showed OTHER features' unrelated card art
-// ("STILL SAYS LOG IN", "Food Label"...) bleeding through behind the targetOverrun stat,
-// which read as random, off-brand clutter; b2 now plays on the base stage only, same
-// treatment already working in b3, plus a `note` line explaining the 600m/150m track so
-// the before/after isn't just two numbers. b3's pipelineFlow `system` caption was silently
-// truncated by that component's own 22-char clip() to "DigitaltMuseum — muse…" — never a
-// real gloss at all; shortened to the bare name "DigitaltMuseum" (fits whole) and the full
-// explanation now lives in a separate caption line we control. b4 unchanged (LogWindow +
-// featureMatrix already read as the strongest beat). b5's two StatPills used to both pop in
-// on the same frame and then hold dead still for the whole beat; they now land staggered
-// (Arrive, rise) so the closing beat visibly builds instead of freezing on one frame.
+// archetype 3 card-deck, mood mint. RE-SHOOT 2026-11-03: narration and beat windows are
+// UNCHANGED (same measured B1..END below) — only the picture changes. The prior pass staged
+// archetype 2 (a zoom-in reticle, mood violet); this pass draws a deck of six cards that
+// never cuts away — it is a closed pile in b1, scatters into rejected distance tags in b2,
+// fans out to scan the archive in b3, splits into two sub-piles in b4, and settles into one
+// flat, even row holding the final number in b5. b1 also drops cornerTags (used by e01
+// tonight) for keywordCaption instead.
 //
 // Beat → effect (data only from the feature row, meta-g21.json, no invented numbers):
 // b1 15-189   "Kilometers of road went by with nothing to say — real history sat just out
-//             of reach." cornerTags over the feature's own page (LiveBackdrop, strong
-//             push-in — the camera is already moving). Reticle: wide open, near full frame.
+//             of reach." keywordCaption over the feature's own page (LiveBackdrop). Deck:
+//             six cards held in a tight closed pile, unlabeled — nothing to say yet.
 // b2 189-323  "The places the app already knew were too far off to ever surface it."
-//             targetOverrun, base stage only (no hub backdrop — its unrelated card art was
-//             bleeding through), with a note line spelling out the 600m-vs-150m gap.
-//             Reticle: first tightening, now a large center-right box.
+//             targetOverrun, base stage only. Deck: the pile breaks apart into a loose
+//             scatter, each card now showing the distance that got it rejected (430-610m,
+//             all past the 150m reach).
 // b3 323-523  "Now it checks DigitaltMuseum's archive — old photographs, museum records —
-//             for anything near the track." pipelineFlow, no page/hub behind it (base stage
-//             only) — short "DigitaltMuseum" frame title (long form was being silently
-//             truncated) plus a dedicated gloss caption spelling out what it is. Reticle:
-//             tighter still, framing the pipeline chain.
+//             for anything near the track." pipelineFlow, base stage only, plus a gloss
+//             caption for the one tech name and the step/result cards already vetted in the
+//             prior pass. Deck: the scatter fans out into an arc — "scanning" the archive.
 // b4 523-787  "A find near a known place joins its story. A find with nothing nearby becomes
 //             a brand-new stop, named after the farm it came from." featureMatrix over a
 //             worker LogWindow (no runtime log exists for this product; lines paraphrased
-//             straight from meta-g21.json, not invented). Reticle: framing the log window.
-// b5 787-932  "The reach: 150 meters off the road." titleTakeover, no page/hub behind it
-//             (gate: last beat never ends on the feature page or the hub) — the reticle
-//             closes all the way down onto the headline and holds there, full brightness,
-//             to the final frame, while the two reach callouts land staggered so the beat
-//             still visibly builds as it holds.
+//             straight from meta-g21.json, not invented). Deck: the fan splits into two
+//             tight sub-piles — "existing" vs "new stop" — mirroring the matrix's own columns.
+// b5 787-932  "The reach: 150 meters off the road." titleTakeover, base stage only (gate:
+//             last beat never ends on the feature page or the hub). Deck: the two sub-piles
+//             settle into one flat, evenly spaced row, every card holding "150m" — the result
+//             that stuck — while the two reach callouts (600m -> 150m, already used in b2)
+//             land staggered so the closing beat still visibly builds.
 //
-// Persistent element: the zoom reticle (archetype 2) — four corner brackets plus a live
-// "×" readout, continuously interpolated across all five beats (one camera move, not five
-// cuts), shrinking from a near-full-frame box in b1 to a tight frame around the b5 result.
+// Persistent element: the card deck (archetype 3) — six cards, continuously interpolated
+// across all five beats (one re-shuffle, not five cuts) in the y>=596 band the editorial
+// effects keep clear; only the text ON the cards switches discretely at each beat boundary.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
@@ -62,60 +49,136 @@ const B4 = 523;
 const B5 = 787;
 const END = 932;
 
-/** Indigo/plum accent tuned to read on the dark stage. */
-const ACCENT = "#8E7CF0";
-const STAGE = "#140F2B";
+/** mint's raw accent (#0B7A5A) reads too dark on the dark plate — brighter override. */
+const ACCENT = "#22D3A6";
+const STAGE = "#0D2019";
 
-// Reticle keyframes: [frame, x, y, w, h] — a single continuous camera move across the
-// whole clip. b1 opens near full-frame ("a wide, small-scale view of a whole interface");
-// each later key tightens onto that beat's own content; b5 closes onto the headline and
-// holds (frame repeated at END so the last beat does not keep drifting).
-const RETICLE: number[][] = [
-  [B1, 36, 34, 1208, 652],
-  [B2, 130, 110, 900, 440],
-  [B3, 300, 150, 420, 330],
-  [B4, 300, 150, 460, 330],
-  [B5, 330, 260, 420, 190],
-  [END, 330, 260, 420, 190],
+// Card-deck band (1280x720, below the effects' safe bottom at y≈587).
+const BAND = { x: 40, y: 596, w: 1200, h: 118 };
+const TRACK_X = 350;
+const TRACK_W = 850;
+const CARD_COUNT = 6;
+
+type Pos = { x: number; y: number; rot: number };
+const pos = (frac: number, y: number, rot: number): Pos => ({ x: TRACK_X + frac * TRACK_W, y, rot });
+
+// Five hand-placed states, one per beat — a closed pile, a rejected-distance scatter, a
+// scanning fan, a two-pile split, and a settled even row. END repeats SETTLE so the deck
+// does not keep drifting after the voice ends.
+const PILE: Pos[] = [0.08, 0.09, 0.1, 0.11, 0.12, 0.13].map((f, i) => pos(f, 655 - i * 3, -10 + i * 4));
+const CLUSTER: Pos[] = [0.05, 0.17, 0.3, 0.45, 0.6, 0.75].map((f, i) =>
+  pos(f, i % 2 === 0 ? 641 : 669, -25 + i * 9)
+);
+const FAN: Pos[] = [0.275, 0.365, 0.455, 0.545, 0.635, 0.725].map((f, i) =>
+  pos(f, 655 - (2.5 - Math.abs(i - 2.5)) * 5, -30 + i * 12)
+);
+const SPLIT: Pos[] = [0.08, 0.16, 0.24, 0.62, 0.7, 0.78].map((f, i) => pos(f, 655, i < 3 ? -8 + i * 8 : -8 + (i - 3) * 8));
+const SETTLE: Pos[] = [0.03, 0.218, 0.406, 0.594, 0.782, 0.97].map((f) => pos(f, 655, 0));
+
+const CARD_TRACKS: number[][][] = Array.from({ length: CARD_COUNT }, (_, i) => [
+  [B1, PILE[i].x, PILE[i].y, PILE[i].rot],
+  [B2, CLUSTER[i].x, CLUSTER[i].y, CLUSTER[i].rot],
+  [B3, FAN[i].x, FAN[i].y, FAN[i].rot],
+  [B4, SPLIT[i].x, SPLIT[i].y, SPLIT[i].rot],
+  [B5, SETTLE[i].x, SETTLE[i].y, SETTLE[i].rot],
+  [END, SETTLE[i].x, SETTLE[i].y, SETTLE[i].rot],
+]);
+
+type StampTone = "neutral" | "danger" | "accent" | "success";
+const CARD_LABELS: (string | null)[][] = [
+  [null, null, null, null, null, null],
+  ["610m", "540m", "480m", "430m", "500m", "600m"],
+  ["scan", "match?", "scan", "match?", "scan", "match?"],
+  ["existing", "existing", "existing", "new stop", "new stop", "new stop"],
+  ["150m", "150m", "150m", "150m", "150m", "150m"],
+];
+const CARD_TONE: StampTone[][] = [
+  ["neutral", "neutral", "neutral", "neutral", "neutral", "neutral"],
+  ["danger", "danger", "danger", "danger", "danger", "danger"],
+  ["accent", "accent", "accent", "accent", "accent", "accent"],
+  ["accent", "accent", "accent", "success", "success", "success"],
+  ["success", "success", "success", "success", "success", "success"],
+];
+const KICKERS = ["PILE", "SCATTERED", "SCANNING", "SPLIT", "SETTLED"];
+const HEADLINES = [
+  "Guide — Stories on the Road, read while driving",
+  "Known places sit too far off the track to surface",
+  "DigitaltMuseum's archive checked against the track",
+  "Each find joins a place nearby — or becomes a new one",
+  "150 meters off the road — nothing near it is missed",
 ];
 
-const ZOOM_BASE = 1208 * 652;
-
-const ZoomReticle: React.FC = () => {
+const CardDeck: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
   if (frame < B1) return null;
-  const [x, y, w, h] = track(RETICLE, frame);
-  const zoomX = Math.sqrt(ZOOM_BASE / (w * h));
-  const arm = 26;
-  const Corner: React.FC<{ cx: number; cy: number; hx: 1 | -1; vy: 1 | -1 }> = ({ cx, cy, hx, vy }) => (
-    <>
-      <div style={{ position: "absolute", left: cx, top: cy - 2, width: arm * hx, height: 4, background: P.accent }} />
-      <div style={{ position: "absolute", left: cx - 2, top: cy, width: 4, height: arm * vy, background: P.accent }} />
-    </>
-  );
+  const beatIndex = frame >= B5 ? 4 : frame >= B4 ? 3 : frame >= B3 ? 2 : frame >= B2 ? 1 : 0;
+  const labels = CARD_LABELS[beatIndex];
+  const tones = CARD_TONE[beatIndex];
+
+  const toneColor = (tone: StampTone) =>
+    tone === "danger"
+      ? { fg: P.danger, bg: P.dangerBg, edge: P.dangerEdge }
+      : tone === "accent"
+      ? { fg: P.accent, bg: P.accentBg, edge: P.accentEdge }
+      : tone === "success"
+      ? { fg: P.success, bg: P.successBg, edge: P.successEdge }
+      : { fg: P.muted, bg: P.chipBg, edge: P.border };
+
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      <Corner cx={x} cy={y} hx={1} vy={1} />
-      <Corner cx={x + w} cy={y} hx={-1} vy={1} />
-      <Corner cx={x} cy={y + h} hx={1} vy={-1} />
-      <Corner cx={x + w} cy={y + h} hx={-1} vy={-1} />
-      <div
-        style={{
-          position: "absolute",
-          left: x + w - 86,
-          top: y - 30,
-          fontSize: 20,
-          fontWeight: 800,
-          letterSpacing: 1,
-          color: P.accent,
-          background: "rgba(0,0,0,0.42)",
-          padding: "3px 10px",
-          borderRadius: 8,
-        }}
-      >
-        {zoomX.toFixed(1)}×
-      </div>
+      <Arrive at={B1 + 4} kind="wipe" box={BAND} dur={0.45}>
+        <div
+          style={{
+            position: "absolute",
+            left: BAND.x,
+            top: BAND.y,
+            width: BAND.w,
+            height: BAND.h,
+            background: P.card,
+            borderRadius: 4,
+            boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
+          }}
+        />
+        <div style={{ position: "absolute", left: BAND.x + 22, top: BAND.y + 16, width: 260 }}>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>{KICKERS[beatIndex]}</div>
+          <div style={{ fontSize: 13, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.25 }}>{HEADLINES[beatIndex]}</div>
+        </div>
+
+        {CARD_TRACKS.map((trk, i) => {
+          const [x, y, rot] = track(trk, frame);
+          const { fg, bg, edge } = toneColor(tones[i]);
+          const label = labels[i];
+          const emphasize = beatIndex === 4 && i === CARD_COUNT - 1;
+          const w = emphasize ? 84 : 72;
+          const h = emphasize ? 104 : 90;
+          return (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left: x - w / 2,
+                top: y - h / 2,
+                width: w,
+                height: h,
+                borderRadius: 8,
+                background: label ? bg : P.chipBg,
+                border: `2px solid ${label ? edge : P.border}`,
+                transform: `rotate(${rot}deg)`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: emphasize ? 15 : 12,
+                fontWeight: 800,
+                color: fg,
+                boxShadow: "3px 3px 0 rgba(0,0,0,0.35)",
+              }}
+            >
+              {label ?? ""}
+            </div>
+          );
+        })}
+      </Arrive>
     </div>
   );
 };
@@ -124,31 +187,29 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1 — real history out of reach, over the feature's own page, camera already moving */}
+      {/* b1 — real history out of reach, over the feature's own page */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} push={0.14} />}
       <MotionInsert
-        effect="cornerTags"
+        effect="keywordCaption"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        plate={0.7}
         data={{
-          statement: "Real history, just out of reach",
-          tags: ["Known places too far", "History unheard", "Kilometers of silence", "Every single pass"],
+          line1: "Kilometers of road went by with nothing to say",
+          line2: "real history sat just out of reach",
+          keywords: ["nothing to say", "just out of reach"],
         }}
       />
       {/* product-line plate, carried for the length of b1 — plain text, not a competing effect */}
       {frame >= B1 && frame < B2 && (
-        <div style={{ position: "absolute", left: 90, top: 28, fontSize: 18, fontWeight: 750, color: "#E7E2FB", fontFamily }}>
+        <div style={{ position: "absolute", left: 90, top: 28, fontSize: 18, fontWeight: 750, color: "#DFF7EC", fontFamily }}>
           🧭 Guide — Stories on the Road — a personal audio guide for driving: the phone knows
           where I am and plays short stories about the places around me, in Norwegian and
           Ukrainian side by side.
         </div>
       )}
 
-      {/* b2 — known places were too far off to ever surface it, base stage only
-          (the "hub" page recording used to sit behind this, but it showed OTHER
-          features' unrelated card art bleeding through — dropped). */}
+      {/* b2 — known places were too far off to ever surface it, base stage only */}
       <MotionInsert
         effect="targetOverrun"
         from={B2}
@@ -177,15 +238,12 @@ const Inner: React.FC = () => {
           system: "DigitaltMuseum",
         }}
       />
-      {/* a legible gloss, outside pipelineFlow's own frame-title clip() (which silently
-          truncated the long form to "DigitaltMuseum — muse…" — never a real gloss at all). */}
+      {/* a legible gloss, outside pipelineFlow's own frame-title clip() */}
       {frame >= B3 && frame < B4 && (
-        <div style={{ position: "absolute", left: 90, top: 28, fontSize: 18, fontWeight: 750, color: "#E7E2FB", fontFamily, width: 900 }}>
+        <div style={{ position: "absolute", left: 90, top: 28, fontSize: 18, fontWeight: 750, color: "#DFF7EC", fontFamily, width: 900 }}>
           🏛 DigitaltMuseum — Norway's national museum archive of old photographs and local records
         </div>
       )}
-      {/* the pipeline chain sits compacted mid-frame, leaving the top and bottom bands empty —
-          fill them with the chain's own step/result text, not new claims (no prop for size). */}
       {frame >= B3 && frame < B4 && (
         <>
           <IconCard x={90} y={70} w={300} emoji="📍" title="Known places" sub="already on the map" tone="accent" />
@@ -231,7 +289,7 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b5 — the reach, no page or hub behind it — the reticle closes onto this result */}
+      {/* b5 — the reach, no page or hub behind it — the deck settles onto this result */}
       <MotionInsert
         effect="titleTakeover"
         from={B5}
@@ -240,10 +298,6 @@ const Inner: React.FC = () => {
         base={STAGE}
         data={{ title: "150 meters off the road", kicker: "History, no longer out of reach" }}
       />
-      {/* the headline sits vertically centered, leaving top and lower bands empty — flank it with
-          the real before/after numbers (already used in b2) as labelled callouts, not new figures.
-          Staggered (Arrive, rise) instead of both popping in on the same frame, so the closing
-          beat visibly builds rather than freezing on one frame. */}
       {frame >= B5 && frame < END && (
         <>
           <Arrive at={B5 + 15} kind="rise" box={{ x: 110, y: 100, w: 320, h: 56 }}>
@@ -255,13 +309,13 @@ const Inner: React.FC = () => {
         </>
       )}
 
-      <ZoomReticle />
+      <CardDeck />
     </AbsoluteFill>
   );
 };
 
 export const FeatureMuseumArchivesAlongRouteG21: React.FC = () => (
-  <PaletteProvider value={MOODS.violet}>
+  <PaletteProvider value={MOODS.mint}>
     <Inner />
   </PaletteProvider>
 );

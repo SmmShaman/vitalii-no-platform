@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureOneVoiceCommandCreatesC07 } from "./compositions/feature-demos/FeatureOneVoiceCommandCreatesC07";
+import { FeatureTriedThreeTickerStylesB78 } from "./compositions/feature-demos/FeatureTriedThreeTickerStylesB78";
 import { FeatureFamilyDnsGuardKeepsG27 } from "./compositions/feature-demos/FeatureFamilyDnsGuardKeepsG27";
 import { FeatureCalendarBotLearnedNorwegianC08 } from "./compositions/feature-demos/FeatureCalendarBotLearnedNorwegianC08";
 import { FeatureEveryParentOverrideExpiresB76 } from "./compositions/feature-demos/FeatureEveryParentOverrideExpiresB76";
@@ -2349,6 +2351,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureOneVoiceCommandCreatesC07"
+        component={FeatureOneVoiceCommandCreatesC07}
+        durationInFrames={951}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTriedThreeTickerStylesB78"
+        component={FeatureTriedThreeTickerStylesB78}
+        durationInFrames={886}
         fps={30}
         width={1280}
         height={720}

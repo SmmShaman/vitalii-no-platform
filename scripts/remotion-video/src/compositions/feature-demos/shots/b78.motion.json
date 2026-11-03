@@ -1,0 +1,7 @@
+{"id": "b78", "composition": "FeatureTriedThreeTickerStylesB78", "beats": [
+  {"beat": "b1", "effect": "keywordCaption", "backdrop": "page", "data": {"line1": "Our kids could only see today's events", "line2": "on the kitchen kiosk calendar", "keywords": ["today's events", "kitchen kiosk"]}},
+  {"beat": "b2", "effect": "cornerTags", "backdrop": null, "data": {"statement": "A scrolling ticker felt like a TV news crawl", "tags": ["Right-to-left scroll", "Too busy to glance at", "\"Flicker and get in the way\""]}},
+  {"beat": "b3", "effect": "handoffExplain", "backdrop": null, "data": {"from": "Scrolling ticker", "to": "Paging every few seconds", "points": ["Calmer than scrolling", "Still shifted on its own", "Also flickered, got in the way"]}},
+  {"beat": "b4", "effect": "ratioBars", "backdrop": null, "data": {"a": {"label": "Backend window (before)", "value": 1}, "b": {"label": "Backend window (now)", "value": 2}, "unit": "weeks", "title": "Cloudflare Workers backend window"}},
+  {"beat": "b5", "effect": "drawn", "note": "LogWindow with feature-row facts (static text wins); timeline ribbon stamps its final 'holds still' state"}
+]}
