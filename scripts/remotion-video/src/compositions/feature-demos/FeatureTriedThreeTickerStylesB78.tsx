@@ -13,7 +13,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, IconCard, StatPill } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow, WIN_DEFAULT, type LogLine } from "./live-primitives";
 import shotsFile from "./shots/b78.json";
@@ -169,9 +169,18 @@ const Inner: React.FC = () => {
         base={STAGE}
         data={{
           statement: "A scrolling ticker felt like a TV news crawl",
-          tags: ["Right-to-left scroll", "Too busy to glance at", '"Flicker and get in the way"'],
+          tags: ["Right-to-left scroll", "Too busy to glance at"],
         }}
       />
+      {/* fill the frame — the effect's own statement+tags cluster mid-upper, leaving the
+          rest of the 1280x720 canvas bare; spread the same facts across it. */}
+      {frame >= B2 && frame < B3 && (
+        <>
+          <IconCard x={90} y={320} w={300} emoji="📺" title="Scrolling ticker" sub="right-to-left, TV crawl" tone="danger" />
+          <IconCard x={890} y={320} w={300} emoji="👀" title="Too busy" sub="to glance at" tone="danger" />
+          <StatPill x={440} y={520} emoji="🚨" text="Flickers, gets in the way" tone="danger" />
+        </>
+      )}
 
       {/* b3 — attempt 2: paging, calmer but still shifting on its own */}
       <MotionInsert
@@ -186,6 +195,16 @@ const Inner: React.FC = () => {
           points: ["Calmer than scrolling", "Still shifted on its own", "Also flickered, got in the way"],
         }}
       />
+      {/* fill the frame — the arrow+box pair sits upper-center, leaving the canvas mostly
+          bare at the beat's midpoint; hold the three "points" as static cards so the frame
+          reads full no matter where the effect's own animation is. */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <IconCard x={90} y={320} w={300} emoji="🔄" title="Calmer" sub="than scrolling" tone="accent" />
+          <IconCard x={490} y={320} w={300} emoji="⏱" title="Still shifting" sub="every few seconds" tone="accent" />
+          <IconCard x={890} y={320} w={300} emoji="🚨" title="Also flickered" sub="got in the way" tone="danger" />
+        </>
+      )}
 
       {/* b4 — the fix underneath: double the backend window */}
       <MotionInsert
@@ -201,6 +220,13 @@ const Inner: React.FC = () => {
           title: "Cloudflare Workers backend window",
         }}
       />
+      {/* fill the frame — the title+bars sit left-of-center, leaving the right half bare */}
+      {frame >= B4 && frame < B5 && (
+        <>
+          <IconCard x={860} y={120} w={330} emoji="📅" title="More room" sub="for family events" tone="accent" />
+          <StatPill x={860} y={420} emoji="✅" text="Doubled: 1 -> 2 weeks" tone="success" />
+        </>
+      )}
 
       {/* b5 — what stuck: static text that holds still, built from the feature's own facts */}
       {frame >= B5 && (

@@ -224,6 +224,19 @@ const Inner: React.FC = () => {
           note: "Up to 600m off the road — too far for the 150m reach",
         }}
       />
+      {/* fill the frame — the stat+bar sit upper-left, leaving the right side and lower
+          half bare; the "note" field above isn't rendered by targetOverrun itself, so state
+          it here plus two flanking cards spelling out the same before/after numbers. */}
+      {frame >= B2 && frame < B3 && (
+        <>
+          <div style={{ position: "absolute", left: 90, top: 250, fontSize: 18, fontWeight: 750, color: "#DFF7EC", fontFamily, width: 900 }}>
+            Up to 600m off the road — too far for the 150m reach
+          </div>
+          <IconCard x={860} y={70} w={330} emoji="📍" title="Known places" sub="already on the map" tone="danger" />
+          <StatPill x={90} y={540} emoji="🎯" text="Target reach: 150 m" tone="accent" />
+          <StatPill x={700} y={540} emoji="🚫" text="Too far to surface" tone="danger" />
+        </>
+      )}
 
       {/* b3 — DigitaltMuseum archive check, drawn mechanism (no public UI for the match itself) */}
       <MotionInsert
