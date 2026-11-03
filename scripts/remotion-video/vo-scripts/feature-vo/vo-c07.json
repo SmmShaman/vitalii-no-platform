@@ -1,0 +1,57 @@
+{
+ "id": "c07",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.673,
+  "b2": 5.782,
+  "b3": 5.444,
+  "b4": 5.89,
+  "b5": 5.695
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Dictate a recurring event for a semester, and the assistant used to spell out every date itself.",
+   "start_s": 0.5,
+   "end_s": 6.173,
+   "start_f": 15,
+   "end_f": 185
+  },
+  {
+   "beat": "b2",
+   "text": "Six months of Tuesdays was so much text the reply broke, leaving a bare processing error.",
+   "start_s": 6.473,
+   "end_s": 12.255,
+   "start_f": 194,
+   "end_f": 368
+  },
+  {
+   "beat": "b3",
+   "text": "Like writing every Tuesday on a calendar by hand, instead of saying 'repeat weekly.'",
+   "start_s": 12.555,
+   "end_s": 17.999,
+   "start_f": 377,
+   "end_f": 540
+  },
+  {
+   "beat": "b4",
+   "text": "Now it just says what repeats, and the server fills in each date \u2014 the JSON never breaks.",
+   "start_s": 18.299,
+   "end_s": 24.189,
+   "start_f": 549,
+   "end_f": 726
+  },
+  {
+   "beat": "b5",
+   "text": "The series is capped at two hundred events, so one bad dictation can't run away forever.",
+   "start_s": 24.489,
+   "end_s": 30.184,
+   "start_f": 735,
+   "end_f": 906
+  }
+ ],
+ "total_s": 31.684,
+ "durationInFrames": 951,
+ "measured_track_s": 30.24,
+ "track": "/root/feature-demos/vo-c07/vo-c07.mp3"
+}

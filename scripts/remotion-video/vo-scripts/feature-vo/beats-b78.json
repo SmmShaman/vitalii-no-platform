@@ -1,0 +1,7 @@
+{"id": "b78", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Our kids could only see today's events on the kitchen kiosk calendar — nothing later in the week."],
+  ["b2", "A scrolling ticker felt like a TV news crawl — too busy for a screen meant to be glanced at."],
+  ["b3", "Paging through events was calmer, but it still shifted every few seconds."],
+  ["b4", "I even doubled the backend window on Cloudflare Workers, from one week to two."],
+  ["b5", "What finally worked was text that holds still — two weeks of family events, right there on screen."]
+]}

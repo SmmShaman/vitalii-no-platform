@@ -1,0 +1,7 @@
+{"id": "c07", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Dictate a recurring event for a semester, and the assistant used to spell out every date itself."],
+  ["b2", "Six months of Tuesdays was so much text the reply broke, leaving a bare processing error."],
+  ["b3", "Like writing every Tuesday on a calendar by hand, instead of saying 'repeat weekly.'"],
+  ["b4", "Now it just says what repeats, and the server fills in each date — the JSON never breaks."],
+  ["b5", "The series is capped at two hundred events, so one bad dictation can't run away forever."]
+]}

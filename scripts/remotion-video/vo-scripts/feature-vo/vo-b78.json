@@ -1,0 +1,57 @@
+{
+ "id": "b78",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.414,
+  "b2": 5.713,
+  "b3": 4.486,
+  "b4": 4.804,
+  "b5": 5.9
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Our kids could only see today's events on the kitchen kiosk calendar \u2014 nothing later in the week.",
+   "start_s": 0.5,
+   "end_s": 5.914,
+   "start_f": 15,
+   "end_f": 177
+  },
+  {
+   "beat": "b2",
+   "text": "A scrolling ticker felt like a TV news crawl \u2014 too busy for a screen meant to be glanced at.",
+   "start_s": 6.214,
+   "end_s": 11.927,
+   "start_f": 186,
+   "end_f": 358
+  },
+  {
+   "beat": "b3",
+   "text": "Paging through events was calmer, but it still shifted every few seconds.",
+   "start_s": 12.227,
+   "end_s": 16.713,
+   "start_f": 367,
+   "end_f": 501
+  },
+  {
+   "beat": "b4",
+   "text": "I even doubled the backend window on Cloudflare Workers, from one week to two.",
+   "start_s": 17.013,
+   "end_s": 21.817,
+   "start_f": 510,
+   "end_f": 655
+  },
+  {
+   "beat": "b5",
+   "text": "What finally worked was text that holds still \u2014 two weeks of family events, right there on screen.",
+   "start_s": 22.117,
+   "end_s": 28.017,
+   "start_f": 664,
+   "end_f": 841
+  }
+ ],
+ "total_s": 29.517,
+ "durationInFrames": 886,
+ "measured_track_s": 28.08,
+ "track": "/root/feature-demos/vo-b78/vo-b78.mp3"
+}
