@@ -163,7 +163,11 @@ const Inner: React.FC = () => {
         }}
       />
       {frame >= B2 && frame < B3 && (
-        <StatPill x={470} y={540} emoji="🗣" text="Every voice line" tone="accent" />
+        <>
+          <IconCard x={840} y={70} w={360} emoji="🚗" title="Driving at speed" sub="no way to double-check" tone="danger" />
+          <IconCard x={840} y={250} w={360} emoji="🔢" title="Digits only" sub="never spelled out" tone="danger" />
+          <StatPill x={470} y={540} emoji="🗣" text="Every voice line" tone="accent" />
+        </>
       )}
 
       {/* b3 — the fix: real address, two languages, before the flash begins */}
@@ -183,6 +187,8 @@ const Inner: React.FC = () => {
         <>
           <IconCard x={90} y={70} w={300} emoji="🏠" title="Real address" sub="spoken first" tone="accent" />
           <IconCard x={890} y={70} w={300} emoji="🌐" title="Kartverket" sub="address registry" tone="accent" />
+          <StatPill x={150} y={520} emoji="📍" text="Looked up automatically" tone="accent" />
+          <StatPill x={740} y={520} emoji="🗣" text="Spoken before the story starts" tone="accent" />
         </>
       )}
 
@@ -251,6 +257,8 @@ const Inner: React.FC = () => {
         <>
           <StatPill x={110} y={100} emoji="🔢" text="Before: digits in every chapter" tone="accent" opacity={0.75} />
           <StatPill x={740} y={100} emoji="✅" text="After: zero digits left" tone="success" />
+          <IconCard x={850} y={220} w={360} emoji="📬" title="Every new story" sub="respelled automatically" tone="success" />
+          <IconCard x={850} y={400} w={360} emoji="🗂" title="Old catalog too" sub="rewritten the same way" tone="success" />
         </>
       )}
 
