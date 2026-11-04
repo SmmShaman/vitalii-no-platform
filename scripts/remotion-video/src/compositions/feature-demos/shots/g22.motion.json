@@ -4,35 +4,34 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "keywordCaption",
+      "effect": "quoteMarker",
       "backdrop": "page",
       "data": {
-        "line1": "The story starts talking.",
-        "line2": "Never says which house.",
-        "keywords": ["which house"]
+        "quote": "A quiet street, decades ago — but never which house.",
+        "highlight": "which house"
       }
     },
     {
       "beat": "b2",
-      "effect": "cornerTags",
+      "effect": "statusFocus",
       "backdrop": null,
       "data": {
-        "statement": "Digits, misread every time",
-        "tags": ["House numbers", "Years", "Counts", "Every voice line"]
+        "title": "Every number, misread",
+        "claims": [
+          { "text": "House numbers", "verdict": "no" },
+          { "text": "Years", "verdict": "no" },
+          { "text": "Counts", "verdict": "no" }
+        ]
       }
     },
     {
       "beat": "b3",
-      "effect": "handoffExplain",
+      "effect": "hubRouting",
       "backdrop": null,
       "data": {
-        "from": "No address spoken",
-        "to": "Real address, spoken first",
-        "points": [
-          "Looked up via Kartverket (Norway's address registry)",
-          "Spoken in Ukrainian",
-          "Spoken in Norwegian"
-        ]
+        "inputs": ["Kartverket registry", "Street + house number"],
+        "hub": "Real address, spoken first",
+        "outputs": ["Ukrainian", "Norwegian"]
       }
     },
     {
@@ -56,11 +55,13 @@
     },
     {
       "beat": "b6",
-      "effect": "titleTakeover",
+      "effect": "percentRing",
       "backdrop": null,
       "data": {
-        "title": "Zero digits left",
-        "kicker": "Every story. Every chapter."
+        "value": 100,
+        "label": "catalog clean of stray digits",
+        "threshold": 50,
+        "notes": ["Every chapter respelled", "Zero digits left to mishear"]
       }
     }
   ]

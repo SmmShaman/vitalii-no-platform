@@ -1,0 +1,49 @@
+{
+  "id": "g26",
+  "composition": "FeatureRotatedMacAddressUsedG26",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "A rotated MAC erased every rule",
+        "tags": ["Android + iOS feature", "No name, no owner", "Zero limits applied", "Happens automatically"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": { "line1": "A new name tag. Every rule vanished.", "keywords": ["vanished"] }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Random MAC = brand-new device",
+        "to": "Random MAC = matched & flagged",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Same hostname, old row offline", "Cloudflare Worker scans deviceStates()", "D1 match leads to a Telegram alert"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["Phone reconnects with new MAC", "twinOf() check matches old row", "Device flagged as likely twin"],
+        "result": "No manual reset needed",
+        "system": "Cloudflare Worker"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "hero-number archetype (gate 1): full-frame '1' + TAP + 4-field merge checklist, fontSize>=200, no effect/backdrop, holds to END=871 — ends on the result, never the page or hub."
+    }
+  ]
+}

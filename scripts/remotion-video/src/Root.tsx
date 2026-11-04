@@ -239,6 +239,8 @@ import { FeatureFamilyDnsGuardKeepsG27 } from "./compositions/feature-demos/Feat
 import { FeatureCalendarBotLearnedNorwegianC08 } from "./compositions/feature-demos/FeatureCalendarBotLearnedNorwegianC08";
 import { FeatureEveryParentOverrideExpiresB76 } from "./compositions/feature-demos/FeatureEveryParentOverrideExpiresB76";
 import { FeatureArtemsBloodSugarRidesB75 } from "./compositions/feature-demos/FeatureArtemsBloodSugarRidesB75";
+import { FeatureRotatedMacAddressUsedG26 } from "./compositions/feature-demos/FeatureRotatedMacAddressUsedG26";
+import { FeatureGuideVitaliiNoTurnsG05 } from "./compositions/feature-demos/FeatureGuideVitaliiNoTurnsG05";
 import { FeatureBersFourKidsFinallyB74 } from "./compositions/feature-demos/FeatureBersFourKidsFinallyB74";
 import { FeatureBlogWriterHasMemoryP79 } from "./compositions/feature-demos/FeatureBlogWriterHasMemoryP79";
 import { FeatureOneButtonShutsYoutubeB73 } from "./compositions/feature-demos/FeatureOneButtonShutsYoutubeB73";
@@ -2903,6 +2905,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureCalendarBotLearnedNorwegianC08"
         component={FeatureCalendarBotLearnedNorwegianC08}
         durationInFrames={904}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureRotatedMacAddressUsedG26"
+        component={FeatureRotatedMacAddressUsedG26}
+        durationInFrames={871}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureGuideVitaliiNoTurnsG05"
+        component={FeatureGuideVitaliiNoTurnsG05}
+        durationInFrames={927}
         fps={30}
         width={1280}
         height={720}

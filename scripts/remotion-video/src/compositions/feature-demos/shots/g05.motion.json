@@ -1,0 +1,58 @@
+{
+  "id": "g05",
+  "composition": "FeatureGuideVitaliiNoTurnsG05",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "copyCorrection",
+      "backdrop": "page",
+      "data": {
+        "wrong": "A fixed delivery route, planned once",
+        "right": "A route that is never the same twice",
+        "label": "Breaks by day two"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": {
+        "line1": "I wanted to learn these places,",
+        "line2": "in Norwegian and Ukrainian, without the phone",
+        "keywords": ["Norwegian", "Ukrainian"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Harvester pulls area facts", "Runner writes a story with Claude", "Needs 2 sourced facts first", "edge-tts voices the story"],
+        "result": "Ready to play, like a friend narrating",
+        "system": "Local-history companion"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Follows a planned route",
+        "to": "Reacts to GPS position",
+        "fromLabel": "ROUTE PLANNER",
+        "toLabel": "NOW",
+        "points": ["No fixed itinerary needed", "Cloudflare Worker serves by location", "Android app runs GPS as a foreground service"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "cardCounter",
+      "backdrop": null,
+      "data": {
+        "cards": [{ "label": "Sourced facts required", "value": 2 }],
+        "unit": "facts",
+        "totalLabel": "Minimum, every story"
+      }
+    }
+  ]
+}

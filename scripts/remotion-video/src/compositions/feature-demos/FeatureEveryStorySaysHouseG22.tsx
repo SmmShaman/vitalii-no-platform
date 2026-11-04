@@ -1,21 +1,24 @@
 // FeatureEveryStorySaysHouseG22 — feature g22 — 1280x720, 963 frames @ 30fps, VOICE-SYNCED.
-// archetype 3 card-deck, mood violet. Motion direction v2 (feature-motion skill, 2026-10-07).
+// RE-SHOOT (2026-11-04): same narration, new picture. archetype 3 card-deck, mood mint.
 //
-// Beat → effect (data only from the feature row, meta-g22.json, no invented numbers):
+// Beat → effect (data only from the feature row / meta-g22.json, no invented numbers):
 // b1 15-165   "the story starts talking — but never says which house"
-//             keywordCaption over the feature's own page (backdrop).
+//             quoteMarker over the feature's own page (backdrop). Fresh opener — the
+//             previous cut (mood violet) opened on keywordCaption, same as g21/b78, and
+//             this session already opened on cornerTags (g26) and copyCorrection (g05).
 // b2 165-298  "digits came out wrong every time"
-//             cornerTags: house numbers / years / counts / every voice line.
+//             statusFocus: three claims (house numbers / years / counts), each marked ×.
 // b3 298-502  "every story opens with its real address, Kartverket, two languages"
-//             handoffExplain — no public UI for an address lookup, base stage only.
+//             hubRouting — Kartverket + street/number route into the real address, which
+//             routes out to Ukrainian and Norwegian. No public UI for this, base stage only.
 // b4 502-640  "every number inside is spelled out in words"
 //             copyCorrection over a worker LogWindow (no runtime log exists for this
-//             product; lines are paraphrased straight from meta-g22.json, not invented).
+//             product; lines are paraphrased straight from the feature text, not invented).
 // b5 640-794  "even the old stories are rewritten the same way"
 //             pipelineFlow over the features hub (backdrop).
 // b6 794-963  "the result: zero digits left to mishear"
-//             titleTakeover, no page/hub behind it (gate: last beat never ends on the
-//             feature page or the hub) — the card deck's own final stamp carries the close.
+//             percentRing, no page/hub behind it (gate: last beat never ends on the
+//             feature page or the hub) — ring fills to a clean catalog, card deck closes.
 //
 // Persistent element: a card deck (archetype 3) in the bottom band, one card lighting
 // up per beat, peeling from a dim "which house?" pile to a bright "0 digits left" stamp.
@@ -37,9 +40,8 @@ const B5 = 640;
 const B6 = 794;
 const END = 963;
 
-/** Accent tuned for the dark stage (violet's #5B37D4 reads fine, kept as-is). */
-const ACCENT = "#8E6FEA";
-const STAGE = "#17132B";
+const ACCENT = "#2BBE8F";
+const STAGE = "#0E1A16";
 
 // Card-deck band (1280×720, below the effects' safe bottom at y≈587).
 const LT = { x: 40, y: 606, w: 1200, h: 92 };
@@ -133,53 +135,50 @@ const Inner: React.FC = () => {
       {/* b1 — the problem, over the feature's own page */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
       <MotionInsert
-        effect="keywordCaption"
+        effect="quoteMarker"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
         plate={0.7}
-        data={{ line1: "The story starts talking.", line2: "Never says which house.", keywords: ["which house"] }}
+        data={{
+          quote: "A quiet street, decades ago — but never which house.",
+          highlight: "which house",
+        }}
       />
 
       {/* b2 — digits misread every time, drawn (no public UI for this) */}
       <MotionInsert
-        effect="cornerTags"
+        effect="statusFocus"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
+        base={STAGE}
         data={{
-          statement: "Digits, misread every time",
-          tags: ["House numbers", "Years", "Counts", "Every voice line"],
+          title: "Every number, misread",
+          claims: [
+            { text: "House numbers", verdict: "no" },
+            { text: "Years", verdict: "no" },
+            { text: "Counts", verdict: "no" },
+          ],
         }}
       />
-      {/* the corner tags leave the top strip and the gap above the card deck empty —
-          fill both with the beat's own statement and tag words, nothing new. */}
       {frame >= B2 && frame < B3 && (
-        <>
-          <StatPill x={110} y={30} emoji="🔢" text="House numbers, Years, Counts" tone="accent" />
-          <StatPill x={700} y={30} emoji="📢" text="Digits, misread every time" tone="danger" />
-          <StatPill x={470} y={540} emoji="🗣" text="Every voice line" tone="accent" />
-        </>
+        <StatPill x={470} y={540} emoji="🗣" text="Every voice line" tone="accent" />
       )}
 
       {/* b3 — the fix: real address, two languages, before the flash begins */}
       <MotionInsert
-        effect="handoffExplain"
+        effect="hubRouting"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
+        base={STAGE}
         data={{
-          from: "No address spoken",
-          to: "Real address, spoken first",
-          points: [
-            "Looked up via Kartverket (Norway's address registry)",
-            "Spoken in Ukrainian",
-            "Spoken in Norwegian",
-          ],
+          inputs: ["Kartverket registry", "Street + house number"],
+          hub: "Real address, spoken first",
+          outputs: ["Ukrainian", "Norwegian"],
         }}
       />
-      {/* the old/new handoff panel sits mid-frame, leaving the top band empty — fill it
-          with the two real facts the panel's own points already name. */}
       {frame >= B3 && frame < B4 && (
         <>
           <IconCard x={90} y={70} w={300} emoji="🏠" title="Real address" sub="spoken first" tone="accent" />
@@ -236,14 +235,18 @@ const Inner: React.FC = () => {
 
       {/* b6 — the result, no page or hub behind it */}
       <MotionInsert
-        effect="titleTakeover"
+        effect="percentRing"
         from={B6}
         dur={END - B6}
         accent={ACCENT}
-        data={{ title: "Zero digits left", kicker: "Every story. Every chapter." }}
+        base={STAGE}
+        data={{
+          value: 100,
+          label: "catalog clean of stray digits",
+          threshold: 50,
+          notes: ["Every chapter respelled", "Zero digits left to mishear"],
+        }}
       />
-      {/* the headline sits vertically centered, leaving top and lower bands empty — flank it
-          with the real before/after (already named in b2/b4), not new figures. */}
       {frame >= B6 && (
         <>
           <StatPill x={110} y={100} emoji="🔢" text="Before: digits in every chapter" tone="accent" opacity={0.75} />
@@ -257,7 +260,7 @@ const Inner: React.FC = () => {
 };
 
 export const FeatureEveryStorySaysHouseG22: React.FC = () => (
-  <PaletteProvider value={MOODS.violet}>
+  <PaletteProvider value={MOODS.mint}>
     <Inner />
   </PaletteProvider>
 );
