@@ -1,0 +1,57 @@
+{
+ "id": "g26",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.051,
+  "b2": 4.79,
+  "b3": 4.953,
+  "b4": 4.712,
+  "b5": 3.331
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My kids' phones change their network ID on their own, so Guard saw each one as a brand-new device \u2014 no rules, no limits.",
+   "start_s": 0.5,
+   "end_s": 8.551,
+   "start_f": 15,
+   "end_f": 257
+  },
+  {
+   "beat": "b2",
+   "text": "Every rule I'd set just vanished, like someone swapped in a new name tag.",
+   "start_s": 8.851,
+   "end_s": 13.641,
+   "start_f": 266,
+   "end_f": 409
+  },
+  {
+   "beat": "b3",
+   "text": "A check running on Cloudflare Workers now spots the pattern and flags the match.",
+   "start_s": 13.941,
+   "end_s": 18.894,
+   "start_f": 418,
+   "end_f": 567
+  },
+  {
+   "beat": "b4",
+   "text": "The old phone shows up tagged as a likely twin the instant it reconnects.",
+   "start_s": 19.194,
+   "end_s": 23.906,
+   "start_f": 576,
+   "end_f": 717
+  },
+  {
+   "beat": "b5",
+   "text": "One tap merges its whole history back into place.",
+   "start_s": 24.206,
+   "end_s": 27.537,
+   "start_f": 726,
+   "end_f": 826
+  }
+ ],
+ "total_s": 29.037,
+ "durationInFrames": 871,
+ "measured_track_s": 27.6,
+ "track": "/root/feature-demos/vo-g26/vo-g26.mp3"
+}

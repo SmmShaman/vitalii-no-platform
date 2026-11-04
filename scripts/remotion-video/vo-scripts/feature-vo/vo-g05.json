@@ -1,0 +1,57 @@
+{
+ "id": "g05",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.731,
+  "b2": 5.59,
+  "b3": 7.84,
+  "b4": 3.858,
+  "b5": 3.669
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "I drive the same region every day, but never the same route \u2014 any fixed-itinerary app breaks by day two.",
+   "start_s": 0.5,
+   "end_s": 7.231,
+   "start_f": 15,
+   "end_f": 217
+  },
+  {
+   "beat": "b2",
+   "text": "I wanted to actually learn these places, in Norwegian and Ukrainian, without staring at my phone.",
+   "start_s": 7.531,
+   "end_s": 13.121,
+   "start_f": 226,
+   "end_f": 394
+  },
+  {
+   "beat": "b3",
+   "text": "Now a companion rides along, turning real local-history facts into short stories with Claude \u2014 like a friend narrating the drive.",
+   "start_s": 13.421,
+   "end_s": 21.261,
+   "start_f": 403,
+   "end_f": 638
+  },
+  {
+   "beat": "b4",
+   "text": "It reacts to wherever I am, not to any planned route.",
+   "start_s": 21.561,
+   "end_s": 25.419,
+   "start_f": 647,
+   "end_f": 763
+  },
+  {
+   "beat": "b5",
+   "text": "And it never speaks without two solid sourced facts behind it.",
+   "start_s": 25.719,
+   "end_s": 29.388,
+   "start_f": 772,
+   "end_f": 882
+  }
+ ],
+ "total_s": 30.888,
+ "durationInFrames": 927,
+ "measured_track_s": 29.448,
+ "track": "/root/feature-demos/vo-g05/vo-g05.mp3"
+}

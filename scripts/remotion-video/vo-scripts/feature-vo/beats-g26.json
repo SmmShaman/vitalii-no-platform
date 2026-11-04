@@ -1,0 +1,7 @@
+{"id": "g26", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My kids' phones change their network ID on their own, so Guard saw each one as a brand-new device — no rules, no limits."],
+ ["b2", "Every rule I'd set just vanished, like someone swapped in a new name tag."],
+ ["b3", "A check running on Cloudflare Workers now spots the pattern and flags the match."],
+ ["b4", "The old phone shows up tagged as a likely twin the instant it reconnects."],
+ ["b5", "One tap merges its whole history back into place."]
+]}
