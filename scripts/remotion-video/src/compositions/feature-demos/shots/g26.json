@@ -7,15 +7,17 @@
       "name": "page",
       "url": "https://vitalii.no/features/a-rotated-mac-address-used-to-erase-a-phones-limits-now-guard-spots-the-twin-and-g26",
       "frames": 200,
-      "scroll": [[0, 0], [100, 240], [199, 480]],
-      "mouse": [[0, 620, 200], [100, 680, 260], [199, 640, 300]]
+      "scroll": [[0, 0], [100, 60], [199, 120]],
+      "mouse": [[0, 620, 200], [100, 680, 260], [199, 640, 300]],
+      "hide": ["h1", "h2.text-brand-light", "h2.text-brand-light + p"]
     },
     {
       "name": "page2",
       "url": "https://vitalii.no/features/a-rotated-mac-address-used-to-erase-a-phones-limits-now-guard-spots-the-twin-and-g26",
       "frames": 100,
-      "scroll": [[0, 480], [50, 700], [99, 920]],
-      "mouse": [[0, 660, 300], [50, 700, 340], [99, 680, 380]]
+      "scroll": [[0, 120], [50, 220], [99, 320]],
+      "mouse": [[0, 660, 300], [50, 700, 340], [99, 680, 380]],
+      "hide": ["h1", "h2.text-brand-light", "h2.text-brand-light + p"]
     },
     {
       "name": "hub",

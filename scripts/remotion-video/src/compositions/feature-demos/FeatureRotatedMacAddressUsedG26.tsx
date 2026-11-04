@@ -66,7 +66,7 @@ const Badge: React.FC = () => {
   const bg = flipped ? P.successBg : P.dangerBg;
   const edge = flipped ? P.successEdge : P.dangerEdge;
   const count = flipped ? 4 : 0;
-  const showBrand = frame < B2;
+  const showBrand = frame < B3;
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
@@ -87,8 +87,8 @@ const Badge: React.FC = () => {
           style={{
             position: "absolute",
             left: LT.x + 22,
-            top: LT.y + 10,
-            fontSize: 11,
+            top: LT.y + 8,
+            fontSize: 10,
             fontWeight: 700,
             letterSpacing: 3,
             color: P.muted,
@@ -97,12 +97,15 @@ const Badge: React.FC = () => {
         >
           GUARD
         </div>
-        <div style={{ position: "absolute", left: LT.x + 22, top: LT.y + 26, fontSize: 13, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>
+        <div style={{ position: "absolute", left: LT.x + 22, top: LT.y + 20, fontSize: 12, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>
           MAC TWIN CHECK
         </div>
-        <div style={{ position: "absolute", left: LT.x + 22, top: LT.y + 48, display: "flex", alignItems: "baseline", gap: 10 }}>
-          <span style={{ fontSize: 40, fontWeight: 800, color: tone, fontVariantNumeric: "tabular-nums" }}>{count}</span>
-          <span style={{ fontSize: 17, fontWeight: 700, color: P.ink }}>of 4 fields kept</span>
+        <div style={{ position: "absolute", left: LT.x + 22, top: LT.y + 38, display: "flex", alignItems: "baseline", gap: 10 }}>
+          <span style={{ fontSize: 32, fontWeight: 800, color: tone, fontVariantNumeric: "tabular-nums" }}>{count}</span>
+          <span style={{ fontSize: 14, fontWeight: 700, color: P.ink }}>of 4 fields kept</span>
+        </div>
+        <div style={{ position: "absolute", left: LT.x + 22, top: LT.y + 80, fontSize: 10.5, fontWeight: 600, color: P.muted, maxWidth: 440 }}>
+          Name & owner · Time limit & block · Usage history · Events log
         </div>
         <div
           style={{
@@ -205,7 +208,7 @@ const Finale: React.FC = () => {
         Merges the twin's whole history back into one row
       </div>
       {fields.map((label, i) => {
-        const at = B5 + 70 + i * 8;
+        const at = B5 + 34 + i * 18;
         if (frame < at) return null;
         const sc = punchScale(sec(frame, at, fps), 0);
         return (
@@ -236,6 +239,27 @@ const Finale: React.FC = () => {
           </div>
         );
       })}
+      {(() => {
+        const capAt = B5 + 34 + 3 * 18 + 14;
+        if (frame < capAt) return null;
+        const pulse = 1 + 0.025 * Math.sin(sec(frame, capAt, fps) * 3.4);
+        return (
+          <div
+            style={{
+              position: "absolute",
+              left: 688,
+              top: 138,
+              width: 444,
+              height: 68 * 4 + 12,
+              borderRadius: 10,
+              border: `2px solid ${P.success}`,
+              transform: `scale(${pulse})`,
+              transformOrigin: "center",
+              opacity: 0.6,
+            }}
+          />
+        );
+      })()}
     </AbsoluteFill>
   );
 };
@@ -252,7 +276,7 @@ const Inner: React.FC = () => {
         dur={B2 - B1}
         accent={ACCENT}
         data={{
-          statement: "A rotated MAC erased every rule",
+          statement: "GUARD: a rotated MAC erased every rule",
           tags: ["Android + iOS feature", "No name, no owner", "Zero limits applied", "Happens automatically"],
         }}
       />
