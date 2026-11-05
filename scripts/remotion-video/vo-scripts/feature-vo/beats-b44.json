@@ -1,0 +1,7 @@
+{"id": "b44", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My task generator built homework from memory and weak spots — never checking what classes were studying that week."],
+ ["b2", "Homework should match what's taught in class, for each subject, for every kid."],
+ ["b3", "Like teaching last year's lesson plan while the real class moved on."],
+ ["b4", "Now a nightly Cloudflare Workers routine reads the real curriculum and builds each day's practice from that week's unit."],
+ ["b5", "It's built from 634 real lesson units across three subjects and nine grades, matched to every child."]
+]}

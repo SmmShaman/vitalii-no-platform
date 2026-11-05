@@ -1,0 +1,57 @@
+{
+ "id": "b44",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.569,
+  "b2": 4.611,
+  "b3": 4.281,
+  "b4": 6.733,
+  "b5": 7.039
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My task generator built homework from memory and weak spots \u2014 never checking what classes were studying that week.",
+   "start_s": 0.5,
+   "end_s": 7.069,
+   "start_f": 15,
+   "end_f": 212
+  },
+  {
+   "beat": "b2",
+   "text": "Homework should match what's taught in class, for each subject, for every kid.",
+   "start_s": 7.369,
+   "end_s": 11.98,
+   "start_f": 221,
+   "end_f": 359
+  },
+  {
+   "beat": "b3",
+   "text": "Like teaching last year's lesson plan while the real class moved on.",
+   "start_s": 12.28,
+   "end_s": 16.561,
+   "start_f": 368,
+   "end_f": 497
+  },
+  {
+   "beat": "b4",
+   "text": "Now a nightly Cloudflare Workers routine reads the real curriculum and builds each day's practice from that week's unit.",
+   "start_s": 16.861,
+   "end_s": 23.594,
+   "start_f": 506,
+   "end_f": 708
+  },
+  {
+   "beat": "b5",
+   "text": "It's built from 634 real lesson units across three subjects and nine grades, matched to every child.",
+   "start_s": 23.894,
+   "end_s": 30.933,
+   "start_f": 717,
+   "end_f": 928
+  }
+ ],
+ "total_s": 32.433,
+ "durationInFrames": 973,
+ "measured_track_s": 30.984,
+ "track": "/root/feature-demos/vo-b44/vo-b44.mp3"
+}
