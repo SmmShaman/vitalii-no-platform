@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureGradesBumpThemselvesFirstB45 } from "./compositions/feature-demos/FeatureGradesBumpThemselvesFirstB45";
+import { FeatureNorwegianSchoolCurriculumBackboneB44 } from "./compositions/feature-demos/FeatureNorwegianSchoolCurriculumBackboneB44";
 import { FeatureOneVoiceCommandCreatesC07 } from "./compositions/feature-demos/FeatureOneVoiceCommandCreatesC07";
 import { FeatureTriedThreeTickerStylesB78 } from "./compositions/feature-demos/FeatureTriedThreeTickerStylesB78";
 import { FeatureFamilyDnsGuardKeepsG27 } from "./compositions/feature-demos/FeatureFamilyDnsGuardKeepsG27";
@@ -2353,6 +2355,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureGradesBumpThemselvesFirstB45"
+        component={FeatureGradesBumpThemselvesFirstB45}
+        durationInFrames={887}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNorwegianSchoolCurriculumBackboneB44"
+        component={FeatureNorwegianSchoolCurriculumBackboneB44}
+        durationInFrames={973}
         fps={30}
         width={1280}
         height={720}

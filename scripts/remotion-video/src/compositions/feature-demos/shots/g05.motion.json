@@ -7,8 +7,8 @@
       "effect": "copyCorrection",
       "backdrop": "page",
       "data": {
-        "wrong": "A fixed delivery route, planned once",
-        "right": "A route that is never the same twice",
+        "wrong": "A fixed route, planned once",
+        "right": "Never the same route twice",
         "label": "Breaks by day two"
       }
     },
@@ -27,7 +27,7 @@
       "effect": "pipelineFlow",
       "backdrop": null,
       "data": {
-        "steps": ["Harvester pulls area facts", "Runner writes a story with Claude", "Needs 2 sourced facts first", "edge-tts voices the story"],
+        "steps": ["Harvester pulls area facts", "Runner writes a story with Claude", "revoice.py keeps the voice current", "Worker serves it by GPS"],
         "result": "Ready to play, like a friend narrating",
         "system": "Local-history companion"
       }
@@ -39,20 +39,13 @@
       "data": {
         "from": "Follows a planned route",
         "to": "Reacts to GPS position",
-        "fromLabel": "ROUTE PLANNER",
-        "toLabel": "NOW",
-        "points": ["No fixed itinerary needed", "Cloudflare Worker serves by location", "Android app runs GPS as a foreground service"]
+        "points": ["Street stories play first", "Drive pack cached for dead zones", "DriveService keeps GPS alive in the background"]
       }
     },
     {
       "beat": "b5",
-      "effect": "cardCounter",
-      "backdrop": null,
-      "data": {
-        "cards": [{ "label": "Sourced facts required", "value": 2 }],
-        "unit": "facts",
-        "totalLabel": "Minimum, every story"
-      }
+      "effect": "drawn",
+      "note": "RE-SHOOT: no catalog effect (matches b44/b45 precedent) — hero '2' facts-required number beside a vertical staged checklist of the completed chain, holds to frame 927. Not the feature page or hub (gate 2)."
     }
   ]
 }

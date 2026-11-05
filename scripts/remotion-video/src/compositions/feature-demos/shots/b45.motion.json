@@ -1,0 +1,7 @@
+{"id": "b45", "beats": [
+  {"beat": "b1", "effect": "titleTakeover", "backdrop": "page", "data": {"kicker": "Boytasks — screen time gated by finishing school tasks", "title": "I Forgot To Bump The Grade"}},
+  {"beat": "b2", "effect": "cornerTags", "backdrop": "hub", "data": {"statement": "children.grade decides the whole curriculum — miss it, a year runs on the wrong content", "tags": ["grade 3/5/7", "wrong unit", "wrong band", "wrong bonus"]}},
+  {"beat": "b3", "effect": "drawn", "note": "clock/calendar metaphor (daylight saving analogy), single-codepoint emoji only, no catalog effect per motion skill guidance on metaphor beats"},
+  {"beat": "b4", "effect": "pipelineFlow", "backdrop": "page2", "data": {"steps": ["Check the date", "Bump every grade", "Log what happened"], "system": "Nightly cron — runs itself, every night", "result": "Zero manual steps"}},
+  {"beat": "b5", "effect": "drawn", "note": "LogWindow with 6 lines built strictly from solution_en/result_en numbers (grade 3→4, 5→6, 7→8, log rolled forward, manual steps: 0) — not a catalog effect, holds to frame 887 per gate 2"}
+]}

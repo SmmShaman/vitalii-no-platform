@@ -1,0 +1,28 @@
+{
+  "id": "b44",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-norwegian-school-curriculum-is-now-the-backbone-of-every-task-b44",
+      "frames": 206,
+      "scroll": [[0, 0], [90, 260], [205, 520]],
+      "mouse": [[0, 560, 70], [100, 560, 260], [205, 560, 420]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 147,
+      "scroll": [[0, 0], [70, 180], [146, 360]],
+      "mouse": [[0, 560, 70], [75, 560, 230], [146, 560, 380]]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/the-norwegian-school-curriculum-is-now-the-backbone-of-every-task-b44",
+      "frames": 211,
+      "scroll": [[0, 620], [100, 820], [210, 1040]],
+      "mouse": [[0, 560, 80], [105, 560, 260], [210, 560, 420]]
+    }
+  ]
+}

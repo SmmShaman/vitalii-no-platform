@@ -1,0 +1,7 @@
+{"id": "b44", "beats": [
+  {"beat": "b1", "effect": "titleTakeover", "backdrop": "page", "data": {"kicker": "Boytasks — screen time gated by finishing school tasks", "title": "Built From Memory, Not Class"}},
+  {"beat": "b2", "effect": "cornerTags", "backdrop": "hub", "data": {"statement": "Match what's taught in class — every subject, every kid", "tags": ["Norwegian", "English", "Maths", "9 grades"]}},
+  {"beat": "b3", "effect": "drawn", "note": "stale-calendar analogy (last year's lesson plan vs the class that moved on), single-codepoint emoji only, no catalog effect per motion skill guidance on metaphor beats"},
+  {"beat": "b4", "effect": "pipelineFlow", "backdrop": "page2", "data": {"steps": ["Resolve this week's unit", "Build today's practice", "70% unit / 30% review"], "system": "Cloudflare Workers — runs nightly", "result": "Matched to class, every week"}},
+  {"beat": "b5", "effect": "drawn", "note": "LogWindow with 6 lines built strictly from the feature's own numbers (634 units, 3 subjects, grades 1-9, 70/30 split, <1MB bundle, admin preview) — not a catalog effect, holds to frame 973 per gate 2"}
+]}
