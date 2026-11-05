@@ -144,23 +144,30 @@ const Ledger: React.FC = () => {
   );
 };
 
+const CLOCK_ROWS = [
+  { frozen: "Grade 3", real: "Grade 4" },
+  { frozen: "Grade 5", real: "Grade 6" },
+  { frozen: "Grade 7", real: "Grade 8" },
+];
+
 const ClockAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   const t = sec(frame, from, fps);
   const inAmt = tween(t, 0, 0.3, ease.power3Out);
+  const panelIn = tween(t, 0.15, 0.45, ease.power3Out);
   const spin = (t / (dur / fps)) * 220;
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       <div
         style={{
           position: "absolute",
-          left: 440,
-          top: 90,
-          width: 400,
-          height: 400,
-          borderRadius: 200,
+          left: 430,
+          top: 56,
+          width: 420,
+          height: 420,
+          borderRadius: 210,
           border: `6px solid ${P.accent}`,
           background: "rgba(255,255,255,0.04)",
           opacity: inAmt,
@@ -173,7 +180,7 @@ const ClockAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }) =>
             left: "50%",
             top: "50%",
             width: 4,
-            height: 130,
+            height: 136,
             background: "#fff",
             transformOrigin: "50% 100%",
             transform: `translate(-50%,-100%) rotate(${spin}deg)`,
@@ -185,7 +192,7 @@ const ClockAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }) =>
             left: "50%",
             top: "50%",
             width: 4,
-            height: 90,
+            height: 94,
             background: P.accent,
             transformOrigin: "50% 100%",
             transform: `translate(-50%,-100%) rotate(${spin * 2.1}deg)`,
@@ -197,7 +204,7 @@ const ClockAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }) =>
             left: "50%",
             top: "50%",
             width: 90,
-            fontSize: 70,
+            fontSize: 74,
             transform: "translate(-50%, 30px)",
             textAlign: "center",
           }}
@@ -205,6 +212,47 @@ const ClockAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }) =>
           ⏰
         </div>
       </div>
+
+      <div style={{ position: "absolute", left: 60, top: 150, width: 300, opacity: panelIn, transform: `translateY(${mix(panelIn, 16, 0)}px)` }}>
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: P.danger }}>STILL FROZEN</div>
+        <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+          {CLOCK_ROWS.map((r, i) => (
+            <div
+              key={i}
+              style={{
+                borderRadius: 4,
+                border: `2px dashed ${P.muted}`,
+                background: P.card,
+                padding: "10px 16px",
+              }}
+            >
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.4, color: P.muted }}>CHILD {i + 1}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: P.ink, marginTop: 2 }}>{r.frozen}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ position: "absolute", right: 60, top: 150, width: 300, opacity: panelIn, transform: `translateY(${mix(panelIn, 16, 0)}px)` }}>
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: P.accent }}>REAL SCHOOL YEAR</div>
+        <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+          {CLOCK_ROWS.map((r, i) => (
+            <div
+              key={i}
+              style={{
+                borderRadius: 4,
+                border: `2px solid ${P.accentEdge}`,
+                background: P.accentBg,
+                padding: "10px 16px",
+              }}
+            >
+              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.4, color: P.muted }}>CHILD {i + 1}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, color: P.accent, marginTop: 2 }}>{r.real}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div style={{ position: "absolute", left: 0, top: 500, width: 1280, textAlign: "center", opacity: inAmt }}>
         <div style={{ fontSize: 38, fontWeight: 800, color: "#fff", fontFamily, letterSpacing: 0.5 }}>
           Forgot to set the clock forward
@@ -214,6 +262,50 @@ const ClockAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }) =>
         </div>
       </div>
     </AbsoluteFill>
+  );
+};
+
+/** b4 only — pipelineFlow's own chain sits in a mid-frame band; this fills the empty top
+ *  margin (naming the nightly cron) and the narrow gap above the ledger strip. */
+const CronFill: React.FC<{ from: number }> = ({ from }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < from) return null;
+  const t = tween(sec(frame, from + 6, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 60, top: 40, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 38 }}>🌙</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>NIGHTLY CRON</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 820 }}>
+            Runs itself every night — checks today's date, bumps every grade, logs what happened
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 60,
+          top: 544,
+          width: 1160,
+          height: 46,
+          borderRadius: 6,
+          background: P.card,
+          border: `2px solid ${P.accent}`,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          paddingLeft: 20,
+          fontSize: 15,
+          fontWeight: 700,
+          color: P.ink,
+        }}
+      >
+        <span>✅</span>
+        <span>Zero manual steps — it ships itself, every August</span>
+      </div>
+    </div>
   );
 };
 
@@ -262,6 +354,7 @@ const Inner: React.FC = () => {
           result: "Zero manual steps",
         }}
       />
+      {cut(frame, B4, B5) === 1 && <CronFill from={B4} />}
 
       {/* b5 — the result: all three boys bumped, holds to the end */}
       {frame >= B5 && (

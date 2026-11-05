@@ -138,24 +138,34 @@ const DrillTrail: React.FC = () => {
   );
 };
 
+const STALE_SUBJECTS = ["Maths · wk 12", "Norwegian · wk 12", "English · wk 12"];
+const REAL_SUBJECTS = ["Maths", "Norwegian", "English"];
+
 const StalePlanAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   const t = sec(frame, from, fps);
   const inAmt = tween(t, 0, 0.3, ease.power3Out);
+  const chipsIn = tween(t, 0.2, 0.5, ease.power3Out);
   const progress = Math.min(1, t / (dur / fps));
   const liveWeek = 12 + Math.floor(progress * 35);
 
   return (
     <AbsoluteFill style={{ background: STAGE }}>
+      <div style={{ position: "absolute", left: 0, top: 40, width: 1280, textAlign: "center", opacity: inAmt }}>
+        <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 2.4, color: P.muted }}>
+          3 SUBJECTS · 9 GRADES · EVERY WEEK
+        </div>
+      </div>
+
       <div
         style={{
           position: "absolute",
-          left: 290,
-          top: 150,
-          width: 300,
-          height: 220,
+          left: 120,
+          top: 110,
+          width: 340,
+          height: 280,
           borderRadius: 10,
           border: `6px solid ${P.border}`,
           background: "rgba(255,255,255,0.04)",
@@ -167,17 +177,39 @@ const StalePlanAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }
           justifyContent: "center",
         }}
       >
-        <div style={{ fontSize: 60 }}>📅</div>
-        <div style={{ fontSize: 16, fontWeight: 700, color: P.muted, marginTop: 10 }}>PLAN</div>
+        <div style={{ fontSize: 56 }}>📅</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: P.muted, marginTop: 8 }}>PLAN</div>
         <div style={{ fontSize: 34, fontWeight: 800, color: "#fff", marginTop: 4 }}>Week 12</div>
+        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 6, opacity: chipsIn }}>
+          {STALE_SUBJECTS.map((s) => (
+            <div
+              key={s}
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: P.muted,
+                border: `1px dashed ${P.muted}`,
+                borderRadius: 4,
+                padding: "3px 10px",
+              }}
+            >
+              {s}
+            </div>
+          ))}
+        </div>
       </div>
+
+      <div style={{ position: "absolute", left: 610, top: 220, width: 60, textAlign: "center", opacity: inAmt, fontSize: 30, fontWeight: 800, color: P.muted }}>
+        ≠
+      </div>
+
       <div
         style={{
           position: "absolute",
-          left: 690,
-          top: 150,
-          width: 300,
-          height: 220,
+          left: 820,
+          top: 110,
+          width: 340,
+          height: 280,
           borderRadius: 10,
           border: `6px solid ${ACCENT}`,
           background: "rgba(255,255,255,0.04)",
@@ -191,7 +223,26 @@ const StalePlanAnalogy: React.FC<{ from: number; dur: number }> = ({ from, dur }
       >
         <div style={{ fontSize: 16, fontWeight: 700, color: ACCENT }}>REAL CLASS</div>
         <div style={{ fontSize: 34, fontWeight: 800, color: "#fff", marginTop: 4 }}>Week {liveWeek}</div>
+        <div style={{ marginTop: 16, display: "flex", flexDirection: "column", gap: 6, opacity: chipsIn }}>
+          {REAL_SUBJECTS.map((s) => (
+            <div
+              key={s}
+              style={{
+                fontSize: 13,
+                fontWeight: 700,
+                color: ACCENT,
+                border: `1px solid ${ACCENT}`,
+                borderRadius: 4,
+                padding: "3px 10px",
+                textAlign: "center",
+              }}
+            >
+              {s} · wk {liveWeek}
+            </div>
+          ))}
+        </div>
       </div>
+
       <div style={{ position: "absolute", left: 0, top: 500, width: 1280, textAlign: "center", opacity: inAmt }}>
         <div style={{ fontSize: 38, fontWeight: 800, color: "#fff", fontFamily, letterSpacing: 0.5 }}>
           Still Teaching Last Year&apos;s Plan
