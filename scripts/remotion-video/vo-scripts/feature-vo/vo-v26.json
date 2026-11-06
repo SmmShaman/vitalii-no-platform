@@ -1,0 +1,57 @@
+{
+ "id": "v26",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.044,
+  "b2": 3.486,
+  "b3": 6.089,
+  "b4": 5.054,
+  "b5": 5.673
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Twice this month a video digest stalled for hours - August 18th and 21st - and nobody noticed until someone happened to check.",
+   "start_s": 0.5,
+   "end_s": 8.544,
+   "start_f": 15,
+   "end_f": 256
+  },
+  {
+   "beat": "b2",
+   "text": "There was no retry - a stuck draft just sat there.",
+   "start_s": 8.844,
+   "end_s": 12.33,
+   "start_f": 265,
+   "end_f": 370
+  },
+  {
+   "beat": "b3",
+   "text": "Now narration and scenario come straight from my own Claude subscription, not a free AI cascade.",
+   "start_s": 12.63,
+   "end_s": 18.719,
+   "start_f": 379,
+   "end_f": 562
+  },
+  {
+   "beat": "b4",
+   "text": "A watchdog checks every 30 minutes and wakes the pipeline the moment a draft sticks.",
+   "start_s": 19.019,
+   "end_s": 24.073,
+   "start_f": 571,
+   "end_f": 722
+  },
+  {
+   "beat": "b5",
+   "text": "That exact stall - the cause of both gaps - now heals itself within 30 minutes.",
+   "start_s": 24.373,
+   "end_s": 30.046,
+   "start_f": 731,
+   "end_f": 901
+  }
+ ],
+ "total_s": 31.546,
+ "durationInFrames": 946,
+ "measured_track_s": 30.096,
+ "track": "/root/feature-demos/vo-v26/vo-v26.mp3"
+}

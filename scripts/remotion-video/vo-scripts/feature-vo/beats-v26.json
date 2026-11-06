@@ -1,0 +1,7 @@
+{"id": "v26", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Twice this month a video digest stalled for hours - August 18th and 21st - and nobody noticed until someone happened to check."],
+ ["b2", "There was no retry - a stuck draft just sat there."],
+ ["b3", "Now narration and scenario come straight from my own Claude subscription, not a free AI cascade."],
+ ["b4", "A watchdog checks every 30 minutes and wakes the pipeline the moment a draft sticks."],
+ ["b5", "That exact stall - the cause of both gaps - now heals itself within 30 minutes."]
+]}

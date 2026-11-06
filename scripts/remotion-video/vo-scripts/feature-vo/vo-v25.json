@@ -1,0 +1,57 @@
+{
+ "id": "v25",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.094,
+  "b2": 5.107,
+  "b3": 3.756,
+  "b4": 4.973,
+  "b5": 5.999
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Ten of my oldest feature videos still looked like a dark computer terminal while the rest of the site had moved on.",
+   "start_s": 0.5,
+   "end_s": 6.594,
+   "start_f": 15,
+   "end_f": 198
+  },
+  {
+   "beat": "b2",
+   "text": "A new visual style only proves itself on real content, not a single demo.",
+   "start_s": 6.894,
+   "end_s": 12.001,
+   "start_f": 207,
+   "end_f": 360
+  },
+  {
+   "beat": "b3",
+   "text": "So Claude rewrote all ten clips in one parallel batch.",
+   "start_s": 12.301,
+   "end_s": 16.057,
+   "start_f": 369,
+   "end_f": 482
+  },
+  {
+   "beat": "b4",
+   "text": "Each was re-rendered and uploaded back to its exact old link, so nothing broke.",
+   "start_s": 16.357,
+   "end_s": 21.33,
+   "start_f": 491,
+   "end_f": 640
+  },
+  {
+   "beat": "b5",
+   "text": "Now every clip gets a second run too - one a day for ten days, instead of all at once.",
+   "start_s": 21.63,
+   "end_s": 27.629,
+   "start_f": 649,
+   "end_f": 829
+  }
+ ],
+ "total_s": 29.129,
+ "durationInFrames": 874,
+ "measured_track_s": 27.696,
+ "track": "/root/feature-demos/vo-v25/vo-v25.mp3"
+}
