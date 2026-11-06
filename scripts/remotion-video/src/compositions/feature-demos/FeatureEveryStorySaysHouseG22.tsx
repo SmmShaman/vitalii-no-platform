@@ -31,8 +31,8 @@
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
-import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily, IconCard, StatPill } from "./bright-primitives";
+import { MOODS, PaletteProvider, usePalette, cardShadow } from "./bright-theme";
+import { fontFamily, StatPill } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow } from "./live-primitives";
 import { punchScale } from "../../components/effects/motion/grammar";
@@ -61,6 +61,46 @@ const SLOT_X = (i: number) => LT.x + 14 + i * (CARD_W + GAP);
 const LOG_WIN = { x: 150, y: 150, w: 980, h: 430 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
+
+// bright-primitives' IconCard titles use the light-theme "ink" colour, which is
+// near-black and invisible on this clip's dark stage — this is the same card
+// but with a readable title colour for a dark background.
+const DarkIconCard: React.FC<{
+  x: number;
+  y: number;
+  w: number;
+  emoji: string;
+  title: string;
+  sub?: string;
+  tone?: "danger" | "success" | "accent";
+}> = ({ x, y, w, emoji, title, sub, tone = "accent" }) => {
+  const P = usePalette();
+  const c = tone === "danger" ? P.danger : tone === "success" ? P.success : P.accent;
+  const bg = tone === "danger" ? P.dangerBg : tone === "success" ? P.successBg : P.accentBg;
+  const edge = tone === "danger" ? P.dangerEdge : tone === "success" ? P.successEdge : P.accentEdge;
+  return (
+    <div style={{ position: "absolute", left: x, top: y, width: w, display: "flex", flexDirection: "column", alignItems: "center", gap: 12, fontFamily }}>
+      <div
+        style={{
+          width: 110,
+          height: 110,
+          borderRadius: 30,
+          background: bg,
+          border: `2px solid ${edge}`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 56,
+          boxShadow: cardShadow,
+        }}
+      >
+        {emoji}
+      </div>
+      <div style={{ fontSize: 23, fontWeight: 700, color: P.bgTop, textAlign: "center", lineHeight: 1.25 }}>{title}</div>
+      {sub ? <div style={{ fontSize: 17.5, fontWeight: 600, color: c, textAlign: "center", lineHeight: 1.3 }}>{sub}</div> : null}
+    </div>
+  );
+};
 
 const CardDeck: React.FC = () => {
   const frame = useCurrentFrame();
@@ -170,8 +210,9 @@ const Inner: React.FC = () => {
       />
       {frame >= B2 && frame < B3 && (
         <>
-          <IconCard x={840} y={70} w={360} emoji="🚗" title="Driving at speed" sub="no way to double-check" tone="danger" />
-          <IconCard x={840} y={250} w={360} emoji="🔢" title="Digits only" sub="never spelled out" tone="danger" />
+          <DarkIconCard x={840} y={70} w={360} emoji="🚗" title="Driving at speed" sub="no way to double-check" tone="danger" />
+          <DarkIconCard x={840} y={250} w={360} emoji="🔢" title="Digits only" sub="never spelled out" tone="danger" />
+          <DarkIconCard x={840} y={430} w={360} emoji="📉" title="Counts drift" sub="totals never verified" tone="danger" />
           <StatPill x={470} y={540} emoji="🗣" text="Every voice line" tone="accent" />
         </>
       )}
@@ -191,8 +232,8 @@ const Inner: React.FC = () => {
       />
       {frame >= B3 && frame < B4 && (
         <>
-          <IconCard x={90} y={70} w={300} emoji="🏠" title="Real address" sub="spoken first" tone="accent" />
-          <IconCard x={890} y={70} w={300} emoji="🌐" title="Kartverket" sub="address registry" tone="accent" />
+          <DarkIconCard x={90} y={70} w={300} emoji="🏠" title="Real address" sub="spoken first" tone="accent" />
+          <DarkIconCard x={890} y={70} w={300} emoji="🌐" title="Kartverket" sub="address registry" tone="accent" />
           <StatPill x={150} y={520} emoji="📍" text="Looked up automatically" tone="accent" />
           <StatPill x={740} y={520} emoji="🗣" text="Spoken before the story starts" tone="accent" />
           <div style={{ position: "absolute", left: 40, top: 18, fontSize: 14, fontWeight: 700, letterSpacing: 0.4, color: "#8FD9BC", fontFamily }}>
@@ -264,10 +305,14 @@ const Inner: React.FC = () => {
       />
       {frame >= B6 && (
         <>
+          {/* kept in the top band, clear of the percentRing's own centred ring+text block
+              (which sits lower, roughly y 240-480) — the old IconCards at y 220/400 sat
+              right on top of that text and their title used the light-theme ink colour,
+              invisible on this dark stage. */}
           <StatPill x={110} y={100} emoji="🔢" text="Before: digits in every chapter" tone="accent" opacity={0.75} />
           <StatPill x={740} y={100} emoji="✅" text="After: zero digits left" tone="success" />
-          <IconCard x={850} y={220} w={360} emoji="📬" title="Every new story" sub="respelled automatically" tone="success" />
-          <IconCard x={850} y={400} w={360} emoji="🗂" title="Old catalog too" sub="rewritten the same way" tone="success" />
+          <StatPill x={110} y={170} emoji="📬" text="New stories — auto-respelled" tone="success" />
+          <StatPill x={740} y={170} emoji="🗂" text="Old catalog — rewritten too" tone="success" />
         </>
       )}
 

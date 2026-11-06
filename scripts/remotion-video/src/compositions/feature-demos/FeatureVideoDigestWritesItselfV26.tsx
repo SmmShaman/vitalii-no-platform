@@ -327,6 +327,7 @@ const ClosingBeat: React.FC = () => {
 
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
+  const P = usePalette();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       {/* b1 — two unnoticed stalls, fully drawn, over the feature's own real page */}
@@ -363,6 +364,58 @@ const Inner: React.FC = () => {
           result: "Free-AI steps skipped",
         }}
       />
+      {/* b3 fill fix: pipelineFlow's own build lands mid-compaction at this beat's
+          midpoint (small chain, no frame/title/result yet) — a static top tag + a
+          bottom-right caption keep the canvas owned top-to-bottom regardless of
+          where the catalog effect's own timeline lands. */}
+      {cut(frame, B3, B4) === 1 && (
+        <>
+          <Arrive at={B3 + 4} kind="wipe" box={{ x: 40, y: 56, w: 460, h: 60 }} dur={0.4}>
+            <div
+              style={{
+                position: "absolute",
+                left: 40,
+                top: 56,
+                padding: "10px 20px",
+                borderRadius: 4,
+                background: "rgba(5,8,14,0.85)",
+                border: `1.5px solid ${ACCENT}`,
+                color: ACCENT,
+                fontSize: 16,
+                fontWeight: 800,
+                letterSpacing: 1.5,
+                fontFamily,
+              }}
+            >
+              GITHUB — COMMIT HISTORY
+            </div>
+          </Arrive>
+          <Arrive at={B3 + 10} kind="rise" box={{ x: 520, y: 606, w: 700, h: 92 }} dur={0.4}>
+            <div
+              style={{
+                position: "absolute",
+                left: 520,
+                top: 606,
+                width: 700,
+                height: 92,
+                borderRadius: 4,
+                background: P.card,
+                boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
+                display: "flex",
+                alignItems: "center",
+                padding: "0 24px",
+                fontFamily,
+                fontSize: 19,
+                fontWeight: 700,
+                color: "#111",
+                lineHeight: 1.3,
+              }}
+            >
+              Claude subscription replaces the free AI cascade for every run.
+            </div>
+          </Arrive>
+        </>
+      )}
 
       {/* b4 — the watchdog cadence vs. the stall threshold, drawn only (no backdrop) */}
       <MotionInsert
@@ -380,6 +433,59 @@ const Inner: React.FC = () => {
           note: "re-triggers once a draft passes the threshold",
         }}
       />
+      {/* b4 fill fix: targetOverrun's track and label live in the upper-left two
+          thirds — this beat's midpoint falls before the note/verdict land, leaving
+          the bottom and top-right empty. A static top-right badge + bottom-right
+          caption own those regions for the whole beat. */}
+      {cut(frame, B4, B5) === 1 && (
+        <>
+          <Arrive at={B4 + 4} kind="wipe" box={{ x: 820, y: 56, w: 400, h: 60 }} dur={0.4}>
+            <div
+              style={{
+                position: "absolute",
+                left: 820,
+                top: 56,
+                padding: "10px 20px",
+                borderRadius: 4,
+                background: "rgba(5,8,14,0.85)",
+                border: `1.5px solid ${ACCENT}`,
+                color: ACCENT,
+                fontSize: 16,
+                fontWeight: 800,
+                letterSpacing: 1.5,
+                fontFamily,
+                textAlign: "right",
+              }}
+            >
+              CHECKS EVERY 30 MIN
+            </div>
+          </Arrive>
+          <Arrive at={B4 + 10} kind="rise" box={{ x: 520, y: 606, w: 700, h: 92 }} dur={0.4}>
+            <div
+              style={{
+                position: "absolute",
+                left: 520,
+                top: 606,
+                width: 700,
+                height: 92,
+                borderRadius: 4,
+                background: P.card,
+                boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
+                display: "flex",
+                alignItems: "center",
+                padding: "0 24px",
+                fontFamily,
+                fontSize: 19,
+                fontWeight: 700,
+                color: "#111",
+                lineHeight: 1.3,
+              }}
+            >
+              A watchdog checks every 30 minutes and wakes the pipeline the moment a draft sticks.
+            </div>
+          </Arrive>
+        </>
+      )}
 
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />
