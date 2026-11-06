@@ -1,0 +1,7 @@
+{"id": "v24", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every feature demo looked the same: dark, dense, built for people who already read code."],
+ ["b2", "If you weren't technical, the videos were noise — like reading sheet music instead of hearing the song."],
+ ["b3", "I built a second visual language in Remotion — bright, plain-English panels anyone can follow."],
+ ["b4", "Then I gave one feature a voice: a full narrated walkthrough instead of a silent loop."],
+ ["b5", "That walkthrough runs fifty-four seconds — the first fully narrated demo this project has ever shipped."]
+]}

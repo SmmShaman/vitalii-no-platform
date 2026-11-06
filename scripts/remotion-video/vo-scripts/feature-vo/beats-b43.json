@@ -1,0 +1,7 @@
+{"id": "b43", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Testing a task set meant running it for real — burning a kid's one real attempt."],
+ ["b2", "There was no way to check a fix without risking a child's actual progress."],
+ ["b3", "Parents also found the read-aloud voice too fast, with no way to test a new speed first."],
+ ["b4", "Now a sandbox replays any child's tasks in Supabase without writing a single real row."],
+ ["b5", "And a slider lets a parent test the voice — half speed up to one-point-three times — before it saves."]
+]}

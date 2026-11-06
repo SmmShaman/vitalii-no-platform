@@ -1,0 +1,57 @@
+{
+ "id": "b43",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.023,
+  "b2": 4.568,
+  "b3": 5.791,
+  "b4": 5.911,
+  "b5": 6.532
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Testing a task set meant running it for real \u2014 burning a kid's one real attempt.",
+   "start_s": 0.5,
+   "end_s": 5.523,
+   "start_f": 15,
+   "end_f": 166
+  },
+  {
+   "beat": "b2",
+   "text": "There was no way to check a fix without risking a child's actual progress.",
+   "start_s": 5.823,
+   "end_s": 10.391,
+   "start_f": 175,
+   "end_f": 312
+  },
+  {
+   "beat": "b3",
+   "text": "Parents also found the read-aloud voice too fast, with no way to test a new speed first.",
+   "start_s": 10.691,
+   "end_s": 16.482,
+   "start_f": 321,
+   "end_f": 494
+  },
+  {
+   "beat": "b4",
+   "text": "Now a sandbox replays any child's tasks in Supabase without writing a single real row.",
+   "start_s": 16.782,
+   "end_s": 22.693,
+   "start_f": 503,
+   "end_f": 681
+  },
+  {
+   "beat": "b5",
+   "text": "And a slider lets a parent test the voice \u2014 half speed up to one-point-three times \u2014 before it saves.",
+   "start_s": 22.993,
+   "end_s": 29.525,
+   "start_f": 690,
+   "end_f": 886
+  }
+ ],
+ "total_s": 31.025,
+ "durationInFrames": 931,
+ "measured_track_s": 29.592,
+ "track": "/root/feature-demos/vo-b43/vo-b43.mp3"
+}

@@ -1,0 +1,57 @@
+{
+ "id": "v24",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.893,
+  "b2": 5.819,
+  "b3": 5.942,
+  "b4": 5.722,
+  "b5": 6.414
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every feature demo looked the same: dark, dense, built for people who already read code.",
+   "start_s": 0.5,
+   "end_s": 6.393,
+   "start_f": 15,
+   "end_f": 192
+  },
+  {
+   "beat": "b2",
+   "text": "If you weren't technical, the videos were noise \u2014 like reading sheet music instead of hearing the song.",
+   "start_s": 6.693,
+   "end_s": 12.512,
+   "start_f": 201,
+   "end_f": 375
+  },
+  {
+   "beat": "b3",
+   "text": "I built a second visual language in Remotion \u2014 bright, plain-English panels anyone can follow.",
+   "start_s": 12.812,
+   "end_s": 18.754,
+   "start_f": 384,
+   "end_f": 563
+  },
+  {
+   "beat": "b4",
+   "text": "Then I gave one feature a voice: a full narrated walkthrough instead of a silent loop.",
+   "start_s": 19.054,
+   "end_s": 24.776,
+   "start_f": 572,
+   "end_f": 743
+  },
+  {
+   "beat": "b5",
+   "text": "That walkthrough runs fifty-four seconds \u2014 the first fully narrated demo this project has ever shipped.",
+   "start_s": 25.076,
+   "end_s": 31.49,
+   "start_f": 752,
+   "end_f": 945
+  }
+ ],
+ "total_s": 32.99,
+ "durationInFrames": 990,
+ "measured_track_s": 31.56,
+ "track": "/root/feature-demos/vo-v24/vo-v24.mp3"
+}
