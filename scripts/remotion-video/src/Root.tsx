@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureSecondVisualLanguageDemosV24 } from "./compositions/feature-demos/FeatureSecondVisualLanguageDemosV24";
+import { FeatureSandboxWhereNothingCountsB43 } from "./compositions/feature-demos/FeatureSandboxWhereNothingCountsB43";
 import { FeatureGradesBumpThemselvesFirstB45 } from "./compositions/feature-demos/FeatureGradesBumpThemselvesFirstB45";
 import { FeatureNorwegianSchoolCurriculumBackboneB44 } from "./compositions/feature-demos/FeatureNorwegianSchoolCurriculumBackboneB44";
 import { FeatureOneVoiceCommandCreatesC07 } from "./compositions/feature-demos/FeatureOneVoiceCommandCreatesC07";
@@ -2963,6 +2965,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureGuideVitaliiNoTurnsG05"
         component={FeatureGuideVitaliiNoTurnsG05}
         durationInFrames={927}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureSecondVisualLanguageDemosV24"
+        component={FeatureSecondVisualLanguageDemosV24}
+        durationInFrames={990}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureSandboxWhereNothingCountsB43"
+        component={FeatureSandboxWhereNothingCountsB43}
+        durationInFrames={931}
         fps={30}
         width={1280}
         height={720}

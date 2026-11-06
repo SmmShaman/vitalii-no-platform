@@ -1,0 +1,44 @@
+{
+  "id": "v24",
+  "composition": "FeatureSecondVisualLanguageDemosV24",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "Only for people who code", "kicker": "Every feature demo, until now" }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "hub",
+      "data": { "line1": "If you don't read code,", "line2": "the videos were just noise.", "keywords": ["don't read code", "noise"] }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "commits",
+      "data": {
+        "from": "Dark terminal style",
+        "to": "Bright explainer panels",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Problem/solution zones", "Real browser mockups", "Remotion (video code)"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "actions",
+      "data": {
+        "steps": ["Write voice beats", "Measure durations", "Sync picture to words"],
+        "result": "Narrated walkthrough"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "Flow-map lower third resolves its fork; a LogWindow result panel built from the feature's own numbers (2 visual languages instead of 1, first 54-second narrated walkthrough) — never the feature page or the hub."
+    }
+  ]
+}

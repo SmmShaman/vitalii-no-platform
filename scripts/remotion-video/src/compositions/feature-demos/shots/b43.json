@@ -1,0 +1,21 @@
+{
+  "id": "b43",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/a-sandbox-where-nothing-counts-testing-any-kids-real-tasks-without-burning-a-sin-b43",
+      "frames": 190,
+      "scroll": [[0, 0], [94, 700], [189, 1500]],
+      "mouse": [[0, 560, 220], [95, 560, 260], [189, 560, 300]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 195,
+      "scroll": [[0, 0], [97, 1100], [194, 2200]],
+      "mouse": [[0, 300, 200], [65, 650, 280], [130, 400, 150], [194, 600, 220]]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "b43",
+  "composition": "FeatureSandboxWhereNothingCountsB43",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "quoteMarker",
+      "backdrop": "page",
+      "data": { "quote": "One real attempt — testing a fix meant playing it for real.", "highlight": "playing it for real" }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "No way to test a fix safely",
+        "tags": ["Burns a real attempt", "Writes to real data", "Risks child progress", "No safe test"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": { "line1": "The voice was too fast,", "line2": "with no way to test a new speed.", "keywords": ["too fast", "test a new speed"] }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Real run, real risk",
+        "to": "Sandbox replay, zero risk",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["No real rows written", "No gates fire", "Supabase (database)"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "Timeline archetype's final node lights up; a LogWindow result panel built from the feature's own numbers (0 real rows touched, speed slider tested 0.5x-1.3x before saving) — never the feature page or the hub."
+    }
+  ]
+}

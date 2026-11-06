@@ -1,0 +1,35 @@
+{
+  "id": "v24",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/a-second-visual-language-for-feature-demos-bright-infographics-for-viewers-who-d-v24",
+      "frames": 186,
+      "scroll": [[0, 0], [185, 760]],
+      "mouse": [[0, 560, 220], [90, 560, 260], [185, 560, 300]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 183,
+      "scroll": [[0, 0], [91, 1200], [182, 2200]],
+      "mouse": [[0, 220, 180], [45, 620, 300], [90, 380, 140], [135, 900, 280], [182, 640, 200]]
+    },
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commits",
+      "frames": 188,
+      "scroll": [[0, 0], [187, 2600]],
+      "mouse": [[0, 420, 150], [45, 420, 340], [95, 420, 160], [140, 420, 350], [187, 420, 200]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/actions",
+      "frames": 180,
+      "scroll": [[0, 0], [179, 260]],
+      "mouse": [[0, 300, 250], [179, 520, 250]]
+    }
+  ]
+}
