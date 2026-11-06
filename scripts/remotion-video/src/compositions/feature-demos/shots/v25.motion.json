@@ -1,0 +1,74 @@
+{
+  "id": "v25",
+  "composition": "Feature10ClipsGoDarkV25",
+  "archetype": "5 ledger",
+  "mood": "sand",
+  "notes": "Ledger (receipt column) FULL at x:0-340 full height during b1 and b5 (no catalog effect under it), shrunk into the lower-third BAND (y>=606) during b2-b4 while a catalog effect owns the stage. Red phase (b1-b2, 'STYLE DEBT') flips to green at B3 ('CLIPS REWRITTEN'), a new line is added in b4 and b5 so the receipt keeps growing. b1 opener is drawn-only, avoiding the banned copyCorrection/titleTakeover/cornerTags openers. b5 is also drawn-only so the clip ends on the ledger's own result, never the feature page or hub.",
+  "beats": [
+    {
+      "beat": "b1",
+      "frames": [15, 207],
+      "kind": "drawn",
+      "effect": null,
+      "backdrop": { "file": "v25", "shot": "page", "dim": 0.4 },
+      "data": null,
+      "description": "Product plate (verbatim line) over LiveWindow of the feature's own real page. Ledger FULL: one red line '10 clips ... DARK', total '10 BEHIND'.",
+      "hero": "ledger-full-10-behind"
+    },
+    {
+      "beat": "b2",
+      "frames": [207, 369],
+      "kind": "catalog",
+      "effect": "copyCorrection",
+      "backdrop": { "file": "v25", "shot": "hub", "dim": 0.55 },
+      "data": {
+        "wrong": "One demo composition proves a new style",
+        "right": "Ten already-published clips put it to the real test",
+        "label": "The Real Test"
+      },
+      "description": "Features hub as ambient evidence of real published content. Ledger shrinks to BAND, stays '10'/CLIPS BEHIND, danger.",
+      "hero": null
+    },
+    {
+      "beat": "b3",
+      "frames": [369, 491],
+      "kind": "catalog",
+      "effect": "pipelineFlow",
+      "backdrop": { "file": "v25", "shot": "commits", "dim": 0.55 },
+      "data": {
+        "system": "Claude subagents",
+        "steps": ["10 old dark clips", "Parallel subagents", "Bright v2 template", "10 rewritten clips"],
+        "result": "One batch, ten clips"
+      },
+      "description": "Repo commits as ambient evidence of the rewrite batch, no specific commit asserted. Ledger flips at B3 to BAND green: '10'/CLIPS REWRITTEN.",
+      "hero": "ledger-flip-green"
+    },
+    {
+      "beat": "b4",
+      "frames": [491, 649],
+      "kind": "catalog",
+      "effect": "statusFocus",
+      "backdrop": { "file": "v25", "shot": "actions", "dim": 0.55 },
+      "data": {
+        "title": "AFTER THE RE-UPLOAD",
+        "claims": [
+          { "text": "Storage key changed", "verdict": "no" },
+          { "text": "Old links still resolve", "verdict": "yes" }
+        ]
+      },
+      "description": "GitHub Actions runs as ambient evidence of the re-render/upload jobs. Ledger stays BAND green, flips to '0'/BROKEN LINKS.",
+      "hero": null
+    },
+    {
+      "beat": "b5",
+      "frames": [649, 874],
+      "kind": "drawn",
+      "effect": null,
+      "backdrop": null,
+      "data": null,
+      "description": "Drawn only, no backdrop. Ledger returns FULL: old '10 BEHIND' shown struck-through small, new total '10 DONE' big green, a third receipt line added for the repost schedule ('1/day x 10 REPOST'). Caption line. Holds to END (874), no fade, no cut to empty.",
+      "hero": "ledger-full-10-done",
+      "holdTo": 874
+    }
+  ]
+}

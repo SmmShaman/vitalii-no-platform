@@ -1,5 +1,11 @@
 // FeatureEveryStorySaysHouseG22 — feature g22 — 1280x720, 963 frames @ 30fps, VOICE-SYNCED.
-// RE-SHOOT (2026-11-04): same narration, new picture. archetype 3 card-deck, mood mint.
+// RE-SHOOT (2026-11-06): same narration, same windows. archetype 3 card-deck, mood mint.
+// Only new picture detail: commit 9f169ae ("numbers spoken as words and the house
+// address before every flash", files address.py/respell.py/runner.py) is the one commit
+// of the three given tonight whose message matches a beat's sentence (b3+b4). No verified
+// GitHub URL was listed to record it live, so it is cited as a small tech caption instead
+// of a diff screenshot — the other two commits (a32dc6e place-off-the-road, aa9d0f2
+// museum-records) don't prove any sentence in THIS clip's narration and are not shown.
 //
 // Beat → effect (data only from the feature row / meta-g22.json, no invented numbers):
 // b1 15-165   "the story starts talking — but never says which house"
@@ -189,6 +195,9 @@ const Inner: React.FC = () => {
           <IconCard x={890} y={70} w={300} emoji="🌐" title="Kartverket" sub="address registry" tone="accent" />
           <StatPill x={150} y={520} emoji="📍" text="Looked up automatically" tone="accent" />
           <StatPill x={740} y={520} emoji="🗣" text="Spoken before the story starts" tone="accent" />
+          <div style={{ position: "absolute", left: 40, top: 18, fontSize: 14, fontWeight: 700, letterSpacing: 0.4, color: "#8FD9BC", fontFamily }}>
+            address.py · respell.py — commit 9f169ae
+          </div>
         </>
       )}
 

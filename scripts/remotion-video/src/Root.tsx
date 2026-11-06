@@ -298,6 +298,8 @@ import { FeatureMissedEndStoryGuideG12 } from "./compositions/feature-demos/Feat
 import { FeatureWhenRoadGoesQuietG11 } from "./compositions/feature-demos/FeatureWhenRoadGoesQuietG11";
 import { FeatureKiosksSugarBadgeJustD16 } from "./compositions/feature-demos/FeatureKiosksSugarBadgeJustD16";
 import { FeatureArtemsSugarChartMovesB77 } from "./compositions/feature-demos/FeatureArtemsSugarChartMovesB77";
+import { FeatureVideoDigestWritesItselfV26 } from "./compositions/feature-demos/FeatureVideoDigestWritesItselfV26";
+import { Feature10ClipsGoDarkV25 } from "./compositions/feature-demos/Feature10ClipsGoDarkV25";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2889,6 +2891,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureArtemsSugarChartMovesB77"
         component={FeatureArtemsSugarChartMovesB77}
         durationInFrames={868}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureVideoDigestWritesItselfV26"
+        component={FeatureVideoDigestWritesItselfV26}
+        durationInFrames={946}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="Feature10ClipsGoDarkV25"
+        component={Feature10ClipsGoDarkV25}
+        durationInFrames={874}
         fps={30}
         width={1280}
         height={720}

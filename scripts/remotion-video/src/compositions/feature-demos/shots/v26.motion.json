@@ -1,0 +1,76 @@
+{
+  "id": "v26",
+  "composition": "FeatureVideoDigestWritesItselfV26",
+  "archetype": "6 sidebar",
+  "mood": "slate",
+  "notes": "Sidebar: FULL when no catalog effect owns the stage (b1, b5), BAND lower-third when it does (b2-b4). No real commits for this feature (source_commits=[]) so b3 uses the generic /commits page as ambient evidence, not a specific commit. b5 ends on a drawn LogWindow result, never the feature page/hub (gate 2).",
+  "beats": [
+    {
+      "beat": "b1",
+      "frames": [15, 265],
+      "kind": "drawn",
+      "effect": null,
+      "backdrop": { "file": "v26", "shot": "page", "dim": 0.4 },
+      "data": null,
+      "description": "Product plate (verbatim line) over LiveWindow of the feature's own real page. Sidebar FULL: value=2, label=STALLS THIS MONTH, tone=danger. Caption: two stalls, Aug 18 and 21, went unnoticed for hours.",
+      "hero": "sidebar-full-2-stalls"
+    },
+    {
+      "beat": "b2",
+      "frames": [265, 379],
+      "kind": "catalog",
+      "effect": "statusFocus",
+      "backdrop": { "file": "v26", "shot": "actions", "dim": 0.55 },
+      "data": {
+        "title": "BEFORE THE WATCHDOG",
+        "claims": [
+          { "text": "Automatic retry on stall", "verdict": "no" },
+          { "text": "Draft left stuck for hours", "verdict": "yes" }
+        ]
+      },
+      "description": "GitHub Actions backdrop as ambient evidence of the automated pipeline. Sidebar shrinks to BAND, stays 2/danger (no flip yet).",
+      "hero": null
+    },
+    {
+      "beat": "b3",
+      "frames": [379, 571],
+      "kind": "catalog",
+      "effect": "pipelineFlow",
+      "backdrop": { "file": "v26", "shot": "commits", "dim": 0.55 },
+      "data": {
+        "system": "daily-video-bot",
+        "steps": ["Free AI cascade (old)", "Claude Agent SDK", "agent_submit_digest", "auto_chain_2"],
+        "result": "Free-AI steps skipped"
+      },
+      "description": "GitHub commits listing as ambient evidence, no specific commit asserted. Sidebar flips at B3 to BAND: value=0, label=FREE-AI STEPS LEFT, tone=accent.",
+      "hero": "sidebar-flip-0-free-ai"
+    },
+    {
+      "beat": "b4",
+      "frames": [571, 731],
+      "kind": "catalog",
+      "effect": "targetOverrun",
+      "backdrop": null,
+      "data": {
+        "label": "Minutes stuck before fire",
+        "value": 45,
+        "target": 45,
+        "unit": "min",
+        "note": "checked every 30 min"
+      },
+      "description": "Drawn only, no backdrop, base=STAGE dark plate. Sidebar stays BAND, 0/accent.",
+      "hero": null
+    },
+    {
+      "beat": "b5",
+      "frames": [731, 946],
+      "kind": "drawn",
+      "effect": null,
+      "backdrop": null,
+      "data": null,
+      "description": "Drawn LogWindow with 7 real-numbers lines (Aug 18/21 stalls, digest-watchdog.sh, 30m check cadence, 45m threshold, auto_chain_2, agent_submit_digest, Telegram notified). Sidebar flips to FULL: value=30, label=MINUTES TO SELF-HEAL, tone=success. Caption line. Holds to END (946), no fade, no cut to empty.",
+      "hero": "sidebar-full-30-self-heal",
+      "holdTo": 946
+    }
+  ]
+}

@@ -1,5 +1,9 @@
 // FeatureGradesBumpThemselvesFirstB45 — feature b45 — 1280x720, 887 frames @ 30fps, VOICE-SYNCED.
-// archetype 5 ledger, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 3 card-deck, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// Fix (2026-11-06, Wave B2): was drawn and labelled as archetype 5 ledger — rebuilt as
+// archetype 3 card-deck (three cards fly in STACKED at b1, fan out into their own slots
+// by b2, flip in place through b4-b5). Beat windows, durationInFrames, palette and the
+// per-beat narration/effects are unchanged.
 //
 // One editorial effect per sentence, chosen by what changes on screen, over the
 // real Boytasks feature page/hub as evidence where available, one owner of the
@@ -8,23 +12,25 @@
 // Beat → effect (data only from the feature row — no commits exist for b45):
 // b1 15-191   "a week into school, still on last year's grade — I'd forgotten to bump them"
 //             titleTakeover over the feature's own page (backdrop "page"). Names
-//             the product (Boytasks) in the kicker. The ledger's three cells
-//             wipe in showing grade 3/5/7, each flagged "pending".
+//             the product (Boytasks) in the kicker. The three cards fly in as one
+//             STACKED pile showing grade 3/5/7, each flagged "pending".
 // b2 191-367  "that number decides their lessons — forget it, a year goes to the wrong content"
 //             cornerTags: the claim + four facts, over the features hub (backdrop "hub").
-//             Each ledger cell gets a red "WRONG UNIT" tag, staggered.
+//             The pile FANS OUT into its three slots; each card gets a red "WRONG UNIT"
+//             tag, staggered.
 // b3 367-509  "like forgetting to set the clocks forward — everything runs on old time"
 //             drawn clock analogy (no catalog effect — a metaphor beat), single
 //             codepoint ⏰, hands sweeping continuously for the whole beat.
 // b4 509-675  "now a nightly cron checks the date and bumps every grade automatically"
 //             pipelineFlow (check date → bump grade → log it) over the page's
-//             solution section (backdrop "page2"). Ledger cells flip pending → done,
+//             solution section (backdrop "page2"). Fanned cards flip pending → done,
 //             staggered, red tags fade, checkmarks punch in with the new grade.
 // b5 675-887  "all three boys jumped a grade the same day it shipped — zero manual steps next year"
 //             drawn LogWindow, 6 real lines from solution_en/result_en, holds to
-//             the end. Ledger gets a final "0 manual steps" stamp beside the header.
+//             the end. Fanned deck gets a final "0 manual steps" stamp beside the header.
 //
-// Persistent element: the grade ledger (archetype 5), lives at y>=606, b1 through b5.
+// Persistent element: the grade card deck (archetype 3), lives at y>=606, b1 through b5 —
+// a pile at b1, sorted into its fan by b2, the fan itself never leaves the frame after that.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -54,11 +60,19 @@ const CELL_FLIP_AT = [B4 + 20, B4 + 54, B4 + 88];
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-const Ledger: React.FC = () => {
+const STACK_X = CELL_X[1];
+const STACK_DX = [26, 0, -26];
+const STACK_ROT = [-6, 0, 6];
+
+const CardDeck: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B1) return null;
+
+  // b1: all three cards land STACKED near the center slot. b2: they fan out
+  // into their own slots (fanT 0->1 over the first half-second of b2).
+  const fanT = frame < B2 ? 0 : tween(sec(frame, B2, fps), 0, 0.5, ease.power3Out);
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
@@ -78,9 +92,9 @@ const Ledger: React.FC = () => {
         <div style={{ position: "absolute", left: LT.x + 22, top: LT.y + 16, width: 220 }}>
           <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>BOYTASKS</div>
           <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.2 }}>
-            grade ledger
+            grade deck
             <br />
-            3 kids, 1 field each
+            3 kids, 1 card each
           </div>
         </div>
       </Arrive>
@@ -91,12 +105,15 @@ const Ledger: React.FC = () => {
         const flipT = sec(frame, flipAt, fps);
         const sc = done ? punchScale(flipT, 0) : 1;
         const tagOn = frame >= B2 + 20 + i * 24 && frame < flipAt;
+        const stackedX = STACK_X + STACK_DX[i];
+        const curX = mix(fanT, stackedX, CELL_X[i]);
+        const curRot = mix(fanT, STACK_ROT[i], 0);
         return (
-          <Arrive key={i} at={B1 + 20 + i * 10} kind="rise" box={{ x: CELL_X[i], y: LT.y + 14, w: CELL_W, h: 64 }}>
+          <Arrive key={i} at={B1 + 20 + i * 10} kind="rise" box={{ x: stackedX, y: LT.y + 14, w: CELL_W, h: 64 }}>
             <div
               style={{
                 position: "absolute",
-                left: CELL_X[i],
+                left: curX,
                 top: LT.y + 14,
                 width: CELL_W,
                 height: 64,
@@ -105,7 +122,8 @@ const Ledger: React.FC = () => {
                 border: `2px ${done ? "solid" : "dashed"} ${done ? P.successEdge : P.muted}`,
                 boxSizing: "border-box",
                 padding: "8px 14px",
-                transform: `scale(${sc})`,
+                transform: `scale(${sc}) rotate(${curRot}deg)`,
+                zIndex: 10 - i,
               }}
             >
               <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.6, color: P.muted }}>CHILD {i + 1}</div>
@@ -376,7 +394,7 @@ const Inner: React.FC = () => {
         />
       )}
 
-      <Ledger />
+      <CardDeck />
     </AbsoluteFill>
   );
 };
