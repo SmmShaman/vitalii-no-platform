@@ -174,6 +174,86 @@ const CardDeck: React.FC = () => {
   );
 };
 
+// b1 — product identity, top-left, clear of QuoteMarker's own centred panel.
+const PLATE_BOX = { x: 40, y: 36, w: 700, h: 140 };
+const ProductPlate: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B1, B2) !== 1) return null;
+  return (
+    <Arrive at={B1 + 4} kind="wipe" box={PLATE_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: PLATE_BOX.x,
+          top: PLATE_BOX.y,
+          width: PLATE_BOX.w,
+          height: PLATE_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          border: `2px solid ${P.accentEdge}`,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          boxSizing: "border-box",
+          padding: "12px 20px",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 1.2, color: P.accent }}>
+          GUIDE — STORIES ON THE ROAD
+        </div>
+        <div style={{ fontSize: 13, color: P.muted, marginTop: 6, lineHeight: 1.35 }}>
+          A personal audio guide for driving: the phone knows where I am and plays short
+          stories about the places around me, in Norwegian and Ukrainian side by side.
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
+// b3 — the one commit whose message matches this clip's sentence, drawn as a card
+// (no verified GitHub URL was listed for this product, so no live diff screenshot).
+const COMMIT_BOX = { x: 40, y: 10, w: 560, h: 78 };
+const CommitEvidence: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B3, B4) !== 1) return null;
+  return (
+    <Arrive at={B3 + 4} kind="wipe" box={COMMIT_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: COMMIT_BOX.x,
+          top: COMMIT_BOX.y,
+          width: COMMIT_BOX.w,
+          height: COMMIT_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          border: `2px solid ${P.accentEdge}`,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          boxSizing: "border-box",
+          padding: "10px 18px",
+          fontFamily,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            letterSpacing: 1.2,
+            color: P.accent,
+            fontFamily: '"JetBrains Mono", Menlo, Consolas, monospace',
+          }}
+        >
+          COMMIT 9f169ae
+        </div>
+        <div style={{ fontSize: 13, color: P.ink, marginTop: 4, lineHeight: 1.3 }}>
+          address.py looks up the real address; respell.py spells its numbers as words
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -185,12 +265,16 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.85}
         data={{
           quote: "A quiet street, decades ago — but never which house.",
           highlight: "which house",
         }}
       />
+      <ProductPlate />
+      {frame >= B1 && frame < B2 && (
+        <StatPill x={470} y={540} emoji="🌙" text="Driving at night, hands-free" tone="accent" />
+      )}
 
       {/* b2 — digits misread every time, drawn (no public UI for this) */}
       <MotionInsert
@@ -230,15 +314,16 @@ const Inner: React.FC = () => {
           outputs: ["Ukrainian", "Norwegian"],
         }}
       />
+      <CommitEvidence />
       {frame >= B3 && frame < B4 && (
         <>
-          <DarkIconCard x={90} y={70} w={300} emoji="🏠" title="Real address" sub="spoken first" tone="accent" />
-          <DarkIconCard x={890} y={70} w={300} emoji="🌐" title="Kartverket" sub="address registry" tone="accent" />
-          <StatPill x={150} y={520} emoji="📍" text="Looked up automatically" tone="accent" />
-          <StatPill x={740} y={520} emoji="🗣" text="Spoken before the story starts" tone="accent" />
-          <div style={{ position: "absolute", left: 40, top: 18, fontSize: 14, fontWeight: 700, letterSpacing: 0.4, color: "#8FD9BC", fontFamily }}>
-            address.py · respell.py — commit 9f169ae
+          <DarkIconCard x={90} y={100} w={300} emoji="🏠" title="Real address" sub="spoken first" tone="accent" />
+          <DarkIconCard x={890} y={100} w={300} emoji="🌐" title="Kartverket" sub="address registry" tone="accent" />
+          <div style={{ position: "absolute", left: 890, top: 294, width: 300, fontSize: 14.5, fontWeight: 600, lineHeight: 1.3, textAlign: "center", color: "#8FD9BC", fontFamily }}>
+            Norway&apos;s official address &amp; land registry
           </div>
+          <StatPill x={150} y={540} emoji="📍" text="Looked up automatically" tone="accent" />
+          <StatPill x={740} y={540} emoji="🗣" text="Spoken before the story starts" tone="accent" />
         </>
       )}
 
@@ -282,8 +367,9 @@ const Inner: React.FC = () => {
         from={B5}
         dur={B6 - B5}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.85}
         data={{
+          system: "respell.py",
           steps: ["Walk the catalog", "Rewrite stray digits", "Re-voice touched chapters"],
           result: "Old stories now match new ones",
         }}

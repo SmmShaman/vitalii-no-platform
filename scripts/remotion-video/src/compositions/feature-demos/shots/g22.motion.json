@@ -49,6 +49,7 @@
       "effect": "pipelineFlow",
       "backdrop": "hub",
       "data": {
+        "system": "respell.py",
         "steps": ["Walk the catalog", "Rewrite stray digits", "Re-voice touched chapters"],
         "result": "Old stories now match new ones"
       }
