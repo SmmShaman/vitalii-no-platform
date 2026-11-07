@@ -73,13 +73,19 @@ const HeroFigure: React.FC = () => {
   if (big) {
     const inAt = frame >= B5 ? B5 : B3;
     const t = tween(sec(frame, inAt, fps), 0, 0.5, ease.power3Out);
+    // b3 (climax, sole visual) gets the full column at fontSize 260; b5 shares the
+    // frame with the result LogWindow, so it sits in a narrower left column.
+    const isResult = frame >= B5;
+    const colW = isResult ? 560 : 640;
+    const numSize = isResult ? 210 : 260;
+    const unitSize = isResult ? 40 : 48;
     return (
       <div
         style={{
           position: "absolute",
           left: 0,
           top: 0,
-          width: 1280,
+          width: colW,
           height: 720,
           display: "flex",
           flexDirection: "column",
@@ -93,8 +99,8 @@ const HeroFigure: React.FC = () => {
           ADDED TO THE SERVER
         </span>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-          <span style={{ fontSize: 260, fontWeight: 900, color, lineHeight: 1 }}>{value}</span>
-          <span style={{ fontSize: 48, fontWeight: 800, color: P.muted }}>{unit}</span>
+          <span style={{ fontSize: numSize, fontWeight: 900, color, lineHeight: 1 }}>{value}</span>
+          <span style={{ fontSize: unitSize, fontWeight: 800, color: P.muted }}>{unit}</span>
         </div>
         <div
           style={{
@@ -185,9 +191,9 @@ const MigrationCard: React.FC = () => {
     <div
       style={{
         position: "absolute",
-        left: 710,
+        left: 680,
         top: 230,
-        width: 530,
+        width: 560,
         padding: "22px 26px",
         borderRadius: 10,
         border: `2px solid ${P.success}`,
@@ -206,6 +212,68 @@ const MigrationCard: React.FC = () => {
       <div style={{ marginTop: 6, fontSize: 18, fontWeight: 700, color: P.success }}>
         onto our own VPS — Postgres, self-managed
       </div>
+    </div>
+  );
+};
+
+const FLOW_STEPS = [
+  { icon: "⏸", label: "PAUSE" },
+  { icon: "▶", label: "RESTART" },
+  { icon: "\u{1F4E4}", label: "COPY OUT" },
+];
+
+// b2 has no backdrop (metaphor beat) and the keywordCaption only occupies a
+// lower-third strip — this fills the empty upper two-thirds with the archetype's
+// own object (large labelled nodes) instead of leaving it blank.
+const PauseRestartFlow: React.FC = () => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (!(cut(frame, B2, B3) === 1)) return null;
+  const centers = [220, 640, 1060];
+  const D = 150;
+  return (
+    <div style={{ position: "absolute", left: 0, top: 70, width: 1280, height: 260, fontFamily }}>
+      <div
+        style={{
+          position: "absolute",
+          left: centers[0],
+          top: D / 2 - 2,
+          width: centers[2] - centers[0],
+          height: 4,
+          background: P.border,
+        }}
+      />
+      {centers.map((cx, i) => {
+        const t = tween(sec(frame, B2 + 10 + i * 14, fps), 0, 0.4, ease.power3Out);
+        const step = FLOW_STEPS[i];
+        return (
+          <div
+            key={step.label}
+            style={{ position: "absolute", left: cx - D / 2, top: 0, width: D, opacity: t, transform: `scale(${0.85 + 0.15 * t})` }}
+          >
+            <div
+              style={{
+                width: D,
+                height: D,
+                borderRadius: D / 2,
+                border: `3px solid ${ACCENT}`,
+                background: "rgba(140,111,245,0.12)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 56,
+                boxSizing: "border-box",
+              }}
+            >
+              {step.icon}
+            </div>
+            <div style={{ marginTop: 14, textAlign: "center", fontSize: 18, fontWeight: 800, letterSpacing: 1.5, color: ACCENT }}>
+              {step.label}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -236,12 +304,12 @@ const GlossCaption: React.FC = () => {
 };
 
 const RESULT_LOG = [
-  { t: "02:11", text: "free-tier postgres: connection refused — service deleted", tone: "danger" as const },
-  { t: "02:11", text: "backup check: no automated backup found anywhere", tone: "danger" as const },
-  { t: "02:14", text: "provider: paused instance resumed — one last window open", tone: "accent" as const },
-  { t: "02:19", text: "pg_dump: full export copied out before deletion", tone: "accent" as const },
-  { t: "02:40", text: "self-host: postgres 16 restored on our own VPS", tone: "success" as const },
-  { t: "02:41", text: "same JWT signing keys reused — zero app code changes", tone: "success" as const },
+  { t: "02:11", text: "free postgres: connection refused", tone: "danger" as const },
+  { t: "02:11", text: "backup check: none found anywhere", tone: "danger" as const },
+  { t: "02:14", text: "provider resumed — one last window", tone: "accent" as const },
+  { t: "02:19", text: "pg_dump: full export copied out", tone: "accent" as const },
+  { t: "02:40", text: "self-host: postgres 16 restored", tone: "success" as const },
+  { t: "02:41", text: "same JWT keys — zero code changes", tone: "success" as const },
 ];
 
 const Inner: React.FC = () => {
@@ -277,6 +345,9 @@ const Inner: React.FC = () => {
         }}
       />
 
+      {/* b2 — fills the otherwise-empty upper frame since there is no backdrop here */}
+      <PauseRestartFlow />
+
       {/* b3 — the database moved off rented hosting onto our own server */}
       <MigrationCard />
 
@@ -303,8 +374,8 @@ const Inner: React.FC = () => {
           from={B5}
           every={24}
           opacity={1}
-          win={{ x: 150, y: 110, w: 980, h: 480 }}
-          fontSize={22}
+          win={{ x: 600, y: 110, w: 660, h: 480 }}
+          fontSize={20}
           lines={RESULT_LOG}
         />
       )}
