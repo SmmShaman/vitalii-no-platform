@@ -237,6 +237,8 @@ import { FeatureSecondVisualLanguageDemosV24 } from "./compositions/feature-demo
 import { FeatureSandboxWhereNothingCountsB43 } from "./compositions/feature-demos/FeatureSandboxWhereNothingCountsB43";
 import { FeatureGradesBumpThemselvesFirstB45 } from "./compositions/feature-demos/FeatureGradesBumpThemselvesFirstB45";
 import { FeatureNorwegianSchoolCurriculumBackboneB44 } from "./compositions/feature-demos/FeatureNorwegianSchoolCurriculumBackboneB44";
+import { FeatureFullPreReaderCurriculumB42 } from "./compositions/feature-demos/FeatureFullPreReaderCurriculumB42";
+import { FeatureManagedDatabaseDiedBoytasksB41 } from "./compositions/feature-demos/FeatureManagedDatabaseDiedBoytasksB41";
 import { FeatureOneVoiceCommandCreatesC07 } from "./compositions/feature-demos/FeatureOneVoiceCommandCreatesC07";
 import { FeatureTriedThreeTickerStylesB78 } from "./compositions/feature-demos/FeatureTriedThreeTickerStylesB78";
 import { FeatureFamilyDnsGuardKeepsG27 } from "./compositions/feature-demos/FeatureFamilyDnsGuardKeepsG27";
@@ -2377,6 +2379,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureNorwegianSchoolCurriculumBackboneB44"
         component={FeatureNorwegianSchoolCurriculumBackboneB44}
         durationInFrames={973}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFullPreReaderCurriculumB42"
+        component={FeatureFullPreReaderCurriculumB42}
+        durationInFrames={898}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureManagedDatabaseDiedBoytasksB41"
+        component={FeatureManagedDatabaseDiedBoytasksB41}
+        durationInFrames={961}
         fps={30}
         width={1280}
         height={720}

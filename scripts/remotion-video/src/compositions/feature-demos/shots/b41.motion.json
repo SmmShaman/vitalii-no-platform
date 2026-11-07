@@ -1,0 +1,11 @@
+{
+  "id": "b41",
+  "composition": "FeatureManagedDatabaseDiedBoytasksB41",
+  "beats": [
+    { "beat": "b1", "effect": "cornerTags", "backdrop": "page1", "data": { "statement": "A free database died — zero backups existed", "tags": ["Free-tier DB", "No backup", "App down"] } },
+    { "beat": "b2", "effect": "keywordCaption", "backdrop": null, "data": { "line1": "One pause-and-restart bought just enough time", "line2": "to copy everything out before it died for good", "keywords": ["pause", "restart", "copy", "died"] } },
+    { "beat": "b3", "effect": "drawn", "note": "HeroFigure flips 0 / NO BACKUP (danger) -> 120 / OWN SERVER (success) at this beat's first frame, fontSize 260, owns the frame (gate 1). Small MigrationCard: left the landlord's apartment, moved to our own VPS. No backdrop — metaphor beat (STEP 0c)." },
+    { "beat": "b4", "effect": "copyCorrection", "backdrop": "page2", "data": { "label": "Connection keys", "wrong": "New database URL to update", "right": "Same JWT keys — nothing in the app changed" } },
+    { "beat": "b5", "effect": "drawn", "note": "HeroFigure stays big (120 / OWN SERVER). LogWindow reveals 6 real migration lines (free-tier Postgres died, no backup found, pause-and-restart export, self-hosted restore, same JWT keys reused, +120MB disk added). Holds at full brightness to the final frame. No page/hub shown (gate 2)." }
+  ]
+}

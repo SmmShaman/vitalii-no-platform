@@ -1,0 +1,11 @@
+{
+  "id": "b42",
+  "composition": "FeatureFullPreReaderCurriculumB42",
+  "beats": [
+    { "beat": "b1", "effect": "cornerTags", "backdrop": "page1", "data": { "statement": "The voice said \"ess\" — not the sound a child needs", "tags": ["Toddler + 1st grader", "Can't read yet", "Wrong letter sound"] } },
+    { "beat": "b2", "effect": "keywordCaption", "backdrop": "hub1", "data": { "line1": "Lessons made for readers confused them", "line2": "or skipped teaching and jumped to the test", "keywords": ["confused", "skipped", "jumped", "test"] } },
+    { "beat": "b3", "effect": "pipelineFlow", "backdrop": "page2", "data": { "steps": ["Local lesson bank", "Teach first", "Guided try", "Practice"], "result": "Teaches before it tests", "system": "Boytasks — on-device, React" } },
+    { "beat": "b4", "effect": "copyCorrection", "backdrop": "page3", "data": { "label": "Phoneme map", "wrong": "S → \"ess\"", "right": "S → \"sss\" — the real sound" } },
+    { "beat": "b5", "effect": "drawn", "note": "LogWindow revealing only real result numbers: Tier-2 bonus round 0 (nothing) -> 1 (working) for the older boy, and the younger boy's lesson count 4 -> 8. Holds at full brightness on the final frame. No page/hub shown (gate 2)." }
+  ]
+}
