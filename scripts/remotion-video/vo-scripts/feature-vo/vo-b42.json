@@ -1,0 +1,57 @@
+{
+ "id": "b42",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.866,
+  "b2": 4.834,
+  "b3": 5.143,
+  "b4": 5.28,
+  "b5": 5.613
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A toddler and a first-grader can't read \u2014 and the voice called S 'ess,' not its real sound.",
+   "start_s": 0.5,
+   "end_s": 6.366,
+   "start_f": 15,
+   "end_f": 191
+  },
+  {
+   "beat": "b2",
+   "text": "Lessons made for readers confused them, or skipped teaching and jumped to the test.",
+   "start_s": 6.666,
+   "end_s": 11.5,
+   "start_f": 200,
+   "end_f": 345
+  },
+  {
+   "beat": "b3",
+   "text": "Now every letter comes from a local lesson that teaches first \u2014 like a patient tutor.",
+   "start_s": 11.8,
+   "end_s": 16.943,
+   "start_f": 354,
+   "end_f": 508
+  },
+  {
+   "beat": "b4",
+   "text": "Built in React, it speaks each letter's real sound and tracks progress on its own.",
+   "start_s": 17.243,
+   "end_s": 22.523,
+   "start_f": 517,
+   "end_f": 676
+  },
+  {
+   "beat": "b5",
+   "text": "The older boy's bonus round went from nothing to working, and the younger one's lessons grew to eight.",
+   "start_s": 22.823,
+   "end_s": 28.436,
+   "start_f": 685,
+   "end_f": 853
+  }
+ ],
+ "total_s": 29.936,
+ "durationInFrames": 898,
+ "measured_track_s": 28.488,
+ "track": "/root/feature-demos/vo-b42/vo-b42.mp3"
+}

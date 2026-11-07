@@ -1,0 +1,7 @@
+{"id": "b41", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A free cloud database the app depended on simply stopped working — with no backup saved anywhere."],
+ ["b2", "One pause-and-restart bought enough time to copy everything out before it died for good."],
+ ["b3", "So the database moved off rented hosting onto our own server — like leaving a landlord's apartment."],
+ ["b4", "Postgres now runs there directly, using the same keys, so nothing in the app changed."],
+ ["b5", "It adds about 120 megabytes to the server, and the only thing that changed was the address."]
+]}

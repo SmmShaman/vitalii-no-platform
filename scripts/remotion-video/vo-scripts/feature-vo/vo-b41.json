@@ -1,0 +1,57 @@
+{
+ "id": "b41",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.106,
+  "b2": 5.114,
+  "b3": 5.918,
+  "b4": 5.777,
+  "b5": 5.923
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A free cloud database the app depended on simply stopped working \u2014 with no backup saved anywhere.",
+   "start_s": 0.5,
+   "end_s": 6.606,
+   "start_f": 15,
+   "end_f": 198
+  },
+  {
+   "beat": "b2",
+   "text": "One pause-and-restart bought enough time to copy everything out before it died for good.",
+   "start_s": 6.906,
+   "end_s": 12.02,
+   "start_f": 207,
+   "end_f": 361
+  },
+  {
+   "beat": "b3",
+   "text": "So the database moved off rented hosting onto our own server \u2014 like leaving a landlord's apartment.",
+   "start_s": 12.32,
+   "end_s": 18.238,
+   "start_f": 370,
+   "end_f": 547
+  },
+  {
+   "beat": "b4",
+   "text": "Postgres now runs there directly, using the same keys, so nothing in the app changed.",
+   "start_s": 18.538,
+   "end_s": 24.315,
+   "start_f": 556,
+   "end_f": 729
+  },
+  {
+   "beat": "b5",
+   "text": "It adds about 120 megabytes to the server, and the only thing that changed was the address.",
+   "start_s": 24.615,
+   "end_s": 30.538,
+   "start_f": 738,
+   "end_f": 916
+  }
+ ],
+ "total_s": 32.038,
+ "durationInFrames": 961,
+ "measured_track_s": 30.6,
+ "track": "/root/feature-demos/vo-b41/vo-b41.mp3"
+}
