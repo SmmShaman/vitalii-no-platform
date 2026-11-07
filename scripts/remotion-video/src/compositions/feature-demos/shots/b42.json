@@ -4,7 +4,7 @@
   "dsf": 1.25,
   "shots": [
     { "name": "page1", "url": "https://vitalii.no/features/a-full-pre-reader-curriculum-built-without-an-llm-teach-first-lessons-and-real-l-b42", "frames": 185, "scroll": [[0, 0], [90, 140], [184, 280]], "mouse": [[0, 560, 70], [90, 560, 220], [184, 560, 380]] },
-    { "name": "hub1", "url": "https://vitalii.no/features", "frames": 154, "scroll": [[0, 0], [75, 160], [153, 320]], "mouse": [[0, 560, 70], [75, 560, 230], [153, 560, 380]] },
+    { "name": "page1b", "url": "https://vitalii.no/features/a-full-pre-reader-curriculum-built-without-an-llm-teach-first-lessons-and-real-l-b42", "frames": 154, "scroll": [[0, 280], [75, 360], [153, 440]], "mouse": [[0, 560, 380], [75, 560, 430], [153, 560, 480]] },
     { "name": "page2", "url": "https://vitalii.no/features/a-full-pre-reader-curriculum-built-without-an-llm-teach-first-lessons-and-real-l-b42", "frames": 163, "scroll": [[0, 300], [80, 460], [162, 620]], "mouse": [[0, 560, 80], [80, 560, 240], [162, 560, 400]] },
     { "name": "page3", "url": "https://vitalii.no/features/a-full-pre-reader-curriculum-built-without-an-llm-teach-first-lessons-and-real-l-b42", "frames": 168, "scroll": [[0, 620], [85, 800], [167, 980]], "mouse": [[0, 560, 80], [85, 560, 250], [167, 560, 400]] }
   ]

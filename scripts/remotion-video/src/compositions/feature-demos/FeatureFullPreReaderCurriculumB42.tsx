@@ -13,7 +13,8 @@
 //             band opens on the chaos side.
 // b2 200-354  "lessons made for readers confused them, or skipped teaching and
 //             jumped to the test"
-//             keywordCaption over the features hub (backdrop "hub1"); the
+//             keywordCaption over the feature's own page, continued (backdrop
+//             "page1b" — was "hub1", an unrelated hub page, fixed Wave D); the
 //             confusion words land highlighted.
 // b3 354-517  "now every letter comes from a local lesson that teaches first —
 //             like a patient tutor"
@@ -147,7 +148,34 @@ const ProductPlate: React.FC<{ from: number; dur: number }> = ({ from, dur }) =>
     >
       <span style={{ fontSize: 13, fontWeight: 700, color: "#fff", lineHeight: 1.35 }}>
         Boytasks — a screen-time and task system for three kids: YouTube is gated by finishing
-        school and chore tasks first, run on Cloudflare Workers
+        school and chore tasks first, run on Cloudflare Workers. No LLM — lessons generate locally.
+      </span>
+    </div>
+  );
+};
+
+// b4's copyCorrection has no slot for a tech gloss, so "React" and "tracks
+// progress" (named in the narration) got no on-screen evidence — added Wave D.
+const TechGloss: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (!(cut(frame, B4, B5) === 1)) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: 40,
+        top: 36,
+        width: 760,
+        padding: "8px 14px",
+        borderRadius: 6,
+        background: "rgba(0,0,0,0.55)",
+        border: `1px solid ${P.border}`,
+        fontFamily,
+      }}
+    >
+      <span style={{ fontSize: 13, fontWeight: 700, color: "#fff" }}>
+        ⚛ Built in React — each session auto-saves progress, no server round-trip
       </span>
     </div>
   );
@@ -173,7 +201,7 @@ const Inner: React.FC = () => {
       <ProductPlate from={B1} dur={B2 - B1} />
 
       {/* b2 — lessons built for readers confused them, or skipped straight to the test */}
-      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub1" from={B2} hold={B3 - B2} />}
+      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page1b" from={B2} hold={B3 - B2} />}
       <MotionInsert
         effect="keywordCaption"
         from={B2}
@@ -198,7 +226,10 @@ const Inner: React.FC = () => {
         data={{
           steps: ["Local lesson bank", "Teach first", "Guided try", "Practice"],
           result: "Teaches before it tests",
-          system: "Boytasks — on-device, React",
+          // PipelineFlow clips "system" to 22 chars for its title — the old string
+          // "Boytasks — on-device, React" was silently truncated before "React"
+          // ever rendered (Wave D fix: the viewer never saw the tech name).
+          system: "Boytasks — React app",
         }}
       />
 
@@ -216,6 +247,7 @@ const Inner: React.FC = () => {
           right: "S -> \"sss\" — the real sound",
         }}
       />
+      <TechGloss />
 
       {/* b5 — the result: bonus round built, lessons grew to eight, holds to the end */}
       {frame >= B5 && (
