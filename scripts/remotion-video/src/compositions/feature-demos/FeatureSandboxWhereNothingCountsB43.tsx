@@ -1,10 +1,20 @@
 // FeatureSandboxWhereNothingCountsB43 — feature b43 — 1280x720, 931 frames @ 30fps, VOICE-SYNCED.
 // archetype 1 timeline, mood sand. Motion direction v2 (feature-motion skill, 2026-10-07).
-// RE-SHOOT 2026-11-07 — narration and windows unchanged; mood moved slate -> sand, the
-// lower-third ribbon reworked into numbered icon-nodes on a filling progress track (was
-// plain rectangles with a dot playhead), and the result beat rebuilt as a left/right split
-// (lit final node + pulsing badge | LogWindow) instead of a stacked headline-over-panel —
-// the generic layout flagged as "sameness" on earlier clips.
+// RE-SHOOT 2026-11-08 — narration and windows unchanged; this is the picture's second rewrite.
+// The 2026-11-07 cut scored clarity 6/10 (wave D). Fixes applied:
+//  1. b1 opened with quoteMarker, a forbidden recent opener (g22 opened the same way) —
+//     swapped to titleTakeover.
+//  2. b2 and b4 showed the features HUB scrolling past unrelated feature cards (a kiosk
+//     calendar, a glucose chart, a one-button remote...) as "evidence" for claims about
+//     testing a kid's tasks — nothing to do with the sentence. Replaced with the feature's
+//     own page: shallow scroll for b2 (still problem-framed), a deep scroll for b4 (the
+//     paragraph that actually describes the sandbox fix).
+//  3. b1 and b3 previously shared one "page" shot whose own scroll curve independently
+//     drifted into the solution paragraph mid-beat while the caption still narrated the
+//     problem. Now b1/b2/b3 each get their own shot capped at a shallow scroll band
+//     (0-640px) so the solution paragraph is visible ONLY at b4.
+//  4. b5's result card held static for ~160 frames once its log lines finished — added a
+//     1 -> 0 tick mid-beat and a continuing pulse on the hero number through the final frame.
 //
 // Voice-synced beat table (narration windows, do not shift):
 //  b1  15-166  "Testing a task set meant running it for real — burning a kid's one real attempt."
@@ -14,11 +24,11 @@
 //  b5 690-886  "And a slider lets a parent test the voice — half speed up to one-point-three times — before it saves." — holds to 931.
 //
 // Beat -> effect (data only from the feature row; plan: shots/b43.motion.json):
-//  b1 quoteMarker over the feature's own page (backdrop "page"). Opener is not titleTakeover
-//     (b44's opener) — kept fresh from quoteMarker.
-//  b2 cornerTags over the features hub (backdrop "hub") — the problem + concrete facts.
-//  b3 keywordCaption over the feature's own page (backdrop "page") — the voice-speed claim.
-//  b4 handoffExplain over the features hub (backdrop "hub") — real run -> sandbox replay.
+//  b1 titleTakeover over the feature's own page (backdrop "page1").
+//  b2 cornerTags over the feature's own page, shallow scroll (backdrop "page2").
+//  b3 keywordCaption over the feature's own page, shallow scroll (backdrop "page3").
+//  b4 handoffExplain over the feature's own page, deep scroll — the real fix paragraph
+//     (backdrop "page4").
 //  b5 drawn: the timeline archetype's final node lights up + a LogWindow result panel built
 //     from the feature's own numbers (0 real rows touched, 0.5x-1.3x speed tested before
 //     saving). Never the feature page or the hub (gate 2).
@@ -169,6 +179,12 @@ const ResultBeat: React.FC = () => {
   const P = usePalette();
   if (frame < B5) return null;
   const t = tween(sec(frame, B5 + 4, fps), 0, 0.4, ease.power3Out);
+  // the hero number ticks 1 -> 0 partway through the beat, instead of landing on 0 and freezing.
+  const tickAt = B5 + 36;
+  const ticked = frame >= tickAt;
+  const tickPunch = ticked ? punchScale(sec(frame, tickAt, fps), 0) : 1;
+  // a slow continuing pulse on the number's glow keeps the result from reading as a frozen screen.
+  const pulse = 0.5 + 0.5 * Math.sin(frame / 11);
   return (
     <>
       <div
@@ -184,13 +200,25 @@ const ResultBeat: React.FC = () => {
           boxSizing: "border-box",
           fontFamily,
           opacity: t,
+          boxShadow: ticked ? `0 0 ${18 + pulse * 14}px rgba(21,127,59,${0.25 + pulse * 0.2})` : undefined,
         }}
       >
         <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.4, color: P.muted }}>
           KID TASK SANDBOX — RESULT
         </span>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 16 }}>
-          <span style={{ fontSize: 120, fontWeight: 900, color: P.success, lineHeight: 1 }}>0</span>
+          <span
+            style={{
+              fontSize: 120,
+              fontWeight: 900,
+              color: ticked ? P.success : P.danger,
+              lineHeight: 1,
+              display: "inline-block",
+              transform: `scale(${tickPunch})`,
+            }}
+          >
+            {ticked ? "0" : "1"}
+          </span>
           <span style={{ fontSize: 22, fontWeight: 800, color: "#fff" }}>real rows written</span>
         </div>
         <div style={{ marginTop: 14, fontSize: 18, fontWeight: 700, color: ACCENT }}>
@@ -201,7 +229,7 @@ const ResultBeat: React.FC = () => {
         win={{ x: 630, y: 110, w: 610, h: 480 }}
         title="boytasks sandbox"
         from={B5 + 10}
-        every={16}
+        every={22}
         opacity={cut(frame, B5, END)}
         fontSize={21}
         lines={RESULT_LOG}
@@ -214,50 +242,50 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1 — the problem, over the feature's own page */}
-      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
+      {/* b1 — the problem, over the feature's own page, shallow scroll */}
+      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page1" from={B1} hold={B2 - B1} />}
       <MotionInsert
-        effect="quoteMarker"
+        effect="titleTakeover"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        plate={0.72}
-        data={{ quote: "One real attempt — testing a fix meant playing it for real.", highlight: "playing it for real" }}
+        plate={0.8}
+        data={{ title: "One real attempt. Burned.", kicker: "Testing a kid's tasks meant running them for real" }}
       />
 
-      {/* b2 — the cost of no safe test, over the hub */}
-      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
+      {/* b2 — the cost of no safe test, still over the problem paragraph (shallow scroll) */}
+      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
       <MotionInsert
         effect="cornerTags"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.72}
+        plate={0.8}
         data={{
           statement: "No way to test a fix safely",
           tags: ["Burns a real attempt", "Writes to real data", "Risks child progress", "No safe test"],
         }}
       />
 
-      {/* b3 — the voice-speed problem, over the feature's own page */}
-      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B3} hold={B4 - B3} />}
+      {/* b3 — the voice-speed problem, still shallow — the fix paragraph stays hidden until b4 */}
+      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page3" from={B3} hold={B4 - B3} />}
       <MotionInsert
         effect="keywordCaption"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.72}
-        data={{ line1: "The voice was too fast,", line2: "with no way to test a new speed.", keywords: ["too fast", "test a new speed"] }}
+        plate={0.8}
+        data={{ line1: "The voice was too fast,", line2: "with no speed test first.", keywords: ["too fast", "speed test"] }}
       />
 
-      {/* b4 — the fix, over the hub */}
-      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} />}
+      {/* b4 — the fix, over the deep-scrolled paragraph that actually describes the sandbox */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page4" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="handoffExplain"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.72}
+        plate={0.8}
         data={{
           from: "Real run, real risk",
           to: "Sandbox replay, zero risk",

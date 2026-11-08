@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeaturePostsGoNativeVideoV23 } from "./compositions/feature-demos/FeaturePostsGoNativeVideoV23";
+import { Feature150DemoClipsRenderV22 } from "./compositions/feature-demos/Feature150DemoClipsRenderV22";
 import { FeatureSecondVisualLanguageDemosV24 } from "./compositions/feature-demos/FeatureSecondVisualLanguageDemosV24";
 import { FeatureSandboxWhereNothingCountsB43 } from "./compositions/feature-demos/FeatureSandboxWhereNothingCountsB43";
 import { FeatureGradesBumpThemselvesFirstB45 } from "./compositions/feature-demos/FeatureGradesBumpThemselvesFirstB45";
@@ -2361,6 +2363,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeaturePostsGoNativeVideoV23"
+        component={FeaturePostsGoNativeVideoV23}
+        durationInFrames={869}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="Feature150DemoClipsRenderV22"
+        component={Feature150DemoClipsRenderV22}
+        durationInFrames={851}
         fps={30}
         width={1280}
         height={720}

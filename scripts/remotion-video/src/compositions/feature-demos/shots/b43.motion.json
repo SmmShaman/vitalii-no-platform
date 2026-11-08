@@ -4,14 +4,14 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "quoteMarker",
-      "backdrop": "page",
-      "data": { "quote": "One real attempt — testing a fix meant playing it for real.", "highlight": "playing it for real" }
+      "effect": "titleTakeover",
+      "backdrop": "page1",
+      "data": { "title": "One real attempt. Burned.", "kicker": "Testing a kid's tasks meant running them for real" }
     },
     {
       "beat": "b2",
       "effect": "cornerTags",
-      "backdrop": "hub",
+      "backdrop": "page2",
       "data": {
         "statement": "No way to test a fix safely",
         "tags": ["Burns a real attempt", "Writes to real data", "Risks child progress", "No safe test"]
@@ -20,25 +20,26 @@
     {
       "beat": "b3",
       "effect": "keywordCaption",
-      "backdrop": "page",
-      "data": { "line1": "The voice was too fast,", "line2": "with no way to test a new speed.", "keywords": ["too fast", "test a new speed"] }
+      "backdrop": "page3",
+      "data": { "line1": "The voice was too fast,", "line2": "with no speed test first.", "keywords": ["too fast", "speed test"] }
     },
     {
       "beat": "b4",
       "effect": "handoffExplain",
-      "backdrop": "hub",
+      "backdrop": "page4",
       "data": {
         "from": "Real run, real risk",
         "to": "Sandbox replay, zero risk",
         "fromLabel": "BEFORE",
         "toLabel": "NOW",
-        "points": ["No real rows written", "No gates fire", "Supabase (database)"]
+        "points": ["No real rows written", "No gates fire", "Supabase — the kids' task database"]
       }
     },
     {
       "beat": "b5",
       "effect": "drawn",
-      "note": "Timeline archetype's final node lights up; a LogWindow result panel built from the feature's own numbers (0 real rows touched, speed slider tested 0.5x-1.3x before saving) — never the feature page or the hub."
+      "note": "Timeline archetype's final node lights up; result card ticks 1 -> 0 real rows mid-beat with a continuing pulse, plus a LogWindow result panel built from the feature's own numbers (0 real rows touched, speed slider tested 0.5x-1.3x before saving) — never the feature page or the hub."
     }
-  ]
+  ],
+  "reshoot_2026-11-08": "Viewer scored clarity 6/10 on the 2026-11-07 cut. Fixes: (1) b1 opener was quoteMarker, a forbidden recent opener (g22) — swapped to titleTakeover; (2) b2/b4 showed the features HUB scrolling past unrelated feature cards (kiosk calendar, glucose chart, etc) as 'evidence' with nothing to do with the sentence — replaced with the feature's own page, shallow scroll for b2 (still problem-framed) and a deep scroll for b4 (the actual fix paragraph); (3) b3 and b1 previously shared one aggressive scroll curve that both independently drifted into the solution paragraph mid-beat while the caption still narrated the problem — b1-b3 now use separate shots capped at a shallow scroll band (0-640px) so the solution paragraph only appears at b4; (4) b5's result card held static for ~160 frames after its lines finished — added a 1->0 tick and a continuing pulse through the final frame."
 }

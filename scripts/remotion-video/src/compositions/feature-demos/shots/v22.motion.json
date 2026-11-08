@@ -1,0 +1,53 @@
+{
+ "id": "v22",
+ "composition": "Feature150DemoClipsRenderV22",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "hub",
+   "data": {
+    "title": "The picture just... stopped.",
+    "kicker": "A voiced clip, still talking, over a frozen frame"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "percentRing",
+   "backdrop": "hub",
+   "data": {
+    "value": 50,
+    "label": "of voiced clips froze on the last frame",
+    "notes": ["Voice kept going", "Picture already stopped"]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "ratioBars",
+   "backdrop": "hub",
+   "data": {
+    "a": { "label": "Had a demo clip", "value": 2 },
+    "b": { "label": "Features total", "value": 150 },
+    "unit": "features"
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "pipelineFlow",
+   "backdrop": null,
+   "data": {
+    "steps": ["Render clip (Remotion)", "Loop silent footage (ffmpeg -stream_loop)", "Trim to voice length"],
+    "result": "No more frozen tail",
+    "system": "Render pipeline, step 8"
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": null,
+   "backdrop": "logWindow",
+   "data": {
+    "note": "drawn-only result beat (gate 2): LogWindow built from the feature's own numbers (148 features missing a clip, step 8 loop fix, catalog 2 -> 150+), holds to the end"
+   }
+  }
+ ]
+}

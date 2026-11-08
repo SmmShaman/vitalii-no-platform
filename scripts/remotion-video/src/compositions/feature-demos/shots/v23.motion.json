@@ -1,0 +1,54 @@
+{
+ "id": "v23",
+ "composition": "FeaturePostsGoNativeVideoV23",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "hub",
+   "data": {
+    "title": "Clip ready. Post? A photo.",
+    "kicker": "Every feature already had its own demo clip"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "page",
+   "data": {
+    "statement": "Manual upload, every single post",
+    "tags": ["One video file", "One post", "Every feature ships", "Not sustainable"]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "pipelineFlow",
+   "backdrop": null,
+   "data": {
+    "steps": ["Register upload", "Push video bytes", "Poll asset status"],
+    "result": "Then publish",
+    "system": "LinkedIn Assets API"
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "handoffExplain",
+   "backdrop": null,
+   "data": {
+    "from": "Manual upload, post by post",
+    "to": "nano-social-publish Edge Function",
+    "fromLabel": "BEFORE",
+    "toLabel": "NOW",
+    "points": ["postToLinkedIn + postToFacebook", "registers + uploads the clip", "posts the real demo video"]
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": null,
+   "backdrop": "logWindow",
+   "data": {
+    "note": "drawn-only result beat (gate 2): LogWindow with built lines from solution_en (registerUpload, 50MB cap, 5s/120s polling, Facebook /videos, text fallback), holds to the end"
+   }
+  }
+ ]
+}
