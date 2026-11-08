@@ -281,17 +281,18 @@ const Inner: React.FC = () => {
       {/* b4 — the fix, over the deep-scrolled paragraph that actually describes the sandbox */}
       {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page4" from={B4} hold={B5 - B4} />}
       <MotionInsert
-        effect="handoffExplain"
+        effect="featureMatrix"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
         plate={0.8}
         data={{
-          from: "Real run, real risk",
-          to: "Sandbox replay, zero risk",
-          fromLabel: "BEFORE",
-          toLabel: "NOW",
-          points: ["No real rows written", "No gates fire", "Supabase — the kids' task database"],
+          options: ["Real run", "Sandbox replay"],
+          rows: [
+            { label: "Writes to Supabase", values: [true, false] },
+            { label: "Real rows per test", values: ["1", "0"] },
+            { label: "Safe to test a fix", values: [false, true] },
+          ],
         }}
       />
 

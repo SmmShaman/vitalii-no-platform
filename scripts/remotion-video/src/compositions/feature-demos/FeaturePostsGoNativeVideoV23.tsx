@@ -229,33 +229,37 @@ const Inner: React.FC = () => {
 
       {/* b3 — LinkedIn: register, push bytes, then wait (no public commit, draw it) */}
       <MotionInsert
-        effect="pipelineFlow"
+        effect="statusFocus"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
         plate={0.7}
         base={STAGE}
         data={{
-          steps: ["Register upload", "Push video bytes", "Poll asset status"],
-          result: "Then publish",
-          system: "LinkedIn Assets API",
+          title: "Then publish — LinkedIn Assets API",
+          claims: [
+            { text: "Register upload", verdict: "yes" },
+            { text: "Push video bytes", verdict: "yes" },
+            { text: "Poll asset status", verdict: "yes" },
+          ],
         }}
       />
 
       {/* b4 — nano-social-publish does the hand-off itself (no public commit, draw it) */}
       <MotionInsert
-        effect="handoffExplain"
+        effect="featureMatrix"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
         plate={0.7}
         base={STAGE}
         data={{
-          from: "Manual upload, post by post",
-          to: "nano-social-publish Edge Function",
-          fromLabel: "BEFORE",
-          toLabel: "NOW",
-          points: ["postToLinkedIn + postToFacebook", "registers + uploads the clip", "posts the real demo video"],
+          options: ["Manual", "Function"],
+          rows: [
+            { label: "Registers + uploads clip", values: [false, true] },
+            { label: "Posts real demo video", values: [false, true] },
+            { label: "Needs a human, every post", values: [true, false] },
+          ],
         }}
       />
 
