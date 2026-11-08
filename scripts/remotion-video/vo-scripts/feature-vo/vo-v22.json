@@ -1,0 +1,57 @@
+{
+ "id": "v22",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.597,
+  "b2": 3.964,
+  "b3": 4.92,
+  "b4": 6.39,
+  "b5": 4.311
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Imagine a video where the voiceover keeps going, but the picture just... stops moving.",
+   "start_s": 0.5,
+   "end_s": 6.097,
+   "start_f": 15,
+   "end_f": 183
+  },
+  {
+   "beat": "b2",
+   "text": "That was happening to nearly half of every voiced clip on the site.",
+   "start_s": 6.397,
+   "end_s": 10.361,
+   "start_f": 192,
+   "end_f": 311
+  },
+  {
+   "beat": "b3",
+   "text": "And most of the hundred and fifty features didn't even have a clip yet -- just two did.",
+   "start_s": 10.661,
+   "end_s": 15.581,
+   "start_f": 320,
+   "end_f": 467
+  },
+  {
+   "beat": "b4",
+   "text": "Now Remotion builds a short clip for each feature, and loops the footage instead of freezing it to match the voice.",
+   "start_s": 15.881,
+   "end_s": 22.271,
+   "start_f": 476,
+   "end_f": 668
+  },
+  {
+   "beat": "b5",
+   "text": "The clip catalog went from two demo clips to over one hundred fifty.",
+   "start_s": 22.571,
+   "end_s": 26.882,
+   "start_f": 677,
+   "end_f": 806
+  }
+ ],
+ "total_s": 28.382,
+ "durationInFrames": 851,
+ "measured_track_s": 26.952,
+ "track": "/root/feature-demos/vo-v22/vo-v22.mp3"
+}

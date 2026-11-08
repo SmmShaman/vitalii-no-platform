@@ -1,0 +1,57 @@
+{
+ "id": "v23",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.014,
+  "b2": 3.629,
+  "b3": 6.431,
+  "b4": 5.109,
+  "b5": 5.597
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every feature already had its own demo clip. The post about it? Just a photo.",
+   "start_s": 0.5,
+   "end_s": 5.514,
+   "start_f": 15,
+   "end_f": 165
+  },
+  {
+   "beat": "b2",
+   "text": "Uploading it by hand, for every post, wasn't sustainable.",
+   "start_s": 5.814,
+   "end_s": 9.443,
+   "start_f": 174,
+   "end_f": 283
+  },
+  {
+   "beat": "b3",
+   "text": "Posting video isn't like posting a photo -- LinkedIn makes you register the upload, then wait for it to finish.",
+   "start_s": 9.743,
+   "end_s": 16.174,
+   "start_f": 292,
+   "end_f": 485
+  },
+  {
+   "beat": "b4",
+   "text": "Now one Supabase function does that itself, and posts the real clip instead.",
+   "start_s": 16.474,
+   "end_s": 21.583,
+   "start_f": 494,
+   "end_f": 647
+  },
+  {
+   "beat": "b5",
+   "text": "If the upload fails, the post still goes out as text, instead of not going out at all.",
+   "start_s": 21.883,
+   "end_s": 27.48,
+   "start_f": 656,
+   "end_f": 824
+  }
+ ],
+ "total_s": 28.98,
+ "durationInFrames": 869,
+ "measured_track_s": 27.552,
+ "track": "/root/feature-demos/vo-v23/vo-v23.mp3"
+}

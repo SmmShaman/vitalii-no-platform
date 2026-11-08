@@ -1,0 +1,7 @@
+{"id": "v23", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Every feature already had its own demo clip. The post about it? Just a photo."],
+ ["b2", "Uploading it by hand, for every post, wasn't sustainable."],
+ ["b3", "Posting video isn't like posting a photo -- LinkedIn makes you register the upload, then wait for it to finish."],
+ ["b4", "Now one Supabase function does that itself, and posts the real clip instead."],
+ ["b5", "If the upload fails, the post still goes out as text, instead of not going out at all."]
+]}
