@@ -1,0 +1,7 @@
+{
+  "id": "b40",
+  "file": "yt-feature-b40.mp4",
+  "title": "7 Days Became 3: Real Locations, Real Faces on the TV | vitalii.no",
+  "description": "A kitchen TV calendar that tried to show seven days at once left every event with room for just a time and a clipped title — no location, and each kid's header was a colored circle with an initial standing in for their face.\n\nThe strip was rebuilt to show three days instead of seven. Each row now has enough height for a two-line event chip: full title plus a dedicated line for the venue and city. The ISO week number moved out of its own column and into the date cell itself, handing that width back to the chips. Every kid's header is now a real photo, cycling through up to eight pictures per person on its own interval, falling back to the old circle only when no photos exist.\n\nSeven barely-readable columns became three that actually show what's happening: where, not just when, and whose face it actually is.\n\n🔗 Full write-up: https://vitalii.no/features/the-calendar-strip-grows-up-3-days-real-locations-and-faces-instead-of-circles-b40\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#homeautomation #react #familycalendar #kiosk #uiux",
+  "tags": ["react", "family calendar kiosk", "ui redesign", "home dashboard", "tv display", "smart home", "calendar app", "ux improvement", "kiosk mode", "front end development", "vitalii berbeha"]
+}

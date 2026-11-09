@@ -1,0 +1,57 @@
+{
+ "id": "b40",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.903,
+  "b2": 3.955,
+  "b3": 3.584,
+  "b4": 4.774,
+  "b5": 3.997
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A family calendar crammed seven days onto one TV screen. Every event shrank to a clipped title \u2014 no location, no real faces.",
+   "start_s": 0.5,
+   "end_s": 9.403,
+   "start_f": 15,
+   "end_f": 282
+  },
+  {
+   "beat": "b2",
+   "text": "It got rebuilt in React to show just three days at a time.",
+   "start_s": 9.703,
+   "end_s": 13.658,
+   "start_f": 291,
+   "end_f": 410
+  },
+  {
+   "beat": "b3",
+   "text": "Now every chip has room for the full title and the venue.",
+   "start_s": 13.958,
+   "end_s": 17.542,
+   "start_f": 419,
+   "end_f": 526
+  },
+  {
+   "beat": "b4",
+   "text": "And each kid's header cycles through their real photos, not a flat colored circle.",
+   "start_s": 17.842,
+   "end_s": 22.616,
+   "start_f": 535,
+   "end_f": 678
+  },
+  {
+   "beat": "b5",
+   "text": "Seven cramped columns became three that actually show what's happening.",
+   "start_s": 22.916,
+   "end_s": 26.913,
+   "start_f": 687,
+   "end_f": 807
+  }
+ ],
+ "total_s": 28.413,
+ "durationInFrames": 852,
+ "measured_track_s": 26.976,
+ "track": "/root/feature-demos/vo-b40/vo-b40.mp3"
+}

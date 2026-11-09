@@ -1,0 +1,57 @@
+{
+ "id": "b39",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.242,
+  "b2": 5.088,
+  "b3": 5.019,
+  "b4": 7.038,
+  "b5": 4.162
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "The kitchen TV's weekly calendar looked nearly empty \u2014 even though most of the family's real schedule lived in Google Calendar.",
+   "start_s": 0.5,
+   "end_s": 7.742,
+   "start_f": 15,
+   "end_f": 232
+  },
+  {
+   "beat": "b2",
+   "text": "A kiosk that never logs into anything could never see events hidden behind a login.",
+   "start_s": 8.042,
+   "end_s": 13.13,
+   "start_f": 241,
+   "end_f": 394
+  },
+  {
+   "beat": "b3",
+   "text": "Now it pulls those events in and merges them with the household calendar and the sports app.",
+   "start_s": 13.43,
+   "end_s": 18.449,
+   "start_f": 403,
+   "end_f": 553
+  },
+  {
+   "beat": "b4",
+   "text": "Every event is color-coded, so one glance shows whether it's sports, a handwritten note, or the calendar itself.",
+   "start_s": 18.749,
+   "end_s": 25.787,
+   "start_f": 562,
+   "end_f": 774
+  },
+  {
+   "beat": "b5",
+   "text": "Three separate sources, one real week, nothing invisible anymore.",
+   "start_s": 26.087,
+   "end_s": 30.249,
+   "start_f": 783,
+   "end_f": 907
+  }
+ ],
+ "total_s": 31.749,
+ "durationInFrames": 952,
+ "measured_track_s": 30.312,
+ "track": "/root/feature-demos/vo-b39/vo-b39.mp3"
+}

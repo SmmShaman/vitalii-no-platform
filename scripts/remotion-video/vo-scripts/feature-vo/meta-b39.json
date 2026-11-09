@@ -1,0 +1,7 @@
+{
+  "id": "b39",
+  "file": "yt-feature-b39.mp4",
+  "title": "The Kiosk Couldn't Log In — So Its Calendar Stayed Empty | vitalii.no",
+  "description": "A family calendar strip on a kitchen TV stayed nearly empty, because Google Calendar events only exist inside a browser that's signed in — and a TV kiosk that never logs in to anything could never show them, even though most of the family's actual schedule lived there.\n\nThe kiosk's calendar endpoint now fetches events from a calendar server in parallel with its existing database and sports-club sources, merging all three into one list. Google-sourced events are detected automatically and colored a distinct green alongside the existing sources, with counts of each reported for diagnostics. Events with no assigned family member — most of the Google entries — now render as a full-width banner instead of being silently dropped for having nowhere to sit.\n\nThree separate sources, one real week: nothing that used to vanish disappears anymore.\n\n🔗 Full write-up: https://vitalii.no/features/the-kiosks-empty-week-fills-in-google-calendar-finally-reaches-the-tv-b39\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#homeautomation #cloudflareworkers #googlecalendar #kiosk #familytech",
+  "tags": ["cloudflare workers", "google calendar integration", "family calendar kiosk", "typescript", "home dashboard", "tv display", "api integration", "smart home", "kiosk mode", "vitalii berbeha"]
+}

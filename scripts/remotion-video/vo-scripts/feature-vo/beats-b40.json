@@ -1,0 +1,7 @@
+{"id": "b40", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A family calendar crammed seven days onto one TV screen. Every event shrank to a clipped title — no location, no real faces."],
+ ["b2", "It got rebuilt in React to show just three days at a time."],
+ ["b3", "Now every chip has room for the full title and the venue."],
+ ["b4", "And each kid's header cycles through their real photos, not a flat colored circle."],
+ ["b5", "Seven cramped columns became three that actually show what's happening."]
+]}
