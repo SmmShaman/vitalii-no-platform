@@ -11,7 +11,9 @@
 // b3 320-476  "and most of the 150 features had no clip at all — just 2 did"
 //             ratioBars over the hub, pushed in further (zoom 2.2x).
 // b4 476-677  "Remotion builds the clip, then loops the footage instead of freezing it"
-//             handoffExplain, drawn on a dark plate (zoom 2.8x, no public commit to film).
+//             copyCorrection (freeze -> loop, struck through and corrected), drawn on a dark
+//             plate (zoom 2.8x, no public commit to film), plus a drawn 3-step points row
+//             (HandoffPoints) since copyCorrection's data shape has no points array.
 // b5 677-851  "the catalog went from 2 clips to over 150"
 //             no catalog effect: a LogWindow plays the real render/catalog numbers,
 //             holds to the end (zoom readout settles at LOCKED).
@@ -60,6 +62,71 @@ const LOG_LINES: LogLine[] = [
   { t: "[step8]", text: "freeze-frame tail: removed", tone: "success" },
   { t: "[catalog]", text: "demo clips: 2 -> 150+", tone: "success" },
 ];
+
+// b4's catalog effect (copyCorrection) is a centered strike-through card with no points
+// array — this draws the 3 supporting points as its own row, timed to land well before
+// the beat's midpoint capture frame, and positioned clear of the card (y 250-450) and the
+// ZoomHud readout (y 606-698).
+const B4_POINTS = [
+  "Remotion renders a short clip",
+  "ffmpeg -stream_loop to voice length",
+  "no more frozen tail",
+];
+
+const HandoffPoints: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B4) return null;
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      <Arrive at={B4 + 10} kind="rise" box={{ x: 240, y: 108, w: 800, h: 40 }} dur={0.35}>
+        <div
+          style={{
+            position: "absolute",
+            left: 240,
+            top: 108,
+            width: 800,
+            textAlign: "center",
+            fontSize: 22,
+            fontWeight: 800,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            color: "rgba(255,255,255,0.55)",
+          }}
+        >
+          How the fix works
+        </div>
+      </Arrive>
+      {B4_POINTS.map((text, i) => {
+        const w = 326;
+        const x = 96 + i * (w + 33);
+        return (
+          <Arrive key={text} at={B4 + 24 + i * 14} kind="rise" box={{ x, y: 480, w, h: 100 }} dur={0.4}>
+            <div
+              style={{
+                position: "absolute",
+                left: x,
+                top: 480,
+                width: w,
+                height: 100,
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.18)",
+                borderRadius: 4,
+                padding: "14px 18px",
+                boxSizing: "border-box",
+              }}
+            >
+              <div style={{ fontSize: 14, fontWeight: 800, color: P.accent, marginBottom: 6 }}>STEP {i + 1}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "rgba(255,255,255,0.85)", lineHeight: 1.3 }}>
+                {text}
+              </div>
+            </div>
+          </Arrive>
+        );
+      })}
+    </div>
+  );
+};
 
 const ZoomHud: React.FC = () => {
   const frame = useCurrentFrame();
@@ -232,18 +299,19 @@ const Inner: React.FC = () => {
 
       {/* b4 — Remotion builds the clip, then loops the footage (no public commit, draw it) */}
       <MotionInsert
-        effect="handoffExplain"
+        effect="copyCorrection"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
         plate={0.7}
         base={STAGE}
         data={{
-          from: "Freeze last frame, fill the silence",
-          to: "Loop the footage instead",
-          points: ["Remotion renders a short clip", "ffmpeg -stream_loop to voice length", "no more frozen tail"],
+          wrong: "Freeze last frame, fill the silence",
+          right: "Loop the footage instead",
+          label: "THE FIX",
         }}
       />
+      <HandoffPoints />
 
       {/* b5 — the catalog went from 2 clips to over 150, shown as the real render log, holds to the end */}
       {frame >= B5 && (

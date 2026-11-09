@@ -4,7 +4,11 @@
 // Beat → effect (data only from the feature row):
 // b1 15-241   "the kitchen TV's weekly calendar looked nearly empty, even though most of the
 //             family's real schedule lived in Google Calendar"
-//             drawn: seven faint day boxes, hero number 0 "SOURCES ON SCREEN".
+//             drawn: seven day boxes each labelled "no events", hero number 0 "SOURCES ON
+//             SCREEN". WAVE C 2026-11-09 fix: header/label text was P.ink (#101828, a dark
+//             navy meant for light paper cards) on the dark stage — effectively invisible;
+//             switched to light text. Subtitle also arrived at B1+170, after the beat's
+//             midpoint capture frame — retimed to B1+20, alongside a faster day-box stagger.
 // b2 241-403  "a kiosk that never logs into anything could never see events hidden behind a login"
 //             cornerTags over the feature's own write-up page.
 // b3 403-562  "now it pulls those events in and merges them with the household calendar and the
@@ -89,7 +93,7 @@ const HeroNumber: React.FC = () => {
         <div style={{ fontSize: 240, fontWeight: 800, color: lit ? P.success : P.danger, lineHeight: 1 }}>
           {value}
         </div>
-        <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: 2, color: P.ink, marginTop: 8 }}>
+        <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: 2, color: "rgba(255,255,255,0.85)", marginTop: 8 }}>
           {label}
         </div>
       </div>
@@ -128,39 +132,54 @@ const HeroNumber: React.FC = () => {
 const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
 const B1Drawn: React.FC = () => {
-  const P = usePalette();
   return (
     <>
       <Arrive at={B1 + 4} kind="wipe" box={{ x: 90, y: 60, w: 1100, h: 40 }} dur={0.45}>
-        <div style={{ position: "absolute", left: 90, top: 60, fontSize: 28, fontWeight: 800, color: P.ink, letterSpacing: 1 }}>
+        <div style={{ position: "absolute", left: 90, top: 60, fontSize: 28, fontWeight: 800, color: "rgba(255,255,255,0.92)", letterSpacing: 1 }}>
           BOYTASKS — kitchen kiosk, Cloudflare Workers
         </div>
       </Arrive>
-      <Arrive at={B1 + 170} kind="rise" box={{ x: 90, y: 400, w: 1100, h: 40 }}>
-        <div style={{ position: "absolute", left: 90, top: 400, fontSize: 20, fontWeight: 600, color: ACCENT }}>
+      <Arrive at={B1 + 20} kind="rise" box={{ x: 90, y: 448, w: 1100, h: 40 }} dur={0.4}>
+        <div style={{ position: "absolute", left: 90, top: 448, fontSize: 20, fontWeight: 600, color: ACCENT }}>
           Most of the week lived in Google Calendar — invisible on the TV
         </div>
       </Arrive>
       {DAYS.map((d, i) => {
-        const x = 90 + i * 155;
+        const w = 150;
+        const gap = 14;
+        const x0 = (1280 - (7 * w + 6 * gap)) / 2;
+        const x = x0 + i * (w + gap);
         return (
-          <Arrive key={d} at={B1 + 60 + i * 8} kind="rise" box={{ x, y: 470, w: 140, h: 150 }}>
+          <Arrive key={d} at={B1 + 16 + i * 7} kind="rise" box={{ x, y: 520, w, h: 140 }} dur={0.35}>
             <div
               style={{
                 position: "absolute",
                 left: x,
-                top: 470,
-                width: 140,
-                height: 150,
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                top: 520,
+                width: w,
+                height: 140,
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.26)",
                 borderRadius: 6,
                 padding: 10,
                 boxSizing: "border-box",
               }}
             >
-              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.5, color: "rgba(255,255,255,0.4)" }}>
+              <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.5, color: "rgba(255,255,255,0.75)" }}>
                 {d}
+              </div>
+              <div
+                style={{
+                  position: "absolute",
+                  left: 10,
+                  right: 10,
+                  bottom: 14,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.35)",
+                }}
+              >
+                — no events —
               </div>
             </div>
           </Arrive>

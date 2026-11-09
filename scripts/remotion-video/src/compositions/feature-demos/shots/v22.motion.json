@@ -34,12 +34,13 @@
   },
   {
    "beat": "b4",
-   "effect": "handoffExplain",
+   "effect": "copyCorrection",
    "backdrop": null,
    "data": {
-    "from": "Freeze last frame, fill the silence",
-    "to": "Loop the footage instead",
-    "points": ["Remotion renders a short clip", "ffmpeg -stream_loop to voice length", "no more frozen tail"]
+    "wrong": "Freeze last frame, fill the silence",
+    "right": "Loop the footage instead",
+    "label": "THE FIX",
+    "note": "supporting points (Remotion renders a short clip / ffmpeg -stream_loop to voice length / no more frozen tail) drawn separately in the composition as HandoffPoints, not part of the copyCorrection data shape"
    }
   },
   {
