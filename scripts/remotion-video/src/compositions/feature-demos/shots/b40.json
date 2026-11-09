@@ -4,20 +4,6 @@
   "dsf": 1.25,
   "shots": [
     {
-      "name": "page1",
-      "url": "https://vitalii.no/features/the-calendar-strip-grows-up-3-days-real-locations-and-faces-instead-of-circles-b40",
-      "frames": 110,
-      "scroll": [[0, 0], [109, 420]],
-      "mouse": [[0, 520, 200], [55, 600, 260], [109, 560, 300]]
-    },
-    {
-      "name": "page2",
-      "url": "https://vitalii.no/features/the-calendar-strip-grows-up-3-days-real-locations-and-faces-instead-of-circles-b40",
-      "frames": 100,
-      "scroll": [[0, 420], [99, 900]],
-      "mouse": [[0, 560, 300], [99, 600, 320]]
-    },
-    {
       "name": "hub1",
       "url": "https://vitalii.no/features",
       "frames": 130,
