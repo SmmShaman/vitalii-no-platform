@@ -4,11 +4,12 @@
  "beats": [
   {
    "beat": "b1",
-   "effect": "titleTakeover",
+   "effect": "keywordCaption",
    "backdrop": "hub",
    "data": {
-    "title": "The picture just... stopped.",
-    "kicker": "A voiced clip, still talking, over a frozen frame"
+    "line1": "The picture just stops",
+    "line2": "but the voiceover keeps going",
+    "keywords": ["stops"]
    }
   },
   {
@@ -33,12 +34,12 @@
   },
   {
    "beat": "b4",
-   "effect": "pipelineFlow",
+   "effect": "handoffExplain",
    "backdrop": null,
    "data": {
-    "steps": ["Render clip (Remotion)", "Loop silent footage (ffmpeg -stream_loop)", "Trim to voice length"],
-    "result": "No more frozen tail",
-    "system": "Render pipeline, step 8"
+    "from": "Freeze last frame, fill the silence",
+    "to": "Loop the footage instead",
+    "points": ["Remotion renders a short clip", "ffmpeg -stream_loop to voice length", "no more frozen tail"]
    }
   },
   {

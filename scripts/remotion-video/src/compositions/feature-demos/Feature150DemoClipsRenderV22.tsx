@@ -1,25 +1,26 @@
 // Feature150DemoClipsRenderV22 — feature v22 — 1280x720, 851 frames @ 30fps, VOICE-SYNCED.
-// archetype 2 zoom-in, mood mint. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 2 zoom-in, mood mint. RE-SHOOT 2026-11-09: narration unchanged, picture rewritten
+// (viewer test had no plain product plate on b1; opener diversified off the recent-openers list).
 //
 // Beat → effect (data only from the feature row; no verified commit for v22, so
 // b4 draws the render pipeline on a dark plate instead of a LiveBackdrop):
 // b1 15-192   "the picture just... stopped, mid-voiceover"
-//             titleTakeover over the features hub (wide shot, zoom 1.0x).
+//             keywordCaption over the features hub (wide shot, zoom 1.0x).
 // b2 192-320  "nearly half of every voiced clip froze on its last frame"
 //             percentRing over the hub, pushed in tighter (zoom 1.6x).
 // b3 320-476  "and most of the 150 features had no clip at all — just 2 did"
 //             ratioBars over the hub, pushed in further (zoom 2.2x).
 // b4 476-677  "Remotion builds the clip, then loops the footage instead of freezing it"
-//             pipelineFlow, drawn on a dark plate (zoom 2.8x, no public commit to film).
+//             handoffExplain, drawn on a dark plate (zoom 2.8x, no public commit to film).
 // b5 677-851  "the catalog went from 2 clips to over 150"
 //             no catalog effect: a LogWindow plays the real render/catalog numbers,
 //             holds to the end (zoom readout settles at LOCKED).
 //
 // Persistent element (archetype 2 — camera, not fade): a viewfinder HUD — four
-// corner brackets that close in beat by beat, plus a bottom-left zoom readout
-// ("×1.0" → "LOCKED") and a target label that changes every beat. The brackets
-// closing in simulate one continuous push into the hub, even though each beat
-// is its own backdrop instance.
+// corner brackets that close in beat by beat, a bottom-left zoom readout
+// ("×1.0" → "LOCKED") with a target label that changes every beat, plus a small
+// fixed top-left product plate ("Portfolio & News Platform") that names the
+// maker from b1 onward.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -97,6 +98,28 @@ const ZoomHud: React.FC = () => {
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
       {(["tl", "tr", "bl", "br"] as const).map(bracket)}
+
+      <Arrive at={B1 + 2} kind="wipe" box={{ x: 40, y: 40, w: 420, h: 48 }} dur={0.4}>
+        <div
+          style={{
+            position: "absolute",
+            left: 40,
+            top: 40,
+            height: 48,
+            padding: "0 18px",
+            display: "flex",
+            alignItems: "center",
+            background: P.card,
+            borderRadius: 4,
+            boxShadow: "4px 4px 0 rgba(0,0,0,0.5)",
+          }}
+        >
+          <div style={{ fontSize: 17, fontWeight: 800, color: P.ink, whiteSpace: "nowrap" }}>
+            Portfolio &amp; News Platform
+          </div>
+        </div>
+      </Arrive>
+
       <Arrive at={B1 + 4} kind="wipe" box={BOX} dur={0.45}>
         <div
           style={{
@@ -161,11 +184,16 @@ const Inner: React.FC = () => {
       {/* b1 — the picture stopped, mid-voiceover, wide shot of the hub */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B1} hold={B2 - B1} push={0.04} />}
       <MotionInsert
-        effect="titleTakeover"
+        effect="keywordCaption"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        data={{ title: "The picture just... stopped.", kicker: "A voiced clip, still talking, over a frozen frame" }}
+        plate={0.7}
+        data={{
+          line1: "The picture just stops",
+          line2: "but the voiceover keeps going",
+          keywords: ["stops"],
+        }}
       />
 
       {/* b2 — nearly half of every voiced clip froze, pushed in tighter */}
@@ -204,16 +232,16 @@ const Inner: React.FC = () => {
 
       {/* b4 — Remotion builds the clip, then loops the footage (no public commit, draw it) */}
       <MotionInsert
-        effect="pipelineFlow"
+        effect="handoffExplain"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
         plate={0.7}
         base={STAGE}
         data={{
-          steps: ["Render clip (Remotion)", "Loop silent footage (ffmpeg)", "Trim to voice length"],
-          result: "No more frozen tail",
-          system: "Render pipeline, step 8",
+          from: "Freeze last frame, fill the silence",
+          to: "Loop the footage instead",
+          points: ["Remotion renders a short clip", "ffmpeg -stream_loop to voice length", "no more frozen tail"],
         }}
       />
 
@@ -225,7 +253,7 @@ const Inner: React.FC = () => {
           from={B5 + 10}
           every={22}
           opacity={logOpacity}
-          win={{ x: 150, y: 120, w: 980, h: 420 }}
+          win={{ x: 120, y: 100, w: 1040, h: 480 }}
         />
       )}
 

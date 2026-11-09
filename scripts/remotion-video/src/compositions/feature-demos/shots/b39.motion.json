@@ -1,0 +1,59 @@
+{
+  "id": "b39",
+  "composition": "FeatureKiosksEmptyWeekFillsB39",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "drawn",
+      "backdrop": "none",
+      "data": { "title": "0", "label": "SOURCES ON SCREEN" }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page1",
+      "data": {
+        "statement": "A kiosk that never logs in can't see Google",
+        "tags": ["No login", "No session", "No cookies", "Hidden events"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "hubRouting",
+      "backdrop": "page2",
+      "data": {
+        "inputs": ["Household calendar", "Sports club app", "Google Calendar"],
+        "hub": "Kiosk calendar endpoint",
+        "output": "One merged week"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "keywordCaption",
+      "backdrop": "hub1",
+      "data": {
+        "line1": "Every event is color-coded",
+        "line2": "sports, a note, or the calendar itself",
+        "keywords": ["color-coded"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": "none",
+      "data": {
+        "title": "3",
+        "label": "SOURCES MERGED",
+        "lines": [
+          "calendar server -> fetched in parallel",
+          "3 sources merged into 1 list",
+          "Google events auto-detected",
+          "colored distinct green",
+          "counts per source logged",
+          "no family member -> full-width banner",
+          "nothing silently dropped"
+        ]
+      }
+    }
+  ]
+}
