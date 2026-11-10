@@ -20,7 +20,9 @@
 //             into one endpoint.
 // b4 562-783  "every event is color-coded, so one glance shows whether it's sports, a
 //             handwritten note, or the calendar itself"
-//             keywordCaption over the features hub.
+//             keywordCaption over the write-up page's own RESULT section, scrolled
+//             further still (WAVE D fix: was the unrelated features hub, which a blind
+//             viewer flagged as a distracting grab-bag of other videos' thumbnails).
 // b5 783-952  "three separate sources, one real week, nothing invisible anymore"
 //             drawn: a log window from the feature's own numbers, holding to the end — never
 //             the write-up page or the hub again (gate 2).
@@ -32,7 +34,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, CaptionBand } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow, type LogLine } from "./live-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
@@ -186,6 +188,15 @@ const Inner: React.FC = () => {
           tags: ["Real week lives in Google", "None of it on screen", "7 nearly-blank days"],
         }}
       />
+      {frame >= B1 && frame < B2 && (
+        <CaptionBand
+          y={26}
+          tone="accent"
+          fontSize={17}
+          text="📅 Boytasks — a screen-time system for 3 kids, run on Cloudflare Workers"
+          opacity={tween(sec(frame, B1, 30), 0, 0.4, ease.power2Out)}
+        />
+      )}
 
       {/* b2 — the cause, over the write-up page, scrolled further */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
@@ -217,8 +228,8 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b4 — the color coding, over the features hub */}
-      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} />}
+      {/* b4 — the color coding, over the write-up page's own RESULT section, scrolled further still */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page4" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="keywordCaption"
         from={B4}
