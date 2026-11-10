@@ -1,0 +1,7 @@
+{"id": "b81", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A child gets stuck on a printed textbook page with no digital copy to check."],
+ ["b2", "Someone dug up the real book, flipped to the page, and worked out the homework by hand — every time, even for pages explained before."],
+ ["b3", "Now one photo of the page is read once, and the answer is saved in a database."],
+ ["b4", "Next time that page comes up again, it's just pulled back up."],
+ ["b5", "Read once, reused forever — no page gets explained twice."]
+]}

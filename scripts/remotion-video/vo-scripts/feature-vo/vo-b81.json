@@ -1,0 +1,57 @@
+{
+ "id": "b81",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.796,
+  "b2": 8.041,
+  "b3": 5.088,
+  "b4": 3.93,
+  "b5": 4.39
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A child gets stuck on a printed textbook page with no digital copy to check.",
+   "start_s": 0.5,
+   "end_s": 5.296,
+   "start_f": 15,
+   "end_f": 159
+  },
+  {
+   "beat": "b2",
+   "text": "Someone dug up the real book, flipped to the page, and worked out the homework by hand \u2014 every time, even for pages explained before.",
+   "start_s": 5.596,
+   "end_s": 13.637,
+   "start_f": 168,
+   "end_f": 409
+  },
+  {
+   "beat": "b3",
+   "text": "Now one photo of the page is read once, and the answer is saved in a database.",
+   "start_s": 13.937,
+   "end_s": 19.025,
+   "start_f": 418,
+   "end_f": 571
+  },
+  {
+   "beat": "b4",
+   "text": "Next time that page comes up again, it's just pulled back up.",
+   "start_s": 19.325,
+   "end_s": 23.255,
+   "start_f": 580,
+   "end_f": 698
+  },
+  {
+   "beat": "b5",
+   "text": "Read once, reused forever \u2014 no page gets explained twice.",
+   "start_s": 23.555,
+   "end_s": 27.945,
+   "start_f": 707,
+   "end_f": 838
+  }
+ ],
+ "total_s": 29.445,
+ "durationInFrames": 883,
+ "measured_track_s": 28.008,
+ "track": "/root/feature-demos/vo-b81/vo-b81.mp3"
+}

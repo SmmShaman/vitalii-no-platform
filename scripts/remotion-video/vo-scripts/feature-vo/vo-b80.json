@@ -1,0 +1,57 @@
+{
+ "id": "b80",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.214,
+  "b2": 4.378,
+  "b3": 6.766,
+  "b4": 4.366,
+  "b5": 6.156
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "The hallway screen showed a bare calendar \u2014 vague labels, homework cut off mid-word, cancelled lessons showing as if nothing changed.",
+   "start_s": 0.5,
+   "end_s": 8.714,
+   "start_f": 15,
+   "end_f": 261
+  },
+  {
+   "beat": "b2",
+   "text": "Nobody could tell at a glance which child had gym or swimming that day.",
+   "start_s": 9.014,
+   "end_s": 13.392,
+   "start_f": 270,
+   "end_f": 402
+  },
+  {
+   "beat": "b3",
+   "text": "Now a lookup table color-codes each subject, hides cancelled lessons, and gives every event its real title.",
+   "start_s": 13.692,
+   "end_s": 20.458,
+   "start_f": 411,
+   "end_f": 614
+  },
+  {
+   "beat": "b4",
+   "text": "Gym and swimming days get their own icon from each child's timetable.",
+   "start_s": 20.758,
+   "end_s": 25.124,
+   "start_f": 623,
+   "end_f": 754
+  },
+  {
+   "beat": "b5",
+   "text": "Every pupil's whole week now rotates across the screen at once \u2014 no more guessing at vague labels.",
+   "start_s": 25.424,
+   "end_s": 31.58,
+   "start_f": 763,
+   "end_f": 947
+  }
+ ],
+ "total_s": 33.08,
+ "durationInFrames": 992,
+ "measured_track_s": 31.632,
+ "track": "/root/feature-demos/vo-b80/vo-b80.mp3"
+}
