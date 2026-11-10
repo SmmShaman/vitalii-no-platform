@@ -308,6 +308,8 @@ import { FeatureKiosksSugarBadgeJustD16 } from "./compositions/feature-demos/Fea
 import { FeatureArtemsSugarChartMovesB77 } from "./compositions/feature-demos/FeatureArtemsSugarChartMovesB77";
 import { FeatureVideoDigestWritesItselfV26 } from "./compositions/feature-demos/FeatureVideoDigestWritesItselfV26";
 import { Feature10ClipsGoDarkV25 } from "./compositions/feature-demos/Feature10ClipsGoDarkV25";
+import { FeaturePointCameraAtTextbookB81 } from "./compositions/feature-demos/FeaturePointCameraAtTextbookB81";
+import { FeatureKioskScreenStopsGuessingB80 } from "./compositions/feature-demos/FeatureKioskScreenStopsGuessingB80";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -3043,6 +3045,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureSandboxWhereNothingCountsB43"
         component={FeatureSandboxWhereNothingCountsB43}
         durationInFrames={931}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeaturePointCameraAtTextbookB81"
+        component={FeaturePointCameraAtTextbookB81}
+        durationInFrames={883}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureKioskScreenStopsGuessingB80"
+        component={FeatureKioskScreenStopsGuessingB80}
+        durationInFrames={992}
         fps={30}
         width={1280}
         height={720}

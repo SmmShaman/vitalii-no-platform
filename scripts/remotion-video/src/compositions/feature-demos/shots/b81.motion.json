@@ -1,0 +1,57 @@
+{
+  "id": "b81",
+  "composition": "FeaturePointCameraAtTextbookB81",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "A child is stuck on a printed textbook page",
+        "tags": ["One specific child", "Printed textbook", "One exact page", "Zero digital copies"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "pipelineFlow",
+      "backdrop": "page2",
+      "data": {
+        "steps": ["Dig up the real book", "Flip to the page", "Work it out by hand"],
+        "result": "Redone every single time",
+        "system": "No lookup existed"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Flip pages, solve by hand",
+        "to": "Photographed, read once",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["One photo of the page taken", "AI agent reads it once", "Answer saved to a database"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "copyCorrection",
+      "backdrop": null,
+      "data": {
+        "wrong": "Explain this page again",
+        "right": "Pulled back up instantly",
+        "label": "Next time"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Read once,",
+        "line2": "reused forever.",
+        "keywords": ["once", "reused", "forever"]
+      }
+    }
+  ]
+}

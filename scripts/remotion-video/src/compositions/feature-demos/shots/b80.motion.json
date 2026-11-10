@@ -1,0 +1,56 @@
+{
+  "id": "b80",
+  "composition": "FeatureKioskScreenStopsGuessingB80",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "A bare calendar, nothing useful",
+        "tags": ["Vague event labels", "Homework cut off", "Cancelled still shown", "Nobody notices"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": {
+        "line1": "Nobody could tell,",
+        "line2": "gym day from swimming day.",
+        "keywords": ["gym", "swimming"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Reads the subject", "Colors by subject", "Hides cancelled lessons", "Shows the real title"],
+        "result": "Every event labelled right",
+        "system": "Lookup table"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "No icon for PE days",
+        "to": "Backpack icon shown",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Pulled from each child's timetable", "Flags gym day", "Flags swimming day"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "funnelAbsorption",
+      "backdrop": null,
+      "data": {
+        "inputs": ["Vague event labels", "Cut-off homework", "Stale cancelled lessons", "No PE icon"],
+        "result": "Whole week shown clearly"
+      }
+    }
+  ]
+}

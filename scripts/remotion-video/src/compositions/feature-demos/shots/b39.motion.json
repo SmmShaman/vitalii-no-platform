@@ -4,23 +4,27 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "drawn",
-      "backdrop": "none",
-      "data": { "title": "0", "label": "SOURCES ON SCREEN" }
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "TV calendar: almost empty",
+        "tags": ["Real week lives in Google", "None of it on screen", "7 nearly-blank days"]
+      }
     },
     {
       "beat": "b2",
-      "effect": "cornerTags",
-      "backdrop": "page1",
+      "effect": "copyCorrection",
+      "backdrop": "page2",
       "data": {
-        "statement": "A kiosk that never logs in can't see Google",
-        "tags": ["No login", "No session", "No cookies", "Hidden events"]
+        "wrong": "Assume the TV sees every event",
+        "right": "No login means Google's events stay hidden",
+        "label": "Why"
       }
     },
     {
       "beat": "b3",
       "effect": "hubRouting",
-      "backdrop": "page2",
+      "backdrop": "page3",
       "data": {
         "inputs": ["Household calendar", "Sports club app", "Google Calendar"],
         "hub": "Kiosk calendar endpoint",
@@ -30,7 +34,7 @@
     {
       "beat": "b4",
       "effect": "keywordCaption",
-      "backdrop": "hub1",
+      "backdrop": "hub",
       "data": {
         "line1": "Every event is color-coded",
         "line2": "sports, a note, or the calendar itself",
@@ -40,19 +44,9 @@
     {
       "beat": "b5",
       "effect": "drawn",
-      "backdrop": "none",
+      "backdrop": null,
       "data": {
-        "title": "3",
-        "label": "SOURCES MERGED",
-        "lines": [
-          "calendar server -> fetched in parallel",
-          "3 sources merged into 1 list",
-          "Google events auto-detected",
-          "colored distinct green",
-          "counts per source logged",
-          "no family member -> full-width banner",
-          "nothing silently dropped"
-        ]
+        "note": "result: 3 sources merged, LogWindow of real numbers"
       }
     }
   ]
