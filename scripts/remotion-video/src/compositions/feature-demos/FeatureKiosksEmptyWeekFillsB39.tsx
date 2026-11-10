@@ -164,7 +164,7 @@ const B5Drawn: React.FC = () => {
       from={B5 + 20}
       every={16}
       opacity={1}
-      win={{ x: 150, y: 300, w: 980, h: 340 }}
+      win={{ x: 60, y: 90, w: 1160, h: 500 }}
     />
   );
 };

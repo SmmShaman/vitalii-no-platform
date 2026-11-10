@@ -16,6 +16,13 @@
       "frames": 250,
       "scroll": [[0, 420], [125, 900], [249, 1400]],
       "mouse": [[0, 560, 220], [125, 480, 320], [249, 620, 260]]
+    },
+    {
+      "name": "page3",
+      "url": "https://vitalii.no/features/point-a-camera-at-a-textbook-page-get-the-homework-explained-b81",
+      "frames": 162,
+      "scroll": [[0, 1400], [161, 1700]],
+      "mouse": [[0, 620, 260], [161, 580, 300]]
     }
   ]
 }

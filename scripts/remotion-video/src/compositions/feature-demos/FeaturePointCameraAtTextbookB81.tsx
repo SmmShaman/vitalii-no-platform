@@ -198,14 +198,16 @@ const Inner: React.FC = () => {
         />
       )}
 
-      {/* b2 — the manual loop, over the feature's own page further down */}
+      {/* b2 — the manual loop, over the feature's own page further down.
+          plate lowered (0.7 -> 0.3): pipelineFlow draws its own 0.42-alpha scrim on top,
+          and the two were stacking to ~83% black, drowning the real recording underneath. */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
       <MotionInsert
         effect="pipelineFlow"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.3}
         data={{
           steps: ["Dig up the real book", "Flip to the page", "Work it out by hand"],
           result: "Redone every single time",
@@ -213,14 +215,16 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — the fix: drawn, no commit matches this feature */}
+      {/* b3 — the fix, drawn over the feature's own page scrolled further still (no commit
+          matches this feature, so the mechanism is drawn, but the page behind it is real —
+          handoffExplain has no internal scrim, so a lighter plate keeps it legible). */}
+      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page3" from={B3} hold={B4 - B3} />}
       <MotionInsert
         effect="handoffExplain"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        base={STAGE}
-        plate={0.7}
+        plate={0.55}
         data={{
           from: "Flip pages, solve by hand",
           to: "Photographed, read once",

@@ -24,7 +24,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily, CaptionBand } from "./bright-primitives";
+import { fontFamily, CaptionBand, StatPill } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/b80.json";
@@ -206,14 +206,15 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — the fix: drawn, no commit matches this feature */}
+      {/* b3 — the fix, drawn over the feature's own page scrolled further still (no commit
+          matches this feature, but the page behind the drawn lookup table is real). */}
+      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page3" from={B3} hold={B4 - B3} />}
       <MotionInsert
         effect="pipelineFlow"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        base={STAGE}
-        plate={0.7}
+        plate={0.3}
         data={{
           steps: ["Reads the subject", "Colors by subject", "Hides cancelled lessons", "Shows the real title"],
           result: "Every event labelled right",
@@ -221,14 +222,14 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b4 — the PE icon, drawn */}
+      {/* b4 — the PE icon, drawn over the feature's own page scrolled further still */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page4" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="handoffExplain"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        base={STAGE}
-        plate={0.7}
+        plate={0.55}
         data={{
           from: "No icon for PE days",
           to: "Backpack icon shown",
@@ -238,7 +239,10 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b5 — the result, holds to the end; the route itself shows it, never the page */}
+      {/* b5 — the result, holds to the end; the route itself shows it, never the page.
+          No LiveBackdrop here (gate 2: last beat never shows the write-up page or hub) —
+          filled instead with a caption band and two stat pills in the margins the funnel
+          leaves bare. */}
       <MotionInsert
         effect="funnelAbsorption"
         from={B5}
@@ -251,6 +255,21 @@ const Inner: React.FC = () => {
           result: "Whole week shown clearly",
         }}
       />
+      {frame >= B5 && (
+        <CaptionBand
+          y={26}
+          tone="accent"
+          fontSize={17}
+          text="4 problems in, 1 clear week out — nothing left to guess at"
+          opacity={tween(sec(frame, B5, 30), 0, 0.4, ease.power2Out)}
+        />
+      )}
+      {frame >= B5 + 20 && (
+        <StatPill x={100} y={500} emoji="📅" text="4 inputs merged" tone="accent" opacity={tween(sec(frame, B5 + 20, 30), 0, 0.3, ease.power2Out)} />
+      )}
+      {frame >= B5 + 20 && (
+        <StatPill x={900} y={500} emoji="✅" text="1 week, correct" tone="success" opacity={tween(sec(frame, B5 + 20, 30), 0, 0.3, ease.power2Out)} />
+      )}
 
       <RouteMap />
     </AbsoluteFill>
