@@ -1,0 +1,46 @@
+{
+  "id": "b84",
+  "composition": "FeaturePeSwimmingDaysLoseB84",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": { "title": "One tiny chip", "kicker": "Crammed next to homework on the kiosk" }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": null,
+      "data": {
+        "statement": "On a busy day, the kit reminder got buried",
+        "tags": ["Pack-your-kit chip", "Stacked with homework", "Easy to miss"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "copyCorrection",
+      "backdrop": "page",
+      "data": {
+        "wrong": "Own small chip in the cell",
+        "right": "Whole cell = a thin SVG frame",
+        "label": "Now"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "keywordCaption",
+      "backdrop": "pageDetail",
+      "data": {
+        "line1": "The kit word loops the frame's edge",
+        "line2": "No seam, no stop",
+        "keywords": ["loops", "edge"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "archetype hero number settles 1 (own row) -> 0 (no row); labelled drawn result, no backdrop"
+    }
+  ]
+}

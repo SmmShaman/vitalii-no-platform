@@ -1,5 +1,6 @@
 // FeaturePostsGoNativeVideoV23 — feature v23 — 1280x720, 869 frames @ 30fps, VOICE-SYNCED.
-// archetype 3 card-deck, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 3 card-deck, mood violet. RE-SHOOT (2026-11-11): same narration, same
+// windows (shots/v23.json unchanged), picture re-mooded from dawn to violet.
 //
 // Beat → effect (data only from the feature row; no verified commit for v23, so
 // b3/b4 draw the mechanism on a dark plate instead of a LiveBackdrop):
@@ -37,9 +38,9 @@ const B4 = 494;
 const B5 = 656;
 const END = 869;
 
-/** dawn's own accent (#2563EB) reads fine on a dark plate; lighten slightly for the stage. */
-const ACCENT = "#5B8DEF";
-const STAGE = "#101826";
+/** Brighter than violet's #5B37D4 so it reads on the dark plate. */
+const ACCENT = "#A78BFA";
+const STAGE = "#140F26";
 
 // Lower third geometry (1280x720, below the effects' safe bottom at y≈587).
 const LT = { x: 40, y: 606, w: 1200, h: 92 };
@@ -281,7 +282,7 @@ const Inner: React.FC = () => {
 };
 
 export const FeaturePostsGoNativeVideoV23: React.FC = () => (
-  <PaletteProvider value={MOODS.dawn}>
+  <PaletteProvider value={MOODS.violet}>
     <Inner />
   </PaletteProvider>
 );

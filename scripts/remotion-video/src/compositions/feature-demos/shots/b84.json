@@ -1,0 +1,21 @@
+{
+  "id": "b84",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/pe-and-swimming-days-lose-their-icon-chip-a-word-now-crawls-around-the-cells-fra-b84",
+      "frames": 160,
+      "scroll": [[0, 0], [159, 480]],
+      "mouse": [[0, 560, 200], [80, 560, 260], [159, 560, 220]]
+    },
+    {
+      "name": "pageDetail",
+      "url": "https://vitalii.no/features/pe-and-swimming-days-lose-their-icon-chip-a-word-now-crawls-around-the-cells-fra-b84",
+      "frames": 111,
+      "scroll": [[0, 480], [110, 1040]],
+      "mouse": [[0, 560, 240], [55, 560, 300], [110, 560, 260]]
+    }
+  ]
+}

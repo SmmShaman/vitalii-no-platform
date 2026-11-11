@@ -1,0 +1,55 @@
+{
+  "id": "b83",
+  "composition": "FeatureSchoolLettersComeAsB83",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": { "title": "One shared card", "kicker": "Four boys' letters, one school tone" }
+    },
+    {
+      "beat": "b2",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["One shared card arrives", "I read it myself", "I tell each boy by hand"],
+        "result": "Sorted by hand, every time",
+        "system": "SchoolMessages.tsx"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page",
+      "data": {
+        "from": "One shared, formal card",
+        "to": "Each boy's own voice",
+        "points": ["Two new Postgres columns", "First-person, NO + UA", "SchoolMessages.tsx"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "cornerTags",
+      "backdrop": "pageDetail",
+      "data": {
+        "statement": "Who sent it, to the minute",
+        "tags": ["His own cropped photo", "Sender from the signature", "Received, to the minute"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "compositionStrip",
+      "backdrop": null,
+      "data": {
+        "title": "Four boys, four distinct letters",
+        "items": [
+          { "label": "Letter A", "value": 25 },
+          { "label": "Letter B", "value": 25 },
+          { "label": "Letter C", "value": 25 },
+          { "label": "Letter D", "value": 25 }
+        ]
+      }
+    }
+  ]
+}

@@ -310,6 +310,7 @@ import { FeatureVideoDigestWritesItselfV26 } from "./compositions/feature-demos/
 import { Feature10ClipsGoDarkV25 } from "./compositions/feature-demos/Feature10ClipsGoDarkV25";
 import { FeaturePointCameraAtTextbookB81 } from "./compositions/feature-demos/FeaturePointCameraAtTextbookB81";
 import { FeatureKioskScreenStopsGuessingB80 } from "./compositions/feature-demos/FeatureKioskScreenStopsGuessingB80";
+import { FeaturePeSwimmingDaysLoseB84 } from "./compositions/feature-demos/FeaturePeSwimmingDaysLoseB84";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -3067,6 +3068,16 @@ export const RemotionRoot: React.FC = () => {
         width={1280}
         height={720}
       />
+
+      <Composition
+        id="FeaturePeSwimmingDaysLoseB84"
+        component={FeaturePeSwimmingDaysLoseB84}
+        durationInFrames={821}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
 
     </>
   );

@@ -22,24 +22,28 @@
   },
   {
    "beat": "b3",
-   "effect": "pipelineFlow",
+   "effect": "statusFocus",
    "backdrop": null,
    "data": {
-    "steps": ["Register upload", "Push video bytes", "Poll asset status"],
-    "result": "Then publish",
-    "system": "LinkedIn Assets API"
+    "title": "Then publish — LinkedIn Assets API",
+    "claims": [
+     { "text": "Register upload", "verdict": "yes" },
+     { "text": "Push video bytes", "verdict": "yes" },
+     { "text": "Poll asset status", "verdict": "yes" }
+    ]
    }
   },
   {
    "beat": "b4",
-   "effect": "handoffExplain",
+   "effect": "featureMatrix",
    "backdrop": null,
    "data": {
-    "from": "Manual upload, post by post",
-    "to": "nano-social-publish Edge Function",
-    "fromLabel": "BEFORE",
-    "toLabel": "NOW",
-    "points": ["postToLinkedIn + postToFacebook", "registers + uploads the clip", "posts the real demo video"]
+    "options": ["Manual", "Function"],
+    "rows": [
+     { "label": "Registers + uploads clip", "values": [false, true] },
+     { "label": "Posts real demo video", "values": [false, true] },
+     { "label": "Needs a human, every post", "values": [true, false] }
+    ]
    }
   },
   {
