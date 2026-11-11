@@ -55,6 +55,37 @@ const CARD_H = 60;
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
+/** small labelled fact badge for an otherwise-empty top corner — used on drawn
+    beats (b3/b4) to add frame coverage without touching the shared effect. */
+const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr"; from: number; to: number }> = ({
+  value,
+  label,
+  corner,
+  from,
+  to,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= to) return null;
+  const t = tween(sec(frame, from, fps), 0, 0.3, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 26,
+        [corner === "tl" ? "left" : "right"]: 48,
+        textAlign: corner === "tl" ? "left" : "right",
+        opacity: t,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 30, fontWeight: 800, color: P.accent, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.5, color: P.muted, marginTop: 4 }}>{label}</div>
+    </div>
+  );
+};
+
 const LOG_LINES: LogLine[] = [
   { t: "[LinkedIn]", text: "registerUpload -> feedshare-video", tone: "accent" },
   { t: "[LinkedIn]", text: "PUT video bytes (<=50MB)", tone: "ink" },
@@ -245,6 +276,8 @@ const Inner: React.FC = () => {
           ],
         }}
       />
+      <CornerFact value="≤50MB" label="VIDEO BYTES CAP" corner="tl" from={B3} to={B4} />
+      <CornerFact value="120s" label="MAX POLL WINDOW" corner="tr" from={B3} to={B4} />
 
       {/* b4 — nano-social-publish does the hand-off itself (no zoomable commit tonight, draw it) */}
       <MotionInsert
@@ -260,9 +293,12 @@ const Inner: React.FC = () => {
             { label: "Registers + uploads clip", values: [false, true] },
             { label: "Posts real demo video", values: [false, true] },
             { label: "Needs a human, every post", values: [true, false] },
+            { label: "Handles the whole upload hand-off", values: [false, true] },
           ],
         }}
       />
+      <CornerFact value="1" label="FUNCTION DOES THE HAND-OFF" corner="tl" from={B4} to={B5} />
+      <CornerFact value="0" label="HUMANS PER POST" corner="tr" from={B4} to={B5} />
 
       {/* b5 — the fallback, shown as the real request/fallback sequence, holds to the end */}
       {frame >= B5 && (

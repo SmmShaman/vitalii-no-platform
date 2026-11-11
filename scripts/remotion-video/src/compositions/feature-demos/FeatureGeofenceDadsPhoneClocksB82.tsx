@@ -47,6 +47,37 @@ const BAND = { x: 40, y: 605, w: 1200, h: 100 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
+/** small labelled fact badge for an otherwise-empty top corner — used on the
+    drawn b4 beat to add frame coverage without touching the shared effect. */
+const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr"; from: number; to: number }> = ({
+  value,
+  label,
+  corner,
+  from,
+  to,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= to) return null;
+  const t = tween(sec(frame, from, fps), 0, 0.3, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 26,
+        [corner === "tl" ? "left" : "right"]: 48,
+        textAlign: corner === "tl" ? "left" : "right",
+        opacity: t,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 30, fontWeight: 800, color: P.accent, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.5, color: P.muted, marginTop: 4 }}>{label}</div>
+    </div>
+  );
+};
+
 const NODES = ["DEPOT", "GEOFENCE", "WORKER", "WORK_SHIFTS", "KIOSK"];
 
 /** discrete breakpoints — the route advances in steps, not a continuous crawl. */
@@ -277,7 +308,7 @@ const Inner: React.FC = () => {
         plate={0.78}
         data={{
           statement: "Shift pay existed only in memory",
-          tags: ["Redone by hand", "Every single month", "No record to check"],
+          tags: ["Redone by hand", "Every single month", "No record to check", "0 shifts typed by hand"],
         }}
       />
 
@@ -288,7 +319,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.78}
+        plate={0.42}
         data={{
           steps: ["Phone leaves the depot", "Geofence event fires", "Cloudflare Worker logs it"],
           result: "Shift recorded the moment he leaves",
@@ -308,9 +339,11 @@ const Inner: React.FC = () => {
           to: "Split pay + break rule, automatic",
           fromLabel: "BEFORE",
           toLabel: "NOW",
-          points: ["Before/after 06:00 tariffs", "Unpaid break over 330 min", "No typing required"],
+          points: ["Before/after 06:00 tariffs", "Unpaid break over 330 min", "No typing required", "Kiosk report, every day"],
         }}
       />
+      <CornerFact value="2" label="PAY PERIODS, SPLIT AT 06:00" corner="tl" from={B4} to={B5} />
+      <CornerFact value="330min" label="UNPAID BREAK THRESHOLD" corner="tr" from={B4} to={B5} />
 
       {/* b5 — the result, fully drawn, holds to the end */}
       <ClosingBeat />

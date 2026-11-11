@@ -47,6 +47,37 @@ const BAND = { x: 40, y: 605, w: 1200, h: 100 };
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
+/** small labelled fact badge for an otherwise-empty top corner — used on the
+    drawn b2 beat to add frame coverage without touching the shared effect. */
+const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr"; from: number; to: number }> = ({
+  value,
+  label,
+  corner,
+  from,
+  to,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= to) return null;
+  const t = tween(sec(frame, from, fps), 0, 0.3, ease.power3Out);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        top: 26,
+        [corner === "tl" ? "left" : "right"]: 48,
+        textAlign: corner === "tl" ? "left" : "right",
+        opacity: t,
+        fontFamily,
+      }}
+    >
+      <div style={{ fontSize: 30, fontWeight: 800, color: P.accent, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.5, color: P.muted, marginTop: 4 }}>{label}</div>
+    </div>
+  );
+};
+
 /** archetype 5 — the running ledger total, present every beat, BIG only in b5
     (the one beat with no catalog effect competing for the upper frame). The
     total flips once, at B3, from the stated deficit (0/4) to parity (4/4). */
@@ -268,11 +299,13 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         plate={0.78}
         data={{
-          steps: ["One shared card arrives", "I read it myself", "I tell each boy by hand"],
-          result: "Sorted by hand, every time",
+          steps: ["One shared card arrives", "I read it myself", "I tell each boy by hand", "No per-boy record kept"],
+          results: ["Sorted by hand, every time", "0 personalized letters"],
           system: "SchoolMessages.tsx",
         }}
       />
+      <CornerFact value="1" label="SHARED CARD FOR 4 BOYS" corner="tl" from={B2} to={B3} />
+      <CornerFact value="0" label="PERSONALIZED LETTERS SO FAR" corner="tr" from={B2} to={B3} />
 
       {/* b3 — the fix, over the feature's own page again */}
       {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B3} hold={B4 - B3} />}
