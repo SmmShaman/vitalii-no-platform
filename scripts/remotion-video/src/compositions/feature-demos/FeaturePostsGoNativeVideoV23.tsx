@@ -1,26 +1,27 @@
 // FeaturePostsGoNativeVideoV23 — feature v23 — 1280x720, 869 frames @ 30fps, VOICE-SYNCED.
-// archetype 3 card-deck, mood violet. RE-SHOOT (2026-11-11): same narration, same
-// windows (shots/v23.json unchanged), picture re-mooded from dawn to violet.
+// archetype 3 card-deck, mood sand. RE-SHOOT (2026-11-11): same narration, same
+// windows (shots/v23.json unchanged), picture rewritten and re-mooded to sand.
 //
-// Beat → effect (data only from the feature row; no verified commit for v23, so
-// b3/b4 draw the mechanism on a dark plate instead of a LiveBackdrop):
+// Beat → effect (data only from the feature row; only generic commit/actions
+// listing pages were verified tonight, no specific diff — b3/b4 draw the
+// mechanism on a dark plate instead of a LiveBackdrop):
 // b1 15-174   "every feature already had its own demo clip, the post was just a photo"
 //             titleTakeover over the features hub (many clips already exist).
 // b2 174-292  "uploading it by hand, for every post, wasn't sustainable"
 //             cornerTags over the feature's own page.
 // b3 292-494  "LinkedIn makes you register the upload, then wait for it to finish"
-//             pipelineFlow, drawn (register -> push bytes -> poll status).
+//             statusFocus, drawn (register -> push bytes -> poll status).
 // b4 494-656  "now one Supabase function does that itself, posts the real clip"
-//             handoffExplain, drawn (manual upload -> nano-social-publish).
+//             featureMatrix, drawn (manual upload -> nano-social-publish).
 // b5 656-869  "if the upload fails, the post still goes out as text"
 //             no catalog effect: a LogWindow plays the real request/fallback
-//             sequence from solution_en, holds to the end.
+//             sequence built from the feature's own solution text, holds to end.
 //
 // Persistent element: a 3-card "post format" deck (archetype 3) in the lower
 // third, b1 through b5. It starts stacked (TEXT/PHOTO/VIDEO piled, queued one
 // at a time), fans out while the upload pipeline runs, re-sorts itself to put
 // VIDEO in front once the function posts it, and grows a dashed fallback
-// branch back to TEXT in b5 — the pile shrinking/sorting IS the story.
+// branch back to TEXT in b5 — the pile re-sorting IS the story.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -38,9 +39,9 @@ const B4 = 494;
 const B5 = 656;
 const END = 869;
 
-/** Brighter than violet's #5B37D4 so it reads on the dark plate. */
-const ACCENT = "#A78BFA";
-const STAGE = "#140F26";
+/** Warm amber, brighter than sand's own #B4531F so it reads on the dark plate. */
+const ACCENT = "#F0A868";
+const STAGE = "#1A120A";
 
 // Lower third geometry (1280x720, below the effects' safe bottom at y≈587).
 const LT = { x: 40, y: 606, w: 1200, h: 92 };
@@ -70,7 +71,7 @@ const LowerThird: React.FC = () => {
   const P = usePalette();
   if (frame < B1) return null;
 
-  // b2: a red "by hand" meter crawls while the upload is manual.
+  // b2: an amber "by hand" meter crawls while the upload is manual.
   const byHand = tween(sec(frame, B2 + 10, fps), 0, (B3 - 10 - (B2 + 10)) / fps, ease.linear);
   // b3: the deck fans out from the stacked pile.
   const fan = tween(sec(frame, B3 + 15, fps), 0, 0.6, ease.power3InOut);
@@ -82,8 +83,7 @@ const LowerThird: React.FC = () => {
   const posFor = (label: string) => {
     const now = order.indexOf(label);
     const prev = prevOrder.indexOf(label);
-    const idx = mix(resort, prev, now);
-    return idx;
+    return mix(resort, prev, now);
   };
   const stacked = frame < B3 + 15;
 
@@ -228,13 +228,13 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — LinkedIn: register, push bytes, then wait (no public commit, draw it) */}
+      {/* b3 — LinkedIn: register, push bytes, then wait (no zoomable commit tonight, draw it) */}
       <MotionInsert
         effect="statusFocus"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.82}
         base={STAGE}
         data={{
           title: "Then publish — LinkedIn Assets API",
@@ -246,13 +246,13 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b4 — nano-social-publish does the hand-off itself (no public commit, draw it) */}
+      {/* b4 — nano-social-publish does the hand-off itself (no zoomable commit tonight, draw it) */}
       <MotionInsert
         effect="featureMatrix"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.82}
         base={STAGE}
         data={{
           options: ["Manual", "Function"],
@@ -282,7 +282,7 @@ const Inner: React.FC = () => {
 };
 
 export const FeaturePostsGoNativeVideoV23: React.FC = () => (
-  <PaletteProvider value={MOODS.violet}>
+  <PaletteProvider value={MOODS.sand}>
     <Inner />
   </PaletteProvider>
 );

@@ -1,0 +1,49 @@
+{
+  "id": "b82",
+  "composition": "FeatureGeofenceDadsPhoneClocksB82",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "Pay, never recorded", "kicker": "Dad's delivery shifts start at a fixed 02:15" }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": null,
+      "data": {
+        "statement": "Shift pay existed only in memory",
+        "tags": ["Redone by hand", "Every single month", "No record to check"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "page2",
+      "data": {
+        "steps": ["Phone leaves the depot", "Geofence event fires", "Cloudflare Worker logs it"],
+        "result": "Shift recorded the moment he leaves",
+        "system": "work-event route (Cloudflare Worker)"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Manual math, after the fact",
+        "to": "Split pay + break rule, automatic",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Before/after 06:00 tariffs", "Unpaid break over 330 min", "No typing required"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "Flow-map route reaches KIOSK; big reveal + LogWindow (work_shifts) with real column-shaped lines. Holds to END, no fade. Neither the feature page nor the hub appears here."
+    }
+  ]
+}

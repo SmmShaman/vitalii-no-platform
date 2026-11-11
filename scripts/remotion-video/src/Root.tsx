@@ -233,6 +233,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureSchoolLettersComeAsB83 } from "./compositions/feature-demos/FeatureSchoolLettersComeAsB83";
+import { FeatureGeofenceDadsPhoneClocksB82 } from "./compositions/feature-demos/FeatureGeofenceDadsPhoneClocksB82";
 import { FeatureCalendarStripGrowsUpB40 } from "./compositions/feature-demos/FeatureCalendarStripGrowsUpB40";
 import { FeatureKiosksEmptyWeekFillsB39 } from "./compositions/feature-demos/FeatureKiosksEmptyWeekFillsB39";
 import { FeaturePostsGoNativeVideoV23 } from "./compositions/feature-demos/FeaturePostsGoNativeVideoV23";
@@ -2368,6 +2370,24 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureSchoolLettersComeAsB83"
+        component={FeatureSchoolLettersComeAsB83}
+        durationInFrames={889}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureGeofenceDadsPhoneClocksB82"
+        component={FeatureGeofenceDadsPhoneClocksB82}
+        durationInFrames={950}
         fps={30}
         width={1280}
         height={720}

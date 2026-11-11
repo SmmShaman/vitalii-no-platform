@@ -5,8 +5,8 @@
     {
       "beat": "b1",
       "effect": "titleTakeover",
-      "backdrop": null,
-      "data": { "title": "One shared card", "kicker": "Four boys' letters, one school tone" }
+      "backdrop": "page",
+      "data": { "title": "One shared card", "kicker": "Four boys, one school tone, every letter" }
     },
     {
       "beat": "b2",
@@ -25,13 +25,15 @@
       "data": {
         "from": "One shared, formal card",
         "to": "Each boy's own voice",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
         "points": ["Two new Postgres columns", "First-person, NO + UA", "SchoolMessages.tsx"]
       }
     },
     {
       "beat": "b4",
       "effect": "cornerTags",
-      "backdrop": "pageDetail",
+      "backdrop": "page2",
       "data": {
         "statement": "Who sent it, to the minute",
         "tags": ["His own cropped photo", "Sender from the signature", "Received, to the minute"]
@@ -39,17 +41,9 @@
     },
     {
       "beat": "b5",
-      "effect": "compositionStrip",
+      "effect": "drawn",
       "backdrop": null,
-      "data": {
-        "title": "Four boys, four distinct letters",
-        "items": [
-          { "label": "Letter A", "value": 25 },
-          { "label": "Letter B", "value": 25 },
-          { "label": "Letter C", "value": 25 },
-          { "label": "Letter D", "value": 25 }
-        ]
-      }
+      "note": "Ledger goes BIG: 0/4 struck through, 4/4 in green, plus a LogWindow (school_messages) listing SchoolMessages.tsx's own real columns/helpers. Holds to END, no fade. Neither the feature page nor the hub appears here."
     }
   ]
 }
