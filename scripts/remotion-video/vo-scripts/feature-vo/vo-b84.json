@@ -1,0 +1,57 @@
+{
+ "id": "b84",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.105,
+  "b2": 4.042,
+  "b3": 5.03,
+  "b4": 3.386,
+  "b5": 4.613
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Swim or gym day used to get its own tiny chip, crammed next to homework and real school events on our kitchen kiosk.",
+   "start_s": 0.5,
+   "end_s": 7.605,
+   "start_f": 15,
+   "end_f": 228
+  },
+  {
+   "beat": "b2",
+   "text": "On a busy day, that chip for pack-your-kit just got buried.",
+   "start_s": 7.905,
+   "end_s": 11.947,
+   "start_f": 237,
+   "end_f": 358
+  },
+  {
+   "beat": "b3",
+   "text": "Now the whole cell gets a thin colored frame instead, drawn with SVG.",
+   "start_s": 12.247,
+   "end_s": 17.277,
+   "start_f": 367,
+   "end_f": 518
+  },
+  {
+   "beat": "b4",
+   "text": "The kit word loops endlessly around that frame's edge.",
+   "start_s": 17.577,
+   "end_s": 20.963,
+   "start_f": 527,
+   "end_f": 629
+  },
+  {
+   "beat": "b5",
+   "text": "Homework keeps its space, and the one reminder that matters never disappears.",
+   "start_s": 21.263,
+   "end_s": 25.876,
+   "start_f": 638,
+   "end_f": 776
+  }
+ ],
+ "total_s": 27.376,
+ "durationInFrames": 821,
+ "measured_track_s": 25.944,
+ "track": "/root/feature-demos/vo-b84/vo-b84.mp3"
+}

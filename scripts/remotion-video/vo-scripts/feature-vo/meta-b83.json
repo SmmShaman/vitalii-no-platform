@@ -1,0 +1,7 @@
+{
+  "id": "b83",
+  "file": "yt-feature-b83.mp4",
+  "title": "One Shared Card Becomes Four Kids' Own Voices | vitalii.no",
+  "description": "Four children's school letters used to slide across our family kiosk as one shared card, in the school's own dry wording. There was no sense of which letter belonged to which child or who at school had actually written it — my boys had to be told by me what each letter said and who it was from.\n\nSchoolMessages.tsx was rebuilt around four standing portrait crops, one per child, with a speech-bubble card popping in next to whichever child's letter is showing. Two new Postgres columns hold the letter rewritten in that child's own first-person voice, in both Norwegian and Ukrainian, and a new sender field — filled from the letter's signature — is printed next to the exact time it was received.\n\nA letter about one of the four boys is now unmistakably his: read in his own words, with a name attached to who sent it, instead of one anonymous shared card nobody could place at a glance.\n\n🔗 Full write-up: https://vitalii.no/features/school-letters-now-come-as-speech-bubbles-from-each-childs-own-face-b83\n📚 All features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#schoolcommunication #supabase #react #familydashboard #parentingtech",
+  "tags": ["school communication app", "supabase postgres", "react typescript", "family dashboard", "personalized messaging", "kiosk display", "parenting tech", "multilingual ui", "ai personalization", "home automation", "vitalii berbeha"]
+}

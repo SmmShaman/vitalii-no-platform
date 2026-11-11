@@ -1,0 +1,57 @@
+{
+ "id": "b83",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.048,
+  "b2": 4.493,
+  "b3": 5.915,
+  "b4": 4.902,
+  "b5": 5.068
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Four of my boys' school letters used to land as one shared card, in the school's flat formal wording.",
+   "start_s": 0.5,
+   "end_s": 6.548,
+   "start_f": 15,
+   "end_f": 196
+  },
+  {
+   "beat": "b2",
+   "text": "I had to read it myself and tell each boy which letter was actually his.",
+   "start_s": 6.848,
+   "end_s": 11.341,
+   "start_f": 205,
+   "end_f": 340
+  },
+  {
+   "beat": "b3",
+   "text": "Now two new Postgres fields hold each letter, rewritten in that boy's own first-person voice.",
+   "start_s": 11.641,
+   "end_s": 17.556,
+   "start_f": 349,
+   "end_f": 527
+  },
+  {
+   "beat": "b4",
+   "text": "His own cropped photo speaks it, with who sent it named underneath, down to the minute.",
+   "start_s": 17.856,
+   "end_s": 22.758,
+   "start_f": 536,
+   "end_f": 683
+  },
+  {
+   "beat": "b5",
+   "text": "Four boys, four distinct letters \u2014 nobody needs me to sort them out anymore.",
+   "start_s": 23.058,
+   "end_s": 28.126,
+   "start_f": 692,
+   "end_f": 844
+  }
+ ],
+ "total_s": 29.626,
+ "durationInFrames": 889,
+ "measured_track_s": 28.176,
+ "track": "/root/feature-demos/vo-b83/vo-b83.mp3"
+}
