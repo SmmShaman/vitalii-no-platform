@@ -1,0 +1,21 @@
+{
+  "id": "e05",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/one-audio-player-now-follows-you-across-every-page-in-elvarika-e05",
+      "frames": 200,
+      "scroll": [[0, 0], [199, 650]],
+      "mouse": [[0, 400, 160], [70, 620, 240], [140, 460, 320], [199, 540, 280]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 170,
+      "scroll": [[0, 0], [169, 1400]],
+      "mouse": [[0, 260, 160], [50, 640, 260], [110, 420, 360], [169, 600, 220]]
+    }
+  ]
+}

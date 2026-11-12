@@ -313,6 +313,8 @@ import { Feature10ClipsGoDarkV25 } from "./compositions/feature-demos/Feature10C
 import { FeaturePointCameraAtTextbookB81 } from "./compositions/feature-demos/FeaturePointCameraAtTextbookB81";
 import { FeatureKioskScreenStopsGuessingB80 } from "./compositions/feature-demos/FeatureKioskScreenStopsGuessingB80";
 import { FeaturePeSwimmingDaysLoseB84 } from "./compositions/feature-demos/FeaturePeSwimmingDaysLoseB84";
+import { FeatureElvarikasBackendRefillsCreditsE06 } from "./compositions/feature-demos/FeatureElvarikasBackendRefillsCreditsE06";
+import { FeatureOneAudioPlayerFollowsE05 } from "./compositions/feature-demos/FeatureOneAudioPlayerFollowsE05";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -3098,6 +3100,23 @@ export const RemotionRoot: React.FC = () => {
         height={720}
       />
 
+      <Composition
+        id="FeatureElvarikasBackendRefillsCreditsE06"
+        component={FeatureElvarikasBackendRefillsCreditsE06}
+        durationInFrames={831}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureOneAudioPlayerFollowsE05"
+        component={FeatureOneAudioPlayerFollowsE05}
+        durationInFrames={906}
+        fps={30}
+        width={1280}
+        height={720}
+      />
 
     </>
   );

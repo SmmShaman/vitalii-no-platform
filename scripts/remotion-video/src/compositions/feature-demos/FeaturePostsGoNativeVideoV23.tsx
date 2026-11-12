@@ -1,12 +1,16 @@
 // FeaturePostsGoNativeVideoV23 — feature v23 — 1280x720, 869 frames @ 30fps, VOICE-SYNCED.
-// archetype 3 card-deck, mood sand. RE-SHOOT (2026-11-11): same narration, same
-// windows (shots/v23.json unchanged), picture rewritten and re-mooded to sand.
+// archetype 3 card-deck, mood dawn. RE-SHOOT (2026-11-12): same narration, same
+// windows (shots/v23.json unchanged — hub + page are the only verified sources
+// tonight, no commit/Actions page confirmed, so b3/b4 stay drawn per gate 2's
+// fallback clause), re-mooded dawn, b1 opener swapped off titleTakeover (used
+// as the b1 opener on b83 tonight) and off cornerTags (used as the b1 opener on
+// b39 and b81) — b1 now opens on keywordCaption instead.
 //
-// Beat → effect (data only from the feature row; only generic commit/actions
-// listing pages were verified tonight, no specific diff — b3/b4 draw the
-// mechanism on a dark plate instead of a LiveBackdrop):
+// Beat → effect (data only from the feature row; only the hub and the feature's
+// own page were verified tonight — b3/b4 draw the mechanism on a dark plate
+// instead of a LiveBackdrop):
 // b1 15-174   "every feature already had its own demo clip, the post was just a photo"
-//             titleTakeover over the features hub (many clips already exist).
+//             keywordCaption over the features hub (many clips already exist).
 // b2 174-292  "uploading it by hand, for every post, wasn't sustainable"
 //             cornerTags over the feature's own page.
 // b3 292-494  "LinkedIn makes you register the upload, then wait for it to finish"
@@ -39,9 +43,9 @@ const B4 = 494;
 const B5 = 656;
 const END = 869;
 
-/** Warm amber, brighter than sand's own #B4531F so it reads on the dark plate. */
-const ACCENT = "#F0A868";
-const STAGE = "#1A120A";
+/** Bright azure, boosted for the dark stage (dawn's own #2563EB reads flat on black). */
+const ACCENT = "#4D8CFF";
+const STAGE = "#0D1526";
 
 // Lower third geometry (1280x720, below the effects' safe bottom at y≈587).
 const LT = { x: 40, y: 606, w: 1200, h: 92 };
@@ -135,9 +139,16 @@ const LowerThird: React.FC = () => {
         />
         <div style={{ position: "absolute", left: LT.x + 22, top: LT.y + 16, width: CAPTION_W }}>
           <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>POST FORMAT</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.2 }}>
-            {frame < B2 ? "queued, one at a time" : frame < B3 ? "uploading by hand" : frame < B4 ? "LinkedIn Assets API" : "posted automatically"}
-          </div>
+          {frame < B4 ? (
+            <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.2 }}>
+              {frame < B2 ? "queued, one at a time" : frame < B3 ? "uploading by hand" : "waiting on LinkedIn"}
+            </div>
+          ) : (
+            <div style={{ marginTop: 4 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, lineHeight: 1.2 }}>Supabase function</div>
+              <div style={{ fontSize: 12, fontWeight: 600, color: P.muted, lineHeight: 1.2, marginTop: 2 }}>(auto-posts for you)</div>
+            </div>
+          )}
         </div>
         <div style={{ position: "absolute", left: ROUTE_X0 - 22, top: LINE_Y - 1, width: 1200 - CAPTION_W - 90, height: 2, background: P.border }} />
       </Arrive>
@@ -238,11 +249,15 @@ const Inner: React.FC = () => {
       {/* b1 — every feature already had a clip, the post was just a photo */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B1} hold={B2 - B1} />}
       <MotionInsert
-        effect="titleTakeover"
+        effect="keywordCaption"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        data={{ title: "Clip ready. Post? A photo.", kicker: "Every feature already had its own demo clip" }}
+        data={{
+          line1: "Every feature already had its own demo clip.",
+          line2: "The post itself? Just a photo.",
+          keywords: ["demo clip", "just a photo"],
+        }}
       />
 
       {/* b2 — manual upload, every post, not sustainable */}
@@ -268,7 +283,7 @@ const Inner: React.FC = () => {
         plate={0.82}
         base={STAGE}
         data={{
-          title: "Then publish — LinkedIn Assets API",
+          title: "Then publish — LinkedIn's upload steps",
           claims: [
             { text: "Register upload", verdict: "yes" },
             { text: "Push video bytes", verdict: "yes" },
@@ -318,7 +333,7 @@ const Inner: React.FC = () => {
 };
 
 export const FeaturePostsGoNativeVideoV23: React.FC = () => (
-  <PaletteProvider value={MOODS.sand}>
+  <PaletteProvider value={MOODS.dawn}>
     <Inner />
   </PaletteProvider>
 );

@@ -4,11 +4,12 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "titleTakeover",
+      "effect": "keywordCaption",
       "backdrop": "hub",
       "data": {
-        "title": "Clip ready. Post? A photo.",
-        "kicker": "Every feature already had its own demo clip"
+        "line1": "Every feature already had its own demo clip.",
+        "line2": "The post itself? Just a photo.",
+        "keywords": ["demo clip", "just a photo"]
       }
     },
     {
@@ -25,7 +26,7 @@
       "effect": "statusFocus",
       "backdrop": null,
       "data": {
-        "title": "Then publish — LinkedIn Assets API",
+        "title": "Then publish — LinkedIn's upload steps",
         "claims": [
           { "text": "Register upload", "verdict": "yes" },
           { "text": "Push video bytes", "verdict": "yes" },

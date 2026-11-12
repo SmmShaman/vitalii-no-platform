@@ -1,0 +1,43 @@
+{
+  "id": "e06",
+  "composition": "FeatureElvarikasBackendRefillsCreditsE06",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "Credits topped up by hand.",
+        "line2": "Stuck jobs ran forever.",
+        "keywords": ["by hand", "forever"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "Three doors left wide open",
+        "tags": ["Self-granted credits", "Writable shared cache", "Public profile reads"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Open writes, no job limit",
+        "to": "Closed writes, 30-min limit",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Three write holes sealed", "Every job gets a timeout", "PostgreSQL migration"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype flow-map resolves + LogWindow shows the watchdog killing a stuck job and the monthly refill firing"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "e05",
+  "composition": "FeatureOneAudioPlayerFollowsE05",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "quoteMarker",
+      "backdrop": "page",
+      "data": {
+        "quote": "Leaving a page used to cut off whatever you were listening to.",
+        "highlight": "cut off"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "statusFocus",
+      "backdrop": "hub",
+      "data": {
+        "title": "Three separate players, none remembered you",
+        "claims": [
+          { "text": "Learning session player", "verdict": "no" },
+          { "text": "Playlist player", "verdict": "no" },
+          { "text": "Premium playlist view", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "Like three radios in one house.",
+        "line2": "Each forgot you when you left the room.",
+        "keywords": ["three radios", "forgot"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "page",
+      "data": {
+        "from": "Three disconnected players",
+        "to": "One PlayerProvider, everywhere",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Media Session API", "Persists across pages", "Lock-screen controls"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "zoom-in archetype finishes converging on the one surviving player in the lower band; LogWindow shows playback persisting across navigation and the playlist resume position"
+    }
+  ]
+}
