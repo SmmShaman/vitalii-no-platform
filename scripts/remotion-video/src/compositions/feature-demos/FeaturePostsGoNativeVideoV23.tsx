@@ -61,7 +61,7 @@ const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
 /** small labelled fact badge for an otherwise-empty top corner — used on drawn
     beats (b3/b4) to add frame coverage without touching the shared effect. */
-const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr"; from: number; to: number }> = ({
+const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr" | "bl" | "br"; from: number; to: number }> = ({
   value,
   label,
   corner,
@@ -73,13 +73,15 @@ const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr"; 
   const P = usePalette();
   if (frame < from || frame >= to) return null;
   const t = tween(sec(frame, from, fps), 0, 0.3, ease.power3Out);
+  const isLeft = corner === "tl" || corner === "bl";
+  const isTop = corner === "tl" || corner === "tr";
   return (
     <div
       style={{
         position: "absolute",
-        top: 26,
-        [corner === "tl" ? "left" : "right"]: 48,
-        textAlign: corner === "tl" ? "left" : "right",
+        [isTop ? "top" : "bottom"]: isTop ? 26 : 198,
+        [isLeft ? "left" : "right"]: 48,
+        textAlign: isLeft ? "left" : "right",
         opacity: t,
         fontFamily,
       }}
@@ -293,6 +295,7 @@ const Inner: React.FC = () => {
       />
       <CornerFact value="≤50MB" label="VIDEO BYTES CAP" corner="tl" from={B3} to={B4} />
       <CornerFact value="120s" label="MAX POLL WINDOW" corner="tr" from={B3} to={B4} />
+      <CornerFact value="3" label="STEPS BEFORE IT POSTS" corner="bl" from={B3} to={B4} />
 
       {/* b4 — nano-social-publish does the hand-off itself (no zoomable commit tonight, draw it) */}
       <MotionInsert
@@ -314,6 +317,7 @@ const Inner: React.FC = () => {
       />
       <CornerFact value="1" label="FUNCTION DOES THE HAND-OFF" corner="tl" from={B4} to={B5} />
       <CornerFact value="0" label="HUMANS PER POST" corner="tr" from={B4} to={B5} />
+      <CornerFact value="4" label="CAPABILITIES COMPARED" corner="bl" from={B4} to={B5} />
 
       {/* b5 — the fallback, shown as the real request/fallback sequence, holds to the end */}
       {frame >= B5 && (

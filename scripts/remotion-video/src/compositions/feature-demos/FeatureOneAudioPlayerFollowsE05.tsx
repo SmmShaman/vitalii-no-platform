@@ -88,6 +88,22 @@ const DX_C = [184, 84, 38, 38, 38];
 const OP_C = [1, 1, 1, 0.15, 0];
 const SC_C = [1, 1, 1, 0.85, 0.6];
 
+const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr"; from: number; to: number }> = ({
+  value, label, corner, from, to,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= to) return null;
+  const t = tween(sec(frame, from, fps), 0, 0.3, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", top: 26, [corner === "tl" ? "left" : "right"]: 48, textAlign: corner === "tl" ? "left" : "right", opacity: t, fontFamily }}>
+      <div style={{ fontSize: 30, fontWeight: 800, color: P.accent, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.5, color: P.muted, marginTop: 4 }}>{label}</div>
+    </div>
+  );
+};
+
 const ZoomThird: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -245,8 +261,7 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.78}
-        base={STAGE}
+        plate={0.72}
         data={{
           from: "Three disconnected players",
           to: "One PlayerProvider, everywhere",
@@ -255,6 +270,8 @@ const Inner: React.FC = () => {
           points: ["Media Session API", "Persists across pages", "Lock-screen controls"],
         }}
       />
+      <CornerFact value="1" label="PLAYERPROVIDER FOR ALL PAGES" corner="tl" from={B4} to={B5} />
+      <CornerFact value="04:12" label="RESUME POINT, NOT 00:00" corner="tr" from={B4} to={B5} />
 
       {/* b5 — the result: provider survives navigation, playlist resumes mid-track, holds to the end */}
       {frame >= B5 && (

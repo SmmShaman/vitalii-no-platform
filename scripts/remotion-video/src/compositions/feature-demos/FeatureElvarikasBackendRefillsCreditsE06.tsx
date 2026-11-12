@@ -51,6 +51,22 @@ const NODE_X_NEW = BLOCK_X + BLOCK_W_NEW + 34;
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
+const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr"; from: number; to: number }> = ({
+  value, label, corner, from, to,
+}) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < from || frame >= to) return null;
+  const t = tween(sec(frame, from, fps), 0, 0.3, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", top: 26, [corner === "tl" ? "left" : "right"]: 48, textAlign: corner === "tl" ? "left" : "right", opacity: t, fontFamily }}>
+      <div style={{ fontSize: 30, fontWeight: 800, color: P.accent, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.5, color: P.muted, marginTop: 4 }}>{label}</div>
+    </div>
+  );
+};
+
 const LowerThird: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -224,8 +240,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.78}
-        base={STAGE}
+        plate={0.72}
         data={{
           from: "Open writes, no job limit",
           to: "Closed writes, 30-min limit",
@@ -234,6 +249,8 @@ const Inner: React.FC = () => {
           points: ["Three write holes sealed", "Every job gets a timeout", "PostgreSQL migration"],
         }}
       />
+      <CornerFact value="30m" label="JOB TIMEOUT, NOT FOREVER" corner="tl" from={B3} to={B4} />
+      <CornerFact value="3" label="WRITE HOLES SEALED" corner="tr" from={B3} to={B4} />
 
       {/* b4 — the result: the watchdog and the refill firing, holds to the end */}
       {frame >= B4 && (
