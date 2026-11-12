@@ -164,7 +164,10 @@ jobs:
       - name: Install Chrome dependencies (for Remotion)
         run: |
           sudo apt-get update
-          sudo apt-get install -y chromium-browser libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2t64 ffmpeg
+          # No chromium-browser: on Ubuntu 24.04+ it is a snap transitional .deb that
+          # fails to unpack on the runner (dpkg exit 100, Nov 2026). Remotion renders
+          # with its own Chrome Headless Shell (next steps); these are its shared libs.
+          sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libpango-1.0-0 libcairo2 libasound2t64 ffmpeg
 
       - name: Install video-processor dependencies
         working-directory: ./scripts/video-processor
@@ -173,6 +176,10 @@ jobs:
       - name: Install Remotion project dependencies
         working-directory: ./scripts/remotion-video
         run: npm ci
+
+      - name: Ensure Remotion's own Chrome
+        working-directory: ./scripts/remotion-video
+        run: npx remotion browser ensure
 
       - name: Generate daily news compilation
         working-directory: ./scripts/video-processor

@@ -93,6 +93,75 @@ async function dismissBanners(page, hide) {
   await page.addStyleTag({ content: `${sel.join(", ")} { display: none !important; }` }).catch(() => {});
 }
 
+/**
+ * Navigate without waiting for networkidle. The /features hub carries ~280
+ * autoplay <video> cards (2 MB of HTML); it never goes network-idle, its "load"
+ * took ~75 s, and Playwright's page.screenshot then hung on "waiting for fonts"
+ * (every Feature Clip failure since 2026-11-04). So: commit on DOMContentLoaded
+ * (that response carries the HTTP status), then give load / networkidle / fonts
+ * each a bounded wait and continue with what is there.
+ */
+async function openPage(page, shot) {
+  let resp = null;
+  try {
+    resp = await page.goto(shot.url, { waitUntil: "domcontentloaded", timeout: 60000 });
+  } catch (e) {
+    console.log(`[${shot.name}] DOMContentLoaded not reached (${e.message.split("\n")[0]}) — continuing with what loaded`);
+  }
+  for (const [state, ms] of [["load", 30000], ["networkidle", 15000]]) {
+    const t = Date.now();
+    try {
+      await page.waitForLoadState(state, { timeout: ms });
+    } catch {
+      console.log(`[${shot.name}] ${state} not reached in ${ms / 1000} s — continuing`);
+      break;
+    }
+    console.log(`[${shot.name}] ${state} after ${((Date.now() - t) / 1000).toFixed(1)} s more`);
+  }
+  await waitFonts(page, 10000, shot.name);
+  return resp;
+}
+
+/** document.fonts.ready, but never longer than ms. */
+async function waitFonts(page, ms, name) {
+  const ok = await page
+    .evaluate((t) => Promise.race([document.fonts.ready.then(() => true), new Promise((r) => setTimeout(() => r(false), t))]), ms)
+    .catch(() => false);
+  if (!ok) console.log(`[${name}] fonts not ready in ${ms / 1000} s — continuing`);
+}
+
+/**
+ * One frame = one CDP Page.captureScreenshot of the viewport at device pixels
+ * (byte-identical to page.screenshot at scale "device" — checked on a scrolled
+ * page 2026-11-12), but without Playwright's
+ * unbounded "waiting for fonts" step. A capture that stalls is retried, then
+ * fails the run — a missing frame is never papered over.
+ */
+async function grabFrame(page, cdp, spec, file) {
+  // The clip is in document coordinates; scale = dsf gives device pixels.
+  // Read the real scroll offset (the browser clamps it at the page bottom).
+  const [x, y] = await page.evaluate(() => [window.scrollX, window.scrollY]);
+  const params = {
+    format: "jpeg",
+    quality: 90,
+    captureBeyondViewport: false,
+    clip: { x, y, width: spec.viewport.width, height: spec.viewport.height, scale: spec.dsf },
+  };
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const shot = await Promise.race([
+        cdp.send("Page.captureScreenshot", params),
+        new Promise((_, rej) => setTimeout(() => rej(new Error("captureScreenshot timed out after 30 s")), 30000)),
+      ]);
+      fs.writeFileSync(file, Buffer.from(shot.data, "base64"));
+      return;
+    } catch (e) {
+      if (attempt >= 3) throw new Error(`frame ${path.basename(file)}: ${e.message}`);
+      console.log(`frame ${path.basename(file)}: ${e.message} — retry ${attempt}`);
+    }
+  }
+}
+
 async function recordShot(browser, spec, shot, id) {
   const ctx = await browser.newContext({
     viewport: spec.viewport,
@@ -104,22 +173,13 @@ async function recordShot(browser, spec, shot, id) {
   });
   const page = await ctx.newPage();
   console.log(`[${shot.name}] goto ${shot.url}`);
-  let resp = null;
-  try {
-    resp = await page.goto(shot.url, { waitUntil: "networkidle", timeout: 90000 });
-  } catch (e) {
-    console.log(`[${shot.name}] networkidle not reached (${e.message.split("\n")[0]}) — continuing with what loaded`);
-  }
+  let resp = await openPage(page, shot);
   if (resp && resp.status() === 429) {
     // github.com throttles /commits/<branch> per IP without a Retry-After; one
     // pause and one more try before failing the run (factory rule 2026-09-08).
     console.log(`[${shot.name}] HTTP 429 — waiting 30 s and retrying once`);
     await page.waitForTimeout(30000);
-    try {
-      resp = await page.goto(shot.url, { waitUntil: "networkidle", timeout: 90000 });
-    } catch (e) {
-      console.log(`[${shot.name}] retry: networkidle not reached (${e.message.split("\n")[0]}) — continuing with what loaded`);
-    }
+    resp = (await openPage(page, shot)) || resp;
   }
   if (resp && resp.status() >= 400) throw new Error(`[${shot.name}] ${shot.url} answered HTTP ${resp.status()}`);
   await page.waitForTimeout(800);
@@ -136,6 +196,7 @@ async function recordShot(browser, spec, shot, id) {
   const framesDir = path.join(OUT_DIR, `${id}-${shot.name}`);
   fs.rmSync(framesDir, { recursive: true, force: true });
   fs.mkdirSync(framesDir);
+  const cdp = await page.context().newCDPSession(page);
   const cursor = [];
   const clicks = new Set(shot.clicks || []);
   const t0 = Date.now();
@@ -148,15 +209,12 @@ async function recordShot(browser, spec, shot, id) {
       // A real click: the page may navigate or open something; give it a beat.
       await page.mouse.click(mx, my);
       await page.waitForLoadState("networkidle", { timeout: 8000 }).catch(() => {});
+      await waitFonts(page, 3000, shot.name);
       await page.waitForTimeout(300);
       await dismissBanners(page, hide);
     }
     await page.waitForTimeout(25);
-    await page.screenshot({
-      path: path.join(framesDir, `f${String(f).padStart(4, "0")}.jpg`),
-      type: "jpeg",
-      quality: 90,
-    });
+    await grabFrame(page, cdp, spec, path.join(framesDir, `f${String(f).padStart(4, "0")}.jpg`));
     cursor.push([Math.round(mx), Math.round(my)]);
     if (f % 30 === 0) console.log(`[${shot.name}] frame ${f}/${shot.frames}`);
   }
