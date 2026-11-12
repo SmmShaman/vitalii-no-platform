@@ -1,0 +1,57 @@
+{
+ "id": "e05",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.288,
+  "b2": 5.397,
+  "b3": 4.891,
+  "b4": 5.294,
+  "b5": 7.132
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Leaving a page in Elvarika used to cut off whatever you were listening to.",
+   "start_s": 0.5,
+   "end_s": 4.788,
+   "start_f": 15,
+   "end_f": 144
+  },
+  {
+   "beat": "b2",
+   "text": "Three separate players ran the show, and a saved playlist never remembered where it stopped.",
+   "start_s": 5.088,
+   "end_s": 10.485,
+   "start_f": 153,
+   "end_f": 315
+  },
+  {
+   "beat": "b3",
+   "text": "It was like three radios in one house, each forgetting you when you left the room.",
+   "start_s": 10.785,
+   "end_s": 15.676,
+   "start_f": 324,
+   "end_f": 470
+  },
+  {
+   "beat": "b4",
+   "text": "Now one player follows you everywhere, built on the browser's Media Session API.",
+   "start_s": 15.976,
+   "end_s": 21.27,
+   "start_f": 479,
+   "end_f": 638
+  },
+  {
+   "beat": "b5",
+   "text": "Switching pages no longer stops the sound, and your playlist resumes right where it left off \u2014 three players down to one.",
+   "start_s": 21.57,
+   "end_s": 28.702,
+   "start_f": 647,
+   "end_f": 861
+  }
+ ],
+ "total_s": 30.202,
+ "durationInFrames": 906,
+ "measured_track_s": 28.752,
+ "track": "/root/feature-demos/vo-e05/vo-e05.mp3"
+}

@@ -1,0 +1,6 @@
+{"id": "e06", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Someone had to top up accounts by hand, every month. If a job got stuck, it just ran forever — nobody could stop it."],
+  ["b2", "Three doors into the database were wide open — one let a user hand themselves extra credits."],
+  ["b3", "A new PostgreSQL migration shut those doors and gave every job a hard time limit."],
+  ["b4", "Credits now refill automatically each month, and a stuck job is killed after just 30 minutes."]
+]}

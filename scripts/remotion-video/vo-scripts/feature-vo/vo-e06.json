@@ -1,0 +1,48 @@
+{
+ "id": "e06",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.767,
+  "b2": 5.772,
+  "b3": 5.346,
+  "b4": 5.901
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Someone had to top up accounts by hand, every month. If a job got stuck, it just ran forever \u2014 nobody could stop it.",
+   "start_s": 0.5,
+   "end_s": 8.267,
+   "start_f": 15,
+   "end_f": 248
+  },
+  {
+   "beat": "b2",
+   "text": "Three doors into the database were wide open \u2014 one let a user hand themselves extra credits.",
+   "start_s": 8.567,
+   "end_s": 14.339,
+   "start_f": 257,
+   "end_f": 430
+  },
+  {
+   "beat": "b3",
+   "text": "A new PostgreSQL migration shut those doors and gave every job a hard time limit.",
+   "start_s": 14.639,
+   "end_s": 19.985,
+   "start_f": 439,
+   "end_f": 600
+  },
+  {
+   "beat": "b4",
+   "text": "Credits now refill automatically each month, and a stuck job is killed after just 30 minutes.",
+   "start_s": 20.285,
+   "end_s": 26.186,
+   "start_f": 609,
+   "end_f": 786
+  }
+ ],
+ "total_s": 27.686,
+ "durationInFrames": 831,
+ "measured_track_s": 26.256,
+ "track": "/root/feature-demos/vo-e06/vo-e06.mp3"
+}

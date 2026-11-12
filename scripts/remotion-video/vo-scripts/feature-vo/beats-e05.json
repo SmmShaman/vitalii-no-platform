@@ -1,0 +1,7 @@
+{"id": "e05", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Leaving a page in Elvarika used to cut off whatever you were listening to."],
+  ["b2", "Three separate players ran the show, and a saved playlist never remembered where it stopped."],
+  ["b3", "It was like three radios in one house, each forgetting you when you left the room."],
+  ["b4", "Now one player follows you everywhere, built on the browser's Media Session API."],
+  ["b5", "Switching pages no longer stops the sound, and your playlist resumes right where it left off — three players down to one."]
+]}
