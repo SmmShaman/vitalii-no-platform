@@ -51,7 +51,7 @@ import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { LiveWindow } from "./live-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
-import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
+import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/v25.json";
 
 const B1 = 15;
@@ -313,8 +313,65 @@ const ClosingBeat: React.FC = () => {
   if (cut(frame, B5, END) !== 1) return null;
   const t = sec(frame, B5, fps);
   const captionIn = tween(t, 0.95, 0.3, ease.power2Out);
+  const titleIn = tween(t, 0.1, 0.3, ease.power3Out);
+  // "one a day for ten days": ten day-tiles light up in order across the beat
+  // (a bare right stage here measured 17/48 — the sentence had no picture).
+  const lit = Math.min(10, Math.floor(Math.max(0, frame - B5 - 12) / 14) + 1);
+  const TW = 156;
+  const TG = 21;
 
   return (
+    <>
+      <div
+        style={{
+          position: "absolute",
+          left: STAGE_X,
+          top: 60,
+          fontSize: 16,
+          fontWeight: 800,
+          letterSpacing: 2,
+          color: ACCENT,
+          opacity: titleIn,
+          fontFamily,
+        }}
+      >
+        REPOST SCHEDULE — ONE CLIP A DAY
+      </div>
+      {Array.from({ length: 10 }, (_, i) => {
+        const on = i < lit;
+        const x = STAGE_X + (i % 5) * (TW + TG);
+        const y = 100 + Math.floor(i / 5) * 200;
+        const tileIn = tween(t, 0.15 + i * 0.04, 0.3, ease.power3Out);
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: x,
+              top: y,
+              width: TW,
+              height: 180,
+              borderRadius: 6,
+              background: on ? "rgba(240,138,75,0.22)" : "rgba(255,255,255,0.07)",
+              border: `2px solid ${on ? ACCENT : "rgba(255,255,255,0.18)"}`,
+              opacity: tileIn,
+              transform: `translateY(${mix(tileIn, 14, 0)}px)`,
+              fontFamily,
+              padding: "16px 16px",
+              boxSizing: "border-box",
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.5, color: "rgba(250,245,238,0.6)" }}>DAY {i + 1}</div>
+            <div style={{ fontSize: 44, fontWeight: 800, lineHeight: 1.1, marginTop: 14, color: on ? ACCENT : "rgba(250,245,238,0.35)" }}>
+              {on ? "✓" : "·"}
+            </div>
+            <div style={{ fontSize: 16, fontWeight: 700, marginTop: 14, color: "#F5F5F2" }}>Clip {i + 1}</div>
+            <div style={{ fontSize: 13, fontWeight: 600, marginTop: 4, color: "rgba(250,245,238,0.55)" }}>
+              {on ? "reposted" : "queued"}
+            </div>
+          </div>
+        );
+      })}
     <div
       style={{
         position: "absolute",
@@ -330,6 +387,7 @@ const ClosingBeat: React.FC = () => {
     >
       Rewritten once in a batch, now reposted slowly — one clip a day for ten days.
     </div>
+    </>
   );
 };
 
@@ -362,7 +420,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.8}
+        plate={0.5}
         data={{
           system: "Claude subagents",
           steps: ["10 old dark clips", "Parallel subagents", "Bright v2 template", "10 rewritten clips"],

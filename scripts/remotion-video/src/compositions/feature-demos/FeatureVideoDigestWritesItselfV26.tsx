@@ -357,7 +357,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.8}
+        plate={0.5}
         data={{
           system: "daily-video-bot",
           steps: ["Free AI cascade (old)", "Claude Agent SDK", "agent_submit_digest", "auto_chain_2"],
@@ -417,14 +417,15 @@ const Inner: React.FC = () => {
         </>
       )}
 
-      {/* b4 — the watchdog cadence vs. the stall threshold, drawn only (no backdrop) */}
+      {/* b4 — the watchdog cadence vs. the stall threshold, over the repo's real
+          Actions runs (the runs the watchdog re-triggers) */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="actions" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="targetOverrun"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.8}
-        base={STAGE}
+        plate={0.62}
         data={{
           label: "Minutes stuck vs. the watchdog's check cycle",
           value: 45,

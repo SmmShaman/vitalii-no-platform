@@ -299,13 +299,14 @@ const Inner: React.FC = () => {
       />
       <ProductPlate />
 
-      {/* b2 — the manual pain, drawn only (no public page for it) */}
+      {/* b2 — the manual pain, over the problem paragraph of the feature's own page */}
+      {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B2} hold={B3 - B2} />}
       <MotionInsert
         effect="cornerTags"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.78}
+        plate={0.62}
         data={{
           statement: "Shift pay existed only in memory",
           tags: ["Redone by hand", "Every single month", "No record to check", "0 shifts typed by hand"],
@@ -327,13 +328,14 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b4 — the payoff, drawn only */}
+      {/* b4 — the payoff, over the "how it works" section that describes the split */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="handoffExplain"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.78}
+        plate={0.62}
         data={{
           from: "Manual math, after the fact",
           to: "Split pay + break rule, automatic",

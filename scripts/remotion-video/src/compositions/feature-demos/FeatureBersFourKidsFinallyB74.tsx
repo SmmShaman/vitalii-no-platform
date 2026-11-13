@@ -39,7 +39,8 @@ import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
-import { MotionInsert, Arrive } from "./motion-primitives";
+import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
+import shotsFile from "./shots/b74.json";
 import { LogWindow } from "./live-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
 
@@ -267,12 +268,15 @@ const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ background: STAGE }}>
-      {/* b1 — the claim, drawn, plus the product plate (name + purpose) */}
+      {/* b1 — the claim over the feature's own page (title + problem), plus the
+          product plate (name + purpose). A bare dark plate here measured 25/48. */}
+      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B1} hold={B2 - B1} />}
       <MotionInsert
         effect="cornerTags"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
+        plate={0.66}
         data={{
           statement: "One app, four kids, one look",
           tags: ["4 kids, 1 app", "Same look for all", "No way to tell apart", "Same grey circle"],

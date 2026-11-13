@@ -10,8 +10,7 @@
         "line1": "Every feature already had its own demo clip.",
         "line2": "The post itself? Just a photo.",
         "keywords": ["demo clip", "just a photo"]
-      },
-      "note": "Over the features hub (scrolling past dozens of already-existing clips) — the correction is that the clip existed all along, only the POST never carried it."
+      }
     },
     {
       "beat": "b2",
@@ -20,13 +19,12 @@
       "data": {
         "statement": "Manual upload, every single post",
         "tags": ["One video file", "One post", "Every feature ships", "Not sustainable"]
-      },
-      "note": "Over the feature's own write-up page — same claim as the previous cut, kept."
+      }
     },
     {
       "beat": "b3",
       "effect": "statusFocus",
-      "backdrop": "dark",
+      "backdrop": null,
       "data": {
         "title": "Then publish — LinkedIn's upload steps",
         "claims": [
@@ -34,30 +32,26 @@
           { "text": "Push video bytes", "verdict": "yes" },
           { "text": "Poll asset status", "verdict": "yes" }
         ]
-      },
-      "note": "No commit/Actions shot in shots/v23.json tonight (RE-SHOOT keeps windows exactly) — drawn on the dark plate."
+      }
     },
     {
       "beat": "b4",
       "effect": "featureMatrix",
-      "backdrop": "dark",
+      "backdrop": null,
       "data": {
         "options": ["Manual", "Function"],
         "rows": [
           { "label": "Registers + uploads clip", "values": [false, true] },
           { "label": "Posts real demo video", "values": [false, true] },
-          { "label": "Needs a human, every post", "values": [true, false] },
-          { "label": "Handles the whole upload hand-off", "values": [false, true] }
+          { "label": "Needs a human, every post", "values": [true, false] }
         ]
-      },
-      "note": "Drawn, same reason as b3."
+      }
     },
     {
       "beat": "b5",
-      "effect": "none",
-      "backdrop": "dark",
-      "data": null,
-      "note": "LogWindow plays the real request/fallback sequence built from the feature's own solution text; holds at full brightness to the end."
+      "effect": null,
+      "backdrop": null,
+      "note": "drawn-only result beat (gate 2): LogWindow with built lines (registerUpload, 50MB cap, 5s/120s polling, Facebook /videos, text fallback), holds to the end"
     }
   ]
 }

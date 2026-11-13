@@ -276,14 +276,15 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — LinkedIn: register, push bytes, then wait (no zoomable commit tonight, draw it) */}
+      {/* b3 — LinkedIn: register, push bytes, then wait — over the feature's own
+          write-up, where the upload hand-off is described */}
+      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page" from={B3} hold={B4 - B3} />}
       <MotionInsert
         effect="statusFocus"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.82}
-        base={STAGE}
+        plate={0.66}
         data={{
           title: "Then publish — LinkedIn's upload steps",
           claims: [

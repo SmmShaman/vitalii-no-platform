@@ -189,6 +189,11 @@ const FridgeDoorAnalogy: React.FC = () => {
         LOCKED ON ONE SIDE. WIDE OPEN ON THE OTHER.
       </div>
 
+      {/* the two sides as two panels — locked (green) vs wide open (red); a bare
+          dark stage with two icons measured 28/48 */}
+      <div style={{ position: "absolute", left: 70, top: 128, width: 540, height: 340, borderRadius: 18, background: "rgba(46,170,110,0.20)", border: "2px solid rgba(90,210,150,0.55)", opacity: fridgeP }} />
+      <div style={{ position: "absolute", left: 670, top: 128, width: 540, height: 340, borderRadius: 18, background: "rgba(220,80,60,0.20)", border: "2px solid rgba(240,120,100,0.55)", opacity: doorP }} />
+
       <div
         style={{
           position: "absolute",
@@ -374,14 +379,15 @@ const Inner: React.FC = () => {
       {/* b3 — the analogy, drawn (no recording exists for this beat) */}
       {cut(frame, B3, B4) === 1 && <FridgeDoorAnalogy />}
 
-      {/* b4 — the mechanism, dark base, the clip's one tech caption */}
+      {/* b4 — the mechanism, the clip's one tech caption, over the feature's own
+          page where the home-PC script is described (a bare dark base measured 26/48) */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="pipelineFlow"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.5}
-        base={STAGE}
+        plate={0.62}
         data={{
           steps: ["Foreground app checked each cycle", "Matched against the guard list", "Lock screen fires"],
           system: "Python (home PC)",

@@ -21,14 +21,14 @@
       "name": "page3",
       "url": "https://vitalii.no/features/the-kiosk-screen-stops-guessing-and-starts-showing-the-real-school-day-b80",
       "frames": 212,
-      "scroll": [[0, 1100], [105, 1450], [211, 1750]],
+      "scroll": [[0, 520], [105, 700], [211, 860]],
       "mouse": [[0, 600, 260], [105, 540, 300], [211, 600, 280]]
     },
     {
       "name": "page4",
       "url": "https://vitalii.no/features/the-kiosk-screen-stops-guessing-and-starts-showing-the-real-school-day-b80",
       "frames": 140,
-      "scroll": [[0, 1750], [139, 1950]],
+      "scroll": [[0, 760], [139, 900]],
       "mouse": [[0, 600, 280], [139, 560, 300]]
     }
   ]

@@ -162,6 +162,32 @@ async function grabFrame(page, cdp, spec, file) {
   }
 }
 
+/**
+ * Keep only the <video> elements inside the viewport playing. The /features hub
+ * carries ~280 autoplay cards; with all of them decoding in software
+ * (--disable-gpu) the renderer starves and Page.captureScreenshot stalls past
+ * 30 s mid-shot (v24 on 2026-11-13 at frame 51, v23 on 2026-11-12) even after
+ * the load/fonts fix. Off-screen videos are paused and stop buffering; the few
+ * on screen keep playing, so the recording looks the same.
+ */
+async function throttleVideos(page) {
+  await page
+    .evaluate(() => {
+      const h = window.innerHeight;
+      for (const v of document.querySelectorAll("video")) {
+        const r = v.getBoundingClientRect();
+        const visible = r.bottom > -h * 0.25 && r.top < h * 1.25;
+        if (visible) {
+          if (v.paused) v.play().catch(() => {});
+        } else if (!v.paused) {
+          v.pause();
+          v.preload = "none";
+        }
+      }
+    })
+    .catch(() => {});
+}
+
 async function recordShot(browser, spec, shot, id) {
   const ctx = await browser.newContext({
     viewport: spec.viewport,
@@ -182,6 +208,7 @@ async function recordShot(browser, spec, shot, id) {
     resp = (await openPage(page, shot)) || resp;
   }
   if (resp && resp.status() >= 400) throw new Error(`[${shot.name}] ${shot.url} answered HTTP ${resp.status()}`);
+  await throttleVideos(page);
   await page.waitForTimeout(800);
   const hide = [...(spec.hide || []), ...(shot.hide || [])];
   await dismissBanners(page, hide);
@@ -190,6 +217,7 @@ async function recordShot(browser, spec, shot, id) {
   await page.evaluate((y) => window.scrollTo(0, y), maxY);
   await page.waitForTimeout(1200);
   await page.evaluate(() => window.scrollTo(0, 0));
+  await throttleVideos(page);
   await page.waitForTimeout(600);
 
   fs.mkdirSync(OUT_DIR, { recursive: true });
@@ -204,6 +232,7 @@ async function recordShot(browser, spec, shot, id) {
     const [y] = track(shot.scroll, f);
     const [mx, my] = track(shot.mouse, f);
     await page.evaluate((yy) => window.scrollTo(0, yy), Math.round(y));
+    await throttleVideos(page);
     await page.mouse.move(mx, my);
     if (clicks.has(f)) {
       // A real click: the page may navigate or open something; give it a beat.
