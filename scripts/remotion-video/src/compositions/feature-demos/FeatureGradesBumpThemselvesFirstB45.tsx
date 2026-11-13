@@ -104,7 +104,7 @@ const Deck: React.FC = () => {
         const tagOn = frame >= B2 + 20 + i * 24 && frame < flipAt;
 
         return (
-          <Arrive key={i} at={B1 + 10 + i * 8} kind="rise" box={{ x: STACK_X[i], y: STACK_Y[i], w: CARD_W, h: CARD_H }}>
+          <Arrive key={i} at={B1 + 6 + i * 6} kind="rise" box={{ x: STACK_X[i], y: STACK_Y[i], w: CARD_W, h: CARD_H }}>
             <div
               style={{
                 position: "absolute",
@@ -342,6 +342,30 @@ const CronFill: React.FC<{ from: number }> = ({ from }) => {
   );
 };
 
+/** b5 only — a non-developer has no cue that the terminal panel IS the before/after
+ *  proof; this names it in plain English above the log window. */
+const ProofFill: React.FC<{ from: number }> = ({ from }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < from) return null;
+  const t = tween(sec(frame, from + 4, 30), 0, 0.3, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 150, top: 46, display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ fontSize: 30 }}>✅</div>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 1.6, color: P.success }}>
+            THE PROOF — IT RAN ON ITS OWN
+          </div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: P.muted, marginTop: 2 }}>
+            Real run, 2026-08-17, 02:00 — nobody touched this
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -353,7 +377,8 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        data={{ kicker: "Boytasks — screen time gated by finishing school tasks", title: "I Forgot To Bump The Grade" }}
+        plate={0.78}
+        data={{ kicker: "Boytasks — my 3 kids' screen time, gated by school tasks", title: "I Forgot To Bump The Grade" }}
       />
 
       {/* b2 — why it matters: wrong content for a year */}
@@ -363,10 +388,10 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.86}
         data={{
-          statement: "children.grade decides the lessons — miss it, a year runs on the wrong content",
-          tags: ["grade 3/5/7", "wrong unit", "wrong band", "wrong bonus"],
+          statement: "One grade field decides the lessons — miss it, a year goes to the wrong content",
+          tags: ["Still grade 3, 5, 7", "Wrong lesson unit", "Wrong difficulty", "Wrong bonus tasks"],
         }}
       />
 
@@ -380,7 +405,7 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.82}
         data={{
           steps: ["Check the date", "Bump every grade", "Log what happened"],
           system: "Nightly cron — runs itself, every night",
@@ -390,21 +415,22 @@ const Inner: React.FC = () => {
       {cut(frame, B4, B5) === 1 && <CronFill from={B4} />}
 
       {/* b5 — the result: all three boys bumped, holds to the end */}
+      {frame >= B5 && <ProofFill from={B5} />}
       {frame >= B5 && (
         <LogWindow
-          title="grade_bump_date worker"
+          title="Boytasks — automatic run, 2026-08-17"
           from={B5}
           every={24}
           opacity={1}
           win={{ x: 150, y: 110, w: 980, h: 480 }}
           fontSize={22}
           lines={[
-            { t: "02:00", text: "grade_bump_date check -> today >= 2026-08-17", tone: "accent" },
-            { t: "02:00", text: "grade_bump: child 1 grade 3 -> 4", tone: "success" },
-            { t: "02:00", text: "grade_bump: child 2 grade 5 -> 6", tone: "success" },
-            { t: "02:00", text: "grade_bump: child 3 grade 7 -> 8", tone: "success" },
-            { t: "02:00", text: "grade_bump_date rolled forward +1 year", tone: "muted" },
-            { t: "02:00", text: "manual steps required: 0", tone: "success" },
+            { t: "02:00", text: "Checking date -> today is Aug 17, 2026", tone: "accent" },
+            { t: "02:00", text: "Child 1: Grade 3 -> Grade 4  done", tone: "success" },
+            { t: "02:00", text: "Child 2: Grade 5 -> Grade 6  done", tone: "success" },
+            { t: "02:00", text: "Child 3: Grade 7 -> Grade 8  done", tone: "success" },
+            { t: "02:00", text: "Next bump saved for Aug 2027", tone: "muted" },
+            { t: "02:00", text: "Manual steps needed: 0", tone: "success" },
           ]}
         />
       )}
