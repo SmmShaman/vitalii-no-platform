@@ -335,7 +335,7 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.62}
+        plate={0.82}
         data={{
           from: "Manual math, after the fact",
           to: "Split pay + break rule, automatic",

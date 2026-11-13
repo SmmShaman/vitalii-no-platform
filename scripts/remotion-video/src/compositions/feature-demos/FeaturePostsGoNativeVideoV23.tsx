@@ -284,7 +284,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.66}
+        plate={0.82}
         data={{
           title: "Then publish — LinkedIn's upload steps",
           claims: [

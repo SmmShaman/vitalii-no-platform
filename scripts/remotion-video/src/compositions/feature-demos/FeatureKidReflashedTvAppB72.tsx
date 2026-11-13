@@ -387,7 +387,7 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.62}
+        plate={0.72}
         data={{
           steps: ["Foreground app checked each cycle", "Matched against the guard list", "Lock screen fires"],
           system: "Python (home PC)",
