@@ -1,0 +1,57 @@
+{
+ "id": "b90",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.241,
+  "b2": 5.022,
+  "b3": 4.979,
+  "b4": 6.508,
+  "b5": 6.317
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Gordiy's app taught him letters by the calendar \u2014 two new ones a week, counting from day one of school.",
+   "start_s": 0.5,
+   "end_s": 6.741,
+   "start_f": 15,
+   "end_f": 202
+  },
+  {
+   "beat": "b2",
+   "text": "But his real classroom started in week forty-two, taught letters in its own order.",
+   "start_s": 7.041,
+   "end_s": 12.063,
+   "start_f": 211,
+   "end_f": 362
+  },
+  {
+   "beat": "b3",
+   "text": "By November, the app was quizzing him on letters his class hadn't even reached yet.",
+   "start_s": 12.363,
+   "end_s": 17.342,
+   "start_f": 371,
+   "end_f": 520
+  },
+  {
+   "beat": "b4",
+   "text": "So a small Cloudflare Workers job reads the class's own weekly plan and publishes the real order instead.",
+   "start_s": 17.642,
+   "end_s": 24.15,
+   "start_f": 529,
+   "end_f": 724
+  },
+  {
+   "beat": "b5",
+   "text": "Gordiy's known-letters list finally matches his class \u2014 closing a gap of about fifteen letters.",
+   "start_s": 24.45,
+   "end_s": 30.767,
+   "start_f": 734,
+   "end_f": 923
+  }
+ ],
+ "total_s": 32.267,
+ "durationInFrames": 968,
+ "measured_track_s": 30.816,
+ "track": "/root/feature-demos/vo-b90/vo-b90.mp3"
+}

@@ -1,0 +1,57 @@
+{
+ "id": "b89",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.681,
+  "b2": 5.628,
+  "b3": 6.859,
+  "b4": 5.026,
+  "b5": 5.777
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A quiz wall and the family calendar told two different stories about the same day.",
+   "start_s": 0.5,
+   "end_s": 5.181,
+   "start_f": 15,
+   "end_f": 155
+  },
+  {
+   "beat": "b2",
+   "text": "The wall just grabbed the next card, never checking what the kid actually had at school tomorrow.",
+   "start_s": 5.481,
+   "end_s": 11.109,
+   "start_f": 164,
+   "end_f": 333
+  },
+  {
+   "beat": "b3",
+   "text": "Now it walks tomorrow's real timetable, child by child, subject by subject, in the class's own order.",
+   "start_s": 11.409,
+   "end_s": 18.268,
+   "start_f": 342,
+   "end_f": 548
+  },
+  {
+   "beat": "b4",
+   "text": "A glowing ring lights the matching day, so the calendar and the wall finally agree.",
+   "start_s": 18.568,
+   "end_s": 23.594,
+   "start_f": 557,
+   "end_f": 708
+  },
+  {
+   "beat": "b5",
+   "text": "A small Cloudflare Workers job now catches up two drifted schedules a night instead of one.",
+   "start_s": 23.894,
+   "end_s": 29.671,
+   "start_f": 717,
+   "end_f": 890
+  }
+ ],
+ "total_s": 31.171,
+ "durationInFrames": 935,
+ "measured_track_s": 29.736,
+ "track": "/root/feature-demos/vo-b89/vo-b89.mp3"
+}

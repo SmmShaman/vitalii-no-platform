@@ -1,0 +1,7 @@
+{"id": "b90", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Gordiy's app taught him letters by the calendar — two new ones a week, counting from day one of school."],
+ ["b2", "But his real classroom started in week forty-two, taught letters in its own order."],
+ ["b3", "By November, the app was quizzing him on letters his class hadn't even reached yet."],
+ ["b4", "So a small Cloudflare Workers job reads the class's own weekly plan and publishes the real order instead."],
+ ["b5", "Gordiy's known-letters list finally matches his class — closing a gap of about fifteen letters."]
+]}

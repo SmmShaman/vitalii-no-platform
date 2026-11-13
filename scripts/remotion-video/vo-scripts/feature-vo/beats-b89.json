@@ -1,0 +1,7 @@
+{"id": "b89", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A quiz wall and the family calendar told two different stories about the same day."],
+ ["b2", "The wall just grabbed the next card, never checking what the kid actually had at school tomorrow."],
+ ["b3", "Now it walks tomorrow's real timetable, child by child, subject by subject, in the class's own order."],
+ ["b4", "A glowing ring lights the matching day, so the calendar and the wall finally agree."],
+ ["b5", "A small Cloudflare Workers job now catches up two drifted schedules a night instead of one."]
+]}
