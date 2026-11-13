@@ -202,7 +202,7 @@ const ProductPlate: React.FC = () => {
 // GitHub URL for this product is verified in shots/g27.json, so per the
 // drawn-schematic fallback this is a small, always-legible, opaque tag naming
 // the real commit and the real migration file instead of a live recording.
-const COMMIT_BOX = { x: 700, y: 46, w: 524, h: 84 };
+const COMMIT_BOX = { x: 660, y: 90, w: 560, h: 110 };
 const CommitEvidence: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
@@ -221,13 +221,13 @@ const CommitEvidence: React.FC = () => {
           border: `2px solid ${P.successEdge}`,
           boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
           boxSizing: "border-box",
-          padding: "10px 18px",
+          padding: "14px 20px",
           fontFamily,
         }}
       >
         <div
           style={{
-            fontSize: 13,
+            fontSize: 14,
             fontWeight: 800,
             letterSpacing: 1.2,
             color: P.success,
@@ -236,11 +236,61 @@ const CommitEvidence: React.FC = () => {
         >
           COMMIT 8228598
         </div>
-        <div style={{ fontSize: 13, color: P.ink, marginTop: 4, lineHeight: 1.3 }}>
+        <div style={{ fontSize: 15, color: P.ink, marginTop: 8, lineHeight: 1.4 }}>
           worker/migrations/0007_web_log.sql — the new Cloudflare database
         </div>
       </div>
     </Arrive>
+  );
+};
+
+// b4 fill: handoffExplain's own "points" list (Sites + resolved IPs / Android
+// included / New Cloudflare database) is authored to sit past the right edge
+// of the 1920-wide motion stage — it never reaches the screen. Same three
+// facts, drawn directly in the composition so they are actually visible,
+// spread across the lower band the mid-frame "before/after" papers leave open.
+const FACT_Y = 592;
+const FACT_W = 300;
+const FACT_H = 96;
+const FACT_GAP = 20;
+const FACTS = ["Sites + resolved IPs", "Android included", "New Cloudflare database"];
+const FactRow: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B4, B5) !== 1) return null;
+  return (
+    <>
+      {FACTS.map((f, i) => {
+        const box = { x: 150 + i * (FACT_W + FACT_GAP), y: FACT_Y, w: FACT_W, h: FACT_H };
+        return (
+          <Arrive key={f} at={B4 + 14 + i * 8} kind="rise" box={box} dur={0.3}>
+            <div
+              style={{
+                position: "absolute",
+                left: box.x,
+                top: box.y,
+                width: box.w,
+                height: box.h,
+                boxSizing: "border-box",
+                padding: "14px 18px",
+                background: P.card,
+                borderRadius: 4,
+                border: `2px solid ${P.successEdge}`,
+                boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+                fontFamily,
+              }}
+            >
+              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1, color: P.success }}>
+                {String(i + 1).padStart(2, "0")}
+              </div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: P.ink, marginTop: 6, lineHeight: 1.25 }}>
+                {f}
+              </div>
+            </div>
+          </Arrive>
+        );
+      })}
+    </>
   );
 };
 
@@ -370,6 +420,7 @@ const Inner: React.FC = () => {
         }}
       />
       <CommitEvidence />
+      <FactRow />
 
       {/* b5 — drawn only: no live backdrop (gate 2). Holds to the end, no fade. */}
       <DevicePicker />
