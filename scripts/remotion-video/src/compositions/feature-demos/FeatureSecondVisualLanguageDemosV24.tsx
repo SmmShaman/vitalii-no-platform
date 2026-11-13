@@ -179,6 +179,112 @@ const LowerThird: React.FC = () => {
   );
 };
 
+/** b3 only — handoffExplain's camera pan leaves a near-black band above and below
+ *  its hero box + points column (both sit roughly mid-screen); name the fix up top
+ *  and bridge the gap above the flow-map lower third. */
+const HandoffFill: React.FC<{ from: number }> = ({ from }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < from) return null;
+  const t = tween(sec(frame, from + 6, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 60, top: 40, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 38 }}>🧭</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>SECOND VISUAL LANGUAGE</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 1040 }}>
+            Every beat now gets a bright, plain-English version — no code required
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 60,
+          top: 538,
+          width: 1160,
+          height: 46,
+          borderRadius: 6,
+          background: P.card,
+          border: `2px solid ${P.accent}`,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          paddingLeft: 20,
+          fontSize: 15,
+          fontWeight: 700,
+          color: P.ink,
+        }}
+      >
+        <span>🔀</span>
+        <span>One feature, two very different looks — same facts, told twice</span>
+      </div>
+    </div>
+  );
+};
+
+/** b4 only — pipelineFlow's own chain sits in a mid-frame band; name the feature in
+ *  the empty top margin and bridge the gap above the flow-map lower third. */
+const PipelineFill: React.FC<{ from: number }> = ({ from }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < from) return null;
+  const t = tween(sec(frame, from + 6, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily, opacity: t }}>
+      <div style={{ position: "absolute", left: 60, top: 40, display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 38 }}>🎙️</div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>ONE FEATURE GETS A VOICE</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 1040 }}>
+            Beats are written, timed against the real voice track, then the picture is synced frame by frame
+          </div>
+        </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          right: 60,
+          top: 40,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "10px 18px",
+          borderRadius: 999,
+          background: P.accentBg,
+          border: `2px solid ${P.accentEdge}`,
+        }}
+      >
+        <span style={{ fontSize: 20 }}>🔊</span>
+        <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.2, color: P.accent }}>FULL NARRATED WALKTHROUGH</span>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 60,
+          top: 538,
+          width: 1160,
+          height: 46,
+          borderRadius: 6,
+          background: P.card,
+          border: `2px solid ${P.accent}`,
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          paddingLeft: 20,
+          fontSize: 15,
+          fontWeight: 700,
+          color: P.ink,
+        }}
+      >
+        <span>✅</span>
+        <span>Silent loop retired — this one speaks for itself</span>
+      </div>
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
@@ -221,6 +327,7 @@ const Inner: React.FC = () => {
           points: ["Problem/solution zones", "Real browser mockups", "Remotion (video code)"],
         }}
       />
+      {cut(frame, B3, B4) === 1 && <HandoffFill from={B3} />}
 
       {/* b4 — giving one feature a voice, over the repo's render runs */}
       {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="actions" from={B4} hold={B5 - B4} />}
@@ -235,6 +342,7 @@ const Inner: React.FC = () => {
           result: "Narrated walkthrough",
         }}
       />
+      {cut(frame, B4, B5) === 1 && <PipelineFill from={B4} />}
 
       {/* b5 — the result, drawn: never the feature page or the hub (gate 2) */}
       {frame >= B5 && (

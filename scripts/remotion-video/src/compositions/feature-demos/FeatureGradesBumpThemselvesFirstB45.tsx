@@ -84,9 +84,14 @@ const Deck: React.FC = () => {
 
   const bumpedCount = CARD_FLIP_AT.filter((at) => frame >= at).length;
 
+  // Not-yet-flipped cards still sit at the overlapping stack x-positions (40/54/68),
+  // which collide with card 0's fan destination (also x=40) — render done cards last
+  // so a flipped card is never hidden behind a still-stacked neighbour.
+  const order = [0, 1, 2].slice().sort((a, b) => Number(frame >= CARD_FLIP_AT[a]) - Number(frame >= CARD_FLIP_AT[b]));
+
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      {[0, 1, 2].map((i) => {
+      {order.map((i) => {
         const flipAt = CARD_FLIP_AT[i];
         const done = frame >= flipAt;
         const flipT = sec(frame, flipAt, fps);
@@ -289,10 +294,27 @@ const CronFill: React.FC<{ from: number }> = ({ from }) => {
         <div style={{ fontSize: 38 }}>🌙</div>
         <div>
           <div style={{ fontSize: 22, fontWeight: 800, letterSpacing: 2, color: P.accent }}>NIGHTLY CRON</div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 820 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: P.muted, marginTop: 4, maxWidth: 1040 }}>
             Runs itself every night — checks today's date, bumps every grade, logs what happened
           </div>
         </div>
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          right: 60,
+          top: 40,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          padding: "10px 18px",
+          borderRadius: 999,
+          background: P.accentBg,
+          border: `2px solid ${P.accentEdge}`,
+        }}
+      >
+        <span style={{ fontSize: 20 }}>🗓️</span>
+        <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.2, color: P.accent }}>EVERY AUGUST, UNATTENDED</span>
       </div>
       <div
         style={{
