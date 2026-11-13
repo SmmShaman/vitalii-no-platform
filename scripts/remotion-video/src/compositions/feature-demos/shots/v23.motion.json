@@ -4,12 +4,12 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "copyCorrection",
+      "effect": "keywordCaption",
       "backdrop": "hub",
       "data": {
-        "wrong": "Post about it? Just a photo.",
-        "right": "Feature already has its own demo clip.",
-        "label": "Actually"
+        "line1": "Every feature already had its own demo clip.",
+        "line2": "The post itself? Just a photo.",
+        "keywords": ["demo clip", "just a photo"]
       },
       "note": "Over the features hub (scrolling past dozens of already-existing clips) — the correction is that the clip existed all along, only the POST never carried it."
     },
@@ -25,22 +25,30 @@
     },
     {
       "beat": "b3",
-      "effect": "pipelineFlow",
+      "effect": "statusFocus",
       "backdrop": "dark",
       "data": {
-        "steps": ["Register the upload", "Push video bytes (≤50MB)", "Poll asset status (5s, up to 120s)"],
-        "result": "Only then does it post"
+        "title": "Then publish — LinkedIn's upload steps",
+        "claims": [
+          { "text": "Register upload", "verdict": "yes" },
+          { "text": "Push video bytes", "verdict": "yes" },
+          { "text": "Poll asset status", "verdict": "yes" }
+        ]
       },
       "note": "No commit/Actions shot in shots/v23.json tonight (RE-SHOOT keeps windows exactly) — drawn on the dark plate."
     },
     {
       "beat": "b4",
-      "effect": "handoffExplain",
+      "effect": "featureMatrix",
       "backdrop": "dark",
       "data": {
-        "from": "Manual upload, by hand",
-        "to": "Supabase function, itself",
-        "points": ["Registers + uploads the clip", "Posts the real video", "No human per post"]
+        "options": ["Manual", "Function"],
+        "rows": [
+          { "label": "Registers + uploads clip", "values": [false, true] },
+          { "label": "Posts real demo video", "values": [false, true] },
+          { "label": "Needs a human, every post", "values": [true, false] },
+          { "label": "Handles the whole upload hand-off", "values": [false, true] }
+        ]
       },
       "note": "Drawn, same reason as b3."
     },

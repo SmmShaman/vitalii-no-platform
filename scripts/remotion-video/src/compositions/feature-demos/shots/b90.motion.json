@@ -4,53 +4,61 @@
  "beats": [
   {
    "beat": "b1",
-   "effect": "none",
-   "backdrop": "page",
-   "data": null,
-   "note": "Boytasks plate over the real feature write-up page; a deck of generic 'Week N: 2 letters' cards flies in and stacks — the calendar assumption."
-  },
-  {
-   "beat": "b2",
    "effect": "timelineNodes",
-   "backdrop": "dark",
+   "backdrop": "hub",
    "data": {
     "nodes": [
-     { "date": "Wk 1", "label": "App's clock starts" },
-     { "date": "Wk 20", "label": "App assumes ~18 letters" },
-     { "date": "Wk 42", "label": "Real class starts letters" },
-     { "date": "Wk 43", "label": "Class's own order begins" }
+     { "date": "Day 1", "label": "School starts" },
+     { "date": "Week 1", "label": "+2 letters" },
+     { "date": "Week 2", "label": "+2 letters" }
     ],
     "activeIndex": 2
    }
   },
   {
-   "beat": "b3",
-   "effect": "statusFocus",
-   "backdrop": "dark",
+   "beat": "b2",
+   "effect": "handoffExplain",
+   "backdrop": "page",
    "data": {
-    "title": "What the app still believed in November",
-    "claims": [
-     { "text": "App assumed 2 new letters every week", "verdict": "no" },
-     { "text": "Real class started letters in week 42", "verdict": "yes" },
-     { "text": "App quizzed letters not yet taught", "verdict": "no" }
-    ]
+    "from": "App: calendar order (wk1)",
+    "to": "Class: own order (wk42)",
+    "points": [
+     "Real class starts week 42",
+     "Taught in the class's own order",
+     "App still followed the calendar"
+    ],
+    "fromLabel": "CALENDAR",
+    "toLabel": "CLASS"
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "keywordCaption",
+   "backdrop": null,
+   "data": {
+    "line1": "Quizzing him on letters his class hasn't reached yet",
+    "line2": "By November",
+    "keywords": ["hasn't", "reached"]
    }
   },
   {
    "beat": "b4",
    "effect": "none",
-   "backdrop": "dark",
+   "backdrop": null,
    "data": null,
-   "note": "LogWindow — refreshSchoolLetters() cron ticking every 15 min, scanning the weekly class-plan text, publishing the ordered list to a settings record."
+   "note": "LogWindow plays the real daily-cron sequence (not a catalog MotionInsert effect — drawn directly via <LogWindow>, same as the reference pattern); holds at full brightness through the beat."
   },
   {
    "beat": "b5",
-   "effect": "percentRing",
-   "backdrop": "dark",
+   "effect": "cardCounter",
+   "backdrop": null,
    "data": {
-    "value": 100,
-    "label": "Matches the real class order",
-    "notes": ["Closed a gap of about 15 letters"]
+    "cards": [
+     { "label": "Before fix", "value": 15 },
+     { "label": "After fix", "value": 0 }
+    ],
+    "unit": "letters",
+    "summary": "Known list now matches the class"
    }
   }
  ]

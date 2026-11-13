@@ -1,11 +1,12 @@
 // FeatureGradesBumpThemselvesFirstB45 — feature b45 — 1280x720, 887 frames @ 30fps, VOICE-SYNCED.
-// archetype 4 flow-map, mood violet. Motion direction v2 (feature-motion skill, 2026-10-07).
-// Fix (2026-11-06, Wave B2 retry): the header previously said archetype 3 card-deck but the
-// draw for this clip is archetype 4 flow-map — rebuilt as a flow-map: a source/product node
-// on the left, three parallel lanes (one per child's grade-bump route) forking off a trunk
-// bus, each lane flipping pending -> done as the fix lands, all three converging through a
-// second bus into a single RESULT node on the right. Beat windows, durationInFrames, and the
-// per-beat narration/effects are unchanged.
+// archetype 3 card-deck, mood violet. Motion direction v2 (feature-motion skill, 2026-10-07).
+// Fix (2026-11-13, Wave B2 retry): the header said archetype 4 but a flow-map (source node +
+// three lanes + merge bus) had been drawn for this clip; rebuilt as a genuine card-deck: three
+// report-card chips (one per child) fly in and stack overlapping at b1, jitter under red
+// "WRONG UNIT" tags at b2-b3, then fan out across the full width at b4 as each card flips
+// pending -> done and punches in the new grade, settling into a sorted row with a final
+// "0 manual steps" callout once all three have bumped. Beat windows, durationInFrames, the
+// palette, and the per-beat narration/effects are unchanged.
 //
 // One editorial effect per sentence, chosen by what changes on screen, over the
 // real Boytasks feature page/hub as evidence where available, one owner of the
@@ -14,28 +15,31 @@
 // Beat → effect (data only from the feature row — no commits exist for b45):
 // b1 15-191   "a week into school, still on last year's grade — I'd forgotten to bump them"
 //             titleTakeover over the feature's own page (backdrop "page"). Names
-//             the product (Boytasks) in the kicker. The source node and its three
-//             parallel lanes (grade 3/5/7, each flagged "pending") arrive together.
+//             the product (Boytasks) in the kicker. The three report cards fly in
+//             and stack, overlapping, each showing last year's grade (3/5/7).
 // b2 191-367  "that number decides their lessons — forget it, a year goes to the wrong content"
 //             cornerTags: the claim + four facts, over the features hub (backdrop "hub").
-//             Each lane gets a red "WRONG UNIT" tag, staggered.
+//             The stacked pile jitters; each card gets a red "WRONG UNIT" tag, staggered.
 // b3 367-509  "like forgetting to set the clocks forward — everything runs on old time"
 //             drawn clock analogy (no catalog effect — a metaphor beat), single
-//             codepoint ⏰, hands sweeping continuously for the whole beat.
+//             codepoint ⏰, hands sweeping continuously for the whole beat. The pile
+//             keeps jittering underneath, still stacked and still wrong.
 // b4 509-675  "now a nightly cron checks the date and bumps every grade automatically"
 //             pipelineFlow (check date → bump grade → log it) over the page's
-//             solution section (backdrop "page2"). Each lane flips pending → done,
-//             staggered, red tags fade, checkmarks punch in with the new grade.
+//             solution section (backdrop "page2"). Each card flips pending → done
+//             and flies out of the pile into its own slot, staggered, punching in
+//             the new grade as the pile fans into a sorted row.
 // b5 675-887  "all three boys jumped a grade the same day it shipped — zero manual steps next year"
 //             drawn LogWindow, 6 real lines from solution_en/result_en, holds to
-//             the end. The merge/result node on the right gets a final "0 manual
-//             steps" stamp as all three lanes converge into it.
+//             the end. The fanned row holds sorted and done; a "0 manual steps"
+//             callout punches in once all three cards have flipped.
 //
-// Persistent element: a flow-map (archetype 4) — a product/source node on the left,
-// three parallel lanes (one per child's grade-bump route) fork off a trunk bus, each
-// lane flips pending -> done as the fix lands, then all three lanes converge through
-// a merge bus into a single RESULT node on the right that lights at b5. Lives at
-// y>=600, uses the full canvas width, visible b1 through b5.
+// Persistent element: a card-deck (archetype 3) — three report-card chips, one per
+// child's grade, fly in and stack overlapping at b1, jitter with "WRONG UNIT" tags
+// through b2-b3, then fan out into a sorted row across the full width at b4 as each
+// flips pending -> done, holding fanned and done through b5. Lives at y>=600 (band
+// extends to y 566 for the final callout), uses the full canvas width, visible b1
+// through b5.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -57,139 +61,96 @@ const ACCENT = "#2563EB";
 const STAGE = "#0F1A2E";
 
 const LT = { x: 40, y: 600, w: 1200, h: 110 };
-const PLATE = { x: 40, y: 600, w: 230, h: 110 };
-const BUS1_X = 290;
-const LANE_X0 = 310;
-const LANE_W = 420;
-const LANE_X1 = LANE_X0 + LANE_W;
-const BUS2_X = 750;
-const MERGE = { x: 770, y: 600, w: 470, h: 110 };
-const LANE_H = 28;
-const LANE_Y = [608, 641, 674];
+const CARD_W = 260;
+const CARD_H = 92;
+const STACK_X = [40, 54, 68];
+const STACK_Y = [609, 613, 617];
+const STACK_ROT = [-3, 2, -1];
+const FAN_X = [40, 510, 980];
+const FAN_Y = 609;
 const GRADE_FROM = [3, 5, 7];
 const GRADE_TO = [4, 6, 8];
-const CELL_FLIP_AT = [B4 + 20, B4 + 54, B4 + 88];
+const CARD_FLIP_AT = [B4 + 20, B4 + 54, B4 + 88];
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-const FlowMap: React.FC = () => {
+/** archetype 3 card-deck: three report-card chips fly in and stack overlapping, jitter
+ *  under "WRONG UNIT" tags, then fan out into a sorted row as each flips pending -> done. */
+const Deck: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B1) return null;
 
-  const bumpedCount = CELL_FLIP_AT.filter((at) => frame >= at).length;
+  const bumpedCount = CARD_FLIP_AT.filter((at) => frame >= at).length;
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      <Arrive at={B1 + 4} kind="wipe" box={PLATE} dur={0.45}>
-        <div
-          style={{
-            position: "absolute",
-            left: PLATE.x,
-            top: PLATE.y,
-            width: PLATE.w,
-            height: PLATE.h,
-            background: P.card,
-            borderRadius: 4,
-            boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
-          }}
-        />
-        <div style={{ position: "absolute", left: PLATE.x + 22, top: PLATE.y + 16, width: 190 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>BOYTASKS</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.2 }}>
-            grade bump
-            <br />
-            3 kids, 1 route each
-          </div>
-        </div>
-      </Arrive>
-
-      {/* trunk bus: plate -> fork */}
-      <div style={{ position: "absolute", left: PLATE.x + PLATE.w, top: LT.y + LT.h / 2 - 1, width: BUS1_X - (PLATE.x + PLATE.w), height: 2, background: P.border }} />
-      <div style={{ position: "absolute", left: BUS1_X - 1, top: LANE_Y[0] + LANE_H / 2, width: 2, height: LANE_Y[2] + LANE_H / 2 - (LANE_Y[0] + LANE_H / 2), background: P.border }} />
-
-      {/* merge bus: join -> result */}
-      <div style={{ position: "absolute", left: BUS2_X - 1, top: LANE_Y[0] + LANE_H / 2, width: 2, height: LANE_Y[2] + LANE_H / 2 - (LANE_Y[0] + LANE_H / 2), background: P.border }} />
-      <div style={{ position: "absolute", left: BUS2_X, top: LT.y + LT.h / 2 - 1, width: MERGE.x - BUS2_X, height: 2, background: P.border }} />
-
       {[0, 1, 2].map((i) => {
-        const y = LANE_Y[i];
-        const midY = y + LANE_H / 2;
-        const flipAt = CELL_FLIP_AT[i];
+        const flipAt = CARD_FLIP_AT[i];
         const done = frame >= flipAt;
         const flipT = sec(frame, flipAt, fps);
+        const fan = done ? tween(flipT, 0, 0.5, ease.power3Out) : 0;
+        const x = mix(fan, STACK_X[i], FAN_X[i]);
+        const y = mix(fan, STACK_Y[i], FAN_Y);
+        const rot = mix(fan, STACK_ROT[i], 0);
         const sc = done ? punchScale(flipT, 0) : 1;
+        const jitter = !done && frame >= B2 && frame < B3 ? Math.sin((frame - B2 + i * 7) / 3) * 1.4 : 0;
         const tagOn = frame >= B2 + 20 + i * 24 && frame < flipAt;
+
         return (
-          <React.Fragment key={i}>
-            <div style={{ position: "absolute", left: BUS1_X, top: midY - 1, width: LANE_X0 - BUS1_X, height: 2, background: P.border }} />
-            <div style={{ position: "absolute", left: LANE_X1, top: midY - 1, width: BUS2_X - LANE_X1, height: 2, background: P.border }} />
-            <Arrive at={B1 + 20 + i * 10} kind="rise" box={{ x: LANE_X0, y, w: LANE_W, h: LANE_H }}>
-              <div
-                style={{
-                  position: "absolute",
-                  left: LANE_X0,
-                  top: y,
-                  width: LANE_W,
-                  height: LANE_H,
-                  borderRadius: 4,
-                  background: done ? P.successBg : P.card,
-                  border: `2px ${done ? "solid" : "dashed"} ${done ? P.successEdge : P.muted}`,
-                  boxSizing: "border-box",
-                  padding: "0 12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  transform: `scale(${sc})`,
-                }}
-              >
-                <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.4, color: P.muted }}>CHILD {i + 1}</span>
-                <span style={{ fontSize: 16, fontWeight: 800, color: done ? P.success : P.ink }}>
-                  {done ? GRADE_TO[i] : GRADE_FROM[i]}
+          <Arrive key={i} at={B1 + 10 + i * 8} kind="rise" box={{ x: STACK_X[i], y: STACK_Y[i], w: CARD_W, h: CARD_H }}>
+            <div
+              style={{
+                position: "absolute",
+                left: x,
+                top: y,
+                width: CARD_W,
+                height: CARD_H,
+                borderRadius: 8,
+                background: done ? P.successBg : P.card,
+                border: `2px ${done ? "solid" : "dashed"} ${done ? P.successEdge : P.muted}`,
+                boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+                boxSizing: "border-box",
+                padding: "12px 18px",
+                transform: `rotate(${rot + jitter}deg) scale(${sc})`,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: 4,
+              }}
+            >
+              <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.6, color: P.muted }}>CHILD {i + 1}</span>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
+                <span style={{ fontSize: 30, fontWeight: 800, color: done ? P.success : P.ink }}>
+                  Grade {done ? GRADE_TO[i] : GRADE_FROM[i]}
                 </span>
-                {!done && <span style={{ fontSize: 11, color: P.muted }}>pending</span>}
-                {done && <span style={{ fontSize: 13, color: P.success }}>✓</span>}
-                {tagOn && <span style={{ fontSize: 11, fontWeight: 800, color: P.danger }}>WRONG UNIT</span>}
+                {done && <span style={{ fontSize: 18, color: P.success }}>✓</span>}
               </div>
-            </Arrive>
-          </React.Fragment>
+              {!done && <span style={{ fontSize: 12, color: P.muted }}>still last year's</span>}
+              {tagOn && <span style={{ fontSize: 11, fontWeight: 800, color: P.danger }}>WRONG UNIT</span>}
+            </div>
+          </Arrive>
         );
       })}
 
-      <Arrive at={B1 + 50} kind="rise" box={MERGE}>
+      {bumpedCount === 3 && (
         <div
           style={{
             position: "absolute",
-            left: MERGE.x,
-            top: MERGE.y,
-            width: MERGE.w,
-            height: MERGE.h,
-            borderRadius: 4,
-            background: P.card,
-            boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+            left: 320,
+            top: 624,
+            width: 170,
+            textAlign: "center",
+            fontSize: 14,
+            fontWeight: 800,
+            color: P.success,
+            transform: `scale(${punchScale(sec(frame, CARD_FLIP_AT[2], fps), 0)})`,
           }}
-        />
-        <div style={{ position: "absolute", left: MERGE.x + 22, top: MERGE.y + 14, width: MERGE.w - 44 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>RESULT</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 2 }}>
-            {bumpedCount}/3 bumped
-          </div>
-          {frame >= B5 + 60 && (
-            <div
-              style={{
-                fontSize: 15,
-                fontWeight: 800,
-                color: P.success,
-                marginTop: 6,
-                transform: `scale(${punchScale(sec(frame, B5 + 60, fps), 0)})`,
-              }}
-            >
-              0 manual steps
-            </div>
-          )}
+        >
+          0 manual steps
         </div>
-      </Arrive>
+      )}
     </div>
   );
 };
@@ -426,7 +387,7 @@ const Inner: React.FC = () => {
         />
       )}
 
-      <FlowMap />
+      <Deck />
     </AbsoluteFill>
   );
 };

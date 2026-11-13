@@ -4,48 +4,53 @@
  "beats": [
   {
    "beat": "b1",
-   "effect": "none",
-   "backdrop": "page",
-   "data": null,
-   "note": "Boytasks plate over the real feature write-up page; flow-map block shows 'Quiz wall' and 'Family calendar' disagreeing on the same day."
+   "effect": "keywordCaption",
+   "backdrop": "hub",
+   "data": {
+    "line1": "A quiz wall and the family calendar",
+    "line2": "told two different stories about the same day",
+    "keywords": ["two different stories"]
+   }
   },
   {
    "beat": "b2",
-   "effect": "cornerTags",
-   "backdrop": "dark",
+   "effect": "pipelineFlow",
+   "backdrop": null,
    "data": {
-    "statement": "Grabs whatever card is next",
-    "tags": ["No class check", "No child link", "No tomorrow check"]
+    "steps": ["Grab next card", "Show kid the card", "Never checks tomorrow"],
+    "result": "Wall vs calendar mismatch",
+    "system": "Old quiz wall logic"
    }
   },
   {
    "beat": "b3",
-   "effect": "pipelineFlow",
-   "backdrop": "dark",
+   "effect": "timelineNodes",
+   "backdrop": null,
    "data": {
-    "steps": ["Pick child, calendar order", "Find tomorrow's class day", "Walk subjects in timetable order"],
-    "result": "Real order, not a random card",
-    "system": "Preview BoardCard + sequence field"
+    "nodes": [
+     { "date": "Тимур", "label": "Matematikk" },
+     { "date": "Артемій", "label": "Norsk" },
+     { "date": "Артемій", "label": "Engelsk" }
+    ],
+    "activeIndex": 1
    }
   },
   {
    "beat": "b4",
-   "effect": "funnelAbsorption",
-   "backdrop": "dark",
+   "effect": "percentRing",
+   "backdrop": "page",
    "data": {
-    "inputs": ["Calendar tile", "Quiz wall's ask", "Tomorrow's real class"],
-    "result": "Calendar and wall finally agree"
+    "value": 100,
+    "label": "Calendar and wall now agree",
+    "notes": ["Same day, same subject"]
    }
   },
   {
    "beat": "b5",
-   "effect": "ratioBars",
-   "backdrop": "dark",
-   "data": {
-    "a": { "label": "Before", "value": 1 },
-    "b": { "label": "Now", "value": 2 },
-    "unit": "a night"
-   }
+   "effect": "none",
+   "backdrop": null,
+   "data": null,
+   "note": "LogWindow plays the real daily-cron sequence (not a catalog MotionInsert effect — drawn directly via <LogWindow>, same as the reference pattern); holds at full brightness to the end."
   }
  ]
 }
