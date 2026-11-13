@@ -1,0 +1,57 @@
+{
+ "id": "b90",
+ "composition": "FeatureLettersFollowHisOwnB90",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "none",
+   "backdrop": "page",
+   "data": null,
+   "note": "Boytasks plate over the real feature write-up page; a deck of generic 'Week N: 2 letters' cards flies in and stacks — the calendar assumption."
+  },
+  {
+   "beat": "b2",
+   "effect": "timelineNodes",
+   "backdrop": "dark",
+   "data": {
+    "nodes": [
+     { "date": "Wk 1", "label": "App's clock starts" },
+     { "date": "Wk 20", "label": "App assumes ~18 letters" },
+     { "date": "Wk 42", "label": "Real class starts letters" },
+     { "date": "Wk 43", "label": "Class's own order begins" }
+    ],
+    "activeIndex": 2
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "statusFocus",
+   "backdrop": "dark",
+   "data": {
+    "title": "What the app still believed in November",
+    "claims": [
+     { "text": "App assumed 2 new letters every week", "verdict": "no" },
+     { "text": "Real class started letters in week 42", "verdict": "yes" },
+     { "text": "App quizzed letters not yet taught", "verdict": "no" }
+    ]
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "none",
+   "backdrop": "dark",
+   "data": null,
+   "note": "LogWindow — refreshSchoolLetters() cron ticking every 15 min, scanning the weekly class-plan text, publishing the ordered list to a settings record."
+  },
+  {
+   "beat": "b5",
+   "effect": "percentRing",
+   "backdrop": "dark",
+   "data": {
+    "value": 100,
+    "label": "Matches the real class order",
+    "notes": ["Closed a gap of about 15 letters"]
+   }
+  }
+ ]
+}

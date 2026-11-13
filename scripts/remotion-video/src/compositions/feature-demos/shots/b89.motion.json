@@ -1,0 +1,51 @@
+{
+ "id": "b89",
+ "composition": "FeatureTvWallWalksThroughB89",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "none",
+   "backdrop": "page",
+   "data": null,
+   "note": "Boytasks plate over the real feature write-up page; flow-map block shows 'Quiz wall' and 'Family calendar' disagreeing on the same day."
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "dark",
+   "data": {
+    "statement": "Grabs whatever card is next",
+    "tags": ["No class check", "No child link", "No tomorrow check"]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "pipelineFlow",
+   "backdrop": "dark",
+   "data": {
+    "steps": ["Pick child, calendar order", "Find tomorrow's class day", "Walk subjects in timetable order"],
+    "result": "Real order, not a random card",
+    "system": "Preview BoardCard + sequence field"
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "funnelAbsorption",
+   "backdrop": "dark",
+   "data": {
+    "inputs": ["Calendar tile", "Quiz wall's ask", "Tomorrow's real class"],
+    "result": "Calendar and wall finally agree"
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "ratioBars",
+   "backdrop": "dark",
+   "data": {
+    "a": { "label": "Before", "value": 1 },
+    "b": { "label": "Now", "value": 2 },
+    "unit": "a night"
+   }
+  }
+ ]
+}

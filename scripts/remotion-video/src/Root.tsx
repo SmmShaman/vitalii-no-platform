@@ -2377,6 +2377,8 @@ export const RemotionRoot: React.FC = () => {
         height={720}
       />
 
+
+
       <Composition
         id="FeatureSchoolLettersComeAsB83"
         component={FeatureSchoolLettersComeAsB83}

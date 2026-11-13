@@ -1,5 +1,8 @@
 // FeatureFamilyDnsGuardKeepsG27 — feature g27 — 1280x720, 902 frames @ 30fps, VOICE-SYNCED.
-// archetype 1 timeline ribbon, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 0 split-duel, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// WAVE B2 FIX (2026-11-13): the header said archetype 1 but a timeline ribbon was drawn —
+// rebuilt the persistent element as archetype 0 split-duel. Beat windows, durationInFrames,
+// the dawn palette and every beat's narration/data are unchanged.
 //
 // Verified URLs only: the feature's own page and the features hub — recorded as
 // four shots (two scroll depths on each) and used as LiveBackdrop evidence for
@@ -25,9 +28,14 @@
 //             Android subdomain, the Today/Yesterday toggle, the cleanup job and
 //             the cache bump. Holds to the end, no fade.
 //
-// Persistent element: the timeline ribbon (archetype 1) lower third, b1-b5 — a
-// product plate at left, five stamps landing left-to-right as the story moves
-// from "filtered blind" (red) to "logged per device" (green).
+// Persistent element (archetype 0): a vertical divider splits the whole frame
+// for the entire clip — a tinted "filtered, not logged" half (chaos, red) on
+// the left, a tinted "per-device log" half (order, green) on the right, each
+// carrying its own small in-half label, never a centered headline. Both
+// halves are tinted at once for every beat; the divider slides left beat by
+// beat as the fix takes over, until the logged half owns almost the whole
+// frame. Deleting the divider would delete the one idea that survives all
+// five pictures: filtering blind vs. a per-device log.
 
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
@@ -35,6 +43,7 @@ import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow } from "./live-primitives";
+import { tween, ease, mix } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/g27.json";
 
 const B1 = 15;
@@ -47,106 +56,101 @@ const END = 902;
 const ACCENT = "#2563EB";
 const STAGE = "#101722";
 
-// Lower third geometry (1280×720, below the effects' safe bottom at y≈587).
-const LT = { x: 40, y: 606, w: 1200, h: 92 };
-const LINE_Y = LT.y + 50;
-const LINE_START = LT.x + 236;
-const LINE_END = LT.x + LT.w - 20;
-const STAMP_W = 150;
-
-type Tone = "danger" | "success";
-const STAMPS: { at: number; label: string; tone: Tone }[] = [
-  { at: B1 + 20, label: "FILTERED,\nNOT LOGGED", tone: "danger" },
-  { at: B2 + 20, label: "NO RECORD\nOF VISITS", tone: "danger" },
-  { at: B3 + 20, label: "ANDROID\nBLIND SPOT", tone: "danger" },
-  { at: B4 + 20, label: "PER-DEVICE\nLOG", tone: "success" },
-  { at: B5 + 20, label: "2-DAY\nLOOKUP", tone: "success" },
-];
-const STAMP_GAP = (LINE_END - LINE_START - STAMP_W) / (STAMPS.length - 1);
-
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-const Ribbon: React.FC = () => {
+// Divider holds one x per beat, sliding there over 0.45s at the start of that beat.
+const STOPS: { at: number; x: number }[] = [
+  { at: B1, x: 980 },
+  { at: B2, x: 760 },
+  { at: B3, x: 540 },
+  { at: B4, x: 320 },
+  { at: B5, x: 140 },
+];
+
+const dividerX = (frame: number, fps: number) => {
+  if (frame < B1) return STOPS[0].x;
+  let idx = 0;
+  for (let i = 0; i < STOPS.length; i++) if (frame >= STOPS[i].at) idx = i;
+  const cur = STOPS[idx];
+  const prev = idx > 0 ? STOPS[idx - 1].x : cur.x;
+  const p = tween(sec(frame, cur.at, fps), 0, 0.45, ease.power3Out);
+  return mix(p, prev, cur.x);
+};
+
+type HalfLabel = { left: string; right: string };
+const LABELS: { at: number; label: HalfLabel }[] = [
+  { at: B1, label: { left: "FILTERED, NOT LOGGED", right: "no visit history yet" } },
+  { at: B2, label: { left: "NO RECORD OF VISITS", right: "building the log..." } },
+  { at: B3, label: { left: "ANDROID BLIND SPOT", right: "DNS requests escape the filter" } },
+  { at: B4, label: { left: "old path (blind)", right: "PER-DEVICE LOG, LIVE" } },
+  { at: B5, label: { left: "", right: "2-DAY LOOKUP, PER DEVICE" } },
+];
+
+/** Persistent archetype 0 spine: a sliding vertical divider, tinted halves, in-half labels. */
+const SplitDuel: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B1) return null;
 
-  const progress = Math.max(0, Math.min(1, (frame - B1) / (END - B1)));
-  const lineW = (LINE_END - LINE_START) * progress;
+  const x = dividerX(frame, fps);
+  let cur = LABELS[0].label;
+  for (const l of LABELS) if (frame >= l.at) cur = l.label;
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      <Arrive at={B1 + 4} kind="wipe" box={LT} dur={0.45}>
+      <div style={{ position: "absolute", left: 0, top: 0, width: x, height: 720, background: P.danger, opacity: 0.16 }} />
+      <div style={{ position: "absolute", left: x, top: 0, width: 1280 - x, height: 720, background: P.success, opacity: 0.14 }} />
+      <div
+        style={{
+          position: "absolute",
+          left: x - 2,
+          top: 0,
+          width: 4,
+          height: 720,
+          background: P.accent,
+          boxShadow: `0 0 22px 4px ${P.accent}`,
+        }}
+      />
+      {cur.left && (
         <div
           style={{
             position: "absolute",
-            left: LT.x,
-            top: LT.y,
-            width: LT.w,
-            height: LT.h,
-            background: P.card,
+            left: 24,
+            top: 24,
+            padding: "8px 14px",
             borderRadius: 4,
-            boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
+            background: P.card,
+            border: `2px solid ${P.dangerEdge}`,
+            fontSize: 14,
+            fontWeight: 800,
+            color: P.danger,
+            letterSpacing: 0.4,
           }}
-        />
-        <div style={{ position: "absolute", left: LT.x + 22, top: LT.y + 16, width: 196 }}>
-          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2.4, color: P.accent }}>GUARD</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.2 }}>
-            Family Network
-            <br />
-            Guard
-          </div>
+        >
+          {cur.left}
         </div>
-        {/* ribbon track + filled progress */}
-        <div style={{ position: "absolute", left: LINE_START, top: LINE_Y - 1, width: LINE_END - LINE_START, height: 2, background: P.border }} />
-        <div style={{ position: "absolute", left: LINE_START, top: LINE_Y - 1, width: lineW, height: 2, background: P.ink }} />
-      </Arrive>
-
-      {STAMPS.map((s, i) => {
-        if (frame < s.at) return null;
-        const sx = LINE_START + i * STAMP_GAP;
-        const t = sec(frame, s.at, fps);
-        const bg = s.tone === "danger" ? P.dangerBg : P.successBg;
-        const edge = s.tone === "danger" ? P.dangerEdge : P.successEdge;
-        const ink = s.tone === "danger" ? P.danger : P.success;
-        return (
-          <Arrive key={s.label} at={s.at} kind="punch" box={{ x: sx, y: LT.y + 14, w: STAMP_W, h: 64 }}>
-            <div
-              style={{
-                position: "absolute",
-                left: sx,
-                top: LT.y + 14,
-                width: STAMP_W,
-                height: 64,
-                background: bg,
-                border: `2px solid ${edge}`,
-                borderRadius: 4,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "0 10px",
-                boxSizing: "border-box",
-              }}
-            >
-              <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1, color: ink, whiteSpace: "pre-line", textAlign: "center", lineHeight: 1.25 }}>
-                {s.label}
-              </div>
-            </div>
-            <div
-              style={{
-                position: "absolute",
-                left: sx + STAMP_W / 2 - 5,
-                top: LINE_Y - 5,
-                width: 10,
-                height: 10,
-                borderRadius: 5,
-                background: ink,
-              }}
-            />
-          </Arrive>
-        );
-      })}
+      )}
+      {cur.right && (
+        <div
+          style={{
+            position: "absolute",
+            right: 24,
+            top: 24,
+            padding: "8px 14px",
+            borderRadius: 4,
+            background: P.card,
+            border: `2px solid ${P.successEdge}`,
+            fontSize: 14,
+            fontWeight: 800,
+            color: P.success,
+            letterSpacing: 0.4,
+            textAlign: "right",
+          }}
+        >
+          {cur.right}
+        </div>
+      )}
     </div>
   );
 };
@@ -386,7 +390,7 @@ const Inner: React.FC = () => {
         ]}
       />
 
-      <Ribbon />
+      <SplitDuel />
     </AbsoluteFill>
   );
 };
