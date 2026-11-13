@@ -328,14 +328,13 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b4 — the payoff, over the "how it works" section that describes the split */}
-      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B4} hold={B5 - B4} />}
+      {/* b4 — the payoff, drawn only */}
       <MotionInsert
         effect="handoffExplain"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.82}
+        plate={0.78}
         data={{
           from: "Manual math, after the fact",
           to: "Split pay + break rule, automatic",
