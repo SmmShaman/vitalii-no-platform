@@ -67,6 +67,84 @@ const CornerFact: React.FC<{ value: string; label: string; corner: "tl" | "tr"; 
   );
 };
 
+const PLATE_BOX = { x: 40, y: 28, w: 520, h: 40 };
+const ProductPlate: React.FC = () => {
+  const frame = useCurrentFrame();
+  if (frame < B1 || frame >= B2) return null;
+  return (
+    <Arrive at={B1 + 2} kind="wipe" box={PLATE_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: PLATE_BOX.x,
+          top: PLATE_BOX.y,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "9px 18px",
+          borderRadius: 999,
+          background: "rgba(10,20,16,0.88)",
+          border: `1.5px solid ${ACCENT}`,
+          color: "#E8FAF0",
+          fontSize: 17,
+          fontWeight: 700,
+          letterSpacing: 0.2,
+          fontFamily,
+          whiteSpace: "nowrap",
+        }}
+      >
+        <span style={{ color: ACCENT, fontWeight: 800 }}>Elvarika</span>
+        <span style={{ opacity: 0.88 }}>— your text becomes a language lesson</span>
+      </div>
+    </Arrive>
+  );
+};
+
+/** Real-commit proof: the handoff effect's camera pan crops the old card mid-slide
+ *  (shared-effect behavior, not editable here), so b3 also carries a static, fully
+ *  legible card naming the actual commit and file the migration landed in. */
+const COMMIT_BOX = { x: 290, y: 530, w: 700, h: 64 };
+const CommitEvidence: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B3 + 40 || frame >= B4) return null;
+  return (
+    <Arrive at={B3 + 40} kind="wipe" box={COMMIT_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: COMMIT_BOX.x,
+          top: COMMIT_BOX.y,
+          width: COMMIT_BOX.w,
+          height: COMMIT_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          border: `2px solid ${ACCENT}`,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          boxSizing: "border-box",
+          padding: "10px 20px",
+          fontFamily,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 800,
+            letterSpacing: 1.2,
+            color: ACCENT,
+            fontFamily: '"JetBrains Mono", Menlo, Consolas, monospace',
+          }}
+        >
+          COMMIT df853f3
+        </div>
+        <div style={{ fontSize: 15, color: P.ink, marginTop: 6, lineHeight: 1.35 }}>
+          supabase/migrations/20261110120000_backend_v2.sql — the PostgreSQL migration itself
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 const LowerThird: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -216,8 +294,10 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
+        plate={0.82}
         data={{ line1: "Credits topped up by hand.", line2: "Stuck jobs ran forever.", keywords: ["by hand", "forever"] }}
       />
+      <ProductPlate />
 
       {/* b2 — three open write-holes, over the hub */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
@@ -226,7 +306,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.84}
         data={{
           statement: "Three doors left wide open",
           tags: ["Self-granted credits", "Writable shared cache", "Public profile reads"],
@@ -240,7 +320,7 @@ const Inner: React.FC = () => {
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.72}
+        plate={0.84}
         data={{
           from: "Open writes, no job limit",
           to: "Closed writes, 30-min limit",
@@ -251,6 +331,7 @@ const Inner: React.FC = () => {
       />
       <CornerFact value="30m" label="JOB TIMEOUT, NOT FOREVER" corner="tl" from={B3} to={B4} />
       <CornerFact value="3" label="WRITE HOLES SEALED" corner="tr" from={B3} to={B4} />
+      <CommitEvidence />
 
       {/* b4 — the result: the watchdog and the refill firing, holds to the end */}
       {frame >= B4 && (
@@ -259,7 +340,7 @@ const Inner: React.FC = () => {
           from={B4 + 10}
           every={16}
           opacity={seg(frame, B4, B4 + 20)}
-          win={{ x: 60, y: 80, w: 1160, h: 510 }}
+          win={{ x: 60, y: 80, w: 1160, h: 470 }}
           fontSize={22}
           lines={[
             { t: "02:14", text: "job a91f stuck 32m → killed", tone: "danger" },
@@ -271,6 +352,25 @@ const Inner: React.FC = () => {
             { t: "00:41", text: "3 open write paths → closed", tone: "success" },
           ]}
         />
+      )}
+      {frame >= B4 + 140 && (
+        <div
+          style={{
+            position: "absolute",
+            left: 60,
+            top: 556,
+            width: 1160,
+            textAlign: "center",
+            opacity: seg(frame, B4 + 140, B4 + 160),
+            fontFamily,
+            fontSize: 17,
+            fontWeight: 600,
+            color: "#CFEFE0",
+          }}
+        >
+          <span style={{ color: ACCENT, fontWeight: 800 }}>watchdog</span> = the timer that kills a stuck job · the
+          blocked writes are the <span style={{ color: ACCENT, fontWeight: 800 }}>3 doors</span> from Beat 2, now shut
+        </div>
       )}
 
       <LowerThird />
