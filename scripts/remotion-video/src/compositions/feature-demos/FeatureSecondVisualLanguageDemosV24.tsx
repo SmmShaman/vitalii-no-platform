@@ -176,6 +176,28 @@ const Ledger: React.FC = () => {
   );
 };
 
+/** b1 only — names the actual product behind this whole clip (WAVE D1 fix,
+ *  2026-11-14): a blind viewer could not tell what business/software this is,
+ *  since every other beat is about the demo-video pipeline itself, not the
+ *  product it renders demos for. Bottom-left, clear of the ledger column. */
+const ProductPlate: React.FC<{ from: number }> = ({ from }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < from) return null;
+  const t = tween(sec(frame, from, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 40, top: 636, display: "flex", alignItems: "center", gap: 16, fontFamily, opacity: t }}>
+      <div style={{ fontSize: 34 }}>📰</div>
+      <div>
+        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 1, color: "#fff" }}>vitalii.no</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: P.muted, marginTop: 2, maxWidth: 760 }}>
+          News site + pipeline that writes and narrates its own feature videos
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /** b3 only — handoffExplain's camera pan leaves a near-black band above and below
  *  its hero box + points column (both sit roughly mid-screen); name the fix up top
  *  so the ledger column on the right stays the only thing anchored at the bottom. */
@@ -252,6 +274,7 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{ title: "Only for people who code", kicker: "Every feature demo, until now" }}
       />
+      {cut(frame, B1, B2) === 1 && <ProductPlate from={B1 + 30} />}
 
       {/* b2 — the cost of the old style, over the hub roster */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
@@ -293,6 +316,10 @@ const Inner: React.FC = () => {
         data={{
           steps: ["Write voice beats", "Measure durations", "Sync picture to words"],
           result: "Narrated walkthrough",
+          // WAVE D1 fix (2026-11-14): pipelineFlow falls back to a hard-coded
+          // Norwegian title ("Prosessen") when data.system is omitted, which a
+          // blind viewer flagged as an unexplained foreign word. Set explicitly.
+          system: "The Process",
         }}
       />
       {cut(frame, B4, B5) === 1 && <PipelineFill from={B4} />}
