@@ -1,0 +1,7 @@
+{
+  "id": "b91",
+  "file": "yt-feature-b91.mp4",
+  "title": "Hand-Written Scenes Become Scripts: 3 Types Became 8 | vitalii.no",
+  "description": "Every new teaching scenario for my kids' TV wall used to mean me hand-coding a new React component — one file per exercise type, with no way to check whether the animation actually matched the lesson before it reached the kids.\n\nNow a lesson is authored as a script instead of code: a short description with five timed beats, put together automatically by an AI session running in the background. That script is checked twice — once before the wall accepts it, once again on the screen itself — before a child ever sees it.\n\nHand-coded exercise types went from three to eight in a single week, and the newest five needed zero new code written by hand.\n\n🔗 Full write-up: https://vitalii.no/features/a-headless-claude-now-directs-the-tv-walls-teaching-scenes-not-hand-written-code-b91\n📚 All 380 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#aiautomation #react #typescript #edtech #vitaliino",
+  "tags": ["ai automation", "react", "typescript", "cloudflare workers", "supabase", "edtech", "scripted ui", "validation pipeline", "home automation", "kiosk display", "parenting tech", "vitalii berbeha"]
+}

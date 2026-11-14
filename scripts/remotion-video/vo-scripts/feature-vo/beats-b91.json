@@ -1,0 +1,6 @@
+{"id": "b91", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every new lesson on my kids' TV wall meant me hand-coding a new React screen — and no way to check it matched the lesson before they saw it."],
+  ["b2", "Now each lesson is written as a script — a set of timed steps an AI puts together on its own."],
+  ["b3", "Every script gets checked twice, once before the wall shows it and once again on the screen itself."],
+  ["b4", "In a single week, hand-coded lesson types went from three to eight."]
+]}

@@ -1,0 +1,7 @@
+{
+  "id": "b92",
+  "file": "yt-feature-b92.mp4",
+  "title": "A Bright Skin Ships Without Touching 430 Existing Cards | vitalii.no",
+  "description": "Every card and scene on my kids' TV wall drew the same way — dark background, thin lines, small type. There was no way to try a punchier, more saturated look for the kids without risking a silent regression across the 430 cards and 9 scenes that already worked.\n\nI built a second React renderer that runs side by side with the original instead of replacing it — saturated colors, chunky tiles, a self-hosted variable font. The nine teaching scenes get the same treatment through a shared skin setting, so the code, timing and movement stay identical and only the look changes. One setting switches the whole wall bright, or just one child's.\n\nBefore any of it shipped, all 430 existing cards and every scene were checked pixel for pixel against the original — identical, every one.\n\n🔗 Full write-up: https://vitalii.no/features/the-tv-wall-gets-an-opt-in-bright-skin-without-touching-a-single-byte-of-the-ori-b92\n📚 All 380 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#react #uidesign #typescript #edtech #vitaliino",
+  "tags": ["react", "ui design", "typescript", "cloudflare workers", "supabase", "variable fonts", "regression testing", "home automation", "kiosk display", "edtech", "design systems", "vitalii berbeha"]
+}

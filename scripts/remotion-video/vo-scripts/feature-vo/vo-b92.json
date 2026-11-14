@@ -1,0 +1,48 @@
+{
+ "id": "b92",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.367,
+  "b2": 5.941,
+  "b3": 7.1,
+  "b4": 6.888
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every card and scene on my kids' TV wall looked the same \u2014 dark, thin lines, tiny type, with no safe way to try something brighter.",
+   "start_s": 0.5,
+   "end_s": 8.867,
+   "start_f": 15,
+   "end_f": 266
+  },
+  {
+   "beat": "b2",
+   "text": "So I built a second React renderer that runs side by side with the original, instead of replacing it.",
+   "start_s": 9.167,
+   "end_s": 15.108,
+   "start_f": 275,
+   "end_f": 453
+  },
+  {
+   "beat": "b3",
+   "text": "One switch flips the whole wall bright, or just one child's \u2014 same lessons, same timing, different skin.",
+   "start_s": 15.408,
+   "end_s": 22.508,
+   "start_f": 462,
+   "end_f": 675
+  },
+  {
+   "beat": "b4",
+   "text": "Before shipping it, I checked every existing card against the original, pixel for pixel: all 430.",
+   "start_s": 22.808,
+   "end_s": 29.696,
+   "start_f": 684,
+   "end_f": 891
+  }
+ ],
+ "total_s": 31.196,
+ "durationInFrames": 936,
+ "measured_track_s": 29.76,
+ "track": "/root/feature-demos/vo-b92/vo-b92.mp3"
+}

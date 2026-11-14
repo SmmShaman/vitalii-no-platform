@@ -1,0 +1,6 @@
+{"id": "b92", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every card and scene on my kids' TV wall looked the same — dark, thin lines, tiny type, with no safe way to try something brighter."],
+  ["b2", "So I built a second React renderer that runs side by side with the original, instead of replacing it."],
+  ["b3", "One switch flips the whole wall bright, or just one child's — same lessons, same timing, different skin."],
+  ["b4", "Before shipping it, I checked every existing card against the original, pixel for pixel: all 430."]
+]}
