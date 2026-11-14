@@ -181,7 +181,7 @@ const Inner: React.FC = () => {
           to: "Checked twice, every time",
           fromLabel: "BEFORE",
           toLabel: "NOW",
-          points: ["Before the wall accepts it", "Again on the screen itself"],
+          points: ["AI assembles beats into a scene", "Before the wall accepts it", "Again on the screen itself"],
         }}
       />
 
@@ -193,8 +193,8 @@ const Inner: React.FC = () => {
           from={B4 + 46}
           every={22}
           opacity={1}
-          win={{ x: 340, y: 240, w: 600, h: 330 }}
-          fontSize={20}
+          win={{ x: 190, y: 240, w: 900, h: 350 }}
+          fontSize={22}
         />
       )}
       <HeroCount />
