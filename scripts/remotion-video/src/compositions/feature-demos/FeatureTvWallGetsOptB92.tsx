@@ -32,6 +32,7 @@ import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { fontFamily, StatPill } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, cut } from "./motion-primitives";
 import { LogWindow } from "./live-primitives";
+import { tween, ease } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/b92.json";
 
 const B1 = 15;
@@ -39,6 +40,8 @@ const B2 = 275;
 const B3 = 462;
 const B4 = 684;
 const END = 936;
+
+const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
 /** Tuned lighter than dawn's #2563EB accent so it still reads on the dark plate. */
 const ACCENT = "#5B9DFF";
@@ -127,6 +130,71 @@ const LOG_LINES = [
   { t: "06", text: "board_skin -> per child: OK", tone: "ink" as const },
 ];
 
+/** b1 only — names the actual product behind this whole clip (WAVE D1 fix,
+ *  2026-11-14): a blind viewer could not tell what app this "TV wall" belongs
+ *  to. Bottom-left, clear of the cornerTags above and the hero "1" at cx=175. */
+const ProductPlate: React.FC<{ from: number }> = ({ from }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < from) return null;
+  const t = tween(sec(frame, from, 30), 0, 0.35, ease.power3Out);
+  return (
+    <div style={{ position: "absolute", left: 420, top: 636, display: "flex", alignItems: "center", gap: 16, fontFamily, opacity: t }}>
+      <div style={{ fontSize: 34 }}>📺</div>
+      <div>
+        <div style={{ fontSize: 20, fontWeight: 800, letterSpacing: 1, color: "#fff" }}>Boytasks</div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: P.muted, marginTop: 2, maxWidth: 700 }}>
+          Screen-time &amp; task system for three kids — the TV wall they unlock by finishing tasks
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/** b2 only — the viewer could not see a second renderer, only a caption
+ *  claiming one; draws it with the feature's own real component name
+ *  (BoardCardBright, already named on the feature's own live page) so the
+ *  claim has evidence beyond the caption, and glosses "React" in passing. */
+const RendererSchematic: React.FC<{ from: number }> = ({ from }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < from) return null;
+  const t = tween(sec(frame, from + 6, 30), 0, 0.35, ease.power3Out);
+  const boxStyle: React.CSSProperties = {
+    width: 260,
+    height: 84,
+    borderRadius: 10,
+    background: P.card,
+    border: `2px solid ${P.border}`,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    fontFamily,
+  };
+  return (
+    <div style={{ position: "absolute", left: 60, top: 76, width: 760, fontFamily, opacity: t }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+        <div style={boxStyle}>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: P.muted }}>ORIGINAL RENDERER</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: P.ink, marginTop: 4 }}>Dark skin only</div>
+        </div>
+        <div style={{ textAlign: "center", width: 80 }}>
+          <div style={{ fontSize: 26, color: P.accent }}>→</div>
+          <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.5, color: P.muted }}>SAME DATA</div>
+        </div>
+        <div style={{ ...boxStyle, border: `2px solid ${P.accentEdge}`, background: P.accentBg }}>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1, color: P.accent }}>NEW RENDERER</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: P.ink, marginTop: 4 }}>BoardCardBright</div>
+        </div>
+      </div>
+      <div style={{ marginTop: 10, fontSize: 14, fontWeight: 600, color: P.muted, maxWidth: 700 }}>
+        Two React components draw the same card data — one dark, one bright.
+      </div>
+    </div>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
 
@@ -144,6 +212,7 @@ const Inner: React.FC = () => {
           tags: ["Dark background", "Thin lines", "Tiny type", "No safe way to test"],
         }}
       />
+      {cut(frame, B1, B2) === 1 && <ProductPlate from={B1 + 30} />}
 
       {/* b2 — the fix (a second renderer, not a replacement), over the hub's own card grid */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
@@ -160,6 +229,7 @@ const Inner: React.FC = () => {
           <StatPill x={0} y={0} emoji="⚙️" text="React" tone="accent" fontSize={16} />
         </div>
       )}
+      {cut(frame, B2, B3) === 1 && <RendererSchematic from={B2} />}
 
       {/* b3 — the switch (whole wall or one child), scrolled further down the same page */}
       {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B3} hold={B4 - B3} />}
@@ -186,7 +256,12 @@ const Inner: React.FC = () => {
           from={B4 + 10}
           every={28}
           opacity={1}
-          win={{ x: 470, y: 90, w: 760, h: 560 }}
+          // Repositioned (WAVE D1 fix, 2026-11-14): the hero "430" settles at
+          // cx=640/cy=170 with an 840x360 box (y: -10 to 350) — the window
+          // used to start at y=90 and sat directly under the digit, leaving
+          // line 04 dim/overlapped. Moved below the digit's settled footprint
+          // so every line is clear once the number lands.
+          win={{ x: 290, y: 360, w: 700, h: 345 }}
           fontSize={22}
         />
       )}
