@@ -16,6 +16,20 @@
       "frames": 109,
       "scroll": [[0, 0], [108, 620]],
       "mouse": [[0, 560, 220], [55, 560, 260], [108, 560, 300]]
+    },
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commits",
+      "frames": 202,
+      "scroll": [[0, 0], [100, 900], [201, 1900]],
+      "mouse": [[0, 400, 160], [60, 700, 260], [130, 460, 340], [201, 650, 280]]
+    },
+    {
+      "name": "actions",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/actions",
+      "frames": 162,
+      "scroll": [[0, 0], [80, 700], [161, 1400]],
+      "mouse": [[0, 380, 180], [70, 640, 260], [161, 520, 300]]
     }
   ]
 }

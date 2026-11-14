@@ -4,12 +4,12 @@
   "beats": [
     {
       "beat": "b1",
-      "effect": "keywordCaption",
+      "effect": "copyCorrection",
       "backdrop": "hub",
       "data": {
-        "line1": "Every feature already had its own demo clip.",
-        "line2": "The post itself? Just a photo.",
-        "keywords": ["demo clip", "just a photo"]
+        "wrong": "Post: just a photo",
+        "right": "Clip already existed",
+        "label": "EVERY FEATURE"
       }
     },
     {
@@ -24,7 +24,7 @@
     {
       "beat": "b3",
       "effect": "statusFocus",
-      "backdrop": null,
+      "backdrop": "commits",
       "data": {
         "title": "Then publish — LinkedIn's upload steps",
         "claims": [
@@ -37,7 +37,7 @@
     {
       "beat": "b4",
       "effect": "featureMatrix",
-      "backdrop": null,
+      "backdrop": "actions",
       "data": {
         "options": ["Manual", "Function"],
         "rows": [

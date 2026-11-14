@@ -1,5 +1,9 @@
 // FeatureSecondVisualLanguageDemosV24 — feature v24 — 1280x720, 990 frames @ 30fps, VOICE-SYNCED.
-// archetype 4 flow-map, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// archetype 5 ledger, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+// WAVE B2 FIX (2026-11-14): the host found the header claimed archetype 4 (flow-map)
+// while the brief assigned this clip archetype 5 (ledger); the persistent element below
+// is rebuilt as a dominant receipt-style ledger column, not a flow-map — beat windows,
+// duration, palette and narration are all untouched.
 //
 // Voice-synced beat table (narration windows, do not shift):
 //  b1  15-192  "Every feature demo looked the same: dark, dense, built for people who already read code."
@@ -13,13 +17,15 @@
 //  b2 keywordCaption over the features hub (backdrop "hub") — scrolling the old roster.
 //  b3 handoffExplain over the repo's commit history (backdrop "commits") — dark style -> bright style.
 //  b4 pipelineFlow over the repo's Actions runs (backdrop "actions") — write beats, measure, sync.
-//  b5 drawn: the flow-map fork resolves + a LogWindow result panel built from the feature's own
+//  b5 drawn: the ledger's total row flips + a LogWindow result panel built from the feature's own
 //     numbers (2 visual languages instead of 1, first 54-second narrated walkthrough). Never the
 //     feature page or the hub (gate 2).
 //
-// Persistent element: the flow-map lower third (archetype 4) — one token travels from a single
-// source node to a fork, then forks into two routes: "BRIGHT V2 STYLE" lights at b3, "NARRATED
-// STORY CUT" lights at b4 and carries the "54 s" result badge from b5.
+// Persistent element: a ledger column (archetype 5) — the biggest, most central,
+// longest-lived thing on screen. Three line-item rows ("VISUAL STYLE", "AUDIENCE",
+// "NARRATION") each carry a red debit entry that gets struck through and replaced by
+// a green credit entry as the clip proves that beat's claim, plus a bottom total row
+// that flips at the b5 result ("1 style" -> "2 styles + narrated (54 s)").
 // Single tech name in the whole clip: Remotion (b3 handoffExplain point only).
 
 import React from "react";
@@ -28,7 +34,7 @@ import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { Headline, fontFamily } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow } from "./live-primitives";
-import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
+import { tween, ease } from "../../components/effects/motion/grammar";
 import shotsFile from "./shots/v24.json";
 
 const B1 = 15;
@@ -41,147 +47,138 @@ const END = 990;
 const ACCENT = "#5B9DFF";
 const STAGE = "#161B22";
 
-const LT = { x: 40, y: 600, w: 1200, h: 106 };
-const SRC = { x: LT.x + 10, y: LT.y + 10, w: 180, h: 86 };
-const FORK_X = SRC.x + SRC.w + 56;
-const NODE_W = 300;
-const NODE_X = FORK_X + 70;
-const TOP_Y = LT.y + 8;
-const BOT_Y = LT.y + 60;
+const LEDGER = { x: 860, y: 90, w: 360, h: 560 };
+const ROW_TOP0 = LEDGER.y + 70;
+const ROW_H = 110;
+const TOTAL_TOP = ROW_TOP0 + 3 * ROW_H + 20;
+const TOTAL_FLIP = B5 + 40;
+
+type LedgerRowData = { label: string; debit: string; credit: string; appearAt: number; flipAt: number; top: number };
+
+const ROWS: LedgerRowData[] = [
+  { label: "VISUAL STYLE", debit: "Dark, code-only", credit: "Bright, plain-English", appearAt: B1 + 16, flipAt: B3 + 10, top: ROW_TOP0 + 0 * ROW_H },
+  { label: "AUDIENCE", debit: "Developers only", credit: "Anyone watching", appearAt: B1 + 46, flipAt: B3 + 10, top: ROW_TOP0 + 1 * ROW_H },
+  { label: "NARRATION", debit: "Silent loop", credit: "Full voice track", appearAt: B2 + 16, flipAt: B4 + 10, top: ROW_TOP0 + 2 * ROW_H },
+];
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
-const LowerThird: React.FC = () => {
+const LedgerRow: React.FC<LedgerRowData> = ({ label, debit, credit, appearAt, flipAt, top }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const P = usePalette();
+  if (frame < appearAt) return null;
+  const flipped = frame >= flipAt;
+  const strike = flipped ? tween(sec(frame, flipAt, fps), 0, 0.3, ease.power2Out) : 0;
+  const creditIn = flipped ? tween(sec(frame, flipAt + 6, fps), 0, 0.3, ease.power2Out) : 0;
+  return (
+    <div style={{ position: "absolute", left: LEDGER.x + 24, top, width: LEDGER.w - 48, fontFamily }}>
+      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.muted }}>{label}</div>
+      <div style={{ position: "relative", marginTop: 6, fontSize: 19, fontWeight: 700, color: P.danger, display: "inline-block" }}>
+        {debit}
+        <div style={{ position: "absolute", left: 0, top: "50%", height: 2, width: `${strike * 100}%`, background: P.danger }} />
+      </div>
+      {flipped && (
+        <div
+          style={{
+            marginTop: 6,
+            fontSize: 19,
+            fontWeight: 800,
+            color: P.success,
+            opacity: creditIn,
+            transform: `translateY(${(1 - creditIn) * 8}px)`,
+          }}
+        >
+          {credit}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const Ledger: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const P = usePalette();
   if (frame < B1) return null;
 
-  const toFork = tween(sec(frame, B1 + 20, fps), 0, (B3 - 20 - (B1 + 20)) / fps, ease.linear);
-  const litUp = frame >= B3 + 10;
-  const litDown = frame >= B4 + 10;
-  const tokenX = mix(toFork, SRC.x + SRC.w + 4, FORK_X);
-  const tokenY = LT.y + LT.h / 2 - 9;
+  const flipped = frame >= TOTAL_FLIP;
+  const strike = flipped ? tween(sec(frame, TOTAL_FLIP, fps), 0, 0.3, ease.power2Out) : 0;
+  const creditIn = flipped ? tween(sec(frame, TOTAL_FLIP + 6, fps), 0, 0.3, ease.power2Out) : 0;
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
-      <Arrive at={B1 + 4} kind="wipe" box={LT} dur={0.45}>
+      <Arrive at={B1 + 4} kind="wipe" box={LEDGER} dur={0.45}>
         <div
           style={{
             position: "absolute",
-            left: SRC.x,
-            top: SRC.y,
-            width: SRC.w,
-            height: SRC.h,
+            left: LEDGER.x,
+            top: LEDGER.y,
+            width: LEDGER.w,
+            height: LEDGER.h,
             background: P.card,
-            borderRadius: 4,
-            boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "0 14px",
-            boxSizing: "border-box",
+            borderRadius: 10,
+            boxShadow: "10px 10px 0 rgba(0,0,0,0.5)",
+            border: `2px solid ${P.border}`,
           }}
         >
-          <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.4, color: P.ink, textAlign: "center", lineHeight: 1.3 }}>
-            FEATURE
-            <br />
-            DEMOS
-          </div>
-        </div>
-        <div style={{ position: "absolute", left: SRC.x + SRC.w, top: tokenY + 9, width: FORK_X - (SRC.x + SRC.w), height: 2, background: P.border }} />
-        <div style={{ position: "absolute", left: FORK_X, top: TOP_Y + 16, width: 2, height: BOT_Y + 16 - (TOP_Y + 16), background: P.border }} />
-        <div style={{ position: "absolute", left: FORK_X, top: TOP_Y + 16, width: NODE_X - FORK_X, height: 2, background: P.border }} />
-        <div style={{ position: "absolute", left: FORK_X, top: BOT_Y + 16, width: NODE_X - FORK_X, height: 2, background: P.border }} />
-      </Arrive>
-
-      <Arrive at={B2 + 30} kind="rise" box={{ x: NODE_X, y: TOP_Y, w: NODE_W, h: 34 }}>
-        <div
-          style={{
-            position: "absolute",
-            left: NODE_X,
-            top: TOP_Y,
-            width: NODE_W,
-            height: 34,
-            borderRadius: 4,
-            background: litUp ? P.success : P.card,
-            border: litUp ? `2px solid ${P.success}` : `2px dashed ${P.muted}`,
-            color: litUp ? "#fff" : P.muted,
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: 14,
-            boxSizing: "border-box",
-            fontSize: 14,
-            fontWeight: 800,
-            letterSpacing: 1,
-            transform: `scale(${litUp ? punchScale(sec(frame, B3 + 10, fps), 0) : 1})`,
-          }}
-        >
-          BRIGHT V2 STYLE
-        </div>
-      </Arrive>
-      <Arrive at={B2 + 30} kind="rise" box={{ x: NODE_X, y: BOT_Y, w: NODE_W, h: 34 }}>
-        <div
-          style={{
-            position: "absolute",
-            left: NODE_X,
-            top: BOT_Y,
-            width: NODE_W,
-            height: 34,
-            borderRadius: 4,
-            background: litDown ? P.success : P.card,
-            border: litDown ? `2px solid ${P.success}` : `2px dashed ${P.muted}`,
-            color: litDown ? "#fff" : P.muted,
-            display: "flex",
-            alignItems: "center",
-            paddingLeft: 14,
-            boxSizing: "border-box",
-            fontSize: 14,
-            fontWeight: 800,
-            letterSpacing: 1,
-            transform: `scale(${litDown ? punchScale(sec(frame, B4 + 10, fps), 0) : 1})`,
-          }}
-        >
-          NARRATED STORY CUT
-        </div>
-      </Arrive>
-
-      {frame < B3 + 10 && (
-        <div style={{ position: "absolute", left: tokenX - 9, top: tokenY, width: 18, height: 18, borderRadius: 9, background: P.accent }} />
-      )}
-
-      {frame >= B5 + 40 && (
-        <>
           <div
             style={{
               position: "absolute",
-              left: NODE_X + NODE_W + 14,
-              top: BOT_Y - 3,
-              width: 90,
-              height: 40,
-              borderRadius: 4,
+              left: 0,
+              top: 0,
+              width: "100%",
+              height: 48,
+              borderRadius: "8px 8px 0 0",
               background: P.ink,
               color: "#fff",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 17,
+              fontSize: 15,
               fontWeight: 800,
-              transform: `scale(${punchScale(sec(frame, B5 + 40, fps), 0)})`,
+              letterSpacing: 1.6,
             }}
           >
-            54 s
+            DEMO STYLE LEDGER
           </div>
-          <div style={{ position: "absolute", left: NODE_X + NODE_W + 104, top: BOT_Y + 16, width: 1220 - (NODE_X + NODE_W + 104), height: 2, background: P.success }} />
-        </>
-      )}
+          <div style={{ position: "absolute", left: 24, right: 24, top: 56, height: 2, background: P.border }} />
+        </div>
+      </Arrive>
+
+      {ROWS.map((row) => (
+        <LedgerRow key={row.label} {...row} />
+      ))}
+
+      <div style={{ position: "absolute", left: LEDGER.x + 24, top: TOTAL_TOP - 10, width: LEDGER.w - 48, height: 2, background: P.border }} />
+      <div style={{ position: "absolute", left: LEDGER.x + 24, top: TOTAL_TOP, width: LEDGER.w - 48 }}>
+        <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.muted }}>DEMO STYLES SHIPPED</div>
+        <div style={{ position: "relative", marginTop: 6, fontSize: 21, fontWeight: 800, color: P.danger, display: "inline-block" }}>
+          1 style
+          <div style={{ position: "absolute", left: 0, top: "50%", height: 2, width: `${strike * 100}%`, background: P.danger }} />
+        </div>
+        {flipped && (
+          <div
+            style={{
+              marginTop: 6,
+              fontSize: 21,
+              fontWeight: 800,
+              color: P.success,
+              opacity: creditIn,
+              transform: `translateY(${(1 - creditIn) * 8}px)`,
+            }}
+          >
+            2 styles + narrated (54 s)
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
 /** b3 only — handoffExplain's camera pan leaves a near-black band above and below
  *  its hero box + points column (both sit roughly mid-screen); name the fix up top
- *  and bridge the gap above the flow-map lower third. */
+ *  so the ledger column on the right stays the only thing anchored at the bottom. */
 const HandoffFill: React.FC<{ from: number }> = ({ from }) => {
   const frame = useCurrentFrame();
   const P = usePalette();
@@ -198,34 +195,12 @@ const HandoffFill: React.FC<{ from: number }> = ({ from }) => {
           </div>
         </div>
       </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 60,
-          top: 538,
-          width: 1160,
-          height: 46,
-          borderRadius: 6,
-          background: P.card,
-          border: `2px solid ${P.accent}`,
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          paddingLeft: 20,
-          fontSize: 15,
-          fontWeight: 700,
-          color: P.ink,
-        }}
-      >
-        <span>🔀</span>
-        <span>One feature, two very different looks — same facts, told twice</span>
-      </div>
     </div>
   );
 };
 
 /** b4 only — pipelineFlow's own chain sits in a mid-frame band; name the feature in
- *  the empty top margin and bridge the gap above the flow-map lower third. */
+ *  the empty top margin, leaving the ledger column on the right undisturbed. */
 const PipelineFill: React.FC<{ from: number }> = ({ from }) => {
   const frame = useCurrentFrame();
   const P = usePalette();
@@ -258,28 +233,6 @@ const PipelineFill: React.FC<{ from: number }> = ({ from }) => {
       >
         <span style={{ fontSize: 20 }}>🔊</span>
         <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1.2, color: P.accent }}>FULL NARRATED WALKTHROUGH</span>
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          left: 60,
-          top: 538,
-          width: 1160,
-          height: 46,
-          borderRadius: 6,
-          background: P.card,
-          border: `2px solid ${P.accent}`,
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-          paddingLeft: 20,
-          fontSize: 15,
-          fontWeight: 700,
-          color: P.ink,
-        }}
-      >
-        <span>✅</span>
-        <span>Silent loop retired — this one speaks for itself</span>
       </div>
     </div>
   );
@@ -355,7 +308,7 @@ const Inner: React.FC = () => {
           </div>
           <Headline y={64} text="Two visual languages now" accentText="instead of one" accentColor={P.success} fontSize={34} />
           <LogWindow
-            win={{ x: 80, y: 150, w: 1120, h: 400 }}
+            win={{ x: 60, y: 150, w: 760, h: 400 }}
             title="feature-demos pipeline"
             from={B5 + 10}
             every={16}
@@ -371,7 +324,7 @@ const Inner: React.FC = () => {
         </>
       )}
 
-      <LowerThird />
+      <Ledger />
     </AbsoluteFill>
   );
 };

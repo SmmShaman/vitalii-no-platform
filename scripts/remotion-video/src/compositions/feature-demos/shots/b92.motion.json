@@ -1,0 +1,40 @@
+{
+  "id": "b92",
+  "composition": "FeatureTvWallGetsOptB92",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Every card looked the same",
+        "tags": ["Dark background", "Thin lines", "Tiny type", "No safe way to test"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "hub",
+      "data": {
+        "line1": "A second renderer,",
+        "line2": "running side by side.",
+        "keywords": ["second", "side by side"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page2",
+      "data": {
+        "from": "Dark skin only",
+        "to": "Bright or dark, per child",
+        "points": ["Same lessons", "Same timing", "Only the skin changes"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "drawn",
+      "note": "archetype hero number pays off at 430; LogWindow shows the verification lines"
+    }
+  ]
+}

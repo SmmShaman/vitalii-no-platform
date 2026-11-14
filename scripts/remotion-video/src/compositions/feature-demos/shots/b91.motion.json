@@ -1,0 +1,29 @@
+{
+  "id": "b91",
+  "composition": "FeatureHeadlessClaudeDirectsTvB91",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": { "line1": "Every new lesson meant", "line2": "hand-coding a new screen.", "keywords": ["hand-coding", "new screen"] }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": { "statement": "Lessons are now scripts", "tags": ["Timed steps", "AI-assembled", "No hand code"] }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page2",
+      "data": { "from": "Written once, hoped it worked", "to": "Checked twice, every time", "points": ["Before the wall accepts it", "Again on the screen itself"] }
+    },
+    {
+      "beat": "b4",
+      "effect": "drawn",
+      "note": "archetype flow-map reaches its last node; LogWindow + hero count show 3 -> 8 lesson types in one week"
+    }
+  ]
+}

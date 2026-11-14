@@ -315,6 +315,8 @@ import { FeatureKioskScreenStopsGuessingB80 } from "./compositions/feature-demos
 import { FeaturePeSwimmingDaysLoseB84 } from "./compositions/feature-demos/FeaturePeSwimmingDaysLoseB84";
 import { FeatureElvarikasBackendRefillsCreditsE06 } from "./compositions/feature-demos/FeatureElvarikasBackendRefillsCreditsE06";
 import { FeatureOneAudioPlayerFollowsE05 } from "./compositions/feature-demos/FeatureOneAudioPlayerFollowsE05";
+import { FeatureTvWallGetsOptB92 } from "./compositions/feature-demos/FeatureTvWallGetsOptB92";
+import { FeatureHeadlessClaudeDirectsTvB91 } from "./compositions/feature-demos/FeatureHeadlessClaudeDirectsTvB91";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -3120,7 +3122,23 @@ export const RemotionRoot: React.FC = () => {
         height={720}
       />
 
+      <Composition
+        id="FeatureTvWallGetsOptB92"
+        component={FeatureTvWallGetsOptB92}
+        durationInFrames={936}
+        fps={30}
+        width={1280}
+        height={720}
+      />
 
+      <Composition
+        id="FeatureHeadlessClaudeDirectsTvB91"
+        component={FeatureHeadlessClaudeDirectsTvB91}
+        durationInFrames={808}
+        fps={30}
+        width={1280}
+        height={720}
+      />
 
     </>
   );

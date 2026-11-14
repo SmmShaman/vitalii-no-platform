@@ -1,22 +1,26 @@
 // FeaturePostsGoNativeVideoV23 — feature v23 — 1280x720, 869 frames @ 30fps, VOICE-SYNCED.
-// archetype 3 card-deck, mood dawn. RE-SHOOT (2026-11-12): same narration, same
-// windows (shots/v23.json unchanged — hub + page are the only verified sources
-// tonight, no commit/Actions page confirmed, so b3/b4 stay drawn per gate 2's
-// fallback clause), re-mooded dawn, b1 opener swapped off titleTakeover (used
-// as the b1 opener on b83 tonight) and off cornerTags (used as the b1 opener on
-// b39 and b81) — b1 now opens on keywordCaption instead.
+// archetype 3 card-deck, mood sand. RE-SHOOT (2026-11-14): same narration, same
+// windows. Two more sources got verified tonight — the repo's own commits list
+// and Actions runs — so b3/b4 now sit on real LiveBackdrops instead of a bare
+// dark plate (no specific commit message was supplied, so no commit text is
+// quoted — the pages stand as evidence of real activity while the effect still
+// draws the named mechanism). Re-mooded sand; b1 opener swapped off
+// keywordCaption (used as b91's opener tonight) to copyCorrection. The one
+// generic log line supplied tonight ("run start, full_scope=yes") names no
+// LinkedIn/Facebook/upload step this feature's beats talk about, so it is left
+// unused — b5's LogWindow stays built only from the feature's own request/
+// fallback sequence.
 //
-// Beat → effect (data only from the feature row; only the hub and the feature's
-// own page were verified tonight — b3/b4 draw the mechanism on a dark plate
-// instead of a LiveBackdrop):
+// Beat → effect (data only from the feature row; hub, page, commits and
+// actions are all verified tonight):
 // b1 15-174   "every feature already had its own demo clip, the post was just a photo"
-//             keywordCaption over the features hub (many clips already exist).
+//             copyCorrection over the features hub (the gap, as a correction).
 // b2 174-292  "uploading it by hand, for every post, wasn't sustainable"
 //             cornerTags over the feature's own page.
 // b3 292-494  "LinkedIn makes you register the upload, then wait for it to finish"
-//             statusFocus, drawn (register -> push bytes -> poll status).
+//             statusFocus over the repo's commits list (register -> push bytes -> poll status).
 // b4 494-656  "now one Supabase function does that itself, posts the real clip"
-//             featureMatrix, drawn (manual upload -> nano-social-publish).
+//             featureMatrix over the repo's Actions runs (manual upload -> nano-social-publish).
 // b5 656-869  "if the upload fails, the post still goes out as text"
 //             no catalog effect: a LogWindow plays the real request/fallback
 //             sequence built from the feature's own solution text, holds to end.
@@ -43,9 +47,9 @@ const B4 = 494;
 const B5 = 656;
 const END = 869;
 
-/** Bright azure, boosted for the dark stage (dawn's own #2563EB reads flat on black). */
-const ACCENT = "#4D8CFF";
-const STAGE = "#0D1526";
+/** Warm terracotta, boosted for the dark stage (sand's own #B4531F reads muddy on black). */
+const ACCENT = "#FFA056";
+const STAGE = "#1C140D";
 
 // Lower third geometry (1280x720, below the effects' safe bottom at y≈587).
 const LT = { x: 40, y: 606, w: 1200, h: 92 };
@@ -251,14 +255,14 @@ const Inner: React.FC = () => {
       {/* b1 — every feature already had a clip, the post was just a photo */}
       {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B1} hold={B2 - B1} />}
       <MotionInsert
-        effect="keywordCaption"
+        effect="copyCorrection"
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
         data={{
-          line1: "Every feature already had its own demo clip.",
-          line2: "The post itself? Just a photo.",
-          keywords: ["demo clip", "just a photo"],
+          wrong: "Post: just a photo",
+          right: "Clip already existed",
+          label: "EVERY FEATURE",
         }}
       />
 
@@ -276,14 +280,14 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — LinkedIn: register, push bytes, then wait (no zoomable commit tonight, draw it) */}
+      {/* b3 — LinkedIn: register, push bytes, then wait (over the repo's own commits list) */}
+      {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="commits" from={B3} hold={B4 - B3} />}
       <MotionInsert
         effect="statusFocus"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
-        plate={0.82}
-        base={STAGE}
+        plate={0.7}
         data={{
           title: "Then publish — LinkedIn's upload steps",
           claims: [
@@ -297,14 +301,14 @@ const Inner: React.FC = () => {
       <CornerFact value="120s" label="MAX POLL WINDOW" corner="tr" from={B3} to={B4} />
       <CornerFact value="3" label="STEPS BEFORE IT POSTS" corner="bl" from={B3} to={B4} />
 
-      {/* b4 — nano-social-publish does the hand-off itself (no zoomable commit tonight, draw it) */}
+      {/* b4 — nano-social-publish does the hand-off itself (over the repo's own Actions runs) */}
+      {cut(frame, B4, B5) === 1 && <LiveBackdrop file={shotsFile} shot="actions" from={B4} hold={B5 - B4} />}
       <MotionInsert
         effect="featureMatrix"
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.82}
-        base={STAGE}
+        plate={0.7}
         data={{
           options: ["Manual", "Function"],
           rows: [
