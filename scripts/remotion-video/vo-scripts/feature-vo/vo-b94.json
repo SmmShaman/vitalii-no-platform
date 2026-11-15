@@ -1,0 +1,57 @@
+{
+ "id": "b94",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.468,
+  "b2": 6.893,
+  "b3": 4.575,
+  "b4": 5.879,
+  "b5": 5.909
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Our TV quiz wall kept inventing scenes for subjects with nothing but a topic name to show.",
+   "start_s": 0.5,
+   "end_s": 5.968,
+   "start_f": 15,
+   "end_f": 179
+  },
+  {
+   "beat": "b2",
+   "text": "Other cards \u2014 maths, word cards, plan topics \u2014 got a scene less than half the time, at random.",
+   "start_s": 6.268,
+   "end_s": 13.161,
+   "start_f": 188,
+   "end_f": 395
+  },
+  {
+   "beat": "b3",
+   "text": "So a kid could hit several plain cards before a scripted one ever appeared.",
+   "start_s": 13.461,
+   "end_s": 18.036,
+   "start_f": 404,
+   "end_f": 541
+  },
+  {
+   "beat": "b4",
+   "text": "Now the writer skips subjects with nothing to show, and Cloudflare Workers doubles scene coverage.",
+   "start_s": 18.336,
+   "end_s": 24.215,
+   "start_f": 550,
+   "end_f": 726
+  },
+  {
+   "beat": "b5",
+   "text": "The kiosk now hunts for a card with a scene, never repeating one within forty-five minutes.",
+   "start_s": 24.515,
+   "end_s": 30.424,
+   "start_f": 735,
+   "end_f": 913
+  }
+ ],
+ "total_s": 31.924,
+ "durationInFrames": 958,
+ "measured_track_s": 30.48,
+ "track": "/root/feature-demos/vo-b94/vo-b94.mp3"
+}

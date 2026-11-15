@@ -1,0 +1,7 @@
+{"id": "b94", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Our TV quiz wall kept inventing scenes for subjects with nothing but a topic name to show."],
+ ["b2", "Other cards — maths, word cards, plan topics — got a scene less than half the time, at random."],
+ ["b3", "So a kid could hit several plain cards before a scripted one ever appeared."],
+ ["b4", "Now the writer skips subjects with nothing to show, and Cloudflare Workers doubles scene coverage."],
+ ["b5", "The kiosk now hunts for a card with a scene, never repeating one within forty-five minutes."]
+]}

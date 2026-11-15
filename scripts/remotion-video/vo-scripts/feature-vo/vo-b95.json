@@ -1,0 +1,57 @@
+{
+ "id": "b95",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.421,
+  "b2": 5.976,
+  "b3": 7.237,
+  "b4": 4.992,
+  "b5": 5.745
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Our kids' quiz deck treated every day the same \u2014 even weekends, with no homework due.",
+   "start_s": 0.5,
+   "end_s": 5.921,
+   "start_f": 15,
+   "end_f": 178
+  },
+  {
+   "beat": "b2",
+   "text": "Homework also showed up as its own card, cutting into whatever subject a kid was actually studying.",
+   "start_s": 6.221,
+   "end_s": 12.197,
+   "start_f": 187,
+   "end_f": 366
+  },
+  {
+   "beat": "b3",
+   "text": "Now a Cloudflare Workers routine checks the weekday, picks today's real subjects, and tags the match 'I dag.'",
+   "start_s": 12.497,
+   "end_s": 19.734,
+   "start_f": 375,
+   "end_f": 592
+  },
+  {
+   "beat": "b4",
+   "text": "Homework rides along on that same subject's card instead of butting in as its own.",
+   "start_s": 20.034,
+   "end_s": 25.026,
+   "start_f": 601,
+   "end_f": 751
+  },
+  {
+   "beat": "b5",
+   "text": "Weekends now show zero homework \u2014 the deck finally rests the way school already does.",
+   "start_s": 25.326,
+   "end_s": 31.071,
+   "start_f": 760,
+   "end_f": 932
+  }
+ ],
+ "total_s": 32.571,
+ "durationInFrames": 977,
+ "measured_track_s": 31.128,
+ "track": "/root/feature-demos/vo-b95/vo-b95.mp3"
+}

@@ -1,0 +1,7 @@
+{"id": "b95", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Our kids' quiz deck treated every day the same — even weekends, with no homework due."],
+ ["b2", "Homework also showed up as its own card, cutting into whatever subject a kid was actually studying."],
+ ["b3", "Now a Cloudflare Workers routine checks the weekday, picks today's real subjects, and tags the match 'I dag.'"],
+ ["b4", "Homework rides along on that same subject's card instead of butting in as its own."],
+ ["b5", "Weekends now show zero homework — the deck finally rests the way school already does."]
+]}
