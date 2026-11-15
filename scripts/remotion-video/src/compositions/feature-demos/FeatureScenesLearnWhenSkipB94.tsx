@@ -199,27 +199,28 @@ const Inner: React.FC = () => {
       {/* b2 — other cards got a scene less than half the time, at random */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="page2" from={B2} hold={B3 - B2} />}
       <MotionInsert
-        effect="cornerTags"
+        effect="keywordCaption"
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
         data={{
-          statement: "A scene, less than half the time",
-          tags: ["Matte", "Word cards", "Plan topics", "Random pick"],
+          line1: "Matte, word cards, plan topics",
+          line2: "a scene less than half the time, picked at random",
+          keywords: ["half", "random"],
         }}
       />
 
       {/* b3 — several plain cards before a scripted one ever appeared */}
       {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page3" from={B3} hold={B4 - B3} />}
       <MotionInsert
-        effect="funnelAbsorption"
+        effect="titleTakeover"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
         plate={0.7}
         data={{
-          inputs: ["Plain card", "Plain card", "Plain card"],
-          result: "Scripted scene, eventually",
+          title: "3 PLAIN CARDS IN A ROW",
+          kicker: "before a scripted scene finally landed",
         }}
       />
 

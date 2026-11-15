@@ -243,6 +243,35 @@ const LowerThird: React.FC = () => {
   );
 };
 
+/** b5 only: fills the dead band above RatioBars' centered chart with the plain-English result. */
+const ResultBanner: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B5 + 10) return null;
+  return (
+    <Arrive at={B5 + 10} kind="rise" box={{ x: 40, y: 40, w: 640, h: 110 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 40,
+          top: 40,
+          width: 640,
+          padding: "14px 20px",
+          borderRadius: 6,
+          background: P.card,
+          boxShadow: "4px 4px 0 rgba(0,0,0,0.5)",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 14, fontWeight: 800, letterSpacing: 2.2, color: P.accent }}>RESULT</div>
+        <div style={{ fontSize: 28, fontWeight: 800, color: P.ink, marginTop: 6, lineHeight: 1.2 }}>
+          Weekends now show zero homework
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 const Inner: React.FC = () => {
   const frame = useCurrentFrame();
   return (
@@ -324,6 +353,7 @@ const Inner: React.FC = () => {
           caption: "Weekends: 0 homework items",
         }}
       />
+      <ResultBanner />
 
       <LowerThird />
     </AbsoluteFill>
