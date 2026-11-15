@@ -1,0 +1,58 @@
+{
+ "id": "b95",
+ "composition": "FeatureHomeworkStopsBeingOwnB95",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "cornerTags",
+   "backdrop": "page",
+   "data": {
+    "statement": "Same deck, every single day",
+    "tags": ["Even weekends", "No homework needed", "Random topic rotation", "No sense of 'today'"]
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "keywordCaption",
+   "backdrop": "page2",
+   "data": {
+    "line1": "Homework interrupted the deck",
+    "line2": "as a card of its own",
+    "keywords": ["interrupted", "card of its own"]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "handoffExplain",
+   "backdrop": "page3",
+   "data": {
+    "from": "Every day, any topic",
+    "to": "Weekday-aware subjects",
+    "fromLabel": "BEFORE",
+    "toLabel": "NOW",
+    "points": ["Mon–Fri after 12:00 Oslo time", "Tags the match 'I dag'", "Cloudflare Workers routine"]
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "funnelAbsorption",
+   "backdrop": "page4",
+   "data": {
+    "inputs": ["Homework due tomorrow", "A separate task card", "Mixed into any subject"],
+    "result": "Rides along on today's subject card"
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "ratioBars",
+   "backdrop": null,
+   "data": {
+    "title": "Homework days per week",
+    "a": { "label": "Before: every day", "value": 7 },
+    "b": { "label": "Now: weekdays only", "value": 5 },
+    "unit": "days",
+    "caption": "Weekends: 0 homework items"
+   }
+  }
+ ]
+}

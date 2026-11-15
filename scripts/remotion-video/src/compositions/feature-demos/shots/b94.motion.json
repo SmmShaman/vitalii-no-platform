@@ -1,0 +1,50 @@
+{
+ "id": "b94",
+ "composition": "FeatureScenesLearnWhenSkipB94",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "keywordCaption",
+   "backdrop": "page",
+   "data": {
+    "line1": "A topic name is not a scene",
+    "line2": "yet the writer tried anyway",
+    "keywords": ["topic name", "tried anyway"]
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "page2",
+   "data": {
+    "statement": "A scene, less than half the time",
+    "tags": ["Matte", "Word cards", "Plan topics", "Random pick"]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "funnelAbsorption",
+   "backdrop": "page3",
+   "data": {
+    "inputs": ["Plain card", "Plain card", "Plain card"],
+    "result": "Scripted scene, eventually"
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "handoffExplain",
+   "backdrop": "page4",
+   "data": {
+    "from": "Writes a scene regardless",
+    "to": "Skips, then doubles coverage",
+    "points": ["No scene for topic-only subjects", "Cloudflare Workers daily run", "2x scenes for old drill types"]
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": null,
+   "backdrop": null,
+   "data": { "note": "drawn result — hero number + LogWindow(kiosk-walk), no live page per gate 2" }
+  }
+ ]
+}
