@@ -1,0 +1,7 @@
+{
+  "id": "b96",
+  "file": "yt-feature-b96.mp4",
+  "title": "Five New Lesson Cards a Day, From the Real Textbook | vitalii.no",
+  "description": "My kids' practice app could drill them with questions all day, but it never taught them anything first. There was no lesson content on the wall at all, so a child had to already know a topic before the quiz made sense, and the subjects had no connection to what they were actually studying in school that week.\n\nI built a lesson pipeline that fetches source material for each child's actual subject, runs it through an AI fact-check pass, then writes five cards per subject as a daily ladder. The gate exposes token-protected lesson endpoints, and the kiosk now walks lesson cards first per child and subject, before falling back to drill scenes. The first real source: a child's own Natural Science textbook, chapter by chapter.\n\nEach kid now wakes up to five new lesson cards a day, one ladder per subject, sourced from the actual textbook instead of a generic topic pool.\n\n🔗 Full write-up: https://vitalii.no/features/five-new-lesson-cards-a-day-written-from-the-actual-textbook-b96\n📚 All features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#EdTech #AIAutomation #Curriculum #KidsTech",
+  "tags": ["edtech automation", "ai lesson generation", "personalized learning", "curriculum pipeline", "kids tech", "homeschool tools", "textbook ai", "supabase", "cloudflare workers", "educational content", "vitalii berbeha"]
+}

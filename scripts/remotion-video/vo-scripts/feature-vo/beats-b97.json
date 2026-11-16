@@ -1,0 +1,7 @@
+{"id": "b97", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every lesson video used to borrow its animations from a news-graphics library."],
+  ["b2", "That library was built for grown-up fact-checking, not for how a child actually learns."],
+  ["b3", "It had no way to swap a wrong answer for the right one, or sort items into bins."],
+  ["b4", "So I built Remotion effects made only for teaching, like zooming in and revealing the answer."],
+  ["b5", "Nine new teaching effects now power every lesson card, start to finish."]
+]}

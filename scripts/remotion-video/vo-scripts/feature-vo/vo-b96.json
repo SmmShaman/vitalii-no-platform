@@ -1,0 +1,57 @@
+{
+ "id": "b96",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.976,
+  "b2": 4.615,
+  "b3": 4.426,
+  "b4": 4.694,
+  "b5": 5.213
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My kids' tutoring app could quiz them all day, but it never taught them anything first.",
+   "start_s": 0.5,
+   "end_s": 5.476,
+   "start_f": 15,
+   "end_f": 164
+  },
+  {
+   "beat": "b2",
+   "text": "It picked random topics with no link to what they were studying at school that week.",
+   "start_s": 5.776,
+   "end_s": 10.391,
+   "start_f": 173,
+   "end_f": 312
+  },
+  {
+   "beat": "b3",
+   "text": "Now it reads straight from their real textbook, chapter by chapter.",
+   "start_s": 10.691,
+   "end_s": 15.117,
+   "start_f": 321,
+   "end_f": 454
+  },
+  {
+   "beat": "b4",
+   "text": "AI checks every fact against that source before a single card gets written.",
+   "start_s": 15.417,
+   "end_s": 20.111,
+   "start_f": 463,
+   "end_f": 603
+  },
+  {
+   "beat": "b5",
+   "text": "Each kid now wakes up to five new lesson cards a day, one ladder per subject.",
+   "start_s": 20.411,
+   "end_s": 25.624,
+   "start_f": 612,
+   "end_f": 769
+  }
+ ],
+ "total_s": 27.124,
+ "durationInFrames": 814,
+ "measured_track_s": 25.68,
+ "track": "/root/feature-demos/vo-b96/vo-b96.mp3"
+}

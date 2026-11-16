@@ -1,0 +1,57 @@
+{
+ "id": "b98",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.225,
+  "b2": 5.698,
+  "b3": 7.158,
+  "b4": 6.198,
+  "b5": 3.554
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Once lesson videos could render on their own, nothing checked them before a kid saw them.",
+   "start_s": 0.5,
+   "end_s": 5.725,
+   "start_f": 15,
+   "end_f": 172
+  },
+  {
+   "beat": "b2",
+   "text": "One broken animation, one overlapping label, could have gone straight to the TV on the wall.",
+   "start_s": 6.025,
+   "end_s": 11.723,
+   "start_f": 181,
+   "end_f": 352
+  },
+  {
+   "beat": "b3",
+   "text": "Now a 'blind viewer' judges a contact sheet of every video, frame by frame, before anyone else sees it.",
+   "start_s": 12.023,
+   "end_s": 19.181,
+   "start_f": 361,
+   "end_f": 575
+  },
+  {
+   "beat": "b4",
+   "text": "Only a passing video ever reaches my kids \u2014 the whole thing renders unattended on a VPS.",
+   "start_s": 19.481,
+   "end_s": 25.679,
+   "start_f": 584,
+   "end_f": 770
+  },
+  {
+   "beat": "b5",
+   "text": "It checks for new lessons every fifteen minutes, nonstop.",
+   "start_s": 25.979,
+   "end_s": 29.533,
+   "start_f": 779,
+   "end_f": 886
+  }
+ ],
+ "total_s": 31.033,
+ "durationInFrames": 931,
+ "measured_track_s": 29.592,
+ "track": "/root/feature-demos/vo-b98/vo-b98.mp3"
+}

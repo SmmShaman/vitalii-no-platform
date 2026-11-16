@@ -1,0 +1,57 @@
+{
+ "id": "b97",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.88,
+  "b2": 5.404,
+  "b3": 5.167,
+  "b4": 5.556,
+  "b5": 4.827
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every lesson video used to borrow its animations from a news-graphics library.",
+   "start_s": 0.5,
+   "end_s": 5.38,
+   "start_f": 15,
+   "end_f": 161
+  },
+  {
+   "beat": "b2",
+   "text": "That library was built for grown-up fact-checking, not for how a child actually learns.",
+   "start_s": 5.68,
+   "end_s": 11.084,
+   "start_f": 170,
+   "end_f": 333
+  },
+  {
+   "beat": "b3",
+   "text": "It had no way to swap a wrong answer for the right one, or sort items into bins.",
+   "start_s": 11.384,
+   "end_s": 16.551,
+   "start_f": 342,
+   "end_f": 497
+  },
+  {
+   "beat": "b4",
+   "text": "So I built Remotion effects made only for teaching, like zooming in and revealing the answer.",
+   "start_s": 16.851,
+   "end_s": 22.407,
+   "start_f": 506,
+   "end_f": 672
+  },
+  {
+   "beat": "b5",
+   "text": "Nine new teaching effects now power every lesson card, start to finish.",
+   "start_s": 22.707,
+   "end_s": 27.534,
+   "start_f": 681,
+   "end_f": 826
+  }
+ ],
+ "total_s": 29.034,
+ "durationInFrames": 871,
+ "measured_track_s": 27.6,
+ "track": "/root/feature-demos/vo-b97/vo-b97.mp3"
+}

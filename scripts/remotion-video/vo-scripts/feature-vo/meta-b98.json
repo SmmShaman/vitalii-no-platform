@@ -1,0 +1,7 @@
+{
+  "id": "b98",
+  "file": "yt-feature-b98.mp4",
+  "title": "A Blind Viewer Checks Every Lesson Video First | vitalii.no",
+  "description": "Once lesson cards could render as short videos, nothing stood between an AI-written motion script and my kid's screen. A broken beat, an overlapping label or a nonsense animation would have gone straight to the TV on the wall with no one checking it first.\n\nI added a render pipeline where a server picks up due cards on a timer and renders the final video automatically, with old files cleaned up after two weeks. Before any render ships, a reviewer and a separate 'blind viewer' step judge a contact sheet of the card's frames and can reject it. Only a passing video is ever allowed to reach the kiosk, and only through protected endpoints.\n\nEvery lesson video now passes through a reviewer and a blind-viewer check before it ever reaches a child, and the render itself runs unattended, checking for new work every fifteen minutes.\n\n🔗 Full write-up: https://vitalii.no/features/a-blind-viewer-checks-every-ai-written-lesson-video-before-a-kid-sees-it-b98\n📚 All features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#EdTech #DevOpsInfra #QualityAssurance #KidsTech",
+  "tags": ["edtech qa", "ai content review", "automated video pipeline", "kids tech", "systemd automation", "cloudflare r2", "content moderation", "unattended rendering", "vps automation", "educational video", "vitalii berbeha"]
+}

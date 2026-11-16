@@ -1,0 +1,7 @@
+{
+  "id": "b97",
+  "file": "yt-feature-b97.mp4",
+  "title": "Nine Teaching Effects Give Lesson Cards Their Own Look | vitalii.no",
+  "description": "My kids' lesson cards had no visual engine of their own. Any new lesson had to borrow animation from a news-digest motion library, built for grown-up fact-checking graphics, not for the teach-and-reveal moments a real lesson actually needs, like swapping a wrong answer for a right one or sorting items into bins.\n\nI built a dedicated lesson-video project with its own effects catalog and nine teaching effects, among them a magnifier zoom, a reveal-the-answer moment, and a sort-into-bins effect, plus a skill file that tells the writer which effect fits which teaching moment. Each lesson card now renders from a plain data file, validated first, then rendered into a grid of frames for review, with the first real sample covering an environmental-toxins lesson.\n\nLesson cards now render through a motion system built specifically for teaching, with nine dedicated effects instead of a borrowed library that was never meant for a kid's lesson.\n\n🔗 Full write-up: https://vitalii.no/features/nine-new-teaching-effects-give-lesson-cards-their-own-visual-language-b97\n📚 All features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#EdTech #MediaProduction #Remotion #KidsTech",
+  "tags": ["edtech animation", "remotion", "teaching effects", "motion design", "kids tech", "educational video", "lesson cards", "typescript", "react", "edtech tools", "vitalii berbeha"]
+}
