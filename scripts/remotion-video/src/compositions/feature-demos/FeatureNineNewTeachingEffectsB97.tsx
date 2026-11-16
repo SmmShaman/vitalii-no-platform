@@ -20,7 +20,7 @@
  *  b5 681-826 "Nine new teaching effects now power every lesson card, start to finish." — holds to 871.
  */
 import React from "react";
-import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Easing, interpolate, Sequence, useCurrentFrame } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
 import { MotionInsert, cut } from "./motion-primitives";
 import { LiveWindow, type Win } from "./live-primitives";
@@ -143,32 +143,38 @@ const LimitationCard: React.FC<{
   );
 };
 
+/** At beat 5 the outer camera is held at its final scale (1.82, origin 50% 46%),
+ * so only x in [288,992] / y in [149,545] survives on screen — this grid is sized
+ * to that safe box, not the full 1280x720 canvas, or its edges get cropped. */
 const FinaleMatrix: React.FC<{ frame: number }> = ({ frame }) => {
   const P = usePalette();
   const headerIn = pop(frame, B5, 20);
   const cols = 3;
-  const tileW = 360;
-  const tileH = 138;
-  const gap = 20;
+  const tileW = 210;
+  const tileH = 76;
+  const gap = 10;
   const gridW = cols * tileW + (cols - 1) * gap;
-  const x0 = (1280 - gridW) / 2;
+  const x0 = 640 - gridW / 2;
+  const boxLeft = 315;
+  const boxWidth = 650;
+  const gridTop = 222;
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       <div
         style={{
           position: "absolute",
-          left: 0,
-          top: 46,
-          width: 1280,
+          left: boxLeft,
+          top: 164,
+          width: boxWidth,
           textAlign: "center",
           opacity: headerIn,
           transform: `translateY(${(1 - headerIn) * 14}px)`,
         }}
       >
-        <div style={{ fontSize: 40, fontWeight: 900, letterSpacing: -0.8, color: "#FFF4E8" }}>
+        <div style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, color: "#FFF4E8" }}>
           NINE TEACHING EFFECTS
         </div>
-        <div style={{ marginTop: 6, fontSize: 17, fontWeight: 600, color: "rgba(255,244,232,0.68)" }}>
+        <div style={{ marginTop: 4, fontSize: 11, fontWeight: 600, color: "rgba(255,244,232,0.68)" }}>
           One catalog. Every lesson card, start to finish.
         </div>
       </div>
@@ -182,35 +188,35 @@ const FinaleMatrix: React.FC<{ frame: number }> = ({ frame }) => {
             style={{
               position: "absolute",
               left: x0 + c * (tileW + gap),
-              top: 146 + r * (tileH + gap),
+              top: gridTop + r * (tileH + gap),
               width: tileW,
               height: tileH,
-              borderRadius: 16,
+              borderRadius: 12,
               background: P.card,
               border: `2px solid ${P.accentEdge}`,
-              boxShadow: "0 14px 30px rgba(0,0,0,0.3)",
+              boxShadow: "0 10px 20px rgba(0,0,0,0.3)",
               opacity: t,
               transform: `scale(${0.9 + 0.1 * t})`,
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              gap: 6,
+              gap: 3,
             }}
           >
-            <div style={{ fontSize: 34, lineHeight: 1 }}>{e.icon}</div>
-            <div style={{ fontSize: 17, fontWeight: 800, color: P.ink, letterSpacing: -0.2 }}>{e.label}</div>
+            <div style={{ fontSize: 20, lineHeight: 1 }}>{e.icon}</div>
+            <div style={{ fontSize: 11, fontWeight: 800, color: P.ink, letterSpacing: -0.1, textAlign: "center" }}>{e.label}</div>
           </div>
         );
       })}
       <div
         style={{
           position: "absolute",
-          left: 0,
-          top: 644,
-          width: 1280,
+          left: boxLeft,
+          top: 484,
+          width: boxWidth,
           textAlign: "center",
-          fontSize: 21,
+          fontSize: 14,
           fontWeight: 700,
           color: "#FFF4E8",
         }}
@@ -220,14 +226,14 @@ const FinaleMatrix: React.FC<{ frame: number }> = ({ frame }) => {
       <div
         style={{
           position: "absolute",
-          left: 0,
-          top: 682,
-          width: 1280,
+          left: boxLeft,
+          top: 512,
+          width: boxWidth,
           textAlign: "center",
-          fontSize: 13.5,
+          fontSize: 9,
           fontWeight: 600,
           color: "rgba(255,244,232,0.5)",
-          letterSpacing: 0.4,
+          letterSpacing: 0.3,
         }}
       >
         Shown: the Miljøgifter lesson sample
@@ -252,17 +258,19 @@ const Inner: React.FC = () => {
         }}
       >
         {/* ---------------- beat 1 : wide real view of the old hub ---------------- */}
-        <LiveWindow
-          file={shotsFile}
-          shot="hub"
-          title="vitalii.no/features"
-          from={B1}
-          hold={B2 - B1}
-          zoom={(t) => 1 + 0.06 * t}
-          focus={{ x: 0.5, y: 0.3 }}
-          opacity={1}
-          win={WIN_WIDE}
-        />
+        <Sequence from={B1} durationInFrames={B2 - B1} layout="none">
+          <LiveWindow
+            file={shotsFile}
+            shot="hub"
+            title="vitalii.no/features"
+            from={0}
+            hold={B2 - B1}
+            zoom={(t) => 1 + 0.06 * t}
+            focus={{ x: 0.5, y: 0.3 }}
+            opacity={1}
+            win={WIN_WIDE}
+          />
+        </Sequence>
         <MotionInsert
           effect="titleTakeover"
           from={B1}
@@ -273,17 +281,19 @@ const Inner: React.FC = () => {
         />
 
         {/* ---------------- beat 2 : zoom onto this feature's own page ---------------- */}
-        <LiveWindow
-          file={shotsFile}
-          shot="page"
-          title="vitalii.no/features/nine-new-teaching-effects…"
-          from={B2}
-          hold={B3 - B2}
-          zoom={(t) => 1 + 0.1 * t}
-          focus={{ x: 0.5, y: 0.35 }}
-          opacity={1}
-          win={WIN_PAGE}
-        />
+        <Sequence from={B2} durationInFrames={B3 - B2} layout="none">
+          <LiveWindow
+            file={shotsFile}
+            shot="page"
+            title="vitalii.no/features/nine-new-teaching-effects…"
+            from={0}
+            hold={B3 - B2}
+            zoom={(t) => 1 + 0.1 * t}
+            focus={{ x: 0.5, y: 0.35 }}
+            opacity={1}
+            win={WIN_PAGE}
+          />
+        </Sequence>
         <MotionInsert
           effect="statusFocus"
           from={B2}
@@ -298,46 +308,53 @@ const Inner: React.FC = () => {
           }}
         />
 
-        {/* ---------------- beat 3 : drawn — the two missing capabilities ---------------- */}
+        {/* ---------------- beat 3 : drawn — the two missing capabilities ----------------
+         * Counter-scaled against the outer camera: beats 3-4 are self-contained graphics
+         * authored for a static 1280x720 frame, not for being pushed in on, so they cancel
+         * the outer zoom (1/scale) rather than get magnified past the frame edges. */}
         {cut(frame, B3, B4) === 1 && (
-          <AbsoluteFill style={{ background: STAGE }}>
-            <LimitationCard x={100} title="Swap the answer" sub="wrong → right" visible={pop(frame, B3 + 6)} />
-            <LimitationCard x={660} title="Sort into bins" sub="scattered → grouped" visible={pop(frame, B3 + 22)} />
-            <div
-              style={{
-                position: "absolute",
-                left: 0,
-                top: 600,
-                width: 1280,
-                textAlign: "center",
-                fontSize: 22,
-                fontWeight: 700,
-                color: P.ink,
-                opacity: pop(frame, B3 + 40),
-              }}
-            >
-              No swap. No bins. One fixed animation, every time.
-            </div>
-          </AbsoluteFill>
+          <div style={{ position: "absolute", inset: 0, transform: `scale(${1 / scale})`, transformOrigin: "50% 46%" }}>
+            <AbsoluteFill style={{ background: STAGE }}>
+              <LimitationCard x={100} title="Swap the answer" sub="wrong → right" visible={pop(frame, B3 + 6)} />
+              <LimitationCard x={660} title="Sort into bins" sub="scattered → grouped" visible={pop(frame, B3 + 22)} />
+              <div
+                style={{
+                  position: "absolute",
+                  left: 0,
+                  top: 600,
+                  width: 1280,
+                  textAlign: "center",
+                  fontSize: 22,
+                  fontWeight: 700,
+                  color: P.ink,
+                  opacity: pop(frame, B3 + 40),
+                }}
+              >
+                No swap. No bins. One fixed animation, every time.
+              </div>
+            </AbsoluteFill>
+          </div>
         )}
 
         {/* ---------------- beat 4 : the handoff to teaching-only effects ---------------- */}
-        <MotionInsert
-          effect="handoffExplain"
-          from={B4}
-          dur={B5 - B4}
-          accent={ACCENT}
-          base={STAGE}
-          data={{
-            from: "News-graphics animations",
-            to: "9 teaching-only Remotion effects",
-            points: [
-              "Zoom in to reveal the right answer",
-              "Swap a wrong answer for the right one",
-              "Sort items into their own bins",
-            ],
-          }}
-        />
+        <div style={{ position: "absolute", inset: 0, transform: `scale(${1 / scale})`, transformOrigin: "50% 46%" }}>
+          <MotionInsert
+            effect="handoffExplain"
+            from={B4}
+            dur={B5 - B4}
+            accent={ACCENT}
+            base={STAGE}
+            data={{
+              from: "News-graphics animations",
+              to: "9 teaching-only Remotion effects",
+              points: [
+                "Zoom in to reveal the right answer",
+                "Swap a wrong answer for the right one",
+                "Sort items into their own bins",
+              ],
+            }}
+          />
+        </div>
 
         {/* ---------------- beat 5 : drawn finale — the full catalog, zoomed to fill ---------------- */}
         {frame >= B5 && <FinaleMatrix frame={frame} />}

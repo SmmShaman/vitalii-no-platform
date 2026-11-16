@@ -20,7 +20,7 @@
  *  b5 612-769 "Each kid now wakes up to five new lesson cards a day, one ladder per subject." — holds to 814.
  */
 import React from "react";
-import { AbsoluteFill, Easing, interpolate, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Easing, interpolate, Sequence, useCurrentFrame } from "remotion";
 import { MOODS, PaletteProvider } from "./bright-theme";
 import { MotionInsert } from "./motion-primitives";
 import { LiveWindow, type Win } from "./live-primitives";
@@ -137,17 +137,21 @@ const Inner: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: STAGE, overflow: "hidden", fontFamily }}>
       {/* ---------------- beat 1 : real hub behind the opener ---------------- */}
-      <LiveWindow
-        file={shotsFile}
-        shot="hub"
-        title="vitalii.no/features"
-        from={B1}
-        hold={B2 - B1}
-        zoom={(t) => 1 + 0.08 * t}
-        focus={{ x: 0.5, y: 0.3 }}
-        opacity={1}
-        win={WIN_HUB}
-      />
+      {/* Sequence-gated so the BrowserWindow chrome (unconditionally opaque while mounted)
+          unmounts at B2 instead of sitting on top of every later beat. */}
+      <Sequence from={B1} durationInFrames={B2 - B1} layout="none">
+        <LiveWindow
+          file={shotsFile}
+          shot="hub"
+          title="vitalii.no/features"
+          from={0}
+          hold={B2 - B1}
+          zoom={(t) => 1 + 0.08 * t}
+          focus={{ x: 0.5, y: 0.3 }}
+          opacity={1}
+          win={WIN_HUB}
+        />
+      </Sequence>
       <MotionInsert
         effect="titleTakeover"
         from={B1}
@@ -168,17 +172,19 @@ const Inner: React.FC = () => {
       />
 
       {/* ---------------- beat 3 : real feature page behind the solution ---------------- */}
-      <LiveWindow
-        file={shotsFile}
-        shot="page"
-        title="vitalii.no/features/five-new-lesson-cards…"
-        from={B3}
-        hold={B4 - B3}
-        zoom={(t) => 1 + 0.08 * t}
-        focus={{ x: 0.5, y: 0.35 }}
-        opacity={1}
-        win={WIN_PAGE}
-      />
+      <Sequence from={B3} durationInFrames={B4 - B3} layout="none">
+        <LiveWindow
+          file={shotsFile}
+          shot="page"
+          title="vitalii.no/features/five-new-lesson-cards…"
+          from={0}
+          hold={B4 - B3}
+          zoom={(t) => 1 + 0.08 * t}
+          focus={{ x: 0.5, y: 0.35 }}
+          opacity={1}
+          win={WIN_PAGE}
+        />
+      </Sequence>
       <MotionInsert
         effect="pipelineFlow"
         from={B3}
@@ -192,6 +198,56 @@ const Inner: React.FC = () => {
       />
 
       {/* ---------------- beat 4 : the fact-check gate, drawn ---------------- */}
+      {/* StatusFocus caps its row height at 230px regardless of canvas height, so with only
+          2 claims it leaves large empty top/bottom bands on a 720-tall frame. Filler header
+          + badge below restate (never invent) the beat's own two "yes" verdicts to fill the
+          canvas, gated to this beat only. */}
+      {B4 <= frame && frame < B5 && (
+        <>
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 96,
+              width: 1280,
+              textAlign: "center",
+              opacity: pop(frame, B4, 14),
+            }}
+          >
+            <div style={{ fontSize: 30, fontWeight: 800, color: "#FFF4FF", letterSpacing: 0.4 }}>
+              Fact-check gate
+            </div>
+            <div style={{ marginTop: 8, fontSize: 16, fontWeight: 600, color: "rgba(255,244,255,0.6)" }}>
+              Every card passes this before it reaches a kid
+            </div>
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              bottom: 108,
+              width: 1280,
+              textAlign: "center",
+              opacity: pop(frame, B4 + 60, 14),
+            }}
+          >
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 22px",
+                borderRadius: 999,
+                background: "rgba(140,111,224,0.18)",
+                border: `2px solid ${ACCENT}`,
+              }}
+            >
+              <span style={{ fontSize: 20, color: ACCENT }}>✓</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: "#FFF4FF" }}>Textbook-verified</span>
+            </div>
+          </div>
+        </>
+      )}
       <MotionInsert
         effect="statusFocus"
         from={B4}
