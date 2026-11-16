@@ -1,0 +1,11 @@
+{
+  "id": "b98",
+  "composition": "FeatureBlindViewerChecksEveryB98",
+  "beats": [
+    {"beat":"b1","effect":"titleTakeover","backdrop":"page","data":{"title":"No one checked it first","kicker":"Boytasks — before a kid ever sees it"}},
+    {"beat":"b2","effect":"cornerTags","backdrop":"hub","data":{"statement":"One bad render, nobody watching","tags":["Broken beat","Overlapping label","Nonsense animation","Straight to the TV"]}},
+    {"beat":"b3","effect":"pipelineFlow","backdrop":null,"data":{"steps":["Writer scores motion JSON","Contabo renders the MP4","Reviewer + blind viewer judge it"],"result":"Only a pass ships","system":"render server (VPS)"}},
+    {"beat":"b4","effect":"drawn","note":"LogWindow: lesson-render.timer ticking on the VPS — real numbers only (every 15 min, nice 19, 2G memory cap, 14-day cleanup, R2 upload)"},
+    {"beat":"b5","effect":"drawn","note":"archetype-only finale: card deck finishes fanning into an all-PASS grid, closing stat 'every fifteen minutes, nonstop'"}
+  ]
+}

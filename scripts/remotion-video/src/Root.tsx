@@ -319,6 +319,9 @@ import { FeatureElvarikasBackendRefillsCreditsE06 } from "./compositions/feature
 import { FeatureOneAudioPlayerFollowsE05 } from "./compositions/feature-demos/FeatureOneAudioPlayerFollowsE05";
 import { FeatureTvWallGetsOptB92 } from "./compositions/feature-demos/FeatureTvWallGetsOptB92";
 import { FeatureHeadlessClaudeDirectsTvB91 } from "./compositions/feature-demos/FeatureHeadlessClaudeDirectsTvB91";
+import { FeatureBlindViewerChecksEveryB98 } from "./compositions/feature-demos/FeatureBlindViewerChecksEveryB98";
+import { FeatureNineNewTeachingEffectsB97 } from "./compositions/feature-demos/FeatureNineNewTeachingEffectsB97";
+import { FeatureFiveNewLessonCardsB96 } from "./compositions/feature-demos/FeatureFiveNewLessonCardsB96";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -3155,6 +3158,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureHeadlessClaudeDirectsTvB91"
         component={FeatureHeadlessClaudeDirectsTvB91}
         durationInFrames={808}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureBlindViewerChecksEveryB98"
+        component={FeatureBlindViewerChecksEveryB98}
+        durationInFrames={931}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNineNewTeachingEffectsB97"
+        component={FeatureNineNewTeachingEffectsB97}
+        durationInFrames={871}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFiveNewLessonCardsB96"
+        component={FeatureFiveNewLessonCardsB96}
+        durationInFrames={814}
         fps={30}
         width={1280}
         height={720}

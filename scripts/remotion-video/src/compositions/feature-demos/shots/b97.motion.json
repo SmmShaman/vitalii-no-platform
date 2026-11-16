@@ -1,0 +1,11 @@
+{
+  "id": "b97",
+  "composition": "FeatureNineNewTeachingEffectsB97",
+  "beats": [
+    {"beat":"b1","effect":"titleTakeover","backdrop":"hub","data":{"title":"Borrowed from a news library","kicker":"Boytasks — lesson videos, before today"}},
+    {"beat":"b2","effect":"statusFocus","backdrop":"page","data":{"claims":[{"text":"Built for grown-up fact-checking","verdict":"yes"},{"text":"Built for how a child learns","verdict":"no"}]}},
+    {"beat":"b3","effect":"drawn","note":"no catalog effect covers a missing-capability list without inventing UI; drawn pair of lesson cards shows no swap control on a wrong answer and no bins for unsorted items, camera keeps pushing in"},
+    {"beat":"b4","effect":"handoffExplain","backdrop":null,"data":{"from":"News-graphics animations","to":"9 teaching-only Remotion effects","points":["Zoom in to reveal the right answer","Swap a wrong answer for the right one","Sort items into their own bins"]}},
+    {"beat":"b5","effect":"drawn","note":"archetype-only finale: the camera reaches full zoom on a 3x3 grid of the nine teaching effects, filling the frame — no page/hub backdrop"}
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "b96",
+  "composition": "FeatureFiveNewLessonCardsB96",
+  "beats": [
+    {"beat":"b1","effect":"titleTakeover","backdrop":"hub","data":{"title":"All quiz, no teaching first","kicker":"Boytasks — lesson cards, before today"}},
+    {"beat":"b2","effect":"keywordCaption","backdrop":null,"data":{"line1":"Random topics,","line2":"no link to this week's class","keywords":["Random","no link"]}},
+    {"beat":"b3","effect":"pipelineFlow","backdrop":"page","data":{"steps":["Real textbook","Chapter by chapter","Lesson draft"],"result":"Matches this week's class","system":"Boytasks lesson engine"}},
+    {"beat":"b4","effect":"statusFocus","backdrop":null,"data":{"claims":[{"text":"Every fact checked against textbook","verdict":"yes"},{"text":"Card written only after the check","verdict":"yes"}]}},
+    {"beat":"b5","effect":"cardCounter","backdrop":null,"data":{"cards":[{"label":"Math","value":1},{"label":"Norwegian","value":1},{"label":"English","value":1},{"label":"Science","value":1},{"label":"Social studies","value":1}],"unit":"card","totalLabel":"Cards today"}}
+  ]
+}
