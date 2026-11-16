@@ -306,6 +306,27 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{ title: "Nothing checked it first", kicker: "Boytasks lesson videos, before a kid ever saw one" }}
       />
+      {cut(frame, B1, B2) === 1 && (
+        <Arrive at={B1 + 36} kind="rise" box={{ x: 40, y: 40, w: 300, h: 58 }}>
+          <div
+            style={{
+              position: "absolute",
+              left: 40,
+              top: 40,
+              padding: "10px 18px",
+              borderRadius: 6,
+              background: "rgba(10,10,10,0.78)",
+              border: `2px solid ${ACCENT}`,
+              fontFamily,
+            }}
+          >
+            <div style={{ fontSize: 22, fontWeight: 800, color: ACCENT, letterSpacing: 1 }}>BOYTASKS</div>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#E7E7E7", marginTop: 2 }}>
+              screen-time &amp; chore app for 3 kids
+            </div>
+          </div>
+        </Arrive>
+      )}
 
       {/* b2 — what could have gone straight to the TV */}
       {cut(frame, B2, B3) === 1 && <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />}
@@ -329,11 +350,48 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         base={STAGE}
         data={{
-          steps: ["Writer scores motion JSON", "Contabo renders the MP4", "Reviewer + blind viewer judge it"],
+          steps: ["Writer scores motion JSON", "Contabo (VPS) renders MP4", "Reviewer + blind viewer judge it"],
           result: "Only a pass ships",
           system: "render server (VPS)",
         }}
       />
+      {cut(frame, B3, B4) === 1 && (
+        <Arrive at={B3 + 30} kind="wipe" box={{ x: 40, y: 40, w: 260, h: 192 }} dur={0.4}>
+          <div
+            style={{
+              position: "absolute",
+              left: 40,
+              top: 40,
+              width: 260,
+              height: 192,
+              background: "rgba(10,10,10,0.82)",
+              border: `2px solid ${ACCENT}`,
+              borderRadius: 6,
+              padding: 14,
+              boxSizing: "border-box",
+              fontFamily,
+            }}
+          >
+            <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.6, color: ACCENT }}>CONTACT SHEET</div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6, marginTop: 10 }}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  style={{
+                    height: 36,
+                    borderRadius: 3,
+                    background: "rgba(255,255,255,0.08)",
+                    border: "1px solid rgba(255,255,255,0.25)",
+                  }}
+                />
+              ))}
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "#E7E7E7", marginTop: 10 }}>
+              every frame, checked
+            </div>
+          </div>
+        </Arrive>
+      )}
 
       {/* b4 — the unattended render server, real numbers only (no runtime log exists) */}
       <LogWindow
@@ -344,12 +402,12 @@ const Inner: React.FC = () => {
         win={{ x: 60, y: 40, w: 1160, h: 540 }}
         fontSize={20}
         lines={[
-          { t: "00:00", text: "lesson-render.service started (systemd)", tone: "muted" },
-          { t: "00:02", text: "picked up 1 due card, nice 19", tone: "ink" },
+          { t: "00:00", text: "render job starts on its own, no human needed", tone: "muted" },
+          { t: "00:02", text: "picked up 1 due lesson card", tone: "ink" },
           { t: "00:14", text: "contact sheet rendered -> reviewer", tone: "ink" },
           { t: "00:19", text: "blind viewer: PASS", tone: "success" },
-          { t: "00:21", text: "uploaded to R2, memory cap 2G held", tone: "ink" },
-          { t: "00:22", text: "renders older than 14d cleaned up", tone: "muted" },
+          { t: "00:21", text: "uploaded to cloud storage (R2)", tone: "ink" },
+          { t: "00:22", text: "renders older than 14 days cleaned up", tone: "muted" },
           { t: "15:00", text: "next check in 15 min", tone: "accent" },
         ]}
       />
