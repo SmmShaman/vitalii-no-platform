@@ -1,0 +1,7 @@
+{"id": "b100", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Two kids on one couch, one remote, no way to tell whose turn it was."],
+  ["b2", "Now each player taps in with their own PIN before every move."],
+  ["b3", "A Cloudflare Worker keeps the score table running from one match to the next."],
+  ["b4", "If a kid forgets how winning a small board locks in the big one, one tap opens the rules mid-game."],
+  ["b5", "One remote, one TV, a full nine-board match, no confusion."]
+]}

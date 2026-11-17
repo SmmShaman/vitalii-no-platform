@@ -1,0 +1,57 @@
+{
+ "id": "b93",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.069,
+  "b2": 5.648,
+  "b3": 6.493,
+  "b4": 5.217,
+  "b5": 5.538
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Eight compound words meant eight separate cards, each waiting its turn to come back.",
+   "start_s": 0.5,
+   "end_s": 5.569,
+   "start_f": 15,
+   "end_f": 167
+  },
+  {
+   "beat": "b2",
+   "text": "Picking one card, answering, walking back to pick the next ate up the actual drilling time.",
+   "start_s": 5.869,
+   "end_s": 11.517,
+   "start_f": 176,
+   "end_f": 346
+  },
+  {
+   "beat": "b3",
+   "text": "Now one card holds the whole set - all eight compound words, or all eight math facts, together.",
+   "start_s": 11.817,
+   "end_s": 18.31,
+   "start_f": 355,
+   "end_f": 549
+  },
+  {
+   "beat": "b4",
+   "text": "Each word is still tracked on its own in Supabase, so the due one shows first.",
+   "start_s": 18.61,
+   "end_s": 23.827,
+   "start_f": 558,
+   "end_f": 715
+  },
+  {
+   "beat": "b5",
+   "text": "Vocabulary cards go even further - one card now holds ten words at once.",
+   "start_s": 24.127,
+   "end_s": 29.665,
+   "start_f": 724,
+   "end_f": 890
+  }
+ ],
+ "total_s": 31.165,
+ "durationInFrames": 935,
+ "measured_track_s": 29.736,
+ "track": "/root/feature-demos/vo-b93/vo-b93.mp3"
+}

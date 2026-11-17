@@ -1,0 +1,57 @@
+{
+ "id": "b100",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.112,
+  "b2": 3.971,
+  "b3": 4.726,
+  "b4": 6.336,
+  "b5": 4.978
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Two kids on one couch, one remote, no way to tell whose turn it was.",
+   "start_s": 0.5,
+   "end_s": 5.612,
+   "start_f": 15,
+   "end_f": 168
+  },
+  {
+   "beat": "b2",
+   "text": "Now each player taps in with their own PIN before every move.",
+   "start_s": 5.912,
+   "end_s": 9.883,
+   "start_f": 177,
+   "end_f": 296
+  },
+  {
+   "beat": "b3",
+   "text": "A Cloudflare Worker keeps the score table running from one match to the next.",
+   "start_s": 10.183,
+   "end_s": 14.909,
+   "start_f": 305,
+   "end_f": 447
+  },
+  {
+   "beat": "b4",
+   "text": "If a kid forgets how winning a small board locks in the big one, one tap opens the rules mid-game.",
+   "start_s": 15.209,
+   "end_s": 21.545,
+   "start_f": 456,
+   "end_f": 646
+  },
+  {
+   "beat": "b5",
+   "text": "One remote, one TV, a full nine-board match, no confusion.",
+   "start_s": 21.845,
+   "end_s": 26.823,
+   "start_f": 655,
+   "end_f": 805
+  }
+ ],
+ "total_s": 28.323,
+ "durationInFrames": 850,
+ "measured_track_s": 26.88,
+ "track": "/root/feature-demos/vo-b100/vo-b100.mp3"
+}

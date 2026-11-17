@@ -1,0 +1,57 @@
+{
+ "id": "b99",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.307,
+  "b2": 5.672,
+  "b3": 7.388,
+  "b4": 5.201,
+  "b5": 5.207
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "When a kid asks why the moon has phases, a text answer never really lands.",
+   "start_s": 0.5,
+   "end_s": 5.807,
+   "start_f": 15,
+   "end_f": 174
+  },
+  {
+   "beat": "b2",
+   "text": "Now he just asks out loud, in Ukrainian or Norwegian, and a bot takes down the question.",
+   "start_s": 6.107,
+   "end_s": 11.779,
+   "start_f": 183,
+   "end_f": 353
+  },
+  {
+   "beat": "b3",
+   "text": "The answer comes back as its own little movie - camera flights, 3D models, tiny math scenes, built with Remotion.",
+   "start_s": 12.079,
+   "end_s": 19.467,
+   "start_f": 362,
+   "end_f": 584
+  },
+  {
+   "beat": "b4",
+   "text": "The very first one, 'chicken or egg', played start to finish, made just for him.",
+   "start_s": 19.767,
+   "end_s": 24.968,
+   "start_f": 593,
+   "end_f": 749
+  },
+  {
+   "beat": "b5",
+   "text": "Behind it, six separate renders finish together - so no answer makes him wait.",
+   "start_s": 25.268,
+   "end_s": 30.475,
+   "start_f": 758,
+   "end_f": 914
+  }
+ ],
+ "total_s": 31.975,
+ "durationInFrames": 959,
+ "measured_track_s": 30.528,
+ "track": "/root/feature-demos/vo-b99/vo-b99.mp3"
+}
