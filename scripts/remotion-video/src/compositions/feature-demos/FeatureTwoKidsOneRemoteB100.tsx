@@ -10,8 +10,9 @@
 //             cornerTags: PIN + random X/O + parent PIN facts, over the same
 //             page scrolled further (backdrop "page2").
 // b3 305-455  "a Cloudflare Worker keeps the score table running"
-//             handoffExplain, BEFORE/NOW score handling. No recording: a
-//             background Worker has no page to show, so this is drawn.
+//             statusFocus, three claims (was handoffExplain — its camera-pan
+//             gap left the frame near-empty at the beat's midpoint). No
+//             recording: a background Worker has no page to show, so this is drawn.
 // b4 456-654  "one tap opens the rules mid-game" — drawn only (archetype +
 //             a mockup rules sheet). No verified URL shows the mid-game kiosk
 //             popup, so this stays drawn rather than faked as a recording.
@@ -236,17 +237,18 @@ const Inner: React.FC = () => {
 
       {/* b3 — the Cloudflare Worker score table (invisible plumbing, no page to show) */}
       <MotionInsert
-        effect="handoffExplain"
+        effect="statusFocus"
         from={B3}
         dur={B4 - B3}
         accent={ACCENT}
         plate={0.7}
         data={{
-          from: "Score resets every match",
-          to: "Score saved match to match",
-          fromLabel: "BEFORE",
-          toLabel: "NOW",
-          points: ["Running score table", "Cloudflare Worker", "No sign-in beyond the PIN"],
+          title: "Score tracking",
+          claims: [
+            { text: "Score used to reset after every match", verdict: "no" },
+            { text: "Now the score is saved match to match", verdict: "yes" },
+            { text: "Runs on a Cloudflare Worker — no extra sign-in", verdict: "yes" },
+          ],
         }}
       />
 

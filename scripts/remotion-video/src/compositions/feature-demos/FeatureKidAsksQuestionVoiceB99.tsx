@@ -15,8 +15,10 @@
 //             Informed by commit 14717b6 (effects/pins/prims/CompositionStrip). "Remotion" is
 //             the one allowed tech caption, glossed inline as "rendering code".
 // b4 593-757  "the very first one, 'chicken or egg', played start to finish, made just for him"
-//             timelineNodes, drawn only — informed by commit f5dafae (first full chicken-egg
-//             plan + visualiser prompt). No verified URL shows the finished render.
+//             drawn panel + icon cards (was timelineNodes — its horizontal-band layout left
+//             most of the canvas empty at the beat's midpoint). Informed by commit f5dafae
+//             (first full chicken-egg plan + visualiser prompt). No verified URL shows the
+//             finished render.
 // b5 758-959  "behind it, six separate renders finish together — so no answer makes him wait"
 //             drawn only: a LogWindow built from the feature's own numbers (6 render chunks,
 //             informed by commit 40da4b2's multi-beat render workflow), plus the flow-map's
@@ -31,7 +33,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, Panel, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow, LogLine } from "./live-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
@@ -291,20 +293,19 @@ const Inner: React.FC = () => {
       />
 
       {/* b4 — drawn: the first explainer, "chicken or egg", played start to finish */}
-      <MotionInsert
-        effect="timelineNodes"
-        from={B4}
-        dur={B5 - B4}
-        accent={ACCENT}
-        data={{
-          nodes: [
-            { date: "Asked", label: "\"Chicken or egg?\"" },
-            { date: "Planned", label: "Agents 1-5 build the plan" },
-            { date: "Rendered", label: "Played start to finish" },
-          ],
-          activeIndex: 2,
-        }}
-      />
+      {frame >= B4 && frame < B5 && (
+        <Panel x={140} y={90} w={1000} h={420} tone="note" radius={28} opacity={1}>
+          <div style={{ padding: "30px 40px 0" }}>
+            <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: ACCENT }}>FIRST EXPLAINER</div>
+            <div style={{ fontSize: 30, fontWeight: 800, color: "#101418", marginTop: 4 }}>&ldquo;Chicken or egg?&rdquo;</div>
+          </div>
+          <div style={{ display: "flex", height: 230, alignItems: "center", justifyContent: "space-around", padding: "0 40px" }}>
+            <IconCard x={0} y={0} w={260} emoji="🥚" title="The very first one" sub="Made from his own question" tone="accent" />
+            <IconCard x={0} y={0} w={260} emoji="▶️" title="Played start to finish" sub="No skipping, no cuts" tone="success" />
+            <IconCard x={0} y={0} w={260} emoji="🧒" title="Made just for him" sub="Not a generic answer" tone="danger" />
+          </div>
+        </Panel>
+      )}
 
       {/* b5 — drawn: six renders finishing together, ending on the real result */}
       {frame >= B5 && (

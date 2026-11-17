@@ -27,7 +27,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, Panel, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, cut } from "./motion-primitives";
 import { LogWindow, LogLine } from "./live-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
@@ -174,20 +174,22 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — one card now holds the whole set */}
+      {/* b3 — one card now holds the whole set (was ratioBars — its bracket/ratio reveal
+          hadn't started yet at the beat's measured midpoint, leaving the frame sparse) */}
       {cut(frame, B3, B4) === 1 && <LiveBackdrop file={shotsFile} shot="page3" from={B3} hold={B4 - B3} />}
-      <MotionInsert
-        effect="ratioBars"
-        from={B3}
-        dur={B4 - B3}
-        accent={ACCENT}
-        plate={0.7}
-        data={{
-          a: { label: "Before", value: 8 },
-          b: { label: "Now", value: 1 },
-          unit: "cards",
-        }}
-      />
+      {frame >= B3 && frame < B4 && (
+        <Panel x={140} y={90} w={1000} h={420} tone="note" radius={28} opacity={1}>
+          <div style={{ padding: "30px 40px 0" }}>
+            <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: ACCENT }}>ONE CARD, WHOLE SET</div>
+            <div style={{ fontSize: 30, fontWeight: 800, color: "#101418", marginTop: 4 }}>Eight cards become one</div>
+          </div>
+          <div style={{ display: "flex", height: 230, alignItems: "center", justifyContent: "space-around", padding: "0 40px" }}>
+            <IconCard x={0} y={0} w={260} emoji="🗂️" title="8 compound words" sub="Used to be 8 cards" tone="accent" />
+            <IconCard x={0} y={0} w={260} emoji="🧮" title="8 math facts" sub="Also 8 separate cards" tone="accent" />
+            <IconCard x={0} y={0} w={260} emoji="🃏" title="Now: 1 card" sub="Holds the whole set" tone="success" />
+          </div>
+        </Panel>
+      )}
 
       {/* b4 — drawn: each word tracked on its own, due one shows first */}
       <MotionInsert
@@ -203,12 +205,16 @@ const Inner: React.FC = () => {
             { label: "ost", x: 80, y: 15 },
             { label: "bro", x: 50, y: 50 },
             { label: "fisk", x: 15, y: 70 },
+            { label: "katt", x: 90, y: 90 },
+            { label: "stein", x: 8, y: 10 },
           ],
           focus: "sykkel",
         }}
       />
 
-      {/* b5 — drawn: ten words per card, ending on the real result */}
+      {/* b5 — drawn: ten words per card, ending on the real result (supplemented with two
+          flanking cards — targetOverrun's own content is a thin centered track that left
+          the corners empty at the beat's measured midpoint) */}
       <MotionInsert
         effect="targetOverrun"
         from={B5}
@@ -216,6 +222,12 @@ const Inner: React.FC = () => {
         accent={ACCENT}
         data={{ label: "Words per vocabulary card", value: 10, target: 1, unit: "words" }}
       />
+      {frame >= B5 && frame < B5 + Math.round((END - B5) * 0.55) && (
+        <>
+          <IconCard x={950} y={70} w={260} emoji="🔄" title="Fresh words" sub="Picked every visit" tone="accent" />
+          <IconCard x={950} y={470} w={260} emoji="⏳" title="Drilling time" sub="Back where it belongs" tone="success" />
+        </>
+      )}
       {frame >= B5 + Math.round((END - B5) * 0.5) && (
         <LogWindow lines={RESULT_LINES} title="deck log" from={B5 + Math.round((END - B5) * 0.55)} every={16} opacity={1} fontSize={22} />
       )}
