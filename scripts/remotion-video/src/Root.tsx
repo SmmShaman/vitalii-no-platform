@@ -233,6 +233,9 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureTwoKidsOneRemoteB100 } from "./compositions/feature-demos/FeatureTwoKidsOneRemoteB100";
+import { FeatureKidAsksQuestionVoiceB99 } from "./compositions/feature-demos/FeatureKidAsksQuestionVoiceB99";
+import { FeaturePracticeCardUsedAskB93 } from "./compositions/feature-demos/FeaturePracticeCardUsedAskB93";
 import { FeatureHomeworkStopsBeingOwnB95 } from "./compositions/feature-demos/FeatureHomeworkStopsBeingOwnB95";
 import { FeatureScenesLearnWhenSkipB94 } from "./compositions/feature-demos/FeatureScenesLearnWhenSkipB94";
 import { FeatureSchoolLettersComeAsB83 } from "./compositions/feature-demos/FeatureSchoolLettersComeAsB83";
@@ -2379,6 +2382,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTwoKidsOneRemoteB100"
+        component={FeatureTwoKidsOneRemoteB100}
+        durationInFrames={850}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureKidAsksQuestionVoiceB99"
+        component={FeatureKidAsksQuestionVoiceB99}
+        durationInFrames={959}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeaturePracticeCardUsedAskB93"
+        component={FeaturePracticeCardUsedAskB93}
+        durationInFrames={935}
         fps={30}
         width={1280}
         height={720}

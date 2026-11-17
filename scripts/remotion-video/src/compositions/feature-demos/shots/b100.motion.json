@@ -1,0 +1,44 @@
+{
+  "id": "b100",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "Whose turn was it?", "kicker": "Two kids, one remote, one TV" }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "Every player taps in with their own PIN",
+        "tags": ["PIN before every move", "Random X or O", "Parents get a PIN too", "Kiosk game button"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Score resets every match",
+        "to": "Score saved match to match",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Running score table", "Cloudflare Worker", "No sign-in beyond the PIN"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype only: a RULES card flips out of the deck. No catalog effect, no live recording (no verified URL shows this mid-game interaction); none of the three given commits mention b100, so this is drawn, not sourced from a commit."
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "LogWindow (built from the feature's own problem/solution/result facts, no invented numbers) plus the card-deck fanning into its final 3x3 grid with the winning line lit. Ends on the 9-board result, never on the feature page or the hub (gate 2)."
+    }
+  ]
+}

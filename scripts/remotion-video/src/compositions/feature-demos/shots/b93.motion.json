@@ -1,0 +1,64 @@
+{
+  "id": "b93",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cardCounter",
+      "backdrop": "page",
+      "data": {
+        "cards": [
+          { "label": "Compound words", "value": 8 },
+          { "label": "Math facts", "value": 8 }
+        ],
+        "unit": "cards",
+        "totalLabel": "Separate decks"
+      },
+      "note": "opener deliberately NOT titleTakeover (b97, b98) and NOT keywordCaption (b94). Matches commit 89114cd (lists for compound words (8) and mental-maths facts (8))."
+    },
+    {
+      "beat": "b2",
+      "effect": "pipelineFlow",
+      "backdrop": "page2",
+      "data": {
+        "steps": ["Pick a card", "Answer it", "Walk back for the next"],
+        "result": "Drilling time lost",
+        "system": "Old flow"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "ratioBars",
+      "backdrop": "page3",
+      "data": {
+        "a": { "label": "Before", "value": 8 },
+        "b": { "label": "Now", "value": 1 },
+        "unit": "cards"
+      },
+      "note": "matches commit 89114cd — all 8 compound words (or 8 math facts) on one card."
+    },
+    {
+      "beat": "b4",
+      "effect": "quadrantPositioning",
+      "backdrop": null,
+      "data": {
+        "xLabel": "correct in a row",
+        "yLabel": "days since last seen",
+        "items": [
+          { "label": "sykkel", "x": 25, "y": 85 },
+          { "label": "ost", "x": 80, "y": 15 },
+          { "label": "bro", "x": 50, "y": 50 },
+          { "label": "fisk", "x": 15, "y": 70 }
+        ],
+        "focus": "sykkel"
+      },
+      "note": "drawn — each word tracked on its own in Supabase (commit 50df24b: repetition tracked per word); the focus word is the one due first."
+    },
+    {
+      "beat": "b5",
+      "effect": "targetOverrun",
+      "backdrop": null,
+      "data": { "label": "Words per vocabulary card", "value": 10, "target": 1, "unit": "words" },
+      "note": "drawn, matches commit 50df24b (ten words per card instead of one). Followed by a LogWindow result; ends here, never on the feature page or the hub (gate 2)."
+    }
+  ]
+}

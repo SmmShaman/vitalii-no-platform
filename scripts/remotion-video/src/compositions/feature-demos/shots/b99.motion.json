@@ -1,0 +1,55 @@
+{
+  "id": "b99",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "A text answer never really lands",
+        "tags": ["Asked at a 6-year-old level", "One specific question", "Ukrainian or Norwegian"]
+      },
+      "note": "opener deliberately NOT titleTakeover (used by b97, b98) and NOT keywordCaption (used by b94)."
+    },
+    {
+      "beat": "b2",
+      "effect": "pipelineFlow",
+      "backdrop": "page2",
+      "data": {
+        "steps": ["Asked out loud", "Bot takes down question", "Turned into a scene plan"],
+        "result": "Ready to render",
+        "system": "Explain bot"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "funnelAbsorption",
+      "backdrop": "page3",
+      "data": {
+        "inputs": ["Camera flights", "3D models", "Math scenes", "Emoji actors"],
+        "result": "One explainer video (Remotion = rendering code)"
+      },
+      "note": "informed by commit 14717b6 (timelineNodes/pins/prims/CompositionStrip effects). The single allowed tech caption, 'Remotion', is glossed inline in the result text."
+    },
+    {
+      "beat": "b4",
+      "effect": "timelineNodes",
+      "backdrop": null,
+      "data": {
+        "nodes": [
+          { "date": "Asked", "label": "\"Chicken or egg?\"" },
+          { "date": "Planned", "label": "Agents 1-5 build the plan" },
+          { "date": "Rendered", "label": "Played start to finish" }
+        ],
+        "activeIndex": 2
+      },
+      "note": "drawn, directly informed by commit f5dafae (first full chicken-egg plan + visualiser prompt). No verified URL shows the finished render, so this stays a timeline, not a recording."
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "LogWindow built only from the feature's own numbers (6 render chunks, informed by commit 40da4b2's multi-beat/pace-gate render workflow) plus the flow-map archetype's 6 pips lighting up SIMULTANEOUSLY (not staggered) to match the sentence 'finish together'. Ends on this drawn result, never on the feature page or the hub (gate 2)."
+    }
+  ]
+}
