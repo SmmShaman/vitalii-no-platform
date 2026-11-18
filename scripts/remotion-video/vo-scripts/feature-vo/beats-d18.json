@@ -1,0 +1,8 @@
+{"id": "d18", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "A low blood sugar alert used to flash red and blue - but only on one screen."],
+  ["b2", "The second someone switched the kitchen TV to YouTube, that warning vanished."],
+  ["b3", "The reading kept falling underneath, and nobody watching could see it."],
+  ["b4", "Now a background Android service watches the sugar levels on its own."],
+  ["b5", "It throws a full-screen flash on top of whatever app is open."],
+  ["b6", "YouTube, games, anything - the warning gets through every single time."]
+]}

@@ -1,0 +1,66 @@
+{
+ "id": "b105",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.782,
+  "b2": 4.035,
+  "b3": 4.275,
+  "b4": 4.269,
+  "b5": 5.172,
+  "b6": 4.69
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "The first fully finished explainer video exposed problems no one had caught.",
+   "start_s": 0.5,
+   "end_s": 5.282,
+   "start_f": 15,
+   "end_f": 158
+  },
+  {
+   "beat": "b2",
+   "text": "It quizzed the kid mid-video instead of just answering their question.",
+   "start_s": 5.582,
+   "end_s": 9.617,
+   "start_f": 167,
+   "end_f": 289
+  },
+  {
+   "beat": "b3",
+   "text": "Numbers were vague, and the real explanation got buried under filler.",
+   "start_s": 9.917,
+   "end_s": 14.192,
+   "start_f": 298,
+   "end_f": 426
+  },
+  {
+   "beat": "b4",
+   "text": "So a sixth AI editor was added, just to catch exactly that.",
+   "start_s": 14.492,
+   "end_s": 18.761,
+   "start_f": 435,
+   "end_f": 563
+  },
+  {
+   "beat": "b5",
+   "text": "It blocks quiz questions, demands real numbers, and protects the explanation.",
+   "start_s": 19.061,
+   "end_s": 24.233,
+   "start_f": 572,
+   "end_f": 727
+  },
+  {
+   "beat": "b6",
+   "text": "That core explanation must now fill at least 30 percent of every video.",
+   "start_s": 24.533,
+   "end_s": 29.223,
+   "start_f": 736,
+   "end_f": 877
+  }
+ ],
+ "total_s": 30.723,
+ "durationInFrames": 922,
+ "measured_track_s": 29.28,
+ "track": "/root/feature-demos/vo-b105/vo-b105.mp3"
+}

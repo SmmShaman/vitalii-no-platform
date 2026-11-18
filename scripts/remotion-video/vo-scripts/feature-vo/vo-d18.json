@@ -1,0 +1,66 @@
+{
+ "id": "d18",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.122,
+  "b2": 4.762,
+  "b3": 4.068,
+  "b4": 4.531,
+  "b5": 4.022,
+  "b6": 5.005
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A low blood sugar alert used to flash red and blue - but only on one screen.",
+   "start_s": 0.5,
+   "end_s": 5.622,
+   "start_f": 15,
+   "end_f": 169
+  },
+  {
+   "beat": "b2",
+   "text": "The second someone switched the kitchen TV to YouTube, that warning vanished.",
+   "start_s": 5.922,
+   "end_s": 10.684,
+   "start_f": 178,
+   "end_f": 321
+  },
+  {
+   "beat": "b3",
+   "text": "The reading kept falling underneath, and nobody watching could see it.",
+   "start_s": 10.984,
+   "end_s": 15.052,
+   "start_f": 330,
+   "end_f": 452
+  },
+  {
+   "beat": "b4",
+   "text": "Now a background Android service watches the sugar levels on its own.",
+   "start_s": 15.352,
+   "end_s": 19.883,
+   "start_f": 461,
+   "end_f": 596
+  },
+  {
+   "beat": "b5",
+   "text": "It throws a full-screen flash on top of whatever app is open.",
+   "start_s": 20.183,
+   "end_s": 24.205,
+   "start_f": 605,
+   "end_f": 726
+  },
+  {
+   "beat": "b6",
+   "text": "YouTube, games, anything - the warning gets through every single time.",
+   "start_s": 24.505,
+   "end_s": 29.51,
+   "start_f": 735,
+   "end_f": 885
+  }
+ ],
+ "total_s": 31.01,
+ "durationInFrames": 930,
+ "measured_track_s": 29.568,
+ "track": "/root/feature-demos/vo-d18/vo-d18.mp3"
+}

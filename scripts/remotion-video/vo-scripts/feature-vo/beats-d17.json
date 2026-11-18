@@ -1,0 +1,8 @@
+{"id": "d17", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Turning a spare TV stick into a kitchen display used to mean buying a paid licence."],
+  ["b2", "Without it, the screen just reverts back to the normal Android home screen."],
+  ["b3", "Or it drains the battery with an idle animation nobody asked for."],
+  ["b4", "So now a tiny app registers itself as the stick's actual home screen."],
+  ["b5", "It boots straight into a clock showing glucose, time, and the weather."],
+  ["b6", "No licence, no fallback screen - the cost comes down to zero."]
+]}

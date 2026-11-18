@@ -1,0 +1,66 @@
+{
+ "id": "d17",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.356,
+  "b2": 4.789,
+  "b3": 4.225,
+  "b4": 4.664,
+  "b5": 4.582,
+  "b6": 4.71
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Turning a spare TV stick into a kitchen display used to mean buying a paid licence.",
+   "start_s": 0.5,
+   "end_s": 5.856,
+   "start_f": 15,
+   "end_f": 176
+  },
+  {
+   "beat": "b2",
+   "text": "Without it, the screen just reverts back to the normal Android home screen.",
+   "start_s": 6.156,
+   "end_s": 10.945,
+   "start_f": 185,
+   "end_f": 328
+  },
+  {
+   "beat": "b3",
+   "text": "Or it drains the battery with an idle animation nobody asked for.",
+   "start_s": 11.245,
+   "end_s": 15.47,
+   "start_f": 337,
+   "end_f": 464
+  },
+  {
+   "beat": "b4",
+   "text": "So now a tiny app registers itself as the stick's actual home screen.",
+   "start_s": 15.77,
+   "end_s": 20.434,
+   "start_f": 473,
+   "end_f": 613
+  },
+  {
+   "beat": "b5",
+   "text": "It boots straight into a clock showing glucose, time, and the weather.",
+   "start_s": 20.734,
+   "end_s": 25.316,
+   "start_f": 622,
+   "end_f": 759
+  },
+  {
+   "beat": "b6",
+   "text": "No licence, no fallback screen - the cost comes down to zero.",
+   "start_s": 25.616,
+   "end_s": 30.326,
+   "start_f": 768,
+   "end_f": 910
+  }
+ ],
+ "total_s": 31.826,
+ "durationInFrames": 955,
+ "measured_track_s": 30.384,
+ "track": "/root/feature-demos/vo-d17/vo-d17.mp3"
+}
