@@ -229,7 +229,7 @@ const Inner: React.FC = () => {
       )}
 
       {cut(frame, B2, B3) === 1 && (
-        <LiveBackdrop file={shotsFile} shot="hub" from={B2} hold={B3 - B2} />
+        <LiveBackdrop file={shotsFile} shot="page" from={B2} hold={B3 - B2} />
       )}
       {cut(frame, B2, B3) === 1 && (
         <MotionInsert
@@ -241,7 +241,7 @@ const Inner: React.FC = () => {
             title: "Without it",
             claims: [
               { text: "No licence installed", verdict: "yes" },
-              { text: "Stays on the clock page", verdict: "no" },
+              { text: "Reverts to Android home screen", verdict: "yes" },
             ],
           }}
         />
@@ -264,7 +264,7 @@ const Inner: React.FC = () => {
       )}
 
       {cut(frame, B4, B5) === 1 && (
-        <LiveBackdrop file={shotsFile} shot="hub" from={B4} hold={B5 - B4} />
+        <LiveBackdrop file={shotsFile} shot="page" from={B4} hold={B5 - B4} />
       )}
       {cut(frame, B4, B5) === 1 && (
         <MotionInsert
@@ -307,7 +307,7 @@ const Inner: React.FC = () => {
           accent={ACCENT}
           data={{
             statement: "The clock keeps running",
-            tags: ["Glucose shown live", "Stale, struck through", "Local time, always on", "Zero licence cost"],
+            tags: ["Glucose shown live", "Stale, struck through", "Local time, always on", "Weather row shown"],
           }}
         />
       )}
