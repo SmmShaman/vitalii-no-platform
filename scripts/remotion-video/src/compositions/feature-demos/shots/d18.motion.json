@@ -1,0 +1,57 @@
+{
+  "id": "d18",
+  "composition": "FeatureLowSugarSirenFlashesD18",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Alert only lived on the clock page",
+        "tags": ["Red/blue flash", "Clock page only", "Hub still polling", "Invisible elsewhere"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Clock page open",
+        "to": "YouTube or any app",
+        "points": ["Warning vanishes", "Reading still falls", "No one gets notified"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": { "note": "full ledger card, archetype element only, no live backdrop" }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "page",
+      "data": {
+        "steps": ["Hub reading", "SirenService polls", "Full-screen overlay"],
+        "result": "Works without the clock page",
+        "system": "Android foreground service"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "copyCorrection",
+      "backdrop": "hub",
+      "data": {
+        "wrong": "Alert stays behind the open app",
+        "right": "Full-screen flash over any app",
+        "label": "Now"
+      }
+    },
+    {
+      "beat": "b6",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": { "note": "full ledger card held to END, result only, no page/hub" }
+    }
+  ]
+}

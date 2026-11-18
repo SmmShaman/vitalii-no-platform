@@ -1,0 +1,64 @@
+{
+  "id": "b105",
+  "composition": "FeatureSixthAgentEditsEveryB105",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "regionCallout",
+      "backdrop": "page",
+      "data": {
+        "region": { "x": 12, "y": 18, "w": 50, "h": 22 },
+        "label": "First render",
+        "note": "The first full render exposed problems no one had caught"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "Quizzed the kid mid-video",
+        "tags": ["Predict", "Check", "Recall", "Reveal answer"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "Numbers stayed vague",
+        "line2": "the real explanation got buried under filler",
+        "keywords": ["vague", "buried"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["Quiz question — blocked", "Vague number — flagged", "Core share — checked"],
+        "result": "Sixth editor pass",
+        "system": "Script editor"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "featureMatrix",
+      "backdrop": "page",
+      "data": {
+        "options": ["Before", "After (6th editor)"],
+        "rows": [
+          { "label": "Quiz mid-video", "values": ["Allowed", "Blocked"] },
+          { "label": "Numbers", "values": ["Vague", "Real, sourced"] },
+          { "label": "Core explanation", "values": ["Buried", "Protected"] }
+        ]
+      }
+    },
+    {
+      "beat": "b6",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": { "note": "percentRing hero — core explanation now >=30% of every video, held to END" }
+    }
+  ]
+}

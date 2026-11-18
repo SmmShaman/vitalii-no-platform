@@ -1,0 +1,21 @@
+{
+  "id": "b105",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/a-sixth-agent-now-edits-every-explainer-script-before-it-ever-gets-narrated-b105",
+      "frames": 170,
+      "scroll": [[0, 0], [169, 1500]],
+      "mouse": [[0, 230, 150], [169, 580, 440]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 145,
+      "scroll": [[0, 0], [144, 950]],
+      "mouse": [[0, 300, 200], [144, 600, 360]]
+    }
+  ]
+}

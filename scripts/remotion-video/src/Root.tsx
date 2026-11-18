@@ -233,6 +233,9 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureLowSugarSirenFlashesD18 } from "./compositions/feature-demos/FeatureLowSugarSirenFlashesD18";
+import { FeatureSpareAndroidTvStickD17 } from "./compositions/feature-demos/FeatureSpareAndroidTvStickD17";
+import { FeatureSixthAgentEditsEveryB105 } from "./compositions/feature-demos/FeatureSixthAgentEditsEveryB105";
 import { FeatureTwoKidsOneRemoteB100 } from "./compositions/feature-demos/FeatureTwoKidsOneRemoteB100";
 import { FeatureKidAsksQuestionVoiceB99 } from "./compositions/feature-demos/FeatureKidAsksQuestionVoiceB99";
 import { FeaturePracticeCardUsedAskB93 } from "./compositions/feature-demos/FeaturePracticeCardUsedAskB93";
@@ -2382,6 +2385,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFirst20SecondsUsedP75Motion"
         component={FeatureFirst20SecondsUsedP75Motion}
         durationInFrames={972}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureLowSugarSirenFlashesD18"
+        component={FeatureLowSugarSirenFlashesD18}
+        durationInFrames={930}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureSpareAndroidTvStickD17"
+        component={FeatureSpareAndroidTvStickD17}
+        durationInFrames={955}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureSixthAgentEditsEveryB105"
+        component={FeatureSixthAgentEditsEveryB105}
+        durationInFrames={922}
         fps={30}
         width={1280}
         height={720}

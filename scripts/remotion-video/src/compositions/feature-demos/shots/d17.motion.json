@@ -1,0 +1,62 @@
+{
+  "id": "d17",
+  "composition": "FeatureSpareAndroidTvStickD17",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "A paid licence",
+        "line2": "just to lock one page on screen",
+        "keywords": ["licence", "one page"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "statusFocus",
+      "backdrop": "hub",
+      "data": {
+        "title": "Without it",
+        "claims": [
+          { "text": "No licence installed", "verdict": "yes" },
+          { "text": "Stays on the clock page", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "funnelAbsorption",
+      "backdrop": "page",
+      "data": {
+        "inputs": ["No licence", "Reverts to Android home", "Idle battery animation"],
+        "result": "A screen nobody asked for"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "copyCorrection",
+      "backdrop": "hub",
+      "data": {
+        "wrong": "Stick reverts to Android home",
+        "right": "Tiny app IS the home screen now",
+        "label": "Now"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "The clock keeps running",
+        "tags": ["Glucose shown live", "Stale, struck through", "Local time, always on", "Zero licence cost"]
+      }
+    },
+    {
+      "beat": "b6",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": { "note": "flow-map hero — cost collapses to $0, held to END" }
+    }
+  ]
+}
