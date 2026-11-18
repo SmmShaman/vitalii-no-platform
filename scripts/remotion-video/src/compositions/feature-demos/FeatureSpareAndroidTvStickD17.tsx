@@ -32,50 +32,103 @@ const FlowMap: React.FC<{ fixed: boolean; hero: boolean }> = ({ fixed, hero }) =
   ];
 
   if (hero) {
+    const chips = ["Spare TV stick", "WebView HOME app", "Glucose + time + weather"];
     return (
-      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 18 }}>
+      <AbsoluteFill
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "60px 70px",
+          gap: 28,
+        }}
+      >
+        <div
+          style={{
+            flex: 1,
+            height: "100%",
+            borderRadius: 24,
+            background: p.card,
+            border: `2px solid ${p.border}`,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 16,
+            fontFamily: "Inter, sans-serif",
+          }}
+        >
+          <div style={{ fontSize: 20, fontWeight: 700, color: p.muted }}>Hardware</div>
+          <div style={{ fontSize: 30, fontWeight: 800, color: p.ink, textAlign: "center", padding: "0 16px" }}>
+            Spare TV stick
+          </div>
+        </div>
+        <div style={{ fontSize: 48, color: p.muted, fontWeight: 700 }}>&rarr;</div>
+        <div
+          style={{
+            flex: 1,
+            height: "100%",
+            borderRadius: 24,
+            background: p.accentBg,
+            border: `2px solid ${p.accentEdge}`,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 16,
+            fontFamily: "Inter, sans-serif",
+          }}
+        >
+          <div style={{ fontSize: 20, fontWeight: 700, color: p.accent }}>Launcher</div>
+          <div style={{ fontSize: 30, fontWeight: 800, color: p.ink, textAlign: "center", padding: "0 16px" }}>
+            WebView HOME app
+          </div>
+        </div>
+        <div style={{ fontSize: 48, color: p.muted, fontWeight: 700 }}>&rarr;</div>
+        <div
+          style={{
+            flex: 1.3,
+            height: "100%",
+            borderRadius: 24,
+            background: p.card,
+            border: `3px solid ${p.accentEdge}`,
+            boxShadow: "0 24px 60px rgba(0,0,0,0.2)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 14,
+            fontFamily: "Inter, sans-serif",
+          }}
+        >
+          <div style={{ fontSize: 20, fontWeight: 700, color: p.accent }}>Result</div>
           <div
             style={{
-              fontFamily: "Inter, sans-serif",
-              fontSize: 240,
+              fontSize: 140,
               fontWeight: 900,
               color: p.accent,
-              letterSpacing: "-0.03em",
+              letterSpacing: "-0.02em",
               lineHeight: 1,
             }}
           >
             $0
           </div>
-          <div
-            style={{
-              fontFamily: "Inter, sans-serif",
-              fontSize: 26,
-              fontWeight: 700,
-              color: p.ink,
-            }}
-          >
+          <div style={{ fontSize: 22, fontWeight: 700, color: p.ink, textAlign: "center", padding: "0 20px" }}>
             No licence, no fallback screen
           </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 14,
-              marginTop: 10,
-            }}
-          >
-            {["Spare TV stick", "WebView HOME app", "Glucose + time + weather"].map((t) => (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+            {chips.map((t) => (
               <div
                 key={t}
                 style={{
-                  fontFamily: "Inter, sans-serif",
-                  fontSize: 18,
+                  fontSize: 16,
                   fontWeight: 600,
                   color: p.muted,
-                  background: p.card,
+                  background: p.bgTop,
                   border: `1px solid ${p.border}`,
-                  borderRadius: 10,
-                  padding: "8px 16px",
+                  borderRadius: 8,
+                  padding: "6px 14px",
                 }}
               >
                 {t}

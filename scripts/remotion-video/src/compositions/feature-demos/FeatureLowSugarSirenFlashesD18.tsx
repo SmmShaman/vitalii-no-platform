@@ -43,7 +43,7 @@ const Ledger: React.FC<{ expanded: boolean; settled: boolean; rowIndex?: number 
   const stripRow = rows[rowIndex % rows.length];
 
   const box = expanded
-    ? { x: 190, y: 150, w: 900, h: 420 }
+    ? { x: 60, y: 70, w: 1160, h: 590 }
     : { x: 40, y: 606, w: 1200, h: 92 };
 
   return (
@@ -58,16 +58,16 @@ const Ledger: React.FC<{ expanded: boolean; settled: boolean; rowIndex?: number 
         background: p.card,
         border: `2px solid ${toneEdge}`,
         boxShadow: "0 18px 40px rgba(0,0,0,0.18)",
-        padding: expanded ? "28px 32px" : "14px 28px",
+        padding: expanded ? "48px 56px" : "14px 28px",
         display: "flex",
         flexDirection: "column",
         justifyContent: expanded ? "flex-start" : "center",
-        gap: expanded ? 14 : 6,
+        gap: expanded ? 36 : 6,
         fontFamily: "Inter, sans-serif",
       }}
     >
       {expanded && (
-        <div style={{ fontSize: 30, fontWeight: 800, color: p.ink, marginBottom: 6 }}>
+        <div style={{ fontSize: 44, fontWeight: 800, color: p.ink, marginBottom: 12 }}>
           {settled ? "SirenService — now" : "Low-sugar alert — before"}
         </div>
       )}
@@ -78,10 +78,10 @@ const Ledger: React.FC<{ expanded: boolean; settled: boolean; rowIndex?: number 
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            fontSize: expanded ? 22 : 18,
+            fontSize: expanded ? 32 : 18,
             color: p.ink,
             borderBottom: expanded && i < rows.length - 1 ? `1px solid ${p.border}` : "none",
-            paddingBottom: expanded ? 10 : 0,
+            paddingBottom: expanded ? 24 : 0,
           }}
         >
           <span style={{ color: p.muted }}>{row.label}</span>
@@ -91,7 +91,7 @@ const Ledger: React.FC<{ expanded: boolean; settled: boolean; rowIndex?: number 
               color: tone,
               background: toneBg,
               borderRadius: 8,
-              padding: "4px 12px",
+              padding: expanded ? "8px 18px" : "4px 12px",
               textDecoration: settled && !expanded ? "none" : undefined,
             }}
           >
