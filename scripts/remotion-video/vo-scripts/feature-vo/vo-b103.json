@@ -1,0 +1,57 @@
+{
+ "id": "b103",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.902,
+  "b2": 4.442,
+  "b3": 5.886,
+  "b4": 6.286,
+  "b5": 4.431
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "The narration voice was hardcoded \u2014 changing it meant shipping new code, and nobody could see what one explainer video actually cost.",
+   "start_s": 0.5,
+   "end_s": 8.402,
+   "start_f": 15,
+   "end_f": 252
+  },
+  {
+   "beat": "b2",
+   "text": "Now an admin card swaps the voice per language, no deploy needed.",
+   "start_s": 8.702,
+   "end_s": 13.144,
+   "start_f": 261,
+   "end_f": 394
+  },
+  {
+   "beat": "b3",
+   "text": "Every render tries one text-to-speech engine first, and quietly falls back if it fails.",
+   "start_s": 13.444,
+   "end_s": 19.33,
+   "start_f": 403,
+   "end_f": 580
+  },
+  {
+   "beat": "b4",
+   "text": "Each video's cost \u2014 AI time, voice, and render minutes \u2014 gets logged instead of guessed.",
+   "start_s": 19.63,
+   "end_s": 25.916,
+   "start_f": 589,
+   "end_f": 777
+  },
+  {
+   "beat": "b5",
+   "text": "One card now shows all three costs, added up, per video.",
+   "start_s": 26.216,
+   "end_s": 30.647,
+   "start_f": 786,
+   "end_f": 919
+  }
+ ],
+ "total_s": 32.147,
+ "durationInFrames": 964,
+ "measured_track_s": 30.696,
+ "track": "/root/feature-demos/vo-b103/vo-b103.mp3"
+}

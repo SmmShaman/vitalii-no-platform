@@ -1,0 +1,7 @@
+{
+  "id": "b102",
+  "file": "yt-feature-b102.mp4",
+  "title": "Kids Ask «Поясни» for a Video Right From the App | vitalii.no",
+  "description": "Before now, a child who wanted an explainer video had to ask outside the app entirely — parents had no way to see the question, cancel it, or stop the shared queue from being flooded.\n\nA new Explain page lets a child hold the record button and simply speak the question. The gate transcribes it and reads it back for confirmation before anything is queued, enforced server-side. Parents see every question land in real time, can cancel anything still waiting, or type a question themselves instead of speaking it.\n\nThe shared queue is now protected by a real per-child cap of 2 questions a day, replacing a queue that had no limit at all.\n\n🔗 Full write-up: https://vitalii.no/features/kids-can-now-ask-for-an-explainer-video-straight-from-the-ber-app-b102\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#voiceinterface #kidsapp #parentalcontrols #speechrecognition #parenting #vitaliino",
+  "tags": ["voice interface", "kids app", "parental controls", "speech recognition", "text to speech", "websocket", "family app", "rate limiting", "node.js", "react", "vitalii berbeha"]
+}

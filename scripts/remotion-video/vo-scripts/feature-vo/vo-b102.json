@@ -1,0 +1,57 @@
+{
+ "id": "b102",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.644,
+  "b2": 3.546,
+  "b3": 4.781,
+  "b4": 5.611,
+  "b5": 4.252
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Before now, a curious kid had no way to ask for an explainer video from inside the family app \u2014 the question just went nowhere parents could see.",
+   "start_s": 0.5,
+   "end_s": 9.144,
+   "start_f": 15,
+   "end_f": 274
+  },
+  {
+   "beat": "b2",
+   "text": "Now a child holds one button and simply speaks the question.",
+   "start_s": 9.444,
+   "end_s": 12.99,
+   "start_f": 283,
+   "end_f": 390
+  },
+  {
+   "beat": "b3",
+   "text": "Text-to-speech reads it back, so the kid can confirm before it's ever queued.",
+   "start_s": 13.29,
+   "end_s": 18.071,
+   "start_f": 399,
+   "end_f": 542
+  },
+  {
+   "beat": "b4",
+   "text": "Parents see every question land, and can cancel one still waiting \u2014 or type it themselves.",
+   "start_s": 18.371,
+   "end_s": 23.982,
+   "start_f": 551,
+   "end_f": 719
+  },
+  {
+   "beat": "b5",
+   "text": "The shared queue is capped at 2 questions per child, every day.",
+   "start_s": 24.282,
+   "end_s": 28.534,
+   "start_f": 728,
+   "end_f": 856
+  }
+ ],
+ "total_s": 30.034,
+ "durationInFrames": 901,
+ "measured_track_s": 28.584,
+ "track": "/root/feature-demos/vo-b102/vo-b102.mp3"
+}

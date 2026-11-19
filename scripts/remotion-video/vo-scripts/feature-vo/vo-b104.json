@@ -1,0 +1,57 @@
+{
+ "id": "b104",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.258,
+  "b2": 4.492,
+  "b3": 5.172,
+  "b4": 4.549,
+  "b5": 7.227
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "An explainer video about a mutation or timeline used to show whatever generic icon was on hand \u2014 not the real thing.",
+   "start_s": 0.5,
+   "end_s": 7.758,
+   "start_f": 15,
+   "end_f": 233
+  },
+  {
+   "beat": "b2",
+   "text": "Now every picture can point straight at a real emoji instead of a guess.",
+   "start_s": 8.058,
+   "end_s": 12.55,
+   "start_f": 242,
+   "end_f": 376
+  },
+  {
+   "beat": "b3",
+   "text": "For genetics, a DNA effect zooms into the exact base pair that changed.",
+   "start_s": 12.85,
+   "end_s": 18.022,
+   "start_f": 386,
+   "end_f": 541
+  },
+  {
+   "beat": "b4",
+   "text": "Timelines now space dates by how far apart the years really are.",
+   "start_s": 18.322,
+   "end_s": 22.871,
+   "start_f": 550,
+   "end_f": 686
+  },
+  {
+   "beat": "b5",
+   "text": "The whole set is licensed and verified: 1,595 Fluent Emoji images, pinned in place.",
+   "start_s": 23.171,
+   "end_s": 30.398,
+   "start_f": 695,
+   "end_f": 912
+  }
+ ],
+ "total_s": 31.898,
+ "durationInFrames": 957,
+ "measured_track_s": 30.456,
+ "track": "/root/feature-demos/vo-b104/vo-b104.mp3"
+}

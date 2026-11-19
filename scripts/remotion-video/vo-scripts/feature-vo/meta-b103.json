@@ -1,0 +1,7 @@
+{
+  "id": "b103",
+  "file": "yt-feature-b103.mp4",
+  "title": "Switch the Narration Voice, See the Real Cost | vitalii.no",
+  "description": "The explainer pipeline ran on one hardcoded narration voice, and changing it meant shipping new code. Worse, nobody could see what any single video actually cost — only a lump total at the end of the month.\n\nAn admin card now switches the narration voice per language with no deploy. Every render tries a primary text-to-speech engine first and falls back automatically if a call fails, logging exactly which engine spoke each line.\n\nEach video's real cost — AI time, voice generation, and render minutes — is now added up and stored per video, combining all three into one number an admin can actually see instead of guessing from the monthly bill.\n\n🔗 Full write-up: https://vitalii.no/features/admin-can-now-switch-the-explainer-narration-voice-and-see-exactly-what-each-vid-b103\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#admindashboard #texttospeech #costtracking #observability #vitaliino",
+  "tags": ["admin dashboard", "text to speech", "cost tracking", "github actions", "supabase", "react admin", "voice settings", "fallback systems", "render pipeline", "observability", "vitalii berbeha"]
+}

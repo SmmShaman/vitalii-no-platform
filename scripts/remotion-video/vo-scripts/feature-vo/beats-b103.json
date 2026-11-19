@@ -1,0 +1,7 @@
+{"id": "b103", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "The narration voice was hardcoded — changing it meant shipping new code, and nobody could see what one explainer video actually cost."],
+  ["b2", "Now an admin card swaps the voice per language, no deploy needed."],
+  ["b3", "Every render tries one text-to-speech engine first, and quietly falls back if it fails."],
+  ["b4", "Each video's cost — AI time, voice, and render minutes — gets logged instead of guessed."],
+  ["b5", "One card now shows all three costs, added up, per video."]
+]}
