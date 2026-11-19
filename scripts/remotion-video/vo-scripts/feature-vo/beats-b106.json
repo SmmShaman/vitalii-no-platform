@@ -1,0 +1,7 @@
+{"id": "b106", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Two kids could ask for a film minutes apart, and the second request just queued silently behind the first."],
+  ["b2", "Nobody could tell it had happened until two films showed up at once."],
+  ["b3", "Like a kitchen taking a second order without telling the table the first is still cooking."],
+  ["b4", "Now every entry point checks if a render is already in flight before accepting a new one."],
+  ["b5", "It replies instantly with the exact stage, the minutes left, and a 409."]
+]}

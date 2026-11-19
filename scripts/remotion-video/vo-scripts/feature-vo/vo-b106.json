@@ -1,0 +1,57 @@
+{
+ "id": "b106",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.252,
+  "b2": 4.043,
+  "b3": 4.819,
+  "b4": 5.433,
+  "b5": 5.254
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Two kids could ask for a film minutes apart, and the second request just queued silently behind the first.",
+   "start_s": 0.5,
+   "end_s": 6.752,
+   "start_f": 15,
+   "end_f": 203
+  },
+  {
+   "beat": "b2",
+   "text": "Nobody could tell it had happened until two films showed up at once.",
+   "start_s": 7.052,
+   "end_s": 11.095,
+   "start_f": 212,
+   "end_f": 333
+  },
+  {
+   "beat": "b3",
+   "text": "Like a kitchen taking a second order without telling the table the first is still cooking.",
+   "start_s": 11.395,
+   "end_s": 16.214,
+   "start_f": 342,
+   "end_f": 486
+  },
+  {
+   "beat": "b4",
+   "text": "Now every entry point checks if a render is already in flight before accepting a new one.",
+   "start_s": 16.514,
+   "end_s": 21.947,
+   "start_f": 495,
+   "end_f": 658
+  },
+  {
+   "beat": "b5",
+   "text": "It replies instantly with the exact stage, the minutes left, and a 409.",
+   "start_s": 22.247,
+   "end_s": 27.501,
+   "start_f": 667,
+   "end_f": 825
+  }
+ ],
+ "total_s": 29.001,
+ "durationInFrames": 870,
+ "measured_track_s": 27.552,
+ "track": "/root/feature-demos/vo-b106/vo-b106.mp3"
+}

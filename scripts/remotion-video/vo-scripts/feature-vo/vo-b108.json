@@ -1,0 +1,57 @@
+{
+ "id": "b108",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.844,
+  "b2": 5.632,
+  "b3": 4.458,
+  "b4": 5.671,
+  "b5": 5.838
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A kid watching an explainer film could sit through long stretches where nothing moved.",
+   "start_s": 0.5,
+   "end_s": 5.344,
+   "start_f": 15,
+   "end_f": 160
+  },
+  {
+   "beat": "b2",
+   "text": "The old timeline padded shots to fit a slow camera move, even when the sentence didn't need it.",
+   "start_s": 5.644,
+   "end_s": 11.276,
+   "start_f": 169,
+   "end_f": 338
+  },
+  {
+   "beat": "b3",
+   "text": "Like a train waiting at a station just because the next track isn't ready yet.",
+   "start_s": 11.576,
+   "end_s": 16.034,
+   "start_f": 347,
+   "end_f": 481
+  },
+  {
+   "beat": "b4",
+   "text": "Now the engine refuses a shot that sits still too long; every beat must change something.",
+   "start_s": 16.334,
+   "end_s": 22.005,
+   "start_f": 490,
+   "end_f": 660
+  },
+  {
+   "beat": "b5",
+   "text": "A shot can't sit still past 8 seconds, and total silence can't pass 15 percent.",
+   "start_s": 22.305,
+   "end_s": 28.143,
+   "start_f": 669,
+   "end_f": 844
+  }
+ ],
+ "total_s": 29.643,
+ "durationInFrames": 889,
+ "measured_track_s": 28.2,
+ "track": "/root/feature-demos/vo-b108/vo-b108.mp3"
+}

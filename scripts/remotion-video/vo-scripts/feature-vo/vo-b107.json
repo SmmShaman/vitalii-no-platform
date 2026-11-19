@@ -1,0 +1,57 @@
+{
+ "id": "b107",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.701,
+  "b2": 5.807,
+  "b3": 3.905,
+  "b4": 4.786,
+  "b5": 5.017
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A wrong fact could slip through two script reviews and only get caught after the film was already rendered.",
+   "start_s": 0.5,
+   "end_s": 6.201,
+   "start_f": 15,
+   "end_f": 186
+  },
+  {
+   "beat": "b2",
+   "text": "By then it had already cost rendering time, with no one whose single job was checking the facts.",
+   "start_s": 6.501,
+   "end_s": 12.308,
+   "start_f": 195,
+   "end_f": 369
+  },
+  {
+   "beat": "b3",
+   "text": "Like a newsroom printing the paper before the fact-checker reads it.",
+   "start_s": 12.608,
+   "end_s": 16.513,
+   "start_f": 378,
+   "end_f": 495
+  },
+  {
+   "beat": "b4",
+   "text": "Every change the reviewer makes gets written to a file the director reads first.",
+   "start_s": 16.813,
+   "end_s": 21.599,
+   "start_f": 504,
+   "end_f": 648
+  },
+  {
+   "beat": "b5",
+   "text": "Now a seventh agent owns that one job, before a single shot gets planned.",
+   "start_s": 21.899,
+   "end_s": 26.916,
+   "start_f": 657,
+   "end_f": 807
+  }
+ ],
+ "total_s": 28.416,
+ "durationInFrames": 852,
+ "measured_track_s": 26.976,
+ "track": "/root/feature-demos/vo-b107/vo-b107.mp3"
+}
