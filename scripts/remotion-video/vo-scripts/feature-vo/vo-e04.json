@@ -1,0 +1,57 @@
+{
+ "id": "e04",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.64,
+  "b2": 6.073,
+  "b3": 7.507,
+  "b4": 5.523,
+  "b5": 5.758
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every visitor to Elvarika stared at a blank screen for up to three seconds before anything appeared.",
+   "start_s": 0.5,
+   "end_s": 6.14,
+   "start_f": 15,
+   "end_f": 184
+  },
+  {
+   "beat": "b2",
+   "text": "That wait was just a health check \u2014 sitting on top of years of leftover pages nobody used anymore.",
+   "start_s": 6.44,
+   "end_s": 12.513,
+   "start_f": 193,
+   "end_f": 375
+  },
+  {
+   "beat": "b3",
+   "text": "So the whole interface got rebuilt around one design system \u2014 new colors, new fonts, a cleaned-up React codebase.",
+   "start_s": 12.813,
+   "end_s": 20.32,
+   "start_f": 384,
+   "end_f": 610
+  },
+  {
+   "beat": "b4",
+   "text": "Dead screens got deleted. The blocking check is gone \u2014 the first screen just appears.",
+   "start_s": 20.62,
+   "end_s": 26.143,
+   "start_f": 619,
+   "end_f": 784
+  },
+  {
+   "beat": "b5",
+   "text": "And the file it has to load first dropped from 2.4 megabytes to 0.65.",
+   "start_s": 26.443,
+   "end_s": 32.201,
+   "start_f": 793,
+   "end_f": 966
+  }
+ ],
+ "total_s": 33.701,
+ "durationInFrames": 1011,
+ "measured_track_s": 32.256,
+ "track": "/root/feature-demos/vo-e04/vo-e04.mp3"
+}

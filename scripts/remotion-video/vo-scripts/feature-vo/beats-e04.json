@@ -1,0 +1,7 @@
+{"id": "e04", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every visitor to Elvarika stared at a blank screen for up to three seconds before anything appeared."],
+  ["b2", "That wait was just a health check — sitting on top of years of leftover pages nobody used anymore."],
+  ["b3", "So the whole interface got rebuilt around one design system — new colors, new fonts, a cleaned-up React codebase."],
+  ["b4", "Dead screens got deleted. The blocking check is gone — the first screen just appears."],
+  ["b5", "And the file it has to load first dropped from 2.4 megabytes to 0.65."]
+]}

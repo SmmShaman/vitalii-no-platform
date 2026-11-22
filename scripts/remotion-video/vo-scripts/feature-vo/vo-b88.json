@@ -1,0 +1,57 @@
+{
+ "id": "b88",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.193,
+  "b2": 5.839,
+  "b3": 7.448,
+  "b4": 5.054,
+  "b5": 6.073
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My son's weekly homework just said 's. 83, 84 and 85' \u2014 three page numbers, nothing else.",
+   "start_s": 0.5,
+   "end_s": 8.693,
+   "start_f": 15,
+   "end_f": 261
+  },
+  {
+   "beat": "b2",
+   "text": "The app had no idea which chapter that was, so it couldn't teach toward what his class was covering.",
+   "start_s": 8.993,
+   "end_s": 14.832,
+   "start_f": 270,
+   "end_f": 445
+  },
+  {
+   "beat": "b3",
+   "text": "Now a Cloudflare Workers script reads his real textbook's contents \u2014 chapter titles, grammar focus, page numbers.",
+   "start_s": 15.132,
+   "end_s": 22.58,
+   "start_f": 454,
+   "end_f": 677
+  },
+  {
+   "beat": "b4",
+   "text": "Every homework card now names the actual chapter instead of a bare page number.",
+   "start_s": 22.88,
+   "end_s": 27.934,
+   "start_f": 686,
+   "end_f": 838
+  },
+  {
+   "beat": "b5",
+   "text": "Tonight's card reads 'Kapittel 4: Br\u00f8k' \u2014 not 's. 83'.",
+   "start_s": 28.234,
+   "end_s": 34.307,
+   "start_f": 847,
+   "end_f": 1029
+  }
+ ],
+ "total_s": 35.807,
+ "durationInFrames": 1074,
+ "measured_track_s": 34.368,
+ "track": "/root/feature-demos/vo-b88/vo-b88.mp3"
+}

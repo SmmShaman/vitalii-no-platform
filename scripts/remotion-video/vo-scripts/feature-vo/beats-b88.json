@@ -1,0 +1,7 @@
+{"id": "b88", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "My son's weekly homework just said 's. 83, 84 and 85' — three page numbers, nothing else."],
+  ["b2", "The app had no idea which chapter that was, so it couldn't teach toward what his class was covering."],
+  ["b3", "Now a Cloudflare Workers script reads his real textbook's contents — chapter titles, grammar focus, page numbers."],
+  ["b4", "Every homework card now names the actual chapter instead of a bare page number."],
+  ["b5", "Tonight's card reads 'Kapittel 4: Brøk' — not 's. 83'."]
+]}
