@@ -1,0 +1,48 @@
+{
+ "id": "b101",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.109,
+  "b2": 4.568,
+  "b3": 6.856,
+  "b4": 6.561
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Kids who share one family video budget had asking feel like a coin flip, with no way to know the odds.",
+   "start_s": 0.5,
+   "end_s": 6.609,
+   "start_f": 15,
+   "end_f": 198
+  },
+  {
+   "beat": "b2",
+   "text": "You only found out it didn't work after you'd already recorded and sent the question.",
+   "start_s": 6.909,
+   "end_s": 11.477,
+   "start_f": 207,
+   "end_f": 344
+  },
+  {
+   "beat": "b3",
+   "text": "Now a status line above the record button, built on the family's Claude subscription, shows the real count first.",
+   "start_s": 11.777,
+   "end_s": 18.633,
+   "start_f": 353,
+   "end_f": 559
+  },
+  {
+   "beat": "b4",
+   "text": "This week, right now, the next slot, the reset \u2014 four separate numbers, now folded into one.",
+   "start_s": 18.933,
+   "end_s": 25.494,
+   "start_f": 568,
+   "end_f": 765
+  }
+ ],
+ "total_s": 26.994,
+ "durationInFrames": 810,
+ "measured_track_s": 25.56,
+ "track": "/root/feature-demos/vo-b101/vo-b101.mp3"
+}

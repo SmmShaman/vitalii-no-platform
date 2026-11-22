@@ -1,0 +1,57 @@
+{
+ "id": "b109",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.675,
+  "b2": 4.315,
+  "b3": 5.113,
+  "b4": 4.571,
+  "b5": 8.71
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A kid learning fractions got a honey pot standing in for a honeycomb \u2014 the wrong picture, teaching the wrong idea.",
+   "start_s": 0.5,
+   "end_s": 7.175,
+   "start_f": 15,
+   "end_f": 215
+  },
+  {
+   "beat": "b2",
+   "text": "Every lesson card just grabbed the nearest emoji and hoped it matched.",
+   "start_s": 7.475,
+   "end_s": 11.79,
+   "start_f": 224,
+   "end_f": 354
+  },
+  {
+   "beat": "b3",
+   "text": "Now a shared kit called drawSpec draws the real shape, at one true scale.",
+   "start_s": 12.09,
+   "end_s": 17.203,
+   "start_f": 363,
+   "end_f": 516
+  },
+  {
+   "beat": "b4",
+   "text": "The same kit checks the answer, so picture and check can never disagree.",
+   "start_s": 17.503,
+   "end_s": 22.074,
+   "start_f": 525,
+   "end_f": 662
+  },
+  {
+   "beat": "b5",
+   "text": "No stand-ins: with no exact picture, the card is refused, not shipped wrong \u2014 real pictures now, across all 6.",
+   "start_s": 22.374,
+   "end_s": 31.084,
+   "start_f": 671,
+   "end_f": 933
+  }
+ ],
+ "total_s": 32.584,
+ "durationInFrames": 978,
+ "measured_track_s": 31.152,
+ "track": "/root/feature-demos/vo-b109/vo-b109.mp3"
+}
