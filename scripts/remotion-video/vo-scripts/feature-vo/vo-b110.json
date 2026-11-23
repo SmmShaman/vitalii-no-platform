@@ -1,0 +1,57 @@
+{
+ "id": "b110",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.157,
+  "b2": 5.654,
+  "b3": 5.846,
+  "b4": 5.689,
+  "b5": 3.984
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "When a kid's screen time ran out, the film just vanished, gone, like pulling the plug on movie night.",
+   "start_s": 0.5,
+   "end_s": 6.657,
+   "start_f": 15,
+   "end_f": 200
+  },
+  {
+   "beat": "b2",
+   "text": "A parent's unlock used to mean relaunching everything, and the kid lost their place in the story.",
+   "start_s": 6.957,
+   "end_s": 12.611,
+   "start_f": 209,
+   "end_f": 378
+  },
+  {
+   "beat": "b3",
+   "text": "Now the film pauses exactly where it was, and one QR code scan brings it right back.",
+   "start_s": 12.911,
+   "end_s": 18.757,
+   "start_f": 387,
+   "end_f": 563
+  },
+  {
+   "beat": "b4",
+   "text": "It took building this twice in one evening \u2014 the first version's auto-resume simply didn't work.",
+   "start_s": 19.057,
+   "end_s": 24.746,
+   "start_f": 572,
+   "end_f": 742
+  },
+  {
+   "beat": "b5",
+   "text": "Now it waits fifteen seconds in place before trying anything else.",
+   "start_s": 25.046,
+   "end_s": 29.03,
+   "start_f": 751,
+   "end_f": 871
+  }
+ ],
+ "total_s": 30.53,
+ "durationInFrames": 916,
+ "measured_track_s": 29.088,
+ "track": "/root/feature-demos/vo-b110/vo-b110.mp3"
+}

@@ -1,0 +1,57 @@
+{
+ "id": "b86",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.239,
+  "b2": 4.623,
+  "b3": 6.426,
+  "b4": 4.921,
+  "b5": 5.355
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A parent checks the kids' calendar screen and sees nothing but homework.",
+   "start_s": 0.5,
+   "end_s": 4.739,
+   "start_f": 15,
+   "end_f": 142
+  },
+  {
+   "beat": "b2",
+   "text": "No assignment that day? The screen looks blank, as if school never happened.",
+   "start_s": 5.039,
+   "end_s": 9.662,
+   "start_f": 151,
+   "end_f": 290
+  },
+  {
+   "beat": "b3",
+   "text": "Now the calendar lists every subject in the real timetable order, homework attached only where it exists.",
+   "start_s": 9.962,
+   "end_s": 16.388,
+   "start_f": 299,
+   "end_f": 492
+  },
+  {
+   "beat": "b4",
+   "text": "The homework line itself used to scroll sideways, hard to read at a glance.",
+   "start_s": 16.688,
+   "end_s": 21.609,
+   "start_f": 501,
+   "end_f": 648
+  },
+  {
+   "beat": "b5",
+   "text": "Now it shrinks to fit instead, down to fifty-five percent, before it's ever cut off.",
+   "start_s": 21.909,
+   "end_s": 27.264,
+   "start_f": 657,
+   "end_f": 818
+  }
+ ],
+ "total_s": 28.764,
+ "durationInFrames": 863,
+ "measured_track_s": 27.312,
+ "track": "/root/feature-demos/vo-b86/vo-b86.mp3"
+}

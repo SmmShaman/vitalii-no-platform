@@ -1,0 +1,7 @@
+{"id": "b87", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Dad's hours were tracked by GPS, but payday only ever showed one number: whatever the payslip said."],
+ ["b2", "There was no way to tell if that number matched the hours he actually worked."],
+ ["b3", "Now his work report compares GPS-tracked time against the payslip, day by day."],
+ ["b4", "Training, extra hours, unpaid time — every day gets tagged against what was actually paid."],
+ ["b5", "Any gap between hours worked and hours paid now shows up in red, impossible to miss."]
+]}

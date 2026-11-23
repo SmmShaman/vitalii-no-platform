@@ -1,0 +1,7 @@
+{
+  "id": "b87",
+  "file": "yt-feature-b87.mp4",
+  "title": "Checking a Real Paycheck Against GPS-Tracked Work Hours | vitalii.no",
+  "description": "Work hours were tracked by GPS geofence, but the only number that ever mattered for pay was whatever ended up on the payslip. There was no way to see, day by day, whether the hours the payslip paid for actually matched the hours GPS recorded working.\n\nA new reconciliation function reads a stored payslip's GPS arrival times plus its training, extra, and backpay lines, recomputes each day's shift (worked minutes, break, over-norm minutes), and tags every day as training, extra, or unpaid against what the payslip's own lines cover.\n\nThe work report now renders this as a day-by-day table plus a totals line showing GPS worked time and its money value next to what was actually paid, with the kroner difference highlighted in red whenever the two numbers don't match — underpayment that used to be invisible is now a number on the screen.\n\n🔗 Full write-up: https://vitalii.no/features/dads-real-gps-hours-now-get-checked-against-what-the-payslip-actually-paid-b87\n📚 All 397 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#fintech #frontend #sidehustle #payrolltech #gpstracking",
+  "tags": ["gps tracking", "payroll reconciliation", "work hours report", "fintech side project", "frontend ux", "shift calculation", "underpayment detection", "cloudflare workers", "javascript app", "personal finance tools", "vitalii berbeha"]
+}

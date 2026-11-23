@@ -1,0 +1,7 @@
+{"id": "b110", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "When a kid's screen time ran out, the film just vanished, gone, like pulling the plug on movie night."],
+ ["b2", "A parent's unlock used to mean relaunching everything, and the kid lost their place in the story."],
+ ["b3", "Now the film pauses exactly where it was, and one QR code scan brings it right back."],
+ ["b4", "It took building this twice in one evening — the first version's auto-resume simply didn't work."],
+ ["b5", "Now it waits fifteen seconds in place before trying anything else."]
+]}

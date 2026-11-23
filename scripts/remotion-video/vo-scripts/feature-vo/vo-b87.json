@@ -1,0 +1,57 @@
+{
+ "id": "b87",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.899,
+  "b2": 4.426,
+  "b3": 5.465,
+  "b4": 6.302,
+  "b5": 5.608
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Dad's hours were tracked by GPS, but payday only ever showed one number: whatever the payslip said.",
+   "start_s": 0.5,
+   "end_s": 7.399,
+   "start_f": 15,
+   "end_f": 222
+  },
+  {
+   "beat": "b2",
+   "text": "There was no way to tell if that number matched the hours he actually worked.",
+   "start_s": 7.699,
+   "end_s": 12.125,
+   "start_f": 231,
+   "end_f": 364
+  },
+  {
+   "beat": "b3",
+   "text": "Now his work report compares GPS-tracked time against the payslip, day by day.",
+   "start_s": 12.425,
+   "end_s": 17.89,
+   "start_f": 373,
+   "end_f": 537
+  },
+  {
+   "beat": "b4",
+   "text": "Training, extra hours, unpaid time \u2014 every day gets tagged against what was actually paid.",
+   "start_s": 18.19,
+   "end_s": 24.492,
+   "start_f": 546,
+   "end_f": 735
+  },
+  {
+   "beat": "b5",
+   "text": "Any gap between hours worked and hours paid now shows up in red, impossible to miss.",
+   "start_s": 24.792,
+   "end_s": 30.4,
+   "start_f": 744,
+   "end_f": 912
+  }
+ ],
+ "total_s": 31.9,
+ "durationInFrames": 957,
+ "measured_track_s": 30.456,
+ "track": "/root/feature-demos/vo-b87/vo-b87.mp3"
+}
