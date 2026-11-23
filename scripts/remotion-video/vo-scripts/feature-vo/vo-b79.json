@@ -1,0 +1,57 @@
+{
+ "id": "b79",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.467,
+  "b2": 5.751,
+  "b3": 4.877,
+  "b4": 5.124,
+  "b5": 4.846
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every school morning meant logging into four different kids' pages by hand, then wading through long message threads just to find what was due tomorrow.",
+   "start_s": 0.5,
+   "end_s": 8.967,
+   "start_f": 15,
+   "end_f": 269
+  },
+  {
+   "beat": "b2",
+   "text": "Now one BankID login, done once, keeps all four accounts open all day.",
+   "start_s": 9.267,
+   "end_s": 15.018,
+   "start_f": 278,
+   "end_f": 451
+  },
+  {
+   "beat": "b3",
+   "text": "A background job checks every child's messages and announcements every half hour.",
+   "start_s": 15.318,
+   "end_s": 20.195,
+   "start_f": 460,
+   "end_f": 606
+  },
+  {
+   "beat": "b4",
+   "text": "AI reads the vague homework notes and turns them into one clear task per child.",
+   "start_s": 20.495,
+   "end_s": 25.619,
+   "start_f": 615,
+   "end_f": 769
+  },
+  {
+   "beat": "b5",
+   "text": "One login, four kids' homework sorted automatically, every school day.",
+   "start_s": 25.919,
+   "end_s": 30.765,
+   "start_f": 778,
+   "end_f": 923
+  }
+ ],
+ "total_s": 32.265,
+ "durationInFrames": 968,
+ "measured_track_s": 30.816,
+ "track": "/root/feature-demos/vo-b79/vo-b79.mp3"
+}

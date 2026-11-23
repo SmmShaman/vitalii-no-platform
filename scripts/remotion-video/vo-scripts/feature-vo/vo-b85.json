@@ -1,0 +1,57 @@
+{
+ "id": "b85",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.245,
+  "b2": 4.471,
+  "b3": 5.388,
+  "b4": 5.687,
+  "b5": 5.456
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every week, a teacher's homework plan landed as a PDF, buried in an email no kid could open.",
+   "start_s": 0.5,
+   "end_s": 6.745,
+   "start_f": 15,
+   "end_f": 202
+  },
+  {
+   "beat": "b2",
+   "text": "To see it on TV, a parent had to dig it out and show it on a phone.",
+   "start_s": 7.045,
+   "end_s": 11.516,
+   "start_f": 211,
+   "end_f": 345
+  },
+  {
+   "beat": "b3",
+   "text": "Now Cloudflare watches that email for the PDF and turns every page into a picture.",
+   "start_s": 11.816,
+   "end_s": 17.204,
+   "start_f": 354,
+   "end_f": 516
+  },
+  {
+   "beat": "b4",
+   "text": "Tap the calendar, pick a week, and the real plan appears \u2014 swipe through it like a book.",
+   "start_s": 17.504,
+   "end_s": 23.191,
+   "start_f": 525,
+   "end_f": 696
+  },
+  {
+   "beat": "b5",
+   "text": "Four boys, four calendars, each one opening its own week, no phone required.",
+   "start_s": 23.491,
+   "end_s": 28.947,
+   "start_f": 705,
+   "end_f": 868
+  }
+ ],
+ "total_s": 30.447,
+ "durationInFrames": 913,
+ "measured_track_s": 29.016,
+ "track": "/root/feature-demos/vo-b85/vo-b85.mp3"
+}

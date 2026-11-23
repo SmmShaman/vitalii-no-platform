@@ -1,0 +1,7 @@
+{"id": "b79", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every school morning meant logging into four different kids' pages by hand, then wading through long message threads just to find what was due tomorrow."],
+  ["b2", "Now one BankID login, done once, keeps all four accounts open all day."],
+  ["b3", "A background job checks every child's messages and announcements every half hour."],
+  ["b4", "AI reads the vague homework notes and turns them into one clear task per child."],
+  ["b5", "One login, four kids' homework sorted automatically, every school day."]
+]}
