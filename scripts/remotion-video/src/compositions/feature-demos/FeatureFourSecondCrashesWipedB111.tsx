@@ -6,12 +6,14 @@
 // b1 15-205   "the whole queue for a school day just disappeared"
 //             cornerTags over the feature's own page (backdrop "page").
 // b2 206-458  "four tiny glitches... burning every retry before a real attempt ran"
-//             cardCounter, drawn (4 crashes, each worth 1 burned try). Opener was
-//             deliberately NOT cardCounter (that was b93's opener) — placed here instead.
+//             drawn by hand (title panel + 4 crash IconCards + total panel). cardCounter
+//             centers itself on the full 1920 stage and lost its left "list" column under
+//             the 320px sidebar, leaving the beat's measured midpoint mostly empty — wave C.
 // b3 459-698  "a crash or a glitch no longer spends one of its limited tries"
-//             handoffExplain, drawn — matches commit a299a18 (the pipeline rewrite). No
-//             verified URL shows the diff, so this is a schematic with the real rule
-//             change, not a recording.
+//             drawn by hand (old/new rule panels + 3 bullet IconCards) — matches commit
+//             a299a18 (the pipeline rewrite). handoffExplain had the same sidebar-clipping
+//             problem as b2's cardCounter — wave C. No verified URL shows the diff, so this
+//             stays a schematic with the real rule change, not a recording.
 // b4 699-901  "the exact four three-second crashes... can't do it again"
 //             drawn only — a result panel plus a LogWindow built from this run's own
 //             numbers. Never the feature page or the hub (gate 2).
@@ -149,42 +151,70 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b2 — four tiny glitches, each burning a real try */}
-      <MotionInsert
-        effect="cardCounter"
-        from={B2}
-        dur={B3 - B2}
-        accent={ACCENT}
-        data={{
-          cards: [
-            { label: "Crash 1", value: 1 },
-            { label: "Crash 2", value: 1 },
-            { label: "Crash 3", value: 1 },
-            { label: "Crash 4", value: 1 },
-          ],
-          unit: "try",
-          totalLabel: "Tries burned",
-          countLabel: "crashes",
-        }}
-      />
+      {/* b2 — drawn: four tiny glitches, each burning a real try. Full-width title
+          panel, 4 crash cards spread across the stage, and a bottom total panel —
+          clear of the sidebar (x >= 360), filling the frame the way b4 already does. */}
+      {frame >= B2 && frame < B3 && (
+        <Panel x={360} y={60} w={860} h={160} tone="danger" radius={28} opacity={1}>
+          <div style={{ padding: "24px 40px 0" }}>
+            <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: ACCENT }}>FOUR 3-SECOND GLITCHES</div>
+            <div style={{ fontSize: 30, fontWeight: 800, color: "#101418", marginTop: 4 }}>
+              Each crash burned one real try
+            </div>
+          </div>
+          <StatPill x={40} y={100} emoji="💥" text="4 crashes" tone="danger" />
+          <StatPill x={280} y={100} emoji="🎟️" text="4 tries burned" tone="danger" />
+        </Panel>
+      )}
+      {frame >= B2 && frame < B3 && (
+        <>
+          <IconCard x={360} y={260} w={205} emoji="1️⃣" title="Crash 1" sub="1 try burned" tone="danger" />
+          <IconCard x={590} y={260} w={205} emoji="2️⃣" title="Crash 2" sub="1 try burned" tone="danger" />
+          <IconCard x={820} y={260} w={205} emoji="3️⃣" title="Crash 3" sub="1 try burned" tone="danger" />
+          <IconCard x={1050} y={260} w={205} emoji="4️⃣" title="Crash 4" sub="1 try burned" tone="danger" />
+        </>
+      )}
+      {frame >= B2 && frame < B3 && (
+        <Panel x={360} y={500} w={860} h={140} tone="card" radius={28} opacity={1}>
+          <div style={{ padding: "26px 40px 0" }}>
+            <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: ACCENT }}>BEFORE NOV 23</div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: "#101418", marginTop: 4 }}>
+              Every crash spent one of the day's limited tries
+            </div>
+          </div>
+        </Panel>
+      )}
 
-      {/* b3 — the pipeline rewrite: crash/glitch no longer spends a limited try.
-          Matches commit a299a18. No verified URL shows the diff, so this is drawn. */}
-      <MotionInsert
-        effect="handoffExplain"
-        from={B3}
-        dur={B4 - B3}
-        accent={ACCENT}
-        data={{
-          from: "Crash = real try burned",
-          to: "Crash = free retry",
-          points: [
-            "Only a finished attempt burns a try",
-            "A locked leftover folder no longer blocks the run",
-            "Two AI review passes, capped at two rounds",
-          ],
-        }}
-      />
+      {/* b3 — drawn: the pipeline rewrite. Old/new rule side by side plus 3 bullet
+          IconCards, clear of the sidebar — matches commit a299a18. No verified URL
+          shows the diff, so this stays a schematic, not a recording. */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <Panel x={360} y={60} w={410} h={140} tone="danger" radius={24} opacity={1}>
+            <div style={{ padding: "24px 30px 0" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: ACCENT }}>OLD RULE</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#101418", marginTop: 8 }}>Crash = real try burned</div>
+            </div>
+          </Panel>
+          <Panel x={810} y={60} w={410} h={140} tone="success" radius={24} opacity={1}>
+            <div style={{ padding: "24px 30px 0" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: ACCENT }}>NEW RULE</div>
+              <div style={{ fontSize: 24, fontWeight: 800, color: "#101418", marginTop: 8 }}>Crash = free retry</div>
+            </div>
+          </Panel>
+          <IconCard x={360} y={250} w={270} emoji="✅" title="Finished attempt" sub="Only that burns a try" tone="success" />
+          <IconCard x={660} y={250} w={270} emoji="🔓" title="Leftover folder" sub="No longer blocks the run" tone="success" />
+          <IconCard x={960} y={250} w={270} emoji="🤖" title="Two AI reviews" sub="Capped at two rounds" tone="accent" />
+          <Panel x={360} y={500} w={860} h={140} tone="card" radius={28} opacity={1}>
+            <div style={{ padding: "26px 40px 0" }}>
+              <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: ACCENT }}>RESULT</div>
+              <div style={{ fontSize: 28, fontWeight: 800, color: "#101418", marginTop: 4 }}>
+                A crash no longer costs a limited try
+              </div>
+            </div>
+          </Panel>
+        </>
+      )}
 
       {/* b4 — drawn: the exact four crashes that wiped Nov 21 can't do it again.
           Ends on the feature's own result, never the feature page or the hub (gate 2). */}

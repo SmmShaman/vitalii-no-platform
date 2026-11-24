@@ -11,15 +11,27 @@
 // b3 365-534  "allowance zeroed out instead of topped up" (the analogy) —
 //             keywordCaption on the dark stage, no backdrop. Card deck: the
 //             two stacked cards jostle further apart.
+//             WAVE C FIX (2026-11-24): keywordCaption is by design a lower-
+//             third caption only — at the beat's measured midpoint the frame
+//             was 11/48 filled, just the caption text and the two small deck
+//             cards. Added a static zeroing-vs-topping-up IconCard pair above
+//             the caption (clear of both the caption's lower third and the
+//             deck band) so the analogy has a visual, not just a sentence.
 // b4 534-715  "I fixed the gate so early tasks add time" — no catalog effect;
 //             the one tech caption of the clip (Cloudflare Worker) sits on a
 //             LogWindow of gate lines built from 25 / 60 / 85, over the
 //             features hub, dimmed. Card deck: Card B exits, Card C "+25 MIN
 //             ADDED" slides in.
-// b5 715-933  "25 banked + a finished task = 85 minutes, not 60" — ratioBars
-//             on the dark stage (no page/hub — this is the result, not the
-//             product). Card deck fans out to A + C + the result Card D
-//             "= 85 MIN TOTAL", holds at full brightness to the end.
+// b5 715-933  "25 banked + a finished task = 85 minutes, not 60" — result.
+//             Card deck fans out to A + C + the result Card D "= 85 MIN
+//             TOTAL", holds at full brightness to the end.
+//             WAVE C FIX (2026-11-24): was ratioBars. Its own reveal timeline
+//             (bars grow, then a bracket, then the ×1.4 ratio number — the
+//             single biggest element on the frame) was still mid-reveal at
+//             the beat's measured midpoint — bracket and ratio hadn't drawn
+//             yet, 24/48 filled. Replaced with a static panel showing both
+//             bars and the ×1.4 ratio already settled, full-bright for the
+//             whole beat (matching what the comment above always claimed).
 //
 // Persistent element: the card deck (archetype 3), b1 through b5, lower band
 // y>=600 — the effects keep the bottom clear (look.safeBottom) for it.
@@ -27,7 +39,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily, seg } from "./bright-primitives";
+import { fontFamily, seg, Panel, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow, type LogLine } from "./live-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
@@ -224,6 +236,15 @@ const Inner: React.FC = () => {
           keywords: ["zeroing", "topping"],
         }}
       />
+      {/* b3 fill — the caption alone leaves the frame mostly empty; a static
+          contrast pair gives the analogy a picture, clear of the caption's
+          lower third (y<500) and the deck (y>=600). */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <IconCard x={150} y={150} w={380} emoji="📉" title="Zeroing out" sub="Old reset: back to 0" tone="danger" />
+          <IconCard x={750} y={150} w={380} emoji="📈" title="Topping up" sub="New gate: adds on top" tone="success" />
+        </>
+      )}
 
       {/* b4 — the fix: no commit page exists, so a LogWindow of the gate's own
           numbers is the evidence, dimmed over the features hub. This carries
@@ -250,21 +271,60 @@ const Inner: React.FC = () => {
         </>
       )}
 
-      {/* b5 — the result: not the product, the number, holds to the end */}
-      <MotionInsert
-        effect="ratioBars"
-        from={B5}
-        dur={END - B5}
-        accent={ACCENT}
-        base={STAGE}
-        data={{
-          title: "Minutes after an early task",
-          a: { label: "Old flat reset", value: 60 },
-          b: { label: "Banked total now", value: 85 },
-          unit: "min",
-          caption: "25 min banked, nothing wiped",
-        }}
-      />
+      {/* b5 — the result: not the product, the number, holds to the end.
+          Hand-built static panel (was ratioBars — see header for why). */}
+      {frame >= B5 && (
+        <Panel x={70} y={70} w={1140} h={480} tone="card" radius={28} opacity={1}>
+          <div style={{ padding: "34px 50px 0" }}>
+            <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: ACCENT }}>RESULT</div>
+            <div style={{ fontSize: 34, fontWeight: 800, color: "#101418", marginTop: 4 }}>Minutes after an early task</div>
+          </div>
+          <div style={{ display: "flex", padding: "40px 50px 0", gap: 50, alignItems: "center" }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#5b6b63" }}>Old flat reset</div>
+              <div
+                style={{
+                  height: 64,
+                  width: "70%",
+                  background: "#CBD5D1",
+                  borderRadius: 8,
+                  marginTop: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  paddingRight: 16,
+                  boxSizing: "border-box",
+                }}
+              >
+                <span style={{ fontSize: 28, fontWeight: 800, color: "#101418" }}>60 min</span>
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#5b6b63", marginTop: 34 }}>Banked total now</div>
+              <div
+                style={{
+                  height: 64,
+                  width: "100%",
+                  background: ACCENT,
+                  borderRadius: 8,
+                  marginTop: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  paddingRight: 16,
+                  boxSizing: "border-box",
+                }}
+              >
+                <span style={{ fontSize: 28, fontWeight: 800, color: "#101418" }}>85 min</span>
+              </div>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 96, fontWeight: 800, color: ACCENT }}>×1.4</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#5b6b63", marginTop: 6, whiteSpace: "nowrap" }}>
+                25 min banked, nothing wiped
+              </div>
+            </div>
+          </div>
+        </Panel>
+      )}
 
       <CardDeck />
     </AbsoluteFill>

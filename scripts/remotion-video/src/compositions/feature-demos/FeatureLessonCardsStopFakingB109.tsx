@@ -19,8 +19,13 @@
 //              page scrolled further (backdrop "page2").
 // b3 363-525  "Now a shared kit called drawSpec draws the real shape, at one
 //              true scale."
-//              handoffExplain, drawn (no public UI for an internal module):
-//              emoji guesswork -> drawSpec real shapes.
+//              WAVE C FIX (2026-11-24): was handoffExplain (drawn, no public UI
+//              for an internal module). Its own camera-pan + staggered points
+//              are timed off a 4.3s BUILD against this beat's 5.4s window, so
+//              at the beat's measured midpoint the "before" paper had already
+//              panned off-screen and the points hadn't started — 26/48 filled.
+//              Replaced with a static hand-built BEFORE/NOW panel pair plus the
+//              same 3 points as IconCards, full-bright for the whole beat.
 // b4 525-671  "The same kit checks the answer, so picture and check can
 //              never disagree."
 //              Drawn beat: a LogWindow plays the content gate checking a
@@ -46,7 +51,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily } from "./bright-primitives";
+import { fontFamily, Panel, IconCard } from "./bright-primitives";
 import { LogWindow } from "./live-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { tween, ease, mix, punchScale } from "../../components/effects/motion/grammar";
@@ -264,22 +269,28 @@ const Inner: React.FC = () => {
         }}
       />
 
-      {/* b3 — the fix: drawSpec draws the real shape (no public UI, stays drawn) */}
-      <MotionInsert
-        effect="handoffExplain"
-        from={B3}
-        dur={B4 - B3}
-        accent={ACCENT}
-        base={STAGE}
-        plate={0.55}
-        data={{
-          from: "Emoji guesswork",
-          to: "drawSpec real shapes",
-          fromLabel: "BEFORE",
-          toLabel: "NOW",
-          points: ["Polygons, grids, bars, icons", "One shared true scale", "Same output feeds the check"],
-        }}
-      />
+      {/* b3 — the fix: drawSpec draws the real shape (no public UI, stays drawn).
+          Hand-built, clear of the flow-map band (y>=598) — see header for why
+          handoffExplain was replaced. */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <Panel x={70} y={60} w={500} h={150} tone="danger" radius={24} opacity={1}>
+            <div style={{ padding: "22px 30px 0" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: ACCENT }}>BEFORE</div>
+              <div style={{ fontSize: 26, fontWeight: 800, color: "#101418", marginTop: 8 }}>Emoji guesswork</div>
+            </div>
+          </Panel>
+          <Panel x={650} y={60} w={500} h={150} tone="success" radius={24} opacity={1}>
+            <div style={{ padding: "22px 30px 0" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: ACCENT }}>NOW</div>
+              <div style={{ fontSize: 26, fontWeight: 800, color: "#101418", marginTop: 8 }}>drawSpec real shapes</div>
+            </div>
+          </Panel>
+          <IconCard x={70} y={260} w={360} emoji="🧩" title="Polygons, grids, bars" sub="One drawing kit for every slot" tone="accent" />
+          <IconCard x={460} y={260} w={360} emoji="📐" title="One shared scale" sub="Same true scale, every card" tone="accent" />
+          <IconCard x={850} y={260} w={360} emoji="✅" title="Feeds the check" sub="Same output the gate reads" tone="success" />
+        </>
+      )}
 
       {/* b4 — the gate checking a real picture against the word */}
       {cut(frame, B4, B5) === 1 && (

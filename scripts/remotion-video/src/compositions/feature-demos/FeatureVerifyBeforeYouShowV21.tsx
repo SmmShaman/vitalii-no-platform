@@ -13,6 +13,12 @@
 // b3 346-481  "Like repeating a rumor on camera without calling anyone to
 //             confirm it" (the analogy) — keywordCaption on the dark stage.
 //             Timeline: stamp "LIKE A RUMOR" lands.
+//             WAVE C FIX (2026-11-24): keywordCaption is by design a lower-
+//             third caption only — at the beat's measured midpoint the frame
+//             was 16/48 filled, just the caption text and the timeline band.
+//             Added a static rumor-vs-confirm IconCard pair above the caption
+//             (clear of both the caption's lower third and the ribbon) so the
+//             analogy has a visual, not just a sentence.
 // b4 481-725  "Now a research step checks every fact with real Google searches
 //             before it's allowed on screen" — no catalog effect; the one tech
 //             caption of the clip (Google CSE) sits on a LogWindow of the
@@ -22,6 +28,13 @@
 //             on faith alone" — ratioBars on the dark stage (no page/hub/repo —
 //             this is the result, not the product). Timeline: final stamp
 //             "VERIFIED" lands bright, ribbon completes, holds to the end.
+//             WAVE C FIX (2026-11-24): was ratioBars. Its own reveal timeline
+//             (bars grow, then a bracket, then the ×21.0 ratio number — the
+//             single biggest element on the frame) was still mid-reveal at
+//             the beat's measured midpoint — bracket and ratio hadn't drawn
+//             yet, 26/48 filled. Replaced with a static panel showing both
+//             bars and the ×21.0 ratio already settled, full-bright for the
+//             whole beat (matching what the comment above always claimed).
 //
 // Persistent element: the timeline ribbon (archetype 1), b1 through b5, lower
 // band y>=600 — the effects keep the bottom clear (look.safeBottom) for it.
@@ -31,7 +44,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame, useVideoConfig } from "remotion";
 import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
-import { fontFamily, seg } from "./bright-primitives";
+import { fontFamily, seg, Panel, IconCard } from "./bright-primitives";
 import { MotionInsert, LiveBackdrop, Arrive, cut } from "./motion-primitives";
 import { LogWindow, type LogLine } from "./live-primitives";
 import { tween, ease, punchScale } from "../../components/effects/motion/grammar";
@@ -247,6 +260,15 @@ const Inner: React.FC = () => {
           keywords: ["rumor", "confirm"],
         }}
       />
+      {/* b3 fill — the caption alone leaves the frame mostly empty; a static
+          contrast pair gives the analogy a picture, clear of the caption's
+          lower third and the timeline ribbon (y>=600). */}
+      {frame >= B3 && frame < B4 && (
+        <>
+          <IconCard x={150} y={150} w={380} emoji="🗣️" title="Repeating a rumor" sub="No one called to confirm" tone="danger" />
+          <IconCard x={750} y={150} w={380} emoji="☎️" title="Calling to confirm" sub="Checked before it airs" tone="success" />
+        </>
+      )}
 
       {/* b4 — the fix: no runtime log exists on the VPS, so a LogWindow of the
           checker's own numbers is the evidence, dimmed over the repo's commit
@@ -273,21 +295,34 @@ const Inner: React.FC = () => {
         </>
       )}
 
-      {/* b5 — the result: not the product, the number, holds to the end */}
-      <MotionInsert
-        effect="ratioBars"
-        from={B5}
-        dur={END - B5}
-        accent={ACCENT}
-        base={STAGE}
-        data={{
-          title: "Independent checks per digest",
-          a: { label: "Before (manual trust)", value: 1 },
-          b: { label: "Now (per digest)", value: 21 },
-          unit: "check",
-          caption: "Nothing airs on faith alone",
-        }}
-      />
+      {/* b5 — the result: not the product, the number, holds to the end.
+          Hand-built static panel (was ratioBars — see header for why). */}
+      {frame >= B5 && (
+        <Panel x={70} y={70} w={1140} h={480} tone="card" radius={28} opacity={1}>
+          <div style={{ padding: "34px 50px 0" }}>
+            <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 2.4, color: ACCENT }}>RESULT</div>
+            <div style={{ fontSize: 34, fontWeight: 800, color: "#101418", marginTop: 4 }}>Independent checks per digest</div>
+          </div>
+          <div style={{ display: "flex", padding: "40px 50px 0", gap: 50, alignItems: "center" }}>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#5b6b63" }}>Before (manual trust)</div>
+              <div style={{ height: 64, width: "15%", background: "#CBD5D1", borderRadius: 8, marginTop: 10, display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: 16, boxSizing: "border-box" }}>
+                <span style={{ fontSize: 28, fontWeight: 800, color: "#101418" }}>1</span>
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#5b6b63", marginTop: 34 }}>Now (per digest)</div>
+              <div style={{ height: 64, width: "100%", background: ACCENT, borderRadius: 8, marginTop: 10, display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: 16, boxSizing: "border-box" }}>
+                <span style={{ fontSize: 28, fontWeight: 800, color: "#101418" }}>21</span>
+              </div>
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <div style={{ fontSize: 96, fontWeight: 800, color: ACCENT }}>×21.0</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: "#5b6b63", marginTop: 6, whiteSpace: "nowrap" }}>
+                Nothing airs on faith alone
+              </div>
+            </div>
+          </div>
+        </Panel>
+      )}
 
       <TimelineRibbon />
     </AbsoluteFill>
