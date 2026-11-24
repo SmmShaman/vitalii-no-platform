@@ -1,0 +1,57 @@
+{
+ "id": "b36",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.961,
+  "b2": 6.09,
+  "b3": 5.347,
+  "b4": 5.735,
+  "b5": 5.768
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My kid finished her early task with twenty-five minutes of TV time still banked.",
+   "start_s": 0.5,
+   "end_s": 5.461,
+   "start_f": 15,
+   "end_f": 164
+  },
+  {
+   "beat": "b2",
+   "text": "The reward reset her counter to a flat sixty minutes anyway, wiping out the time she hadn't used yet.",
+   "start_s": 5.761,
+   "end_s": 11.851,
+   "start_f": 173,
+   "end_f": 356
+  },
+  {
+   "beat": "b3",
+   "text": "That's like finishing your chores early and having your allowance zeroed out instead of topped up.",
+   "start_s": 12.151,
+   "end_s": 17.498,
+   "start_f": 365,
+   "end_f": 525
+  },
+  {
+   "beat": "b4",
+   "text": "I fixed the Cloudflare Worker behind the gate so early tasks add time instead of resetting it.",
+   "start_s": 17.798,
+   "end_s": 23.533,
+   "start_f": 534,
+   "end_f": 706
+  },
+  {
+   "beat": "b5",
+   "text": "Twenty-five banked minutes plus a finished task now equals eighty-five minutes, not sixty.",
+   "start_s": 23.833,
+   "end_s": 29.601,
+   "start_f": 715,
+   "end_f": 888
+  }
+ ],
+ "total_s": 31.101,
+ "durationInFrames": 933,
+ "measured_track_s": 29.664,
+ "track": "/root/feature-demos/vo-b36/vo-b36.mp3"
+}

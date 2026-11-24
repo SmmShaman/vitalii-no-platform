@@ -1,0 +1,57 @@
+{
+ "id": "v21",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.607,
+  "b2": 4.842,
+  "b3": 4.183,
+  "b4": 7.836,
+  "b5": 5.171
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My daily video digest narrated whatever the source article said, no questions asked.",
+   "start_s": 0.5,
+   "end_s": 6.107,
+   "start_f": 15,
+   "end_f": 183
+  },
+  {
+   "beat": "b2",
+   "text": "One exaggerated headline, and that claim went straight into a published video.",
+   "start_s": 6.407,
+   "end_s": 11.249,
+   "start_f": 192,
+   "end_f": 337
+  },
+  {
+   "beat": "b3",
+   "text": "Like repeating a rumor on camera without calling anyone to confirm it.",
+   "start_s": 11.549,
+   "end_s": 15.732,
+   "start_f": 346,
+   "end_f": 472
+  },
+  {
+   "beat": "b4",
+   "text": "Now a research step checks every fact with real Google searches before it's allowed on screen, and only draws a chart when the numbers are real.",
+   "start_s": 16.032,
+   "end_s": 23.868,
+   "start_f": 481,
+   "end_f": 716
+  },
+  {
+   "beat": "b5",
+   "text": "Up to twenty-one independent checks per digest, so nothing airs on faith alone.",
+   "start_s": 24.168,
+   "end_s": 29.339,
+   "start_f": 725,
+   "end_f": 880
+  }
+ ],
+ "total_s": 30.839,
+ "durationInFrames": 925,
+ "measured_track_s": 29.4,
+ "track": "/root/feature-demos/vo-v21/vo-v21.mp3"
+}

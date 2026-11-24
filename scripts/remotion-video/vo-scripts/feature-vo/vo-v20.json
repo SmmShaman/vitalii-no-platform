@@ -1,0 +1,57 @@
+{
+ "id": "v20",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 4.658,
+  "b2": 5.801,
+  "b3": 4.058,
+  "b4": 5.449,
+  "b5": 5.527
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Filming or hand-editing a demo video for every shipped feature doesn't scale.",
+   "start_s": 0.5,
+   "end_s": 5.158,
+   "start_f": 15,
+   "end_f": 155
+  },
+  {
+   "beat": "b2",
+   "text": "Many features just had no visual at all, or whatever screenshot happened to be lying around.",
+   "start_s": 5.458,
+   "end_s": 11.259,
+   "start_f": 164,
+   "end_f": 338
+  },
+  {
+   "beat": "b3",
+   "text": "That's like trying to shoot a commercial for every single product update.",
+   "start_s": 11.559,
+   "end_s": 15.617,
+   "start_f": 347,
+   "end_f": 469
+  },
+  {
+   "beat": "b4",
+   "text": "So I built a Remotion template that generates each clip procedurally from the feature's own data.",
+   "start_s": 15.917,
+   "end_s": 21.366,
+   "start_f": 478,
+   "end_f": 641
+  },
+  {
+   "beat": "b5",
+   "text": "Two pilot clips proved it generalizes, and now every new feature gets one automatically.",
+   "start_s": 21.666,
+   "end_s": 27.193,
+   "start_f": 650,
+   "end_f": 816
+  }
+ ],
+ "total_s": 28.693,
+ "durationInFrames": 861,
+ "measured_track_s": 27.264,
+ "track": "/root/feature-demos/vo-v20/vo-v20.mp3"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "b36",
+  "file": "yt-feature-b36.mp4",
+  "title": "Early Task, Banked Time: Fixing a Kids App Reward Reset | vitalii.no",
+  "description": "My kid did the early break task with 25 minutes of TV time still on the clock, and the reward reset the counter to a flat 120 minutes -- throwing away the time she hadn't used yet. Doing the work early was supposed to pay off, not erase a window she was still sitting on.\n\nI changed the gate logic in [workers/youtube-gate/index.js] from a hard reset (baseline = viewtime) to additive banking (baseline += limit), and removed an inner clamp in the countdown helper so a banked remainder actually reaches the kiosk badge, the on-TV overlay and the admin panel. I also reworded the kids-app card copy so it promises exactly what the gate now does: time is added, not restarted.\n\nFinishing the reserve task with time still on the clock now banks that remainder instead of losing it -- 25 minutes left plus a done early task equals 85 minutes, not a reset to 60.\n\n🔗 Full write-up: https://vitalii.no/features/banked-time-not-reset-time-early-tasks-now-add-a-window-instead-of-wiping-it-b36\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#parenting #kidstech #cloudflareworkers #screentime #automation",
+  "tags": ["screen time management", "parenting tech", "cloudflare workers", "reward systems", "kids app", "edge logic", "behavioral design", "family tech", "gamification", "bug fix", "vitalii berbeha"]
+}

@@ -1,0 +1,7 @@
+{"id": "v20", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Filming or hand-editing a demo video for every shipped feature doesn't scale."],
+ ["b2", "Many features just had no visual at all, or whatever screenshot happened to be lying around."],
+ ["b3", "That's like trying to shoot a commercial for every single product update."],
+ ["b4", "So I built a Remotion template that generates each clip procedurally from the feature's own data."],
+ ["b5", "Two pilot clips proved it generalizes, and now every new feature gets one automatically."]
+]}

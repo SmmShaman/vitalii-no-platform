@@ -1,0 +1,7 @@
+{"id": "b36", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "My kid finished her early task with twenty-five minutes of TV time still banked."],
+ ["b2", "The reward reset her counter to a flat sixty minutes anyway, wiping out the time she hadn't used yet."],
+ ["b3", "That's like finishing your chores early and having your allowance zeroed out instead of topped up."],
+ ["b4", "I fixed the Cloudflare Worker behind the gate so early tasks add time instead of resetting it."],
+ ["b5", "Twenty-five banked minutes plus a finished task now equals eighty-five minutes, not sixty."]
+]}
