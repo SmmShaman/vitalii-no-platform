@@ -1,0 +1,6 @@
+{"id": "b38", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Walking past the kitchen TV, you saw one screen — tasks, or a lock screen — never who's home, never what's on this week."],
+  ["b2", "The camera feed, when it showed up at all, got cropped into whatever odd shape was left over."],
+  ["b3", "Now a Cloudflare Worker feeds a calendar strip and a live camera tile alongside the same screen, scaled down instead of redrawn."],
+  ["b4", "One glance at the TV now shows four things at once instead of one."]
+]}

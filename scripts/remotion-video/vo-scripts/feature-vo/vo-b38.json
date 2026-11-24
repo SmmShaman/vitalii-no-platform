@@ -1,0 +1,48 @@
+{
+ "id": "b38",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.023,
+  "b2": 5.795,
+  "b3": 7.969,
+  "b4": 4.685
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Walking past the kitchen TV, you saw one screen \u2014 tasks, or a lock screen \u2014 never who's home, never what's on this week.",
+   "start_s": 0.5,
+   "end_s": 8.523,
+   "start_f": 15,
+   "end_f": 256
+  },
+  {
+   "beat": "b2",
+   "text": "The camera feed, when it showed up at all, got cropped into whatever odd shape was left over.",
+   "start_s": 8.823,
+   "end_s": 14.618,
+   "start_f": 265,
+   "end_f": 439
+  },
+  {
+   "beat": "b3",
+   "text": "Now a Cloudflare Worker feeds a calendar strip and a live camera tile alongside the same screen, scaled down instead of redrawn.",
+   "start_s": 14.918,
+   "end_s": 22.887,
+   "start_f": 448,
+   "end_f": 687
+  },
+  {
+   "beat": "b4",
+   "text": "One glance at the TV now shows four things at once instead of one.",
+   "start_s": 23.187,
+   "end_s": 27.872,
+   "start_f": 696,
+   "end_f": 836
+  }
+ ],
+ "total_s": 29.372,
+ "durationInFrames": 881,
+ "measured_track_s": 27.936,
+ "track": "/root/feature-demos/vo-b38/vo-b38.mp3"
+}

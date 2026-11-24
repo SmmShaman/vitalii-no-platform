@@ -1,0 +1,57 @@
+{
+ "id": "b37",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.345,
+  "b2": 4.227,
+  "b3": 8.402,
+  "b4": 4.544,
+  "b5": 7.042
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My daughter's bonus math task kept handing her the exact same problem \u2014 69 times 71 \u2014 three days running.",
+   "start_s": 0.5,
+   "end_s": 7.845,
+   "start_f": 15,
+   "end_f": 235
+  },
+  {
+   "beat": "b2",
+   "text": "It felt like a bug, and it never fixed what she actually got wrong.",
+   "start_s": 8.145,
+   "end_s": 12.372,
+   "start_f": 244,
+   "end_f": 371
+  },
+  {
+   "beat": "b3",
+   "text": "I gave the quiz a memory in Supabase \u2014 the last 200 questions each kid has seen \u2014 so a maker rerolls before repeating one.",
+   "start_s": 12.672,
+   "end_s": 21.074,
+   "start_f": 380,
+   "end_f": 632
+  },
+  {
+   "beat": "b4",
+   "text": "A third of every bonus set now even targets her actual weak topics.",
+   "start_s": 21.374,
+   "end_s": 25.918,
+   "start_f": 641,
+   "end_f": 778
+  },
+  {
+   "beat": "b5",
+   "text": "36,600 generated answers checked after the fix: zero duplicates, zero repeats.",
+   "start_s": 26.218,
+   "end_s": 33.26,
+   "start_f": 787,
+   "end_f": 998
+  }
+ ],
+ "total_s": 34.76,
+ "durationInFrames": 1043,
+ "measured_track_s": 33.312,
+ "track": "/root/feature-demos/vo-b37/vo-b37.mp3"
+}

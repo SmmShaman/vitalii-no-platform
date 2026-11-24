@@ -1,0 +1,48 @@
+{
+ "id": "b111",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.057,
+  "b2": 8.142,
+  "b3": 7.704,
+  "b4": 5.241
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "My daughter does a wall-lesson every day \u2014 one morning, the whole queue for a school day just disappeared.",
+   "start_s": 0.5,
+   "end_s": 6.557,
+   "start_f": 15,
+   "end_f": 197
+  },
+  {
+   "beat": "b2",
+   "text": "Four tiny glitches in a row, three seconds each, got treated as real failures \u2014 burning every retry before a real attempt ran.",
+   "start_s": 6.857,
+   "end_s": 14.999,
+   "start_f": 206,
+   "end_f": 450
+  },
+  {
+   "beat": "b3",
+   "text": "I rebuilt the Python pipeline so a crash or a glitch no longer spends one of its limited tries \u2014 only a finished attempt does.",
+   "start_s": 15.299,
+   "end_s": 23.003,
+   "start_f": 459,
+   "end_f": 690
+  },
+  {
+   "beat": "b4",
+   "text": "The exact four three-second crashes that wiped that day's lessons can't do it again.",
+   "start_s": 23.303,
+   "end_s": 28.544,
+   "start_f": 699,
+   "end_f": 856
+  }
+ ],
+ "total_s": 30.044,
+ "durationInFrames": 901,
+ "measured_track_s": 28.608,
+ "track": "/root/feature-demos/vo-b111/vo-b111.mp3"
+}
