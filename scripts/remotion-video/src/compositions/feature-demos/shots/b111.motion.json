@@ -1,0 +1,52 @@
+{
+  "id": "b111",
+  "composition": "FeatureFourSecondCrashesWipedB111",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "A day's wall-lessons vanished",
+        "tags": ["4 crashes", "3 sec each", "Nov 21", "0 real attempts"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cardCounter",
+      "backdrop": null,
+      "data": {
+        "cards": [
+          { "label": "Crash 1", "value": 1 },
+          { "label": "Crash 2", "value": 1 },
+          { "label": "Crash 3", "value": 1 },
+          { "label": "Crash 4", "value": 1 }
+        ],
+        "unit": "try",
+        "totalLabel": "Tries burned",
+        "countLabel": "crashes"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "note": "no verified GitHub URL this run — commit a299a18 is drawn, not recorded",
+      "data": {
+        "from": "Crash = real try burned",
+        "to": "Crash = free retry",
+        "points": [
+          "Only a finished attempt burns a try",
+          "A locked leftover folder no longer blocks the run",
+          "Two AI review passes, capped at two rounds"
+        ]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype + LogWindow carry the result — never the feature page or the hub (gate 2)"
+    }
+  ]
+}

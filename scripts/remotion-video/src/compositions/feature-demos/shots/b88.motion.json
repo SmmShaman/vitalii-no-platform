@@ -1,0 +1,54 @@
+{
+ "id": "b88",
+ "composition": "FeatureHomeworkPointsStraightPageB88",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "page",
+   "data": {
+    "title": "Just a page number, no chapter",
+    "kicker": "Boytasks: homework note read 's. 83, 84, 85'"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "page2",
+   "data": {
+    "statement": "The app had no idea which chapter that was",
+    "tags": [
+     "No page-to-chapter map",
+     "Can't teach toward his class",
+     "Just a bare number"
+    ]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "pipelineFlow",
+   "backdrop": "hub",
+   "data": {
+    "steps": [
+     "Read his real textbook's contents",
+     "Pull chapter titles and grammar focus",
+     "Match page numbers to a chapter"
+    ],
+    "result": "Homework card names the real chapter",
+    "system": "Cloudflare Workers"
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "drawn",
+   "backdrop": null,
+   "note": "No verified repo URL for b88 - no commit diff shown. Full-frame drawn match: three homework cards (one per subject) flip from a bare page number to naming their chapter, check badges land on each."
+  },
+  {
+   "beat": "b5",
+   "effect": "drawn",
+   "backdrop": null,
+   "note": "Drawn LogWindow, lines built only from the feature's own data (real textbook file matematikk4a_cappelen.json from commit 96e37c8, and the literal quoted result 'Kapittel 4: Brøk' from the VO). Ends held at full brightness on the before/after line, no fade."
+  }
+ ]
+}

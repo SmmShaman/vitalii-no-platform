@@ -1,0 +1,57 @@
+{
+  "id": "b85",
+  "composition": "FeatureTapKioskCalendarOpensB85",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "kicker": "Every week's homework, as a PDF",
+        "title": "Buried in an email"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": {
+        "line1": "A parent had to dig it out",
+        "line2": "and show it on a phone",
+        "keywords": ["dig it out", "phone"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Email watched for PDF", "Each page saved as JPEG", "Served via Cloudflare"],
+        "result": "Stored in weekly_plan_pages",
+        "system": "Cloudflare Worker"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "No real plan on the TV",
+        "to": "Tap, pick a week, swipe page by page",
+        "points": [
+          "One tap opens WeeklyPlan.tsx full-screen",
+          "Pick any week with arrow buttons",
+          "Jumps to the nearest week that has a plan"
+        ],
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "LogWindow shows flyt_plans.py / weekly_plan_pages running; hero flips 0 -> 4 and holds at full brightness, no catalog effect, no fade."
+    }
+  ]
+}

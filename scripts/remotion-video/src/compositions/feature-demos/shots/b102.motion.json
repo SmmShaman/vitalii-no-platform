@@ -1,0 +1,53 @@
+{
+  "id": "b102",
+  "composition": "FeatureKidsCanAskExplainerB102",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "statusFocus",
+      "backdrop": "page",
+      "data": {
+        "title": "Before",
+        "claims": [
+          { "text": "Kid can ask for an explainer?", "verdict": "no" },
+          { "text": "Parent sees the question?", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Tap ❓ Explain", "Speak the question", "Request captured"],
+        "result": "No typing needed",
+        "system": "Voice ask"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "copyCorrection",
+      "backdrop": null,
+      "data": {
+        "wrong": "Question submitted silently",
+        "right": "TTS reads it back before it's queued",
+        "label": "Confirm step"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "cornerTags",
+      "backdrop": null,
+      "data": {
+        "statement": "Parents see every question",
+        "tags": ["Cancel a pending one", "Or type it themselves"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "ledger's daily-cap row completes + LogWindow carries the result alone, no catalog effect"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "b104",
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/explainer-videos-now-draw-real-dna-strand-comparisons-instead-of-generic-cartoon-b104",
+      "frames": 218,
+      "scroll": [
+        [0, 0],
+        [110, 260],
+        [217, 520]
+      ],
+      "mouse": [
+        [0, 520, 180],
+        [110, 480, 300],
+        [217, 440, 420]
+      ]
+    }
+  ]
+}

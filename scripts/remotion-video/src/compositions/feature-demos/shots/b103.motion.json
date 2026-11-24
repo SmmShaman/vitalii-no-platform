@@ -1,0 +1,50 @@
+{
+  "id": "b103",
+  "composition": "FeatureAdminCanSwitchExplainerB103",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Hardcoded voice, no cost visibility",
+        "tags": ["Change needs a deploy", "No per-video cost"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "copyCorrection",
+      "backdrop": null,
+      "data": {
+        "wrong": "Voice hardcoded in code",
+        "right": "Admin switches voice, no deploy",
+        "label": "Voice settings"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Primary TTS engine", "Call fails", "Fallback engine"],
+        "result": "Line still spoken",
+        "system": "TTS fallback chain"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "funnelAbsorption",
+      "backdrop": null,
+      "data": {
+        "inputs": ["AI time", "Voice generation", "Render minutes"],
+        "result": "One cost number, per video"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "sidebar's third item completes + LogWindow carries the result alone, no catalog effect"
+    }
+  ]
+}

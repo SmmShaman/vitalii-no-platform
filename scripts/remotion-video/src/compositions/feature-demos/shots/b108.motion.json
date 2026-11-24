@@ -1,0 +1,65 @@
+[
+  {
+    "beat": "b1",
+    "effect": "titleTakeover",
+    "backdrop": "hub",
+    "data": {
+      "title": "Dead air, nothing moved",
+      "kicker": "Explainer video pacing bug"
+    }
+  },
+  {
+    "beat": "b2",
+    "effect": "pipelineFlow",
+    "backdrop": "page",
+    "data": {
+      "system": "Old timeline",
+      "steps": [
+        "Shot planned",
+        "Camera move queued",
+        "Timeline padded to fit",
+        "Sentence already done"
+      ],
+      "result": "Padding added anyway"
+    }
+  },
+  {
+    "beat": "b3",
+    "effect": "statusFocus",
+    "backdrop": null,
+    "data": {
+      "title": "Waiting on nothing",
+      "claims": [
+        { "text": "Next shot's move isn't ready", "verdict": "unclear" },
+        { "text": "The sentence already finished", "verdict": "yes" }
+      ]
+    }
+  },
+  {
+    "beat": "b4",
+    "effect": "handoffExplain",
+    "backdrop": null,
+    "data": {
+      "from": "Padded to fit the camera move",
+      "to": "Refused if the shot is too short",
+      "points": [
+        "Every beat after the first must change something",
+        "A look, a colour, or a layout must shift"
+      ]
+    }
+  },
+  {
+    "beat": "b5",
+    "effect": "percentRing",
+    "backdrop": null,
+    "data": {
+      "value": 15,
+      "threshold": 15,
+      "label": "Max planned silence per film",
+      "notes": [
+        "Static shot capped at 8 seconds",
+        "Five fixed pause kinds"
+      ]
+    }
+  }
+]

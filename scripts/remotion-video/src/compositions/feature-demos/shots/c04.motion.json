@@ -1,0 +1,47 @@
+{
+  "id": "c04",
+  "composition": "FeatureGoogleCalendarMirroredServerC04",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "Locked out of our own calendar", "kicker": "BEFORE" }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "One team name, four confused boys",
+        "tags": ["No per-child tag", "Guesswork weekly", "Missed practices", "Team renamed often"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "commit-mirror",
+      "data": {
+        "steps": ["Reads the iCal feed", "Every 15 minutes", "Mirrors it server-side"],
+        "result": "No browser login needed",
+        "system": "server.ts"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "commit-child",
+      "data": {
+        "from": "One team name, 4 boys",
+        "to": "Each boy, own tagged feed",
+        "points": ["Feed tagged per child", "Survives team renames", "server.ts"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "SplitFrame divider has fully slid to 0 — the order half now fills the whole stage. LogWindow shows the real facts (browser login barrier, server.ts mirroring the iCal feed every 15 min, per-child tagged feeds) with a resolved 'sorted by name' stat; holds at full brightness to the final frame. No feature page or hub (gate 2)."
+    }
+  ]
+}

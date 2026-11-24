@@ -1,0 +1,25 @@
+{
+  "id": "b102",
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/kids-can-now-ask-for-an-explainer-video-straight-from-the-ber-app-b102",
+      "frames": 230,
+      "scroll": [
+        [0, 0],
+        [115, 260],
+        [229, 520]
+      ],
+      "mouse": [
+        [0, 520, 180],
+        [115, 480, 300],
+        [229, 440, 420]
+      ]
+    }
+  ]
+}

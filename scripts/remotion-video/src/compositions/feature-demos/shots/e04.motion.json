@@ -1,0 +1,51 @@
+{
+ "id": "e04",
+ "composition": "FeatureElvarikasInterfaceGetsRealE04",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "page",
+   "data": {
+    "title": "Three seconds, blank screen",
+    "kicker": "Elvarika: every visitor waited before anything appeared"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "copyCorrection",
+   "backdrop": "page2",
+   "data": {
+    "wrong": "Looked like a slow network",
+    "right": "A blocking health check, plus years of unused pages",
+    "label": "Actually"
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "pipelineFlow",
+   "backdrop": "hub",
+   "data": {
+    "steps": ["New design system", "New colors and fonts", "Cleaned-up React codebase"],
+    "result": "One interface, rebuilt",
+    "system": "React"
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": "handoffExplain",
+   "backdrop": "page3",
+   "data": {
+    "from": "Health check blocks render",
+    "to": "First screen just appears",
+    "points": ["Dead screens deleted", "Blocking check removed"]
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "drawn",
+   "backdrop": null,
+   "note": "No verified repo URL for e04 - no commit diff shown. Drawn LogWindow + before/after bundle-size cards, lines built only from the feature's own numbers (first-load bundle 2.4MB -> 0.65MB). Ends held at full brightness, no fade."
+  }
+ ]
+}

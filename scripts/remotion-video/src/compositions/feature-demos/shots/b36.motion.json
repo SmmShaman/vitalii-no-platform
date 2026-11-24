@@ -1,0 +1,70 @@
+{
+ "id": "b36",
+ "composition": "FeatureBankedTimeResetTimeB36",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "page",
+   "data": {
+    "title": "25 minutes, already banked",
+    "kicker": "Boytasks: finish the reward task early"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "page2",
+   "data": {
+    "statement": "The reward used to erase it",
+    "tags": [
+     "Flat 60-minute reset",
+     "25 banked minutes lost",
+     "Happens on every reward",
+     "Early effort wiped"
+    ]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "keywordCaption",
+   "backdrop": null,
+   "data": {
+    "line1": "Like zeroing your allowance",
+    "line2": "instead of topping it up",
+    "keywords": ["zeroing", "topping"]
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": null,
+   "backdrop": "hub",
+   "note": "No GitHub commit page exists for this worker fix, so this beat is evidence-by-log, not a catalog effect: a LogWindow built from the feature's own problem/solution numbers substitutes for a recording of the running code. This also carries the clip's one tech caption ('cloudflare worker').",
+   "logWindow": {
+    "title": "cloudflare worker · reward gate",
+    "lines": [
+     "gate: reward claimed (early task)",
+     "banked_remaining = 25m",
+     "mode: additive (baseline += limit)",
+     "baseline 0m -> 85m",
+     "countdown clamp removed",
+     "kiosk badge -> 85m",
+     "tv overlay -> 85m",
+     "admin panel synced"
+    ]
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "ratioBars",
+   "backdrop": null,
+   "data": {
+    "title": "Minutes after an early task",
+    "a": { "label": "Old flat reset", "value": 60 },
+    "b": { "label": "Banked total now", "value": 85 },
+    "unit": "min",
+    "caption": "25 min banked, nothing wiped"
+   }
+  }
+ ]
+}

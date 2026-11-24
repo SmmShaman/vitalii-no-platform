@@ -1,0 +1,52 @@
+[
+  {
+    "beat": "b1",
+    "effect": "titleTakeover",
+    "backdrop": "hub",
+    "data": {
+      "title": "Two requests, one queue",
+      "kicker": "Second film queued silently"
+    }
+  },
+  {
+    "beat": "b2",
+    "effect": "funnelAbsorption",
+    "backdrop": null,
+    "data": {
+      "inputs": ["Kid A's request", "Kid B's request"],
+      "result": "Second film queued, unseen"
+    }
+  },
+  {
+    "beat": "b3",
+    "effect": "statusFocus",
+    "backdrop": null,
+    "data": {
+      "title": "No warning given",
+      "claims": [
+        { "text": "First order still cooking", "verdict": "yes" },
+        { "text": "Kitchen warns the table", "verdict": "no" }
+      ]
+    }
+  },
+  {
+    "beat": "b4",
+    "effect": "handoffExplain",
+    "backdrop": "page",
+    "data": {
+      "from": "Entry points raced blindly",
+      "to": "Checks render in flight",
+      "points": ["Checks in-flight state first", "Second request rejected early"]
+    }
+  },
+  {
+    "beat": "b5",
+    "effect": "pipelineFlow",
+    "backdrop": null,
+    "data": {
+      "system": "Request guard",
+      "steps": ["Second request arrives", "In-flight check runs", "Reply sent instantly"],
+      "result": "Stage, minutes left, 409"
+    }
+  }
+]

@@ -1,0 +1,35 @@
+{
+  "id": "e04",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/elvarikas-interface-gets-a-real-design-system-and-its-main-bundle-shrinks-from-2-e04",
+      "frames": 169,
+      "scroll": [[0, 0], [84, 0], [168, 40]],
+      "mouse": [[0, 560, 300], [84, 560, 300], [168, 580, 320]]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/elvarikas-interface-gets-a-real-design-system-and-its-main-bundle-shrinks-from-2-e04",
+      "frames": 182,
+      "scroll": [[0, 40], [90, 420], [181, 820]],
+      "mouse": [[0, 520, 220], [90, 600, 280], [181, 540, 240]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 226,
+      "scroll": [[0, 0], [112, 900], [225, 1800]],
+      "mouse": [[0, 300, 200], [112, 620, 260], [225, 420, 320]]
+    },
+    {
+      "name": "page3",
+      "url": "https://vitalii.no/features/elvarikas-interface-gets-a-real-design-system-and-its-main-bundle-shrinks-from-2-e04",
+      "frames": 165,
+      "scroll": [[0, 0], [82, 180], [164, 360]],
+      "mouse": [[0, 540, 260], [82, 600, 300], [164, 560, 280]]
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "id": "b110",
+  "composition": "FeatureTimesUpUsedThrowB110",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "Pulled the plug, mid-movie",
+        "kicker": "Boytasks screen-time guard — when time ran out, the film was just gone"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "A parent's unlock meant relaunching — and the kid lost their place",
+        "tags": ["App closed, not paused", "Relaunch from scratch", "Progress lost", "Story restarts"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page",
+      "data": {
+        "from": "App closed, relaunch required",
+        "to": "Paused in place, QR resumes it",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": [
+          "Media pause key freezes the frame",
+          "Parent QR scan unlocks and resumes",
+          "Child picks up right where they left off"
+        ]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "timelineNodes",
+      "backdrop": "hub",
+      "data": {
+        "nodes": [
+          { "date": "v1", "label": "Pause key + parent QR drawn over kiosk" },
+          { "date": "test", "label": "Auto-resume didn't fire on this Android build" },
+          { "date": "v2", "label": "Full-screen overlay swallows every key" }
+        ],
+        "activeIndex": 2
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": { "note": "LogWindow — real overlay/fallback facts, ends on the 15s wait, holds to END" }
+    }
+  ]
+}

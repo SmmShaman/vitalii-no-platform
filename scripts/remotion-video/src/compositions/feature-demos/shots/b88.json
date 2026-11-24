@@ -1,0 +1,28 @@
+{
+  "id": "b88",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/homework-now-points-straight-to-the-page-in-each-kids-real-textbook-b88",
+      "frames": 246,
+      "scroll": [[0, 0], [122, 240], [245, 460]],
+      "mouse": [[0, 540, 220], [122, 600, 260], [245, 560, 300]]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/homework-now-points-straight-to-the-page-in-each-kids-real-textbook-b88",
+      "frames": 175,
+      "scroll": [[0, 460], [87, 760], [174, 1040]],
+      "mouse": [[0, 520, 220], [87, 600, 280], [174, 540, 240]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 223,
+      "scroll": [[0, 0], [111, 900], [222, 1800]],
+      "mouse": [[0, 300, 200], [111, 620, 260], [222, 420, 320]]
+    }
+  ]
+}

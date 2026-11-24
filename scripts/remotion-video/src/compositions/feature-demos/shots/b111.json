@@ -1,0 +1,23 @@
+{
+  "id": "b111",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/four-3-second-crashes-wiped-a-day-of-lessons-now-failures-dont-burn-the-retry-b111",
+      "frames": 191,
+      "scroll": [
+        [0, 0],
+        [95, 360],
+        [190, 760]
+      ],
+      "mouse": [
+        [0, 560, 220],
+        [70, 620, 300],
+        [140, 500, 260],
+        [190, 580, 240]
+      ]
+    }
+  ]
+}

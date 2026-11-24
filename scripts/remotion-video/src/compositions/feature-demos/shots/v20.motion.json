@@ -1,0 +1,63 @@
+{
+ "id": "v20",
+ "composition": "FeatureEveryGetsSilentLoopingV20",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "page",
+   "data": {
+    "title": "Can't film every feature",
+    "kicker": "Hand-editing a video for each shipped feature doesn't scale"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "cornerTags",
+   "backdrop": "hub",
+   "data": {
+    "statement": "Most features got no visual at all",
+    "tags": ["Random screenshot", "No consistent style", "No per-feature clip", "Hours per video, when made"]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "keywordCaption",
+   "backdrop": null,
+   "data": {
+    "line1": "Like shooting a commercial",
+    "line2": "for every single product update",
+    "keywords": ["commercial", "update"]
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": null,
+   "backdrop": null,
+   "note": "No runtime log exists for this pipeline (it is the pipeline that makes the clips, not a service with its own log), so this beat is evidence-by-log, not a catalog effect: a LogWindow built from the real steps of tonight's own factory run (archetype draw, beat measurement, shots.json, typecheck, GitHub render, publish) substitutes for a recording, drawn over the divider wash as it slides toward order. This also carries the clip's one tech caption ('Remotion').",
+   "logWindow": {
+    "title": "feature-clip-factory · render",
+    "lines": [
+     "feature row loaded: v20",
+     "archetype=0 (split-duel) mood=sand drawn",
+     "beats measured: 5 (15f -> 861f)",
+     "shots/v20.json written (2 shots)",
+     "typecheck: 0 errors",
+     "render queued -> GitHub runner",
+     "contact sheet generated",
+     "clip published: feature-v20.mp4"
+    ]
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "percentRing",
+   "backdrop": null,
+   "data": {
+    "value": 100,
+    "label": "New features get a clip automatically",
+    "notes": ["2 pilot clips proved it generalizes", "Every feature since, automatic"]
+   }
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+{
+  "id": "b101",
+  "composition": "FeatureKidsSeeHowManyB101",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "Ber — Family Network",
+        "kicker": "Asking felt like a coin flip"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Record the question", "Send it", "Wait", "Find out it failed"],
+        "result": "Turn already spent"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": null,
+      "backdrop": "page2",
+      "note": "drawn LogWindow \"explain capacity\" + live screenshot of the real status line, no catalog effect — archetype ledger chips flip red->green in sync with the revealed lines"
+    },
+    {
+      "beat": "b4",
+      "effect": "cardCounter",
+      "backdrop": null,
+      "data": {
+        "cards": [
+          { "label": "this week", "value": 1 },
+          { "label": "right now", "value": 1 },
+          { "label": "next slot", "value": 1 },
+          { "label": "reset", "value": 1 }
+        ],
+        "totalLabel": "folded into one line"
+      }
+    }
+  ]
+}

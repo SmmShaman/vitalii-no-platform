@@ -1,0 +1,51 @@
+{
+  "id": "b37",
+  "composition": "FeatureEnding6971LoopB37",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Same problem, 3 days straight",
+        "tags": ["69 x 71", "Bonus math task", "3 days running", "Boytasks"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "Felt like a bug",
+        "line2": "never fixed what she actually got wrong",
+        "keywords": ["bug", "never fixed"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "No memory, same Q repeats",
+        "to": "Checks last 200, rerolls",
+        "points": ["Supabase stores last 200 Qs per kid", "Reroll before repeating one", "Runs before every bonus set"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "percentRing",
+      "backdrop": null,
+      "data": {
+        "value": 33,
+        "label": "of every bonus set now targets her weak topics",
+        "notes": ["Picked from her actual misses"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "result panel + LogWindow carry the numbers (36,600 checked, 0 duplicates, 0 repeats) — never the feature page or the hub (gate 2)"
+    }
+  ]
+}

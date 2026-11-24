@@ -233,6 +233,9 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureBankedTimeResetTimeB36 } from "./compositions/feature-demos/FeatureBankedTimeResetTimeB36";
+import { FeatureVerifyBeforeYouShowV21 } from "./compositions/feature-demos/FeatureVerifyBeforeYouShowV21";
+import { FeatureEveryGetsSilentLoopingV20 } from "./compositions/feature-demos/FeatureEveryGetsSilentLoopingV20";
 import { FeatureLowSugarSirenFlashesD18 } from "./compositions/feature-demos/FeatureLowSugarSirenFlashesD18";
 import { FeatureSpareAndroidTvStickD17 } from "./compositions/feature-demos/FeatureSpareAndroidTvStickD17";
 import { FeatureSixthAgentEditsEveryB105 } from "./compositions/feature-demos/FeatureSixthAgentEditsEveryB105";
@@ -328,6 +331,9 @@ import { FeatureHeadlessClaudeDirectsTvB91 } from "./compositions/feature-demos/
 import { FeatureBlindViewerChecksEveryB98 } from "./compositions/feature-demos/FeatureBlindViewerChecksEveryB98";
 import { FeatureNineNewTeachingEffectsB97 } from "./compositions/feature-demos/FeatureNineNewTeachingEffectsB97";
 import { FeatureFiveNewLessonCardsB96 } from "./compositions/feature-demos/FeatureFiveNewLessonCardsB96";
+import { FeatureFourSecondCrashesWipedB111 } from "./compositions/feature-demos/FeatureFourSecondCrashesWipedB111";
+import { FeatureTimesUpUsedThrowB110 } from "./compositions/feature-demos/FeatureTimesUpUsedThrowB110";
+import { FeatureLessonCardsStopFakingB109 } from "./compositions/feature-demos/FeatureLessonCardsStopFakingB109";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2391,6 +2397,33 @@ export const RemotionRoot: React.FC = () => {
       />
 
       <Composition
+        id="FeatureBankedTimeResetTimeB36"
+        component={FeatureBankedTimeResetTimeB36}
+        durationInFrames={933}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureVerifyBeforeYouShowV21"
+        component={FeatureVerifyBeforeYouShowV21}
+        durationInFrames={925}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureEveryGetsSilentLoopingV20"
+        component={FeatureEveryGetsSilentLoopingV20}
+        durationInFrames={861}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
         id="FeatureLowSugarSirenFlashesD18"
         component={FeatureLowSugarSirenFlashesD18}
         durationInFrames={930}
@@ -3245,6 +3278,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFiveNewLessonCardsB96"
         component={FeatureFiveNewLessonCardsB96}
         durationInFrames={814}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFourSecondCrashesWipedB111"
+        component={FeatureFourSecondCrashesWipedB111}
+        durationInFrames={901}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTimesUpUsedThrowB110"
+        component={FeatureTimesUpUsedThrowB110}
+        durationInFrames={916}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureLessonCardsStopFakingB109"
+        component={FeatureLessonCardsStopFakingB109}
+        durationInFrames={978}
         fps={30}
         width={1280}
         height={720}

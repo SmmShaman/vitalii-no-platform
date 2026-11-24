@@ -1,0 +1,40 @@
+{
+  "id": "b108",
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 154,
+      "scroll": [
+        [0, 0],
+        [76, 250],
+        [153, 480]
+      ],
+      "mouse": [
+        [0, 500, 60],
+        [76, 560, 70],
+        [153, 520, 80]
+      ]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/explainer-videos-stop-padding-silence-to-fit-a-camera-move-the-pause-now-sets-th-b108",
+      "frames": 178,
+      "scroll": [
+        [0, 0],
+        [89, 400],
+        [177, 780]
+      ],
+      "mouse": [
+        [0, 480, 60],
+        [89, 540, 75],
+        [177, 500, 85]
+      ]
+    }
+  ]
+}

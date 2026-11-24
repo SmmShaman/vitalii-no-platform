@@ -1,0 +1,50 @@
+{
+  "id": "b86",
+  "composition": "FeatureEverySchoolSubjectDayB86",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "Nothing but homework.",
+        "kicker": "Boytasks — school calendar, Cloudflare Workers"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": {
+        "line1": "A blank screen",
+        "line2": "as if school never happened",
+        "keywords": ["blank", "never happened"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "page3",
+      "data": {
+        "steps": ["Timetable loaded in its real order", "Every subject gets its slot", "Homework attached only where it exists"],
+        "result": "A full day, not just homework",
+        "system": "School calendar"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "cornerTags",
+      "backdrop": "page4",
+      "data": {
+        "statement": "The homework line itself was hard to read",
+        "tags": ["Scrolled sideways", "Cut off mid-word", "No width check", "Easy to miss"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": { "note": "LogWindow — real fit-to-width mechanism, ends on the 55% shrink stat, holds bright to END" }
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "id": "b87",
+  "composition": "FeatureDadsRealGpsHoursB87",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "One number. No proof.",
+        "kicker": "GPS Work Report — Dad's hours vs the payslip"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "hub",
+      "data": {
+        "line1": "No way to check",
+        "line2": "if the payslip matched the hours he actually worked",
+        "keywords": ["check", "matched"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "page",
+      "data": {
+        "steps": ["GPS arrival logged", "Shift recomputed", "Day compared to payslip"],
+        "result": "Day by day, not just one total",
+        "system": "Work report"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "cornerTags",
+      "backdrop": "hub",
+      "data": {
+        "statement": "Every day gets a tag",
+        "tags": ["Training", "Extra hours", "Unpaid time", "Normal pay"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": { "note": "LogWindow — real reconciliation mechanism, ends on the kroner gap flagged red, holds to END" }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "b38",
+  "composition": "FeatureFourTvZonesOneB38",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "One screen, one state",
+        "tags": ["Tasks or lock only", "Never who's home", "Never this week", "Kitchen TV"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "The camera feed",
+        "line2": "cropped into whatever space was left",
+        "keywords": ["cropped", "leftover"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "hubRouting",
+      "backdrop": null,
+      "note": "commit 8c7d68c (calendar strip mirrors app grid, camera kept 16:9) is drawn as a small chip, not a live diff — no verified GitHub URL this run",
+      "data": {
+        "inputs": ["Calendar strip", "Camera tile (16:9)", "Same screen (kept)"],
+        "hub": "Cloudflare Worker",
+        "output": "Scaled, not redrawn"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "ledger total + LogWindow carry the result — never the feature page or the hub (gate 2)"
+    }
+  ]
+}

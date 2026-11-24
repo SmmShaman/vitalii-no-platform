@@ -1,0 +1,52 @@
+[
+  {
+    "beat": "b1",
+    "effect": "titleTakeover",
+    "backdrop": "hub",
+    "data": {
+      "title": "A fact slipped through",
+      "kicker": "Two AI passes missed it"
+    }
+  },
+  {
+    "beat": "b2",
+    "effect": "funnelAbsorption",
+    "backdrop": null,
+    "data": {
+      "inputs": ["Scriptwriter pass", "Literary editor pass", "Render"],
+      "result": "Wrong fact reached the screen"
+    }
+  },
+  {
+    "beat": "b3",
+    "effect": "statusFocus",
+    "backdrop": null,
+    "data": {
+      "title": "Old order",
+      "claims": [
+        { "text": "Paper printed first", "verdict": "yes" },
+        { "text": "Fact-checker read it after", "verdict": "no" }
+      ]
+    }
+  },
+  {
+    "beat": "b4",
+    "effect": "handoffExplain",
+    "backdrop": "page",
+    "data": {
+      "from": "Director planned blind",
+      "to": "Reads review notes first",
+      "points": ["Reviewer touches only the spoken lines", "Can't add or remove a beat"]
+    }
+  },
+  {
+    "beat": "b5",
+    "effect": "pipelineFlow",
+    "backdrop": null,
+    "data": {
+      "system": "Fact-check stage",
+      "steps": ["Scriptwriter", "Literary editor", "Science reviewer (7th)", "Shots planned"],
+      "result": "Checked before a single shot is drawn"
+    }
+  }
+]

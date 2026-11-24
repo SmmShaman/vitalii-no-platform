@@ -1,0 +1,23 @@
+{
+  "id": "b37",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/ending-the-69-71-loop-bonus-drills-now-remember-what-they-already-asked-b37",
+      "frames": 229,
+      "scroll": [
+        [0, 0],
+        [110, 360],
+        [228, 700]
+      ],
+      "mouse": [
+        [0, 540, 220],
+        [85, 610, 300],
+        [170, 470, 340],
+        [228, 550, 260]
+      ]
+    }
+  ]
+}

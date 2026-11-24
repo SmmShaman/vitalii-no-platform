@@ -1,0 +1,69 @@
+{
+ "id": "v21",
+ "composition": "FeatureVerifyBeforeYouShowV21",
+ "beats": [
+  {
+   "beat": "b1",
+   "effect": "titleTakeover",
+   "backdrop": "page",
+   "data": {
+    "title": "My digest narrated whatever the source said",
+    "kicker": "No questions asked, no second source"
+   }
+  },
+  {
+   "beat": "b2",
+   "effect": "statusFocus",
+   "backdrop": "page2",
+   "data": {
+    "title": "One exaggerated headline, straight to video",
+    "claims": [
+     { "text": "Source headline matches the real event", "verdict": "no" },
+     { "text": "Numbers checked against a second source", "verdict": "no" },
+     { "text": "Published to the digest as-is", "verdict": "yes" }
+    ]
+   }
+  },
+  {
+   "beat": "b3",
+   "effect": "keywordCaption",
+   "backdrop": null,
+   "data": {
+    "line1": "Like repeating a rumor on camera",
+    "line2": "without calling anyone to confirm it",
+    "keywords": ["rumor", "confirm"]
+   }
+  },
+  {
+   "beat": "b4",
+   "effect": null,
+   "backdrop": "commits",
+   "note": "No runtime log exists on the VPS for this pipeline, so this beat is evidence-by-log, not a catalog effect: a LogWindow built from the feature's own real numbers (21 checks, Google CSE searches, conflicting-source holds) substitutes for a recording of the running checker, dimmed over the repo's commit history. This also carries the clip's one tech caption ('Google CSE').",
+   "logWindow": {
+    "title": "research step · fact-check gate",
+    "lines": [
+     "claim queue: 7 statements extracted",
+     "google_cse.search(claim) x21",
+     "source: single -> status HOLD",
+     "source: 2 independent -> status CONFIRMED",
+     "conflicting sources -> status HOLD",
+     "chart data verified before render",
+     "unconfirmed claims dropped from script",
+     "digest cleared: 21/21 checks run"
+    ]
+   }
+  },
+  {
+   "beat": "b5",
+   "effect": "ratioBars",
+   "backdrop": null,
+   "data": {
+    "title": "Independent checks per digest",
+    "a": { "label": "Before (manual trust)", "value": 1 },
+    "b": { "label": "Now (per digest)", "value": 21 },
+    "unit": "check",
+    "caption": "Nothing airs on faith alone"
+   }
+  }
+ ]
+}

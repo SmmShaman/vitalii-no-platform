@@ -1,0 +1,35 @@
+{
+  "id": "c04",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/google-calendar-mirrored-server-side-no-browser-no-login-no-guessing-whose-child-c04",
+      "frames": 168,
+      "scroll": [[0, 0], [83, 260], [167, 520]],
+      "mouse": [[0, 300, 180], [83, 560, 260], [167, 420, 220]]
+    },
+    {
+      "name": "page2",
+      "url": "https://vitalii.no/features/google-calendar-mirrored-server-side-no-browser-no-login-no-guessing-whose-child-c04",
+      "frames": 199,
+      "scroll": [[0, 520], [99, 820], [198, 1120]],
+      "mouse": [[0, 420, 220], [99, 600, 300], [198, 480, 240]]
+    },
+    {
+      "name": "commit-mirror",
+      "url": "https://github.com/SmmShaman/calendar-bot/commit/2d54537b6355d051e965b09dc0e8084ea7ae8193",
+      "frames": 192,
+      "scroll": [[0, 0], [95, 480], [191, 900]],
+      "mouse": [[0, 560, 180], [95, 560, 320], [191, 560, 260]]
+    },
+    {
+      "name": "commit-child",
+      "url": "https://github.com/SmmShaman/calendar-bot/commit/71e5b17783589f8773ae3efd770c2faaa8ff4577",
+      "frames": 188,
+      "scroll": [[0, 0], [93, 460], [187, 880]],
+      "mouse": [[0, 560, 190], [93, 560, 310], [187, 560, 250]]
+    }
+  ]
+}

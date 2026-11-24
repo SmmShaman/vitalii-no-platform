@@ -1,0 +1,58 @@
+{
+  "id": "b109",
+  "composition": "FeatureLessonCardsStopFakingB109",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": {
+        "title": "Wrong Picture, Wrong Idea",
+        "kicker": "A honey pot stood in for a honeycomb"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "cornerTags",
+      "backdrop": "page2",
+      "data": {
+        "statement": "Picked the nearest emoji, hoped it matched",
+        "tags": ["No shared scale", "One-off per effect", "Near-miss pictures", "Taught the wrong thing"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Emoji guesswork",
+        "to": "drawSpec real shapes",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Polygons, grids, bars, icons", "One shared true scale", "Same output feeds the check"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "archetype route + LogWindow carry it: the content gate checking a drawn picture against the word, lines built from solution_en/result_en"
+    },
+    {
+      "beat": "b5",
+      "effect": "cardCounter",
+      "backdrop": null,
+      "data": {
+        "cards": [
+          { "label": "stations", "value": 1 },
+          { "label": "splitCompare", "value": 1 },
+          { "label": "sortIntoBins", "value": 1 },
+          { "label": "bins", "value": 1 },
+          { "label": "magnifier target", "value": 1 },
+          { "label": "revealAnswer", "value": 1 }
+        ],
+        "totalLabel": "slot types now draw real pictures"
+      }
+    }
+  ]
+}

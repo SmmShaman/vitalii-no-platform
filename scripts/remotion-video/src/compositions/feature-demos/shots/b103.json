@@ -1,0 +1,25 @@
+{
+  "id": "b103",
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/admin-can-now-switch-the-explainer-narration-voice-and-see-exactly-what-each-vid-b103",
+      "frames": 237,
+      "scroll": [
+        [0, 0],
+        [120, 280],
+        [236, 560]
+      ],
+      "mouse": [
+        [0, 520, 180],
+        [120, 480, 300],
+        [236, 440, 420]
+      ]
+    }
+  ]
+}

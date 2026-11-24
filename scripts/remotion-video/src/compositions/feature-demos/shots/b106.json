@@ -1,0 +1,40 @@
+{
+  "id": "b106",
+  "viewport": {
+    "width": 1120,
+    "height": 466
+  },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 197,
+      "scroll": [
+        [0, 0],
+        [98, 280],
+        [196, 520]
+      ],
+      "mouse": [
+        [0, 520, 60],
+        [98, 560, 70],
+        [196, 540, 80]
+      ]
+    },
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/no-two-films-at-once-the-explainer-pipeline-now-refuses-a-second-question-mid-re-b106",
+      "frames": 172,
+      "scroll": [
+        [0, 0],
+        [85, 330],
+        [171, 640]
+      ],
+      "mouse": [
+        [0, 480, 60],
+        [85, 520, 75],
+        [171, 500, 85]
+      ]
+    }
+  ]
+}
