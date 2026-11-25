@@ -336,8 +336,6 @@ import { FeatureFourSecondCrashesWipedB111 } from "./compositions/feature-demos/
 import { FeatureTimesUpUsedThrowB110 } from "./compositions/feature-demos/FeatureTimesUpUsedThrowB110";
 import { FeatureLessonCardsStopFakingB109 } from "./compositions/feature-demos/FeatureLessonCardsStopFakingB109";
 import { FeatureEveryStageUsedGuessB114 } from "./compositions/feature-demos/FeatureEveryStageUsedGuessB114";
-import { FeatureCheckerUsedRunAfterB113 } from "./compositions/feature-demos/FeatureCheckerUsedRunAfterB113";
-import { FeatureEveryWallLessonWasB112 } from "./compositions/feature-demos/FeatureEveryWallLessonWasB112";
 import { FeatureFilmingLiveSiteInsteadD01 } from "./compositions/feature-demos/FeatureFilmingLiveSiteInsteadD01";
 
 // Load Comfortaa globally — must happen at module level before any render
@@ -3328,24 +3326,6 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureEveryStageUsedGuessB114"
         component={FeatureEveryStageUsedGuessB114}
         durationInFrames={933}
-        fps={30}
-        width={1280}
-        height={720}
-      />
-
-      <Composition
-        id="FeatureCheckerUsedRunAfterB113"
-        component={FeatureCheckerUsedRunAfterB113}
-        durationInFrames={844}
-        fps={30}
-        width={1280}
-        height={720}
-      />
-
-      <Composition
-        id="FeatureEveryWallLessonWasB112"
-        component={FeatureEveryWallLessonWasB112}
-        durationInFrames={926}
         fps={30}
         width={1280}
         height={720}
