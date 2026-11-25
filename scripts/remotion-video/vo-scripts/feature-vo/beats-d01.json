@@ -1,0 +1,7 @@
+{"id": "d01", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every demo clip I made before was filmed against a fake stand-in page -- it looked real, but proved nothing."],
+  ["b2", "The actual site could be broken, and the demo still played."],
+  ["b3", "A Playwright script now drives a real browser at the live site and clicks through the real feature."],
+  ["b4", "If it records, the feature actually works -- the clip doubles as a smoke test."],
+  ["b5", "It's retimed to 0.67x afterward, just enough to make the real thing feel calm on camera."]
+]}

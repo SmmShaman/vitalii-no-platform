@@ -1,0 +1,57 @@
+{
+ "id": "j70",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.572,
+  "b2": 5.249,
+  "b3": 5.62,
+  "b4": 6.069,
+  "b5": 5.01
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "One tap used to both approve a LinkedIn job and open its whole application form -- before anyone looked at it.",
+   "start_s": 0.5,
+   "end_s": 7.072,
+   "start_f": 15,
+   "end_f": 212
+  },
+  {
+   "beat": "b2",
+   "text": "Meanwhile safer jobs on NAV and FINN sat waiting on that same manual gate.",
+   "start_s": 7.372,
+   "end_s": 12.621,
+   "start_f": 221,
+   "end_f": 379
+  },
+  {
+   "beat": "b3",
+   "text": "I split the trust: LinkedIn now always needs a human look first, no shortcut.",
+   "start_s": 12.921,
+   "end_s": 18.541,
+   "start_f": 388,
+   "end_f": 556
+  },
+  {
+   "beat": "b4",
+   "text": "NAV and FINN get their auto-queue back once a score clears the bar, confirmed right in Telegram.",
+   "start_s": 18.841,
+   "end_s": 24.91,
+   "start_f": 565,
+   "end_f": 747
+  },
+  {
+   "beat": "b5",
+   "text": "Consent is scoped per job and per platform now, not one switch for everything.",
+   "start_s": 25.21,
+   "end_s": 30.22,
+   "start_f": 756,
+   "end_f": 907
+  }
+ ],
+ "total_s": 31.72,
+ "durationInFrames": 952,
+ "measured_track_s": 30.288,
+ "track": "/root/feature-demos/vo-j70/vo-j70.mp3"
+}

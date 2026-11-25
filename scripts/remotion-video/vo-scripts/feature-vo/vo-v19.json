@@ -1,0 +1,57 @@
+{
+ "id": "v19",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.79,
+  "b2": 6.621,
+  "b3": 5.558,
+  "b4": 5.175,
+  "b5": 6.079
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every feature I ship used to sit on its own lonely page -- no way to browse what else was there.",
+   "start_s": 0.5,
+   "end_s": 6.29,
+   "start_f": 15,
+   "end_f": 189
+  },
+  {
+   "beat": "b2",
+   "text": "No topic filter, no project view, and sharing one feature meant sharing a clunky full page reload.",
+   "start_s": 6.59,
+   "end_s": 13.211,
+   "start_f": 198,
+   "end_f": 396
+  },
+  {
+   "beat": "b3",
+   "text": "I built one features hub: click a category badge and the whole list filters instantly.",
+   "start_s": 13.511,
+   "end_s": 19.069,
+   "start_f": 405,
+   "end_f": 572
+  },
+  {
+   "beat": "b4",
+   "text": "A cached Supabase query backs it, so filtering never re-hits the database.",
+   "start_s": 19.369,
+   "end_s": 24.544,
+   "start_f": 581,
+   "end_f": 736
+  },
+  {
+   "beat": "b5",
+   "text": "Now every feature page and the hub itself are crawlable, filterable, and shareable by a direct link.",
+   "start_s": 24.844,
+   "end_s": 30.923,
+   "start_f": 745,
+   "end_f": 928
+  }
+ ],
+ "total_s": 32.423,
+ "durationInFrames": 973,
+ "measured_track_s": 30.984,
+ "track": "/root/feature-demos/vo-v19/vo-v19.mp3"
+}

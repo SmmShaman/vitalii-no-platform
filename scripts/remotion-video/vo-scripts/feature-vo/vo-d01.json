@@ -1,0 +1,57 @@
+{
+ "id": "d01",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.512,
+  "b2": 3.758,
+  "b3": 5.557,
+  "b4": 5.016,
+  "b5": 6.438
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every demo clip I made before was filmed against a fake stand-in page -- it looked real, but proved nothing.",
+   "start_s": 0.5,
+   "end_s": 7.012,
+   "start_f": 15,
+   "end_f": 210
+  },
+  {
+   "beat": "b2",
+   "text": "The actual site could be broken, and the demo still played.",
+   "start_s": 7.312,
+   "end_s": 11.07,
+   "start_f": 219,
+   "end_f": 332
+  },
+  {
+   "beat": "b3",
+   "text": "A Playwright script now drives a real browser at the live site and clicks through the real feature.",
+   "start_s": 11.37,
+   "end_s": 16.927,
+   "start_f": 341,
+   "end_f": 508
+  },
+  {
+   "beat": "b4",
+   "text": "If it records, the feature actually works -- the clip doubles as a smoke test.",
+   "start_s": 17.227,
+   "end_s": 22.243,
+   "start_f": 517,
+   "end_f": 667
+  },
+  {
+   "beat": "b5",
+   "text": "It's retimed to 0.67x afterward, just enough to make the real thing feel calm on camera.",
+   "start_s": 22.543,
+   "end_s": 28.981,
+   "start_f": 676,
+   "end_f": 869
+  }
+ ],
+ "total_s": 30.481,
+ "durationInFrames": 914,
+ "measured_track_s": 29.04,
+ "track": "/root/feature-demos/vo-d01/vo-d01.mp3"
+}

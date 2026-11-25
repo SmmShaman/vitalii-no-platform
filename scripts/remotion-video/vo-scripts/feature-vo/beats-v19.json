@@ -1,0 +1,7 @@
+{"id": "v19", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Every feature I ship used to sit on its own lonely page -- no way to browse what else was there."],
+  ["b2", "No topic filter, no project view, and sharing one feature meant sharing a clunky full page reload."],
+  ["b3", "I built one features hub: click a category badge and the whole list filters instantly."],
+  ["b4", "A cached Supabase query backs it, so filtering never re-hits the database."],
+  ["b5", "Now every feature page and the hub itself are crawlable, filterable, and shareable by a direct link."]
+]}
