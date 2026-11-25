@@ -16,7 +16,9 @@
       "effect": "keywordCaption",
       "backdrop": null,
       "data": {
-        "statement": "No filter. No project view. Full reload just to share one link."
+        "line1": "No filter. No project view.",
+        "line2": "Full reload just to share one link.",
+        "keywords": ["filter", "reload"]
       }
     },
     {
