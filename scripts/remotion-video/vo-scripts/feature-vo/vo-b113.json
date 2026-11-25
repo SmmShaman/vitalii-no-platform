@@ -1,0 +1,57 @@
+{
+ "id": "b113",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.471,
+  "b2": 4.613,
+  "b3": 5.388,
+  "b4": 3.376,
+  "b5": 5.084
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A lesson card used to get checked only after it was fully built -- so one mistake meant redoing the whole batch.",
+   "start_s": 0.5,
+   "end_s": 6.971,
+   "start_f": 15,
+   "end_f": 209
+  },
+  {
+   "beat": "b2",
+   "text": "That wasted model calls and left a parent waiting longer, for nothing new.",
+   "start_s": 7.271,
+   "end_s": 11.884,
+   "start_f": 218,
+   "end_f": 357
+  },
+  {
+   "beat": "b3",
+   "text": "Now the builder runs that very same check on its own work, before it calls itself done.",
+   "start_s": 12.184,
+   "end_s": 17.572,
+   "start_f": 366,
+   "end_f": 527
+  },
+  {
+   "beat": "b4",
+   "text": "Claude catches its own mistake and fixes it on the spot.",
+   "start_s": 17.872,
+   "end_s": 21.248,
+   "start_f": 536,
+   "end_f": 637
+  },
+  {
+   "beat": "b5",
+   "text": "No more starting over -- the error gets caught and corrected in the very pass that made it.",
+   "start_s": 21.548,
+   "end_s": 26.632,
+   "start_f": 646,
+   "end_f": 799
+  }
+ ],
+ "total_s": 28.132,
+ "durationInFrames": 844,
+ "measured_track_s": 26.688,
+ "track": "/root/feature-demos/vo-b113/vo-b113.mp3"
+}

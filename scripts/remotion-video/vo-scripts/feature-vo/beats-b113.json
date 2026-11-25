@@ -1,0 +1,7 @@
+{"id": "b113", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "A lesson card used to get checked only after it was fully built -- so one mistake meant redoing the whole batch."],
+  ["b2", "That wasted model calls and left a parent waiting longer, for nothing new."],
+  ["b3", "Now the builder runs that very same check on its own work, before it calls itself done."],
+  ["b4", "Claude catches its own mistake and fixes it on the spot."],
+  ["b5", "No more starting over -- the error gets caught and corrected in the very pass that made it."]
+]}

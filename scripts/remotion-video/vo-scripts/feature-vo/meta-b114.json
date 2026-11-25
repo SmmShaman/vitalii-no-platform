@@ -1,0 +1,7 @@
+{
+  "id": "b114",
+  "file": "yt-feature-b114.mp4",
+  "title": "Five Lesson Stages Now Share One Memory | vitalii.no",
+  "description": "The base, plan, judge, build and teacher-review stages of lesson generation each worked from the prompt alone, with no shared memory of what a subject like Norwegian grammar needs or how a specific child actually learns. The same mistake, pitched wrong for a particular kid, could happen again in a later stage of the same pipeline, or in tomorrow's run.\n\nEvery one of the five pipeline stages now reads from the same subject skill files, one per school subject, and child skill files, one per child, so the whole pipeline agrees on the same facts before it writes a card.\n\nVerdicts from past teacher reviews are turned into learned notes and appended automatically to that shared context, without spending a separate model call to summarize them -- so a mistake flagged once does not need to be re-learned, at zero extra cost.\n\n🔗 Full write-up: https://vitalii.no/features/every-stage-used-to-guess-at-each-subject-and-child-from-scratch-now-they-read-t-b114\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha -- https://vitalii.no\n\n#aieducation #sharedmemory #multiagent #claudeagents #personalizedlearning #edtech",
+  "tags": ["ai education", "shared memory", "multi agent pipeline", "claude agents", "personalized learning", "edtech automation", "lesson generation", "python automation", "knowledge files", "adaptive teaching", "vitalii berbeha", "ai agents"]
+}

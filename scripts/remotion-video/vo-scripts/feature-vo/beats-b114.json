@@ -1,0 +1,7 @@
+{"id": "b114", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Teaching five subjects to one kid meant each lesson stage guessed the facts fresh, every single time."],
+  ["b2", "No memory of the subject, no memory of the child, no memory of yesterday's mistake."],
+  ["b3", "Now all five stages read the same shared notes -- one file per subject, one per child."],
+  ["b4", "Claude adds every teacher correction straight back into those notes, automatically."],
+  ["b5", "The same mistake never gets taught twice -- at zero extra model calls."]
+]}

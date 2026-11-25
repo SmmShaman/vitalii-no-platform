@@ -1,0 +1,57 @@
+{
+ "id": "b112",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.783,
+  "b2": 5.829,
+  "b3": 6.342,
+  "b4": 4.53,
+  "b5": 5.17
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Every wall lesson had to fill five steps, even when a topic ran out of material after three.",
+   "start_s": 0.5,
+   "end_s": 6.283,
+   "start_f": 15,
+   "end_f": 188
+  },
+  {
+   "beat": "b2",
+   "text": "That left kids answering padded, repeated questions that taught nothing new, just to hit the count.",
+   "start_s": 6.583,
+   "end_s": 12.412,
+   "start_f": 197,
+   "end_f": 372
+  },
+  {
+   "beat": "b3",
+   "text": "Now the planner can skip a thin step -- but only if Claude's editor agrees the material is truly exhausted.",
+   "start_s": 12.712,
+   "end_s": 19.054,
+   "start_f": 381,
+   "end_f": 572
+  },
+  {
+   "beat": "b4",
+   "text": "A lazy shortcut gets rejected and sent back for a real step instead.",
+   "start_s": 19.354,
+   "end_s": 23.884,
+   "start_f": 581,
+   "end_f": 717
+  },
+  {
+   "beat": "b5",
+   "text": "Lessons now run three to five cards -- as many as the topic actually earns.",
+   "start_s": 24.184,
+   "end_s": 29.354,
+   "start_f": 726,
+   "end_f": 881
+  }
+ ],
+ "total_s": 30.854,
+ "durationInFrames": 926,
+ "measured_track_s": 29.424,
+ "track": "/root/feature-demos/vo-b112/vo-b112.mp3"
+}

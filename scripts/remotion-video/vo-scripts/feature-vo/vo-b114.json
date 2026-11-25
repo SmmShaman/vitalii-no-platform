@@ -1,0 +1,57 @@
+{
+ "id": "b114",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.526,
+  "b2": 5.635,
+  "b3": 6.057,
+  "b4": 4.962,
+  "b5": 4.711
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Teaching five subjects to one kid meant each lesson stage guessed the facts fresh, every single time.",
+   "start_s": 0.5,
+   "end_s": 7.026,
+   "start_f": 15,
+   "end_f": 211
+  },
+  {
+   "beat": "b2",
+   "text": "No memory of the subject, no memory of the child, no memory of yesterday's mistake.",
+   "start_s": 7.326,
+   "end_s": 12.961,
+   "start_f": 220,
+   "end_f": 389
+  },
+  {
+   "beat": "b3",
+   "text": "Now all five stages read the same shared notes -- one file per subject, one per child.",
+   "start_s": 13.261,
+   "end_s": 19.318,
+   "start_f": 398,
+   "end_f": 580
+  },
+  {
+   "beat": "b4",
+   "text": "Claude adds every teacher correction straight back into those notes, automatically.",
+   "start_s": 19.618,
+   "end_s": 24.58,
+   "start_f": 589,
+   "end_f": 737
+  },
+  {
+   "beat": "b5",
+   "text": "The same mistake never gets taught twice -- at zero extra model calls.",
+   "start_s": 24.88,
+   "end_s": 29.591,
+   "start_f": 746,
+   "end_f": 888
+  }
+ ],
+ "total_s": 31.091,
+ "durationInFrames": 933,
+ "measured_track_s": 29.64,
+ "track": "/root/feature-demos/vo-b114/vo-b114.mp3"
+}

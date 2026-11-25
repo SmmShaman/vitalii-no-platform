@@ -1,0 +1,7 @@
+{
+  "id": "b113",
+  "file": "yt-feature-b113.mp4",
+  "title": "The Builder Checks Itself Before Calling It Done | vitalii.no",
+  "description": "Lesson cards used to be validated by a separate checker only after the planner and builder had already finished producing them. A mistake caught at that late stage meant redoing an entire generation pass from scratch -- wasted model calls and a longer wait before a lesson was ready.\n\nThe planner and the builder now call the exact same checker that used to run as a separate downstream step, running it on their own output before they report themselves finished. If the checker flags a problem, the agent that produced it fixes the issue on the spot instead of handing broken cards further down the pipeline.\n\nErrors now surface during planning and building instead of after review, so a bad card gets corrected inside the same pass that created it, rather than triggering a full redo once it reaches review.\n\n🔗 Full write-up: https://vitalii.no/features/the-checker-used-to-run-after-the-cards-were-already-built-now-the-builder-runs--b113\n📚 All 250 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha -- https://vitalii.no\n\n#aiagents #selfcorrection #multiagent #claudeagents #qualitycontrol #edtech",
+  "tags": ["ai agents", "self correction", "multi agent pipeline", "claude agents", "quality control", "education automation", "python automation", "lesson generation", "pipeline design", "edtech", "ai validation", "vitalii berbeha"]
+}
