@@ -1,0 +1,21 @@
+{
+  "id": "j70",
+  "viewport": { "width": 980, "height": 450 },
+  "dsf": 1,
+  "shots": [
+    {
+      "name": "feature",
+      "url": "https://vitalii.no/features/linkedin-loses-its-button-consent-comes-back-per-job-not-per-platform-j70",
+      "frames": 200,
+      "scroll": [[0, 0], [100, 250], [199, 500]],
+      "mouse": [[0, 490, 225], [100, 500, 230], [199, 510, 235]]
+    },
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/jobbot-norway/commits",
+      "frames": 170,
+      "scroll": [[0, 0], [85, 200], [169, 400]],
+      "mouse": [[0, 640, 300], [85, 650, 320], [169, 640, 340]]
+    }
+  ]
+}

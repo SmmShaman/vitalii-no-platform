@@ -233,6 +233,7 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureHubCrawlableListingRealV19 } from "./compositions/feature-demos/FeatureHubCrawlableListingRealV19";
 import { FeatureBankedTimeResetTimeB36 } from "./compositions/feature-demos/FeatureBankedTimeResetTimeB36";
 import { FeatureVerifyBeforeYouShowV21 } from "./compositions/feature-demos/FeatureVerifyBeforeYouShowV21";
 import { FeatureEveryGetsSilentLoopingV20 } from "./compositions/feature-demos/FeatureEveryGetsSilentLoopingV20";
@@ -334,6 +335,10 @@ import { FeatureFiveNewLessonCardsB96 } from "./compositions/feature-demos/Featu
 import { FeatureFourSecondCrashesWipedB111 } from "./compositions/feature-demos/FeatureFourSecondCrashesWipedB111";
 import { FeatureTimesUpUsedThrowB110 } from "./compositions/feature-demos/FeatureTimesUpUsedThrowB110";
 import { FeatureLessonCardsStopFakingB109 } from "./compositions/feature-demos/FeatureLessonCardsStopFakingB109";
+import { FeatureEveryStageUsedGuessB114 } from "./compositions/feature-demos/FeatureEveryStageUsedGuessB114";
+import { FeatureCheckerUsedRunAfterB113 } from "./compositions/feature-demos/FeatureCheckerUsedRunAfterB113";
+import { FeatureEveryWallLessonWasB112 } from "./compositions/feature-demos/FeatureEveryWallLessonWasB112";
+import { FeatureFilmingLiveSiteInsteadD01 } from "./compositions/feature-demos/FeatureFilmingLiveSiteInsteadD01";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -1440,7 +1445,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="FeaturePerPlatformConsent"
         component={FeaturePerPlatformConsent}
-        durationInFrames={450}
+        durationInFrames={952}
         fps={30}
         width={1280}
         height={720}
@@ -2397,6 +2402,15 @@ export const RemotionRoot: React.FC = () => {
       />
 
       <Composition
+        id="FeatureHubCrawlableListingRealV19"
+        component={FeatureHubCrawlableListingRealV19}
+        durationInFrames={973}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
         id="FeatureBankedTimeResetTimeB36"
         component={FeatureBankedTimeResetTimeB36}
         durationInFrames={933}
@@ -3305,6 +3319,42 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureLessonCardsStopFakingB109"
         component={FeatureLessonCardsStopFakingB109}
         durationInFrames={978}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureEveryStageUsedGuessB114"
+        component={FeatureEveryStageUsedGuessB114}
+        durationInFrames={933}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureCheckerUsedRunAfterB113"
+        component={FeatureCheckerUsedRunAfterB113}
+        durationInFrames={844}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureEveryWallLessonWasB112"
+        component={FeatureEveryWallLessonWasB112}
+        durationInFrames={926}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureFilmingLiveSiteInsteadD01"
+        component={FeatureFilmingLiveSiteInsteadD01}
+        durationInFrames={914}
         fps={30}
         width={1280}
         height={720}

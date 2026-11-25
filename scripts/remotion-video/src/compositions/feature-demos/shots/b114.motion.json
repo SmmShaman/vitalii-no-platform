@@ -1,0 +1,56 @@
+{
+  "id": "b114",
+  "composition": "FeatureEveryStageUsedGuessB114",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Boytasks: every lesson stage guessed the facts fresh",
+        "tags": ["base stage", "plan stage", "judge stage", "build stage", "review stage"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": {
+        "line1": "No memory of the subject or child",
+        "line2": "no memory of yesterday's mistake",
+        "keywords": ["no memory"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "page3",
+      "data": {
+        "from": "Each stage guesses alone",
+        "to": "All 5 stages share one file",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["One skill file per subject", "One skill file per child", "base, plan, judge, build, review"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "hub",
+      "data": {
+        "steps": ["Teacher review", "Verdict becomes a note", "Note appended to shared file"],
+        "result": "Added back automatically",
+        "system": "Claude — AI that writes the notes"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "funnelAbsorption",
+      "backdrop": "base",
+      "data": {
+        "inputs": ["Teacher flags the mistake", "Verdict logged once", "Note appended automatically"],
+        "result": "Zero extra model calls"
+      }
+    }
+  ]
+}

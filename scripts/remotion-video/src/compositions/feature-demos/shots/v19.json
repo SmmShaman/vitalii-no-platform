@@ -1,0 +1,29 @@
+{
+  "id": "v19",
+  "viewport": { "width": 980, "height": 450 },
+  "dsf": 1,
+  "shots": [
+    {
+      "name": "feature",
+      "url": "https://vitalii.no/features/the-features-hub-crawlable-listing-real-filters-deep-linkable-modal-v19",
+      "frames": 185,
+      "scroll": [[0, 0], [92, 300], [184, 600]],
+      "mouse": [[0, 490, 225], [92, 500, 230], [184, 510, 235]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 180,
+      "scroll": [[0, 0], [80, 0], [179, 0]],
+      "mouse": [[0, 500, 220], [60, 300, 160], [110, 300, 160], [179, 300, 170]],
+      "clicks": [110]
+    },
+    {
+      "name": "commits",
+      "url": "https://github.com/SmmShaman/vitalii-no-platform/commits",
+      "frames": 170,
+      "scroll": [[0, 0], [85, 250], [169, 500]],
+      "mouse": [[0, 600, 150], [85, 620, 300], [169, 600, 450]]
+    }
+  ]
+}

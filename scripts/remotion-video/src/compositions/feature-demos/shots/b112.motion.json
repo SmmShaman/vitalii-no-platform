@@ -1,0 +1,50 @@
+{
+  "id": "b112",
+  "composition": "FeatureEveryWallLessonWasB112",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "Every lesson forced into five steps",
+        "tags": ["5 steps required", "Material often ran out by step 3", "Steps 4-5 padded anyway", "Same count, every lesson"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": "page2",
+      "data": {
+        "line1": "Padded, repeated questions",
+        "line2": "taught nothing new",
+        "keywords": ["padded questions"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "statusFocus",
+      "backdrop": "page3",
+      "data": {
+        "title": "CLAUDE — THE LESSON EDITOR",
+        "claims": [
+          { "text": "Material truly exhausted", "verdict": "yes" },
+          { "text": "Planner wants to stop at step 3", "verdict": "yes" },
+          { "text": "Skip past step 4-5 approved", "verdict": "yes" }
+        ]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "none",
+      "backdrop": "hub",
+      "data": { "note": "drawn by hand (rejected shortcut vs sent-back-for-real-step panels), clear of the 320px sidebar — matches b111's precedent for avoiding handoffExplain's sidebar clipping" }
+    },
+    {
+      "beat": "b5",
+      "effect": "none",
+      "backdrop": "none",
+      "data": { "note": "LogWindow result beat, no catalog effect — matches b67/b111/b113 precedent" }
+    }
+  ]
+}

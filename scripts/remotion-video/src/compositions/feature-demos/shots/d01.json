@@ -1,0 +1,21 @@
+{
+  "id": "d01",
+  "viewport": { "width": 980, "height": 450 },
+  "dsf": 1,
+  "shots": [
+    {
+      "name": "feature",
+      "url": "https://vitalii.no/features/filming-the-live-site-instead-of-a-fake-copy-my-no-harness-demo-recorder-d01",
+      "frames": 200,
+      "scroll": [[0, 0], [100, 220], [199, 440]],
+      "mouse": [[0, 490, 225], [100, 500, 230], [199, 510, 235]]
+    },
+    {
+      "name": "hub",
+      "url": "https://vitalii.no/features",
+      "frames": 170,
+      "scroll": [[0, 0], [85, 200], [169, 400]],
+      "mouse": [[0, 500, 220], [85, 480, 260], [169, 470, 280]]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "id": "j70",
+  "composition": "FeaturePerPlatformConsent",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "feature",
+      "data": {
+        "statement": "One tap approved AND opened the form",
+        "tags": ["LinkedIn only", "No review yet", "Form unseen", "Policy v8"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "NAV and FINN jobs",
+        "line2": "stuck on the same manual gate",
+        "keywords": ["NAV", "FINN", "manual gate"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "commits",
+      "data": {
+        "from": "One button, no review",
+        "to": "Human review, no shortcut",
+        "points": ["LinkedIn exploration blocked until reviewed", "RECON_ALLOWED gates the form", "No single-tap commit"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Score clears auto_soknad_min_score", "Bot auto-queues the application", "Owner confirms in Telegram", "Skyvern sends it"],
+        "result": "Fast queue, still owner-gated",
+        "system": "NAV/FINN auto-queue"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "No catalog effect — archetype timeline ribbon + full LogWindow carry this beat alone (gate 2 ending, never the feature page or hub)."
+    }
+  ]
+}

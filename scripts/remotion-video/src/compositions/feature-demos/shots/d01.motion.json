@@ -1,0 +1,53 @@
+{
+  "id": "d01",
+  "composition": "FeatureFilmingLiveSiteInsteadD01",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "feature",
+      "data": {
+        "statement": "A fake stand-in page proved nothing",
+        "tags": ["Synthetic harness", "Looked real", "Site could be broken", "No proof"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "The site could be broken",
+        "line2": "and the demo still played",
+        "keywords": ["broken site", "fake demo"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "Fake harness page",
+        "to": "Real Chromium on live site",
+        "points": ["Opens the production URL", "Clears the cookie banner itself", "Drives the real DOM, not a copy"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "statusFocus",
+      "backdrop": null,
+      "data": {
+        "title": "Smoke test verdict",
+        "claims": [
+          { "text": "Recording completes", "verdict": "yes" },
+          { "text": "Feature works in production", "verdict": "yes" }
+        ]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "No catalog effect — archetype ledger band + full LogWindow carry this beat alone (gate 2 ending, never the feature page or hub)."
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "id": "v19",
+  "composition": "FeatureHubCrawlableListingRealV19",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "feature",
+      "data": {
+        "statement": "One feature, one lonely page",
+        "tags": ["Separate page per feature", "No topic browse", "Full reload just to share a link", "401 features, no index"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "statement": "No filter. No project view. Full reload just to share one link."
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "hub",
+      "data": {
+        "from": "401 separate pages, no index",
+        "to": "One filterable hub",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Click a category badge", "List filters instantly", "URL updates — shareable link"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "commits",
+      "data": {
+        "steps": ["Click category badge", "Cached Supabase query runs", "Filtered list renders"],
+        "result": "No repeat database hit",
+        "system": "Supabase (cached query)"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "titleTakeover",
+      "backdrop": null,
+      "data": {
+        "title": "Crawlable. Filterable. Shareable.",
+        "kicker": "Every feature page and the hub, indexed and deep-linkable"
+      }
+    }
+  ]
+}

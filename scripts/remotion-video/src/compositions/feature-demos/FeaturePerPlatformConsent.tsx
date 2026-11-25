@@ -1,170 +1,236 @@
-/**
- * FeaturePerPlatformConsent — feature j70 — 1280x720, 15s @ 30fps, silent, loop-friendly.
- *
- * Story: POLICY v8 (j69) let one button both approve a job and grant
- * permission to explore its form — convenient, but a single LinkedIn tap
- * could commit to a form the bot hadn't inspected, while NAV/FINN's more
- * predictable forms stayed stuck behind the same manual gate. POLICY v9
- * splits trust by platform: LinkedIn now needs explicit review before any
- * exploration, while NAV/FINN regain an auto_soknad_min_score queue —
- * still gated at the final send by skyvern_metadata.owner_confirmed.
- */
+// FeaturePerPlatformConsent — feature j70 — 1280x720, 952 frames @ 30fps, VOICE-SYNCED.
+// archetype 1 timeline, mood dawn. Motion direction v2 (feature-motion skill, 2026-10-07).
+//
+// Beat → effect (data only from the feature row — auto_soknad_min_score,
+// skyvern_metadata.owner_confirmed, RECON_ALLOWED are real flags; no numbers exist
+// on this row so none are used):
+// b1 15-212   "one tap used to both approve a LinkedIn job and open its form"
+//             cornerTags over the real feature page (backdrop "feature") — the
+//             problem as four facts. Timeline ribbon: node 1 lights, POLICY v8.
+// b2 221-379  "meanwhile NAV/FINN sat waiting on that same manual gate"
+//             keywordCaption over a dark plate (no new page to film). Ribbon: node 2.
+// b3 388-556  "I split the trust: LinkedIn always needs a human look first"
+//             handoffExplain over the real commit history, ZOOMED on the policy
+//             diff (backdrop "commits") — evidence the split actually shipped.
+//             Ribbon: node 3 lights, banner flips to POLICY v9.
+// b4 565-747  "NAV/FINN get their auto-queue back, confirmed in Telegram"
+//             pipelineFlow over a dark plate (the commit proves the split, not
+//             the queue mechanics — drawn instead). Ribbon: node 4.
+// b5 756-907  "consent is scoped per job and per platform now" — the verdict
+//             LogWindow only — never the feature's own page or the hub (gate 2).
+//             Ribbon: node 5, holds to the end, no fade.
+//
+// Persistent element: the timeline ribbon (archetype 1), b1 through b5 — five
+// stage nodes light up left to right as the clip crosses each beat boundary.
+
 import React from "react";
-import { AbsoluteFill, useCurrentFrame, useVideoConfig, spring, interpolate, Easing } from "remotion";
-import { T, hexA } from "./theme";
-import { Bg, SchemaNode, Connector, Token, Caption, Badge, Pill, Pt, seg, loopFade, fontFamily } from "./primitives";
+import { AbsoluteFill, useCurrentFrame } from "remotion";
+import { MOODS, PaletteProvider, usePalette } from "./bright-theme";
+import { fontFamily } from "./bright-primitives";
+import { MotionInsert, LiveBackdrop, cut } from "./motion-primitives";
+import { LiveShot, LogWindow } from "./live-primitives";
+import shotsFile from "./shots/j70.json";
 
-// ── Layout ──────────────────────────────────────────────────────────
-const ONEBTN = { x: 90, y: 66, w: 280, h: 110 };
-const SLOWED = { x: 500, y: 66, w: 280, h: 110 };
-const ONEBTN_R: Pt = { x: ONEBTN.x + ONEBTN.w, y: ONEBTN.y + ONEBTN.h / 2 };
-const SLOWED_L: Pt = { x: SLOWED.x, y: SLOWED.y + SLOWED.h / 2 };
+const B1 = 15;
+const B2 = 221;
+const B3 = 388;
+const B4 = 565;
+const B5 = 756;
+const END = 952;
 
-const POLICY = { x: 465, y: 250, w: 350, h: 120 };
-const POLICY_TOP: Pt = { x: POLICY.x + POLICY.w / 2, y: POLICY.y };
-const POLICY_R: Pt = { x: POLICY.x + POLICY.w, y: POLICY.y + POLICY.h / 2 };
+/** Accent tuned for the dark stage (dawn's own #2563EB reads flat on a dark plate). */
+const ACCENT = "#6FA8FF";
+const STAGE = "#101826";
 
-const LINKEDIN = { x: 870, y: 266, w: 260, h: 96 };
-const LINKEDIN_L: Pt = { x: LINKEDIN.x, y: LINKEDIN.y + LINKEDIN.h / 2 };
+const NODES = [
+  { x: 140, label: "One button, no review" },
+  { x: 390, label: "NAV/FINN wait on the same gate" },
+  { x: 640, label: "LinkedIn now requires review" },
+  { x: 890, label: "NAV/FINN auto-queue returns" },
+  { x: 1140, label: "Consent scoped per job, per platform" },
+];
 
-const NAVFINN = { x: 465, y: 430, w: 350, h: 96 };
-const NAVFINN_TOP: Pt = { x: NAVFINN.x + NAVFINN.w / 2, y: NAVFINN.y };
-const POLICY_BOTTOM: Pt = { x: POLICY.x + POLICY.w / 2, y: POLICY.y + POLICY.h };
+const BAND_Y = 606;
+const TAG_H = 20;
+const ROW_Y = BAND_Y + TAG_H + 6;
+const DOT_Y = ROW_Y + 16;
 
-const SLOWED_TO_POLICY: Pt[] = [SLOWED_L, { x: SLOWED_L.x - 40, y: SLOWED_L.y }, POLICY_TOP];
-const POLICY_TO_LINKEDIN: Pt[] = [POLICY_R, LINKEDIN_L];
-const POLICY_TO_NAVFINN: Pt[] = [POLICY_BOTTOM, NAVFINN_TOP];
-
-export const FeaturePerPlatformConsent: React.FC = () => {
+const TimelineRibbon: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps, durationInFrames } = useVideoConfig();
-  const lf = loopFade(frame, durationInFrames);
+  const P = usePalette();
+  if (frame < B1) return null;
 
-  const pop = (start: number, damping = 11) =>
-    frame < start ? 0 : spring({ frame: frame - start, fps, config: { damping, mass: 0.6 } });
-  const appear = (start: number, len = 18) =>
-    interpolate(frame, [start, start + len], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-
-  // Beat 1: one button, wrong for both LinkedIn and NAV/FINN
-  const onebtnOp = appear(6) * lf;
-  const slowedOp = appear(20) * lf;
-  const slowedLit = interpolate(frame, [20, 44, 108, 128], [0, 0.6, 0.6, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill1In = seg(frame, 44, 66, Easing.out(Easing.cubic));
-  const pill1Op = pill1In * interpolate(frame, [104, 126], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill1Dx = (1 - pill1In) * 40;
-  const cap1In = seg(frame, 50, 72, Easing.out(Easing.cubic));
-  const cap1Out = interpolate(frame, [108, 128], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap1 = cap1In * cap1Out * lf;
-
-  // Beat 2: POLICY v9 splits trust by platform
-  const policyOp = appear(140, 18) * lf;
-  const linkedinOp = appear(158, 18) * lf;
-  const policyLit = interpolate(frame, [140, 165, 330, 350], [0, 0.8, 0.8, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const t2 = seg(frame, 150, 178);
-  const t2Vis = frame >= 150 && frame < 214 ? 1 : 0;
-  const t2b = seg(frame, 186, 212);
-  const t2bVis = frame >= 186 && frame < 232 ? 1 : 0;
-  const linkedinLit = interpolate(frame, [186, 208, 330, 350], [0, 0.65, 0.65, 0.2], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2In = seg(frame, 194, 216, Easing.out(Easing.cubic));
-  const pill2Op = pill2In * interpolate(frame, [296, 318], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill2Dx = (1 - pill2In) * 40;
-  const cap2In = seg(frame, 162, 184, Easing.out(Easing.cubic));
-  const cap2Out = interpolate(frame, [218, 238], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap2 = cap2In * cap2Out * lf;
-
-  // Beat 3: NAV/FINN regain an auto queue, still gated at final send
-  const navfinnOp = appear(244, 18) * lf;
-  const navfinnLit = interpolate(frame, [252, 274, 330, 350], [0, 0.6, 0.6, 0.15], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const t3 = seg(frame, 254, 280);
-  const t3Vis = frame >= 254 && frame < 320 ? 1 : 0;
-  const navfinnCheck = pop(284) * lf;
-  const pill3In = seg(frame, 262, 284, Easing.out(Easing.cubic));
-  const pill3Op = pill3In * interpolate(frame, [316, 338], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) * lf;
-  const pill3Dx = (1 - pill3In) * 40;
-  const cap3In = seg(frame, 266, 288, Easing.out(Easing.cubic));
-  const cap3Out = interpolate(frame, [326, 346], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
-  const cap3 = cap3In * cap3Out * lf;
-
-  // Beat 4: result
-  const finalCapIn = seg(frame, 372, 394, Easing.out(Easing.cubic));
-  const finalCap = finalCapIn * lf;
-  const finalCheck = pop(378) * lf;
-  const metricIn = seg(frame, 358, 380, Easing.out(Easing.cubic));
-  const metricOp = metricIn * lf;
+  const activeIdx = frame >= B5 ? 4 : frame >= B4 ? 3 : frame >= B3 ? 2 : frame >= B2 ? 1 : 0;
+  const policy = frame >= B3 ? "POLICY v9" : "POLICY v8";
 
   return (
-    <AbsoluteFill style={{ fontFamily }}>
-      <Bg />
+    <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
+      {frame < B2 && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: BAND_Y,
+            width: 1280,
+            height: TAG_H,
+            background: "rgba(16,24,38,0.82)",
+            color: "#fff",
+            fontSize: 12,
+            fontWeight: 800,
+            letterSpacing: 1.6,
+            display: "flex",
+            alignItems: "center",
+            paddingLeft: 16,
+          }}
+        >
+          PRODUCT: JOBBOT NORWAY — sources NAV/FINN/LinkedIn jobs, scores fit, applies
+        </div>
+      )}
 
-      <Connector pts={SLOWED_TO_POLICY} color={T.accent} width={2.5} progress={t2} opacity={0.8 * t2Vis * lf} />
-      <Connector pts={POLICY_TO_LINKEDIN} color={T.danger} width={2.5} progress={t2b} opacity={0.8 * t2bVis * lf} />
-      <Connector pts={POLICY_TO_NAVFINN} color={T.success} width={2.5} progress={t3} opacity={0.8 * t3Vis * lf} />
-
-      <SchemaNode {...ONEBTN} state="danger" lit={0.2 * lf} opacity={onebtnOp} label="One button, two jobs" fontSize={20}>
-        <div style={{ fontSize: 14, color: T.muted, fontWeight: 500, marginTop: 2 }}>approve + explore, same tap</div>
-      </SchemaNode>
-      <SchemaNode {...SLOWED} state="danger" lit={slowedLit} opacity={slowedOp} label="NAV/FINN gated too" fontSize={20}>
-        <div style={{ fontSize: 13, color: T.muted, fontWeight: 500, marginTop: 2 }}>slowed the safest platforms</div>
-      </SchemaNode>
-      <Pill x={SLOWED.x + 4} y={SLOWED.y - 46} dx={pill1Dx} text="LinkedIn tap risked an uninspected form" color={T.danger} opacity={pill1Op} fontSize={16} />
-
-      <SchemaNode {...POLICY} state="accent" lit={policyLit} opacity={policyOp} label="POLICY v9" fontSize={23}>
-        <div style={{ fontSize: 14, color: T.muted, fontWeight: 500, marginTop: 2 }}>trust split, per platform</div>
-      </SchemaNode>
-      <SchemaNode {...LINKEDIN} state="danger" lit={linkedinLit} opacity={linkedinOp} label="LinkedIn: review first" fontSize={18}>
-        <div style={{ fontSize: 12.5, color: T.muted, fontWeight: 500, marginTop: 2, textAlign: "center" }}>shortcut removed</div>
-      </SchemaNode>
-      <Token pts={SLOWED_TO_POLICY} t={t2} opacity={t2Vis * lf} />
-      <Token pts={POLICY_TO_LINKEDIN} t={t2b} color={T.danger} opacity={t2bVis * lf} />
-      <Pill x={POLICY.x + 30} y={POLICY.y + POLICY.h + 14} dx={pill2Dx} text="a human look before the form is touched" color={T.accent} opacity={pill2Op} fontSize={16} />
-
-      <SchemaNode {...NAVFINN} state="success" lit={navfinnLit} opacity={navfinnOp} label="NAV/FINN: auto queue back" fontSize={19}>
-        <div style={{ fontSize: 13, color: T.muted, fontWeight: 500, marginTop: 2 }}>owner_confirmed still gates send</div>
-      </SchemaNode>
-      <Token pts={POLICY_TO_NAVFINN} t={t3} color={T.success} opacity={t3Vis * lf} />
-      <Badge x={NAVFINN.x + NAVFINN.w - 20} y={NAVFINN.y - 12} kind="check" scale={navfinnCheck} opacity={navfinnCheck} />
-      <Pill x={NAVFINN.x + 20} y={NAVFINN.y + NAVFINN.h + 12} dx={pill3Dx} text="score clears the bar, queue moves fast" color={T.success} opacity={pill3Op} fontSize={17} />
-
-      <Caption x={90} y={648} w={1100} text="One shortcut approved a job and unlocked exploring its form" color={T.danger} opacity={cap1} fontSize={24} weight={600} />
-      <Caption x={90} y={648} w={1100} text="LinkedIn now always needs a human look, no shortcut left" color={T.text} opacity={cap2} fontSize={24} weight={600} />
-      <Caption x={90} y={648} w={1100} text="NAV and FINN move fast again, still gated at the final send" color={T.success} opacity={cap3} fontSize={24} weight={600} />
-
-      <div style={{ position: "absolute", left: 0, top: 598, width: 1280, textAlign: "center", opacity: metricOp }}>
-        <div style={{ fontSize: 22, fontWeight: 600, color: T.muted }}>RECON_ALLOWED governs opening a form before consent</div>
+      <div style={{ position: "absolute", left: 16, top: ROW_Y + 4, fontSize: 12, fontWeight: 800, letterSpacing: 1.6, color: P.accent }}>
+        {policy}
       </div>
+
+      {/* connecting line */}
+      <div style={{ position: "absolute", left: NODES[0].x, top: DOT_Y - 1, width: NODES[4].x - NODES[0].x, height: 2, background: P.border }} />
       <div
         style={{
           position: "absolute",
-          left: 0,
-          top: 640,
-          width: 1280,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 14,
-          opacity: finalCap,
+          left: NODES[0].x,
+          top: DOT_Y - 1,
+          width: ((NODES[4].x - NODES[0].x) * activeIdx) / 4,
+          height: 2,
+          background: P.accent,
         }}
-      >
-        <div
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: "50%",
-            background: T.success,
-            color: "#12321c",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 21,
-            fontWeight: 700,
-            transform: `scale(${finalCheck})`,
-            boxShadow: `0 0 16px ${hexA(T.success, 0.5)}`,
-          }}
-        >
-          ✓
-        </div>
-        <div style={{ fontSize: 27, fontWeight: 600, color: T.success }}>trust scoped per platform, and per job</div>
+      />
+
+      {NODES.map((n, i) => {
+        const on = i <= activeIdx;
+        return (
+          <div
+            key={n.label}
+            style={{
+              position: "absolute",
+              left: n.x - 7,
+              top: DOT_Y - 7,
+              width: 14,
+              height: 14,
+              borderRadius: 7,
+              background: on ? P.accent : "transparent",
+              border: `2px solid ${on ? P.accent : P.border}`,
+            }}
+          />
+        );
+      })}
+
+      <div style={{ position: "absolute", left: 16, top: ROW_Y + 36, fontSize: 17, fontWeight: 700, color: P.ink, maxWidth: 1248 }}>
+        {NODES[activeIdx].label}
       </div>
+    </div>
+  );
+};
+
+const Inner: React.FC = () => {
+  const frame = useCurrentFrame();
+  return (
+    <AbsoluteFill style={{ background: STAGE }}>
+      {/* b1 — the problem, over the feature's own lonely page */}
+      {cut(frame, B1, B2) === 1 && <LiveBackdrop file={shotsFile} shot="feature" from={B1} hold={B2 - B1} />}
+      <MotionInsert
+        effect="cornerTags"
+        from={B1}
+        dur={B2 - B1}
+        accent={ACCENT}
+        plate={0.7}
+        data={{
+          statement: "One tap approved AND opened the form",
+          tags: ["LinkedIn only", "No review yet", "Form unseen", "Policy v8"],
+        }}
+      />
+
+      {/* b2 — the same gate, no new page to film */}
+      <MotionInsert
+        effect="keywordCaption"
+        from={B2}
+        dur={B3 - B2}
+        accent={ACCENT}
+        base={STAGE}
+        data={{
+          line1: "NAV and FINN jobs",
+          line2: "stuck on the same manual gate",
+          keywords: ["NAV", "FINN", "manual gate"],
+        }}
+      />
+
+      {/* b3 — the fix, over the real commit history, zoomed on the policy diff */}
+      {cut(frame, B3, B4) === 1 && (
+        <LiveShot
+          file={shotsFile}
+          shot="commits"
+          from={B3}
+          hold={B4 - B3}
+          zoom={() => 2.2}
+          focus={{ x: 0.5, y: 0.3 }}
+          opacity={1}
+          win={{ x: 0, y: -42, w: 1280, h: 762 }}
+        />
+      )}
+      <MotionInsert
+        effect="handoffExplain"
+        from={B3}
+        dur={B4 - B3}
+        accent={ACCENT}
+        plate={0.7}
+        data={{
+          from: "One button, no review",
+          to: "Human review, no shortcut",
+          points: ["LinkedIn exploration blocked until reviewed", "RECON_ALLOWED gates the form", "No single-tap commit"],
+        }}
+      />
+
+      {/* b4 — the auto-queue mechanics, drawn (the commit proves the split, not this) */}
+      <MotionInsert
+        effect="pipelineFlow"
+        from={B4}
+        dur={B5 - B4}
+        accent={ACCENT}
+        base={STAGE}
+        data={{
+          steps: ["Score clears auto_soknad_min_score", "Bot auto-queues the application", "Owner confirms in Telegram", "Skyvern sends it"],
+          result: "Fast queue, still owner-gated",
+          system: "NAV/FINN auto-queue",
+        }}
+      />
+
+      {/* b5 — the verdict, holds to the end. Never the feature page or the hub (gate 2). */}
+      {frame >= B5 && (
+        <LogWindow
+          title="jobbot-norway"
+          from={B5}
+          every={14}
+          opacity={1}
+          fontSize={20}
+          win={{ x: 140, y: 40, w: 1000, h: 520 }}
+          lines={[
+            { text: "POLICY v8 → v9 applied", tone: "accent" },
+            { text: "platform: linkedin → RECON_ALLOWED = false", tone: "danger" },
+            { text: "action: hold for owner review before explore", tone: "muted" },
+            { text: "platform: nav → score ≥ auto_soknad_min_score", tone: "success" },
+            { text: "platform: finn → score ≥ auto_soknad_min_score", tone: "success" },
+            { text: "queued → awaiting skyvern_metadata.owner_confirmed", tone: "muted" },
+            { text: "owner confirms in Telegram → application sent", tone: "success" },
+            { text: "consent scoped: per job, per platform", tone: "accent" },
+          ]}
+        />
+      )}
+
+      <TimelineRibbon />
     </AbsoluteFill>
   );
 };
+
+export const FeaturePerPlatformConsent: React.FC = () => (
+  <PaletteProvider value={MOODS.dawn}>
+    <Inner />
+  </PaletteProvider>
+);
