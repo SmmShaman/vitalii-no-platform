@@ -152,7 +152,7 @@ const Inner: React.FC = () => {
         dur={B3 - B2}
         accent={ACCENT}
         base={STAGE}
-        data={{ statement: "No filter. No project view. Full reload just to share one link." }}
+        data={{ line1: "No filter. No project view.", line2: "Full reload just to share one link.", keywords: ["filter", "reload"] }}
       />
 
       {/* b3 — the fix, over the real hub (live click on a filter chip) */}
