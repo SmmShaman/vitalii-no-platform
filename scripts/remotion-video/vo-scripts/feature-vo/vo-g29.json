@@ -1,0 +1,57 @@
+{
+ "id": "g29",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.655,
+  "b2": 6.134,
+  "b3": 4.606,
+  "b4": 7.186,
+  "b5": 4.484
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "In a live interview, every question made the app phone home to Google just to prove you were still you.",
+   "start_s": 0.5,
+   "end_s": 6.155,
+   "start_f": 15,
+   "end_f": 185
+  },
+  {
+   "beat": "b2",
+   "text": "That round trip sat on the critical path \u2014 one slow check could stall translation mid-sentence.",
+   "start_s": 6.455,
+   "end_s": 12.589,
+   "start_f": 194,
+   "end_f": 378
+  },
+  {
+   "beat": "b3",
+   "text": "Worse, the token died after an hour, killing the interview outright.",
+   "start_s": 12.889,
+   "end_s": 17.495,
+   "start_f": 387,
+   "end_f": 525
+  },
+  {
+   "beat": "b4",
+   "text": "Now the app checks its own session token, signed locally, no network call needed \u2014 Cloudflare Workers does the math.",
+   "start_s": 17.795,
+   "end_s": 24.981,
+   "start_f": 534,
+   "end_f": 749
+  },
+  {
+   "beat": "b5",
+   "text": "Sessions now run a full twelve hours without one single round trip.",
+   "start_s": 25.281,
+   "end_s": 29.765,
+   "start_f": 758,
+   "end_f": 893
+  }
+ ],
+ "total_s": 31.265,
+ "durationInFrames": 938,
+ "measured_track_s": 29.832,
+ "track": "/root/feature-demos/vo-g29/vo-g29.mp3"
+}

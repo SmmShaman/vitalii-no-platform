@@ -1,0 +1,7 @@
+{"id": "g29", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "In a live interview, every question made the app phone home to Google just to prove you were still you."],
+  ["b2", "That round trip sat on the critical path — one slow check could stall translation mid-sentence."],
+  ["b3", "Worse, the token died after an hour, killing the interview outright."],
+  ["b4", "Now the app checks its own session token, signed locally, no network call needed — Cloudflare Workers does the math."],
+  ["b5", "Sessions now run a full twelve hours without one single round trip."]
+]}

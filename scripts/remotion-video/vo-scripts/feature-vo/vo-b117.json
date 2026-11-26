@@ -1,0 +1,57 @@
+{
+ "id": "b117",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.536,
+  "b2": 6.626,
+  "b3": 6.009,
+  "b4": 5.785,
+  "b5": 8.773
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Building one math card by hand meant timing every beat to the second, over and over.",
+   "start_s": 0.5,
+   "end_s": 6.036,
+   "start_f": 15,
+   "end_f": 181
+  },
+  {
+   "beat": "b2",
+   "text": "The real timing lived inside a video component the overnight robot couldn't run \u2014 no browser, no network.",
+   "start_s": 6.336,
+   "end_s": 12.962,
+   "start_f": 190,
+   "end_f": 389
+  },
+  {
+   "beat": "b3",
+   "text": "So I rewrote that logic in plain Python, using exact fractions, not rounded numbers.",
+   "start_s": 13.262,
+   "end_s": 19.271,
+   "start_f": 398,
+   "end_f": 578
+  },
+  {
+   "beat": "b4",
+   "text": "It now checks its own math before anything renders, catching drift before a bad card ships.",
+   "start_s": 19.571,
+   "end_s": 25.356,
+   "start_f": 587,
+   "end_f": 761
+  },
+  {
+   "beat": "b5",
+   "text": "The result lands on the exact same frame as the real thing: frame 2992, not 2991.",
+   "start_s": 25.656,
+   "end_s": 34.429,
+   "start_f": 770,
+   "end_f": 1033
+  }
+ ],
+ "total_s": 35.929,
+ "durationInFrames": 1078,
+ "measured_track_s": 34.488,
+ "track": "/root/feature-demos/vo-b117/vo-b117.mp3"
+}

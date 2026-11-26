@@ -1,0 +1,7 @@
+{"id": "g28", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Before an interview, the app lived in a browser tab — one bad reload and it was gone."],
+  ["b2", "On iPhone there's no install button at all, so most people just kept a bookmark and lost it."],
+  ["b3", "Now it installs like any other app, icon and all, right on the home screen."],
+  ["b4", "A service worker caches the shell, so a flaky connection shows the app, not a blank white page."],
+  ["b5", "One tap opens it, ready, on Android and iPhone alike."]
+]}

@@ -1,0 +1,57 @@
+{
+ "id": "g28",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.538,
+  "b2": 5.61,
+  "b3": 5.162,
+  "b4": 6.014,
+  "b5": 4.23
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Before an interview, the app lived in a browser tab \u2014 one bad reload and it was gone.",
+   "start_s": 0.5,
+   "end_s": 6.038,
+   "start_f": 15,
+   "end_f": 181
+  },
+  {
+   "beat": "b2",
+   "text": "On iPhone there's no install button at all, so most people just kept a bookmark and lost it.",
+   "start_s": 6.338,
+   "end_s": 11.948,
+   "start_f": 190,
+   "end_f": 358
+  },
+  {
+   "beat": "b3",
+   "text": "Now it installs like any other app, icon and all, right on the home screen.",
+   "start_s": 12.248,
+   "end_s": 17.41,
+   "start_f": 367,
+   "end_f": 522
+  },
+  {
+   "beat": "b4",
+   "text": "A service worker caches the shell, so a flaky connection shows the app, not a blank white page.",
+   "start_s": 17.71,
+   "end_s": 23.724,
+   "start_f": 531,
+   "end_f": 712
+  },
+  {
+   "beat": "b5",
+   "text": "One tap opens it, ready, on Android and iPhone alike.",
+   "start_s": 24.024,
+   "end_s": 28.254,
+   "start_f": 721,
+   "end_f": 848
+  }
+ ],
+ "total_s": 29.754,
+ "durationInFrames": 893,
+ "measured_track_s": 28.32,
+ "track": "/root/feature-demos/vo-g28/vo-g28.mp3"
+}

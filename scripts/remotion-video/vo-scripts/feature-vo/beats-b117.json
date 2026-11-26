@@ -1,0 +1,7 @@
+{"id": "b117", "voice": "en-US-AndrewNeural", "beats": [
+  ["b1", "Building one math card by hand meant timing every beat to the second, over and over."],
+  ["b2", "The real timing lived inside a video component the overnight robot couldn't run — no browser, no network."],
+  ["b3", "So I rewrote that logic in plain Python, using exact fractions, not rounded numbers."],
+  ["b4", "It now checks its own math before anything renders, catching drift before a bad card ships."],
+  ["b5", "The result lands on the exact same frame as the real thing: frame 2992, not 2991."]
+]}
