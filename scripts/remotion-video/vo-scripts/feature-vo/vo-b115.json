@@ -1,0 +1,57 @@
+{
+ "id": "b115",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.32,
+  "b2": 7.464,
+  "b3": 5.274,
+  "b4": 4.152,
+  "b5": 5.539
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A phone dies mid-shift. Or it sits forgotten in a bag. The clock-out time comes out wrong.",
+   "start_s": 0.5,
+   "end_s": 6.82,
+   "start_f": 15,
+   "end_f": 205
+  },
+  {
+   "beat": "b2",
+   "text": "Fixing it meant a laptop and the admin panel. On the TV where the family reads the work report, there was no way to touch it.",
+   "start_s": 7.12,
+   "end_s": 14.584,
+   "start_f": 214,
+   "end_f": 438
+  },
+  {
+   "beat": "b3",
+   "text": "Now the TV remote edits that end time directly, no login, no laptop.",
+   "start_s": 14.884,
+   "end_s": 20.158,
+   "start_f": 447,
+   "end_f": 605
+  },
+  {
+   "beat": "b4",
+   "text": "One more click reverts it back to the original GPS time.",
+   "start_s": 20.458,
+   "end_s": 24.61,
+   "start_f": 614,
+   "end_f": 738
+  },
+  {
+   "beat": "b5",
+   "text": "Five new tests cover the edit and every rejection case, reaching back 62 days.",
+   "start_s": 24.91,
+   "end_s": 30.449,
+   "start_f": 747,
+   "end_f": 913
+  }
+ ],
+ "total_s": 31.949,
+ "durationInFrames": 958,
+ "measured_track_s": 30.504,
+ "track": "/root/feature-demos/vo-b115/vo-b115.mp3"
+}

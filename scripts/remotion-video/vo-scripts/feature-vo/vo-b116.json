@@ -1,0 +1,57 @@
+{
+ "id": "b116",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.545,
+  "b2": 2.684,
+  "b3": 5.892,
+  "b4": 8.055,
+  "b5": 3.253
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A guitar actually being played. A shape that really folds. Each one meant a brand new effect built from scratch.",
+   "start_s": 0.5,
+   "end_s": 8.045,
+   "start_f": 15,
+   "end_f": 241
+  },
+  {
+   "beat": "b2",
+   "text": "And the duplicate code only kept piling up.",
+   "start_s": 8.345,
+   "end_s": 11.029,
+   "start_f": 250,
+   "end_f": 331
+  },
+  {
+   "beat": "b3",
+   "text": "So the shared pieces \u2014 timing, camera moves, checks \u2014 got pulled into one kit.",
+   "start_s": 11.329,
+   "end_s": 17.221,
+   "start_f": 340,
+   "end_f": 517
+  },
+  {
+   "beat": "b4",
+   "text": "Its first real test, built in Remotion: a real photo, with the camera walking to each labelled point instead of a drawn diagram.",
+   "start_s": 17.521,
+   "end_s": 25.576,
+   "start_f": 526,
+   "end_f": 767
+  },
+  {
+   "beat": "b5",
+   "text": "The kit held up \u2014 model effects now number four.",
+   "start_s": 25.876,
+   "end_s": 29.129,
+   "start_f": 776,
+   "end_f": 874
+  }
+ ],
+ "total_s": 30.629,
+ "durationInFrames": 919,
+ "measured_track_s": 29.184,
+ "track": "/root/feature-demos/vo-b116/vo-b116.mp3"
+}

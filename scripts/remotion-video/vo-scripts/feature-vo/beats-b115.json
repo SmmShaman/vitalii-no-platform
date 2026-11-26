@@ -1,0 +1,7 @@
+{"id": "b115", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "A phone dies mid-shift. Or it sits forgotten in a bag. The clock-out time comes out wrong."],
+ ["b2", "Fixing it meant a laptop and the admin panel. On the TV where the family reads the work report, there was no way to touch it."],
+ ["b3", "Now the TV remote edits that end time directly, no login, no laptop."],
+ ["b4", "One more click reverts it back to the original GPS time."],
+ ["b5", "Five new tests cover the edit and every rejection case, reaching back 62 days."]
+]}
