@@ -1,0 +1,7 @@
+{"id": "k06", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Anyone who had the one shared password could log into Klient — no way to tell who was really using it, or lock out just one person."],
+ ["b2", "Now login goes through Google instead."],
+ ["b3", "A sign-in token gets checked against an allow-list of approved emails before access is granted."],
+ ["b4", "It's one shared key swapped for name badges only the right people hold."],
+ ["b5", "Remove an email from the list, and that person's 30-day session is gone — everyone else keeps theirs."]
+]}

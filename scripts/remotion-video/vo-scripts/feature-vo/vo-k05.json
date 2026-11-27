@@ -1,0 +1,57 @@
+{
+ "id": "k05",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 10.286,
+  "b2": 6.168,
+  "b3": 5.416,
+  "b4": 4.158,
+  "b5": 3.989
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Deciding what free sample to offer a business meant opening its website and every social page by hand, guessing how much content it had, and writing a prompt from scratch each time.",
+   "start_s": 0.5,
+   "end_s": 10.786,
+   "start_f": 15,
+   "end_f": 324
+  },
+  {
+   "beat": "b2",
+   "text": "A Node.js crawler now covers its whole web presence \u2014 site and socials together.",
+   "start_s": 11.086,
+   "end_s": 17.254,
+   "start_f": 333,
+   "end_f": 518
+  },
+  {
+   "beat": "b3",
+   "text": "Four AI agents take it from there \u2014 looking, analyzing, writing, reviewing.",
+   "start_s": 17.554,
+   "end_s": 22.97,
+   "start_f": 527,
+   "end_f": 689
+  },
+  {
+   "beat": "b4",
+   "text": "Less guesswork, more an assembly line that checks its own work.",
+   "start_s": 23.27,
+   "end_s": 27.428,
+   "start_f": 698,
+   "end_f": 823
+  },
+  {
+   "beat": "b5",
+   "text": "And it now runs three businesses at once, not just one.",
+   "start_s": 27.728,
+   "end_s": 31.717,
+   "start_f": 832,
+   "end_f": 952
+  }
+ ],
+ "total_s": 33.217,
+ "durationInFrames": 997,
+ "measured_track_s": 31.776,
+ "track": "/root/feature-demos/vo-k05/vo-k05.mp3"
+}

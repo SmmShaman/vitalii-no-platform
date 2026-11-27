@@ -1,0 +1,57 @@
+{
+ "id": "k06",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.578,
+  "b2": 2.667,
+  "b3": 5.684,
+  "b4": 4.556,
+  "b5": 6.277
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Anyone who had the one shared password could log into Klient \u2014 no way to tell who was really using it, or lock out just one person.",
+   "start_s": 0.5,
+   "end_s": 8.078,
+   "start_f": 15,
+   "end_f": 242
+  },
+  {
+   "beat": "b2",
+   "text": "Now login goes through Google instead.",
+   "start_s": 8.378,
+   "end_s": 11.045,
+   "start_f": 251,
+   "end_f": 331
+  },
+  {
+   "beat": "b3",
+   "text": "A sign-in token gets checked against an allow-list of approved emails before access is granted.",
+   "start_s": 11.345,
+   "end_s": 17.029,
+   "start_f": 340,
+   "end_f": 511
+  },
+  {
+   "beat": "b4",
+   "text": "It's one shared key swapped for name badges only the right people hold.",
+   "start_s": 17.329,
+   "end_s": 21.885,
+   "start_f": 520,
+   "end_f": 657
+  },
+  {
+   "beat": "b5",
+   "text": "Remove an email from the list, and that person's 30-day session is gone \u2014 everyone else keeps theirs.",
+   "start_s": 22.185,
+   "end_s": 28.462,
+   "start_f": 666,
+   "end_f": 854
+  }
+ ],
+ "total_s": 29.962,
+ "durationInFrames": 899,
+ "measured_track_s": 28.512,
+ "track": "/root/feature-demos/vo-k06/vo-k06.mp3"
+}
