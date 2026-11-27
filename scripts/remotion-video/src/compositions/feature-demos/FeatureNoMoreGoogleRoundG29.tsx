@@ -103,6 +103,47 @@ const ProductNamePlate: React.FC = () => {
   );
 };
 
+const TOKEN_AGE_BOX = { x: 920, y: 40, w: 320, h: 72 };
+
+/** b3's top-right readout — the invisible plumbing has no page to show, so the
+ * countdown to expiry makes the "died after an hour" claim visible on-screen. */
+const TokenAgeReadout: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B3 || frame >= B4) return null;
+  const secs = Math.min(3600, Math.round(((frame - B3) / (B4 - B3)) * 3600));
+  const mm = Math.floor(secs / 60);
+  const ss = secs % 60;
+  const expired = secs >= 3600;
+  return (
+    <Arrive at={B3 + 4} kind="wipe" box={TOKEN_AGE_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: TOKEN_AGE_BOX.x,
+          top: TOKEN_AGE_BOX.y,
+          width: TOKEN_AGE_BOX.w,
+          height: TOKEN_AGE_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "0 16px",
+          boxSizing: "border-box",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 2, color: P.muted }}>TOKEN AGE</div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: expired ? P.danger : P.ink, marginTop: 2 }}>
+          {expired ? "EXPIRED at 60:00" : `${mm}:${String(ss).padStart(2, "0")} / 60:00`}
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 /** A straight route segment between two node centers, as a rotated bar. */
 const Branch: React.FC<{ x1: number; y1: number; x2: number; y2: number; color: string; opacity: number }> = ({
   x1,
@@ -356,6 +397,8 @@ const Inner: React.FC = () => {
           ],
         }}
       />
+      {cut(frame, B3, B4) === 1 && <ProductNamePlate />}
+      <TokenAgeReadout />
 
       {/* b4 — the fix, over the real commit, zoomed to one hunk */}
       {cut(frame, B4, B5) === 1 && (

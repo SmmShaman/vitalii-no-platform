@@ -53,22 +53,27 @@ const STAGE = "#20160A";
 
 const BADGE = { x: 40, y: 40, w: 280, h: 64 };
 
-/** The one element that survives every beat — it changes state each time. */
+/** The one element that survives every beat — it changes state each time.
+ * Dropped lower only through b1: cornerTags' own top-left tag ("One password
+ * for everyone") sits in this exact corner at BADGE.y, and the badge drawing
+ * on top of it hid the tag's first line. b2 onward nothing else claims this
+ * corner, so it returns to BADGE.y. */
 const ZoomBadge: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
   if (frame < B1) return null;
   const secured = frame >= B5;
   const pct = frame >= B4 ? 145 : frame >= B3 ? 130 : frame >= B2 ? 115 : 100;
+  const box = frame < B2 ? { ...BADGE, y: 172 } : BADGE;
   return (
-    <Arrive at={B1 + 4} kind="wipe" box={BADGE} dur={0.4}>
+    <Arrive at={B1 + 4} kind="wipe" box={box} dur={0.4}>
       <div
         style={{
           position: "absolute",
-          left: BADGE.x,
-          top: BADGE.y,
-          width: BADGE.w,
-          height: BADGE.h,
+          left: box.x,
+          top: box.y,
+          width: box.w,
+          height: box.h,
           background: P.card,
           borderRadius: 4,
           boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",

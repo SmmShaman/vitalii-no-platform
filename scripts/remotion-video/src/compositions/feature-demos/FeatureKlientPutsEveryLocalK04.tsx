@@ -138,6 +138,51 @@ const RESULT_FACTS: { label: string; value: string }[] = [
   { label: "outreach", value: "queued + tracked" },
 ];
 
+const TOWNS_LEFT = ["Hamar", "Lillehammer", "Gjøvik"];
+const TOWNS_RIGHT = ["Ringsaker", "Østre Toten", "Vestre Toten"];
+
+/** b5's hero digit sits centered and narrow — these flank it left/right so the
+ * "six towns" the beat names are each visible, not just the digit 6. */
+const TownList: React.FC<{ towns: string[]; side: "left" | "right" }> = ({ towns, side }) => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  const x = side === "left" ? 60 : 980;
+  return (
+    <>
+      {towns.map((town, i) => {
+        const at = B5 + 14 + i * 10;
+        const y = 470 + i * 46;
+        if (frame < at - 6) return null;
+        return (
+          <Arrive key={town} at={at} kind="wipe" box={{ x, y, w: 240, h: 36 }} dur={0.3}>
+            <div
+              style={{
+                position: "absolute",
+                left: x,
+                top: y,
+                width: 240,
+                height: 36,
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                background: P.card,
+                borderRadius: 4,
+                boxShadow: "4px 4px 0 rgba(0,0,0,0.5)",
+                padding: "0 12px",
+                boxSizing: "border-box",
+                fontFamily,
+              }}
+            >
+              <div style={{ width: 8, height: 8, borderRadius: 4, background: P.success }} />
+              <div style={{ fontSize: 14, fontWeight: 700, color: P.ink }}>{town}</div>
+            </div>
+          </Arrive>
+        );
+      })}
+    </>
+  );
+};
+
 const Result: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
@@ -183,6 +228,8 @@ const Result: React.FC = () => {
           { t: "06", text: "result: 6 towns, 1 map, every pin tracked", tone: "success" },
         ]}
       />
+      <TownList towns={TOWNS_LEFT} side="left" />
+      <TownList towns={TOWNS_RIGHT} side="right" />
     </>
   );
 };

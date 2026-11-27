@@ -85,6 +85,57 @@ const ProductNamePlate: React.FC = () => {
   );
 };
 
+const MECH_BOX = { x: 40, y: 40, w: 1200, h: 130 };
+const MECH_STEPS = ["Request the shell", "Try the network first", "Fall back to cache"];
+
+/** b4 has no live page ("invisible plumbing") and PipelineFlow's own chain is
+ * small and centered — this top banner keeps the beat from reading empty. */
+const ServiceWorkerBanner: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B4 || frame >= B5) return null;
+  return (
+    <Arrive at={B4 + 4} kind="wipe" box={MECH_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: MECH_BOX.x,
+          top: MECH_BOX.y,
+          width: MECH_BOX.w,
+          height: MECH_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.55)",
+          padding: "16px 28px",
+          boxSizing: "border-box",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 2, color: P.accent }}>SERVICE WORKER — INVISIBLE PLUMBING</div>
+        <div style={{ fontSize: 20, fontWeight: 800, color: P.ink, marginTop: 4 }}>network-first, cache-fallback shell</div>
+        <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+          {MECH_STEPS.map((s, i) => (
+            <div
+              key={s}
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: P.muted,
+                background: P.chipBg,
+                border: `1px solid ${P.border}`,
+                borderRadius: 3,
+                padding: "4px 10px",
+              }}
+            >
+              {String(i + 1).padStart(2, "0")} {s}
+            </div>
+          ))}
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 const Ribbon: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
@@ -245,6 +296,7 @@ const Inner: React.FC = () => {
           system: "Service worker",
         }}
       />
+      <ServiceWorkerBanner />
 
       {/* b5 — the result: one tap from the home screen, on both Android and iOS. Drawn, holds to the end. */}
       {frame >= B5 && (

@@ -74,7 +74,7 @@ const SplitDuel: React.FC = () => {
     { x: 686, label: "YouTube?" },
   ];
   const checklist = [
-    { at: B2, text: "✓ Node.js crawl: site + socials" },
+    { at: B2, text: "✓ Node.js crawl" },
     { at: B3, text: "✓ 4 agents chained" },
     { at: B4, text: "✓ Reviews its own work" },
     { at: B5, text: "✓ 3 at once" },
