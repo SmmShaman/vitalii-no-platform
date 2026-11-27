@@ -194,6 +194,9 @@ import { FeatureQuestionMarkWasBlinkingB56 } from "./compositions/feature-demos/
 import { FeatureKidsReadEnglishTheyB55 } from "./compositions/feature-demos/FeatureKidsReadEnglishTheyB55";
 import { FeatureNoMoreLoopingPictureV28 } from "./compositions/feature-demos/FeatureNoMoreLoopingPictureV28";
 import { FeatureEightTradingAgentsShareK01 } from "./compositions/feature-demos/FeatureEightTradingAgentsShareK01";
+import { FeatureKlientsLoginChecksYourK06 } from "./compositions/feature-demos/FeatureKlientsLoginChecksYourK06";
+import { FeatureKlientScansBusinesssWholeK05 } from "./compositions/feature-demos/FeatureKlientScansBusinesssWholeK05";
+import { FeatureKlientPutsEveryLocalK04 } from "./compositions/feature-demos/FeatureKlientPutsEveryLocalK04";
 import { FeatureClaudeProxyTrustsSharedG04 } from "./compositions/feature-demos/FeatureClaudeProxyTrustsSharedG04";
 import { FeatureVideoDigestWentSilentV30 } from "./compositions/feature-demos/FeatureVideoDigestWentSilentV30";
 import { FeatureVideoStagingRouletteKillingV27 } from "./compositions/feature-demos/FeatureVideoStagingRouletteKillingV27";
@@ -337,6 +340,9 @@ import { FeatureTimesUpUsedThrowB110 } from "./compositions/feature-demos/Featur
 import { FeatureLessonCardsStopFakingB109 } from "./compositions/feature-demos/FeatureLessonCardsStopFakingB109";
 import { FeatureEveryStageUsedGuessB114 } from "./compositions/feature-demos/FeatureEveryStageUsedGuessB114";
 import { FeatureFilmingLiveSiteInsteadD01 } from "./compositions/feature-demos/FeatureFilmingLiveSiteInsteadD01";
+import { FeatureNoMoreGoogleRoundG29 } from "./compositions/feature-demos/FeatureNoMoreGoogleRoundG29";
+import { FeatureGhostInterviewerInstallsLikeG28 } from "./compositions/feature-demos/FeatureGhostInterviewerInstallsLikeG28";
+import { FeatureNightRunnerWritesMathB117 } from "./compositions/feature-demos/FeatureNightRunnerWritesMathB117";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2046,6 +2052,30 @@ export const RemotionRoot: React.FC = () => {
         width={1280}
         height={720}
       />
+      <Composition
+        id="FeatureKlientsLoginChecksYourK06"
+        component={FeatureKlientsLoginChecksYourK06}
+        durationInFrames={899}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+      <Composition
+        id="FeatureKlientScansBusinesssWholeK05"
+        component={FeatureKlientScansBusinesssWholeK05}
+        durationInFrames={997}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+      <Composition
+        id="FeatureKlientPutsEveryLocalK04"
+        component={FeatureKlientPutsEveryLocalK04}
+        durationInFrames={935}
+        fps={30}
+        width={1280}
+        height={720}
+      />
 
       <Composition
         id="FeatureClaudeProxyTrustsSharedG04"
@@ -3335,6 +3365,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureFilmingLiveSiteInsteadD01"
         component={FeatureFilmingLiveSiteInsteadD01}
         durationInFrames={914}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNoMoreGoogleRoundG29"
+        component={FeatureNoMoreGoogleRoundG29}
+        durationInFrames={938}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureGhostInterviewerInstallsLikeG28"
+        component={FeatureGhostInterviewerInstallsLikeG28}
+        durationInFrames={893}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureNightRunnerWritesMathB117"
+        component={FeatureNightRunnerWritesMathB117}
+        durationInFrames={1078}
         fps={30}
         width={1280}
         height={720}

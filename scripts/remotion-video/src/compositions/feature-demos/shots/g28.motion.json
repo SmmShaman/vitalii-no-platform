@@ -1,0 +1,58 @@
+{
+  "id": "g28",
+  "composition": "FeatureGhostInterviewerInstallsLikeG28",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "copyCorrection",
+      "backdrop": "product",
+      "data": {
+        "wrong": "Just a browser tab",
+        "right": "One reload, gone",
+        "label": "Before"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "statusFocus",
+      "backdrop": "product2",
+      "data": {
+        "title": "Install prompt",
+        "claims": [
+          { "text": "Android gets a native prompt", "verdict": "yes" },
+          { "text": "iPhone gets one too", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": "commit",
+      "data": {
+        "from": "Browser tab, easy to lose",
+        "to": "Home-screen app icon",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["cfda506f", "Standalone app manifest", "192 and 512 px icons"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Request the shell", "Try the network first", "Fall back to cache"],
+        "result": "App shows, even on a weak connection",
+        "system": "Service worker"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": {
+        "note": "No catalog effect — the timeline ribbon's final stamp lights up + a LogWindow reveals the install facts, holds to END."
+      }
+    }
+  ]
+}

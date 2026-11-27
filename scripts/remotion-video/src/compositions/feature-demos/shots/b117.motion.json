@@ -1,0 +1,55 @@
+{
+  "id": "b117",
+  "composition": "FeatureNightRunnerWritesMathB117",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "funnelAbsorption",
+      "backdrop": "feature",
+      "data": {
+        "inputs": ["Every beat", "Every card", "Every day"],
+        "result": "Hours of manual timing"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "statusFocus",
+      "backdrop": null,
+      "data": {
+        "title": "Nightly build",
+        "claims": [
+          { "text": "Timing lives in a video component", "verdict": "yes" },
+          { "text": "That component runs in the CI robot", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Rounded floats, video component",
+        "to": "Exact fractions, plain code",
+        "points": ["cardRules.js — exact fractions (9ff0b73)", "No browser needed", "Runs anywhere, same answer"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": null,
+      "data": {
+        "steps": ["Compute the exact timing", "Compare against the rule", "Catch drift before render"],
+        "result": "Bad card never ships",
+        "system": "series-parity.mjs"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": {
+        "note": "Flow-map archetype closes on the token reaching the last node + LogWindow with frame_match 2992, holds to END."
+      }
+    }
+  ]
+}

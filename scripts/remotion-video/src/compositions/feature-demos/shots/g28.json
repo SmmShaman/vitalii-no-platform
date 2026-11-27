@@ -1,0 +1,28 @@
+{
+  "id": "g28",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "product",
+      "url": "https://ghost.vitalii.no",
+      "frames": 175,
+      "scroll": [[0, 0], [90, 20], [174, 40]],
+      "mouse": [[0, 300, 120], [60, 450, 160], [120, 380, 140], [174, 420, 130]]
+    },
+    {
+      "name": "product2",
+      "url": "https://ghost.vitalii.no",
+      "frames": 177,
+      "scroll": [[0, 40], [88, 220], [176, 300]],
+      "mouse": [[0, 500, 200], [70, 650, 260], [140, 420, 300], [176, 550, 240]]
+    },
+    {
+      "name": "commit",
+      "url": "https://github.com/SmmShaman/Ghost-Interviewer-AI/commit/cfda506f",
+      "frames": 164,
+      "scroll": [[0, 0], [80, 700], [163, 900]],
+      "mouse": [[0, 520, 160], [60, 520, 300], [120, 520, 180], [163, 520, 260]]
+    }
+  ]
+}

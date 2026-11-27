@@ -1,0 +1,14 @@
+{
+  "id": "b116",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/a-guitar-thats-really-played-a-cube-that-really-folds-now-a-real-photo-joins-the-b116",
+      "frames": 235,
+      "scroll": [[0, 0], [120, 260], [234, 520]],
+      "mouse": [[0, 300, 160], [80, 480, 240], [160, 420, 320], [234, 500, 260]]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "b115",
+  "composition": "FeatureForgotClockOutFixB115",
+  "beats": [
+    { "beat": "b1", "effect": "funnelAbsorption", "backdrop": "page",
+      "data": { "inputs": ["Phone dies mid-shift", "Forgotten in a bag"], "result": "Clock-out time comes out wrong" } },
+    { "beat": "b2", "effect": "cornerTags", "backdrop": null,
+      "data": { "statement": "No way to fix it from the couch", "tags": ["Needs a laptop", "Admin panel login", "TV was read-only"] } },
+    { "beat": "b3", "effect": "handoffExplain", "backdrop": null,
+      "data": { "from": "Laptop + admin login", "to": "TV remote, direct edit", "points": ["No login needed", "No laptop needed", "Edits the end time directly"] } },
+    { "beat": "b4", "effect": "pipelineFlow", "backdrop": null,
+      "data": { "steps": ["Edit end time", "Tap once more", "Revert to original GPS time"], "result": "Always recoverable", "system": "One-click undo" } },
+    { "beat": "b5", "effect": "ratioBars", "backdrop": null,
+      "data": { "a": { "label": "New tests", "value": 5 }, "b": { "label": "Days checked back", "value": 62 } } }
+  ]
+}

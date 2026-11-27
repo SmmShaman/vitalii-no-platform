@@ -1,0 +1,52 @@
+{
+  "id": "k04",
+  "composition": "FeatureKlientPutsEveryLocalK04",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "cornerTags",
+      "backdrop": "page",
+      "data": {
+        "statement": "No single source of truth",
+        "tags": ["Who was contacted?", "Who replied?", "Who's left?", "All in spreadsheets"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "handoffExplain",
+      "backdrop": "page",
+      "data": {
+        "from": "Spreadsheet rows",
+        "to": "One live map",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Every business = a pin", "Built with Leaflet"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "Pin color tells the story",
+        "line2": "like traffic lights, not a row",
+        "keywords": ["traffic lights"]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "page",
+      "data": {
+        "steps": ["Monitor rechecks status", "Pin color updates", "Email queues", "Outreach tracked"],
+        "result": "Runs on its own",
+        "system": "background job"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "note": "LogWindow result: fetch_brreg/osm_enrich/geocode -> build_data -> Leaflet map -> monitor.mjs systemd timer -> server.mjs email queue, real facts from solution_en/result_en. Never the feature page or hub (gate 2). HeroNumber ticks to the real fact: 6 towns, one map."
+    }
+  ]
+}

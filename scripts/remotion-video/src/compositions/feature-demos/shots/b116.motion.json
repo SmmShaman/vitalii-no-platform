@@ -1,0 +1,51 @@
+{
+  "id": "b116",
+  "composition": "FeatureGuitarThatsReallyPlayedB116",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "funnelAbsorption",
+      "backdrop": "page",
+      "data": {
+        "inputs": ["Guitar effect", "Solid-fold effect", "Example-series effect"],
+        "result": "Each one, a brand-new effect, every time"
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "keywordCaption",
+      "backdrop": null,
+      "data": {
+        "line1": "The duplicate code",
+        "line2": "just kept piling up",
+        "keywords": ["duplicate code"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "hubRouting",
+      "backdrop": null,
+      "data": {
+        "inputs": ["Timing", "Camera moves", "Checks"],
+        "hub": "Shared model kit",
+        "output": "Reused by every effect"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": null,
+      "data": {
+        "from": "Drawn diagram",
+        "to": "Real photo, camera walks to each point",
+        "points": ["LabelledPicture.tsx", "Camera walks to up to 6 points", "Built on the shared kit"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "note": "No catalog effect — the zoom-in panel reaches its closest frame on the number 4, LogWindow carries the result, holds to END."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "k05",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/klient-scans-a-businesss-whole-web-presence-and-runs-four-ai-agents-against-it-t-k05",
+      "frames": 320,
+      "scroll": [[0, 0], [160, 300], [319, 620]],
+      "mouse": [[0, 560, 200], [100, 560, 260], [220, 560, 320], [319, 560, 280]]
+    }
+  ]
+}

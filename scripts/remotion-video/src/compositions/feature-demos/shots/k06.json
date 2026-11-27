@@ -1,0 +1,14 @@
+{
+  "id": "k06",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/klients-login-now-checks-your-google-id-token-not-just-a-shared-password-k06",
+      "frames": 240,
+      "scroll": [[0, 0], [120, 260], [239, 520]],
+      "mouse": [[0, 560, 200], [80, 560, 260], [160, 560, 320], [239, 560, 280]]
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "id": "g29",
+  "composition": "FeatureNoMoreGoogleRoundG29",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "product",
+      "data": {
+        "line1": "Every single question",
+        "line2": "called home to Google",
+        "keywords": ["every question", "Google"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "funnelAbsorption",
+      "backdrop": "product2",
+      "data": {
+        "inputs": ["AI answer call", "Live translation", "Session re-check"],
+        "result": "Both wait on one slow network check"
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "statusFocus",
+      "backdrop": null,
+      "data": {
+        "title": "Session check",
+        "claims": [
+          { "text": "Re-verified on every question", "verdict": "yes" },
+          { "text": "Survives past 1 hour", "verdict": "no" }
+        ]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "commit",
+      "data": {
+        "from": "Network call to Google",
+        "to": "Local session-token check",
+        "fromLabel": "BEFORE",
+        "toLabel": "NOW",
+        "points": ["Signed with Web Crypto API", "Verified with zero network calls", "96f3c588"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": null,
+      "data": {
+        "note": "No catalog effect — fanned-out card deck result + LogWindow, holds to END."
+      }
+    }
+  ]
+}
