@@ -74,6 +74,41 @@ const popIn = (frame: number, start: number, dur = 10) => {
   return 0.4 + 0.6 * (1 - Math.pow(1 - t, 3));
 };
 
+const PRODUCT_BOX = { x: 36, y: 32, w: 200, h: 84 };
+
+/** One-line context a first-time viewer needs: what the card metaphor even is.
+ * Sits left of DECK_BOX (which starts at x:260), so it never collides with the pile. */
+const ProductNamePlate: React.FC = () => {
+  const P = usePalette();
+  return (
+    <Arrive at={B1 + 4} kind="wipe" box={PRODUCT_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: PRODUCT_BOX.x,
+          top: PRODUCT_BOX.y,
+          width: PRODUCT_BOX.w,
+          height: PRODUCT_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "0 14px",
+          boxSizing: "border-box",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 15, fontWeight: 800, color: P.ink }}>Boytasks — Night Runner</div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: P.muted, marginTop: 4, lineHeight: 1.3 }}>
+          Each card = one worked example in an auto-built kids' math video
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 /** One math card: pile position until B3, then eases into its sorted grid cell and flips red → green. */
 const MathCard: React.FC<{ def: CardDef }> = ({ def }) => {
   const frame = useCurrentFrame();
@@ -152,6 +187,19 @@ const CardDeck: React.FC = () => {
       ? "blocked in CI"
       : "building manual";
 
+  /** Plain-language gloss under the status line — every jargon term that
+   * appears above gets one line translating it, right under it. */
+  const statusGloss =
+    frame >= B5
+      ? "matches the hand-checked original, frame for frame"
+      : frame >= B4
+      ? "self-check that catches drift before it renders"
+      : frame >= B3
+      ? "the file that computes each card's exact timing"
+      : frame >= B2
+      ? "CI = the overnight robot — it can't open a browser"
+      : "";
+
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, fontFamily }}>
       <div
@@ -193,6 +241,21 @@ const CardDeck: React.FC = () => {
       >
         {status}
       </div>
+      {statusGloss && (
+        <div
+          style={{
+            position: "absolute",
+            left: DECK_BOX.x + 32,
+            top: DECK_BOX.y + 72,
+            width: DECK_BOX.w - 64,
+            fontSize: 12,
+            fontWeight: 600,
+            color: P.muted,
+          }}
+        >
+          {statusGloss}
+        </div>
+      )}
 
       {CARDS.map((def) => (
         <MathCard key={def.i} def={def} />
@@ -255,6 +318,7 @@ const Inner: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: STAGE }}>
       {/* b1 — one card, timed by hand, over and over. Small inset grounds the feature. */}
+      {cut(frame, B1, B2) === 1 && <ProductNamePlate />}
       {cut(frame, B1, B2) === 1 && (
         <LiveWindow
           file={shotsFile}
@@ -277,21 +341,27 @@ const Inner: React.FC = () => {
         data={{ inputs: ["Every beat", "Every card", "Every day"], result: "Hours of manual timing" }}
       />
 
-      {/* b2 — the timing lived inside a video component the robot couldn't run */}
-      <MotionInsert
-        effect="statusFocus"
-        from={B2}
-        dur={B3 - B2}
-        accent={ACCENT}
-        plate={0}
-        data={{
-          title: "Nightly build",
-          claims: [
-            { text: "Timing lives in a video component", verdict: "yes" },
-            { text: "That component runs in the CI robot", verdict: "no" },
-          ],
-        }}
-      />
+      {/* b2 — the timing lived inside a video component the robot couldn't run.
+          Wrapped at zIndex above the card pile (10-14): the pile's messy cards
+          were painting over this claim text (the "cut off by a red X" bug the
+          blind viewer hit) because an explicit z-index sibling always wins
+          over a z-index:auto one, regardless of paint order. */}
+      <div style={{ position: "absolute", inset: 0, zIndex: 20 }}>
+        <MotionInsert
+          effect="statusFocus"
+          from={B2}
+          dur={B3 - B2}
+          accent={ACCENT}
+          plate={0}
+          data={{
+            title: "Nightly build",
+            claims: [
+              { text: "Timing lives in a video component", verdict: "yes" },
+              { text: "That component runs in the CI robot", verdict: "no" },
+            ],
+          }}
+        />
+      </div>
 
       {/* b3 — rewritten in plain code, exact fractions, not rounded */}
       <MotionInsert
@@ -316,31 +386,41 @@ const Inner: React.FC = () => {
         plate={0}
         data={{
           steps: ["Compute the exact timing", "Compare against the rule", "Catch drift before render"],
-          result: "Bad card never ships",
+          result: "A wrong clip never reaches the kids",
           system: "series-parity.mjs",
         }}
       />
 
       <CardDeck />
 
-      {/* b5 — the result: frame 2992, not 2991. Drawn, holds to the end. */}
+      {/* b5 — the result: frame 2992, not 2991. Drawn, holds to the end.
+          Wrapped at zIndex above the card pile (10-14): the finished grid was
+          painting over this log (the "code obscured behind cards" bug the
+          blind viewer hit) for the same z-index reason as b2. By now the
+          grid has already shown its fan-out and checkmarks for 135 frames
+          (B4+48 .. B5), so the log taking over the frame is the beat change,
+          not a loss. */}
       {frame >= B5 && (
-        <LogWindow
-          title="night-runner"
-          from={B5 + 20}
-          every={16}
-          opacity={1}
-          win={{ x: 140, y: 70, w: 1000, h: 420 }}
-          fontSize={22}
-          lines={[
-            { t: "01", text: "expected_frame: 2992", tone: "accent" },
-            { t: "02", text: "rendered_frame: 2992", tone: "success" },
-            { t: "03", text: "drift: 0 frames", tone: "success" },
-            { t: "04", text: "timing_source: exact fractions (cardRules.js)", tone: "ink" },
-            { t: "05", text: "self_check: passed before render", tone: "success" },
-            { t: "06", text: "status: card shipped, frame-exact", tone: "success" },
-          ]}
-        />
+        <div style={{ position: "absolute", inset: 0, zIndex: 20 }}>
+          <LogWindow
+            title="night-runner"
+            from={B5 + 20}
+            every={16}
+            opacity={1}
+            win={{ x: 140, y: 70, w: 1000, h: 420 }}
+            fontSize={22}
+            lines={[
+              { t: "01", text: "expected_frame: 2992", tone: "accent" },
+              { t: "02", text: "rendered_frame: 2992", tone: "success" },
+              { t: "03", text: "drift: 0 frames", tone: "success" },
+              { t: "04", text: "timing_source: exact fractions (cardRules.js)", tone: "ink" },
+              { text: "→ the file that computes each card's exact timing", tone: "muted" },
+              { t: "05", text: "self_check: passed before render", tone: "success" },
+              { t: "06", text: "status: lesson ships, frame-exact", tone: "success" },
+              { text: "→ the video a kid watches matches the hand-checked original", tone: "muted" },
+            ]}
+          />
+        </div>
       )}
     </AbsoluteFill>
   );
