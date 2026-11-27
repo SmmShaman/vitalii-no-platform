@@ -63,6 +63,10 @@ const NODE_Y = LT.y + 8;
 const HUB_X = NODE_X;
 const HUB_Y = NODE_Y + NODE_H / 2;
 const HANDOFF = B4 + 40; // frame the GOOGLE node flips to LOCAL
+/** b4 splits in two: the real diff plays clean first (no overlay fighting it
+ * for screen space), then the explain cards take over — matches the scroll's
+ * own keyframe at local frame 100, which lands on the worker/index.ts hunk. */
+const B4_SPLIT = B4 + 100;
 
 const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
 const triangle = (p: number) => (p < 0.5 ? p * 2 : (1 - p) * 2);
@@ -77,27 +81,86 @@ const CARDS: { label: string; arrive: number; mode: CardMode }[] = [
   { label: "Q6", arrive: B4 + 150, mode: "instant" },
 ];
 
+const PRODUCT_BOX = { x: 40, y: 40, w: 360, h: 76 };
+
+/** One-line context a first-time viewer needs: what the product even is. */
 const ProductNamePlate: React.FC = () => {
   const P = usePalette();
   return (
-    <Arrive at={B1 + 4} kind="wipe" box={{ x: 40, y: 40, w: 300, h: 56 }} dur={0.4}>
+    <Arrive at={B1 + 4} kind="wipe" box={PRODUCT_BOX} dur={0.4}>
       <div
         style={{
           position: "absolute",
-          left: 40,
-          top: 40,
-          width: 300,
-          height: 56,
+          left: PRODUCT_BOX.x,
+          top: PRODUCT_BOX.y,
+          width: PRODUCT_BOX.w,
+          height: PRODUCT_BOX.h,
           background: P.card,
           borderRadius: 4,
           boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
           display: "flex",
-          alignItems: "center",
+          flexDirection: "column",
+          justifyContent: "center",
           padding: "0 16px",
+          boxSizing: "border-box",
           fontFamily,
         }}
       >
         <div style={{ fontSize: 16, fontWeight: 800, color: P.ink }}>Ghost Interviewer AI</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: P.muted, marginTop: 2 }}>
+          Live interview translation, on your device
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
+const STALL_BOX = { x: 920, y: 40, w: 320, h: 92 };
+
+/** b2's claim is "could stall translation mid-sentence" — funnelAbsorption's
+ * convergence graphic is a metaphor, not a literal freeze. This card draws the
+ * literal thing: a live caption cut off mid-word, with a blinking cursor. */
+const StalledCaption: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B2 || frame >= B3) return null;
+  const blink = Math.floor(frame / 15) % 2 === 0;
+  return (
+    <Arrive at={B2 + 4} kind="wipe" box={STALL_BOX} dur={0.4}>
+      <div
+        style={{
+          position: "absolute",
+          left: STALL_BOX.x,
+          top: STALL_BOX.y,
+          width: STALL_BOX.w,
+          height: STALL_BOX.h,
+          background: P.card,
+          borderRadius: 4,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.5)",
+          padding: "10px 16px",
+          boxSizing: "border-box",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 2, color: P.muted }}>LIVE TRANSLATION</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 4, lineHeight: 1.2 }}>
+          "Could you walk me thro
+          <span style={{ opacity: blink ? 1 : 0 }}>▮</span>"
+        </div>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: P.danger,
+            background: P.dangerBg,
+            borderRadius: 3,
+            padding: "2px 6px",
+            marginTop: 6,
+            display: "inline-block",
+          }}
+        >
+          paused — waiting on session re-check
+        </div>
       </div>
     </Arrive>
   );
@@ -381,6 +444,7 @@ const Inner: React.FC = () => {
           result: "Both wait on one slow network check",
         }}
       />
+      <StalledCaption />
 
       {/* b3 — the token dies after an hour (invisible plumbing, no public page) */}
       <MotionInsert
@@ -400,24 +464,25 @@ const Inner: React.FC = () => {
       {cut(frame, B3, B4) === 1 && <ProductNamePlate />}
       <TokenAgeReadout />
 
-      {/* b4 — the fix, over the real commit, zoomed to one hunk */}
-      {cut(frame, B4, B5) === 1 && (
+      {/* b4a — the real diff, clean and unobstructed: no overlay fighting it for room */}
+      {cut(frame, B4, B4_SPLIT) === 1 && (
         <LiveWindow
           file={shotsFile}
           shot="commit"
           title="github.com/SmmShaman/Ghost-Interviewer-AI/commit/96f3c588"
           from={B4}
-          hold={B5 - B4}
-          zoom={() => 2.2}
+          hold={B4_SPLIT - B4}
+          zoom={() => 2.4}
           focus={{ x: 0.5, y: 0.42 }}
           opacity={1}
           win={{ x: 40, y: 40, w: 1200, h: 540 }}
         />
       )}
+      {/* b4b — now that the diff has been read, explain what it means */}
       <MotionInsert
         effect="handoffExplain"
-        from={B4}
-        dur={B5 - B4}
+        from={B4_SPLIT}
+        dur={B5 - B4_SPLIT}
         accent={ACCENT}
         plate={0.72}
         data={{
@@ -425,7 +490,11 @@ const Inner: React.FC = () => {
           to: "Local session-token check",
           fromLabel: "BEFORE",
           toLabel: "NOW",
-          points: ["Signed with Web Crypto API", "Verified with zero network calls", "96f3c588"],
+          points: [
+            "Signed with Web Crypto API (built into the browser)",
+            "Verified with zero network calls",
+            "Commit 96f3c588 · worker/index.ts",
+          ],
         }}
       />
 
@@ -440,11 +509,12 @@ const Inner: React.FC = () => {
           fontSize={22}
           lines={[
             { t: "01", text: "session_token: issued (HMAC-SHA256)", tone: "accent" },
+            { text: "→ a signature only our own server can produce", tone: "muted" },
             { t: "02", text: "audience check: client_id matches — pass", tone: "success" },
+            { text: "→ confirms the request really came from this app", tone: "muted" },
             { t: "03", text: "ttl: 12h", tone: "ink" },
-            { t: "04", text: "google_verify_calls: 0", tone: "success" },
-            { t: "05", text: "round_trips_this_session: 0", tone: "success" },
-            { t: "06", text: "status: session valid, no network needed", tone: "success" },
+            { t: "04", text: "google_verify_calls: 0 · round_trips: 0", tone: "success" },
+            { t: "05", text: "status: session valid, no network needed", tone: "success" },
           ]}
         />
       )}
