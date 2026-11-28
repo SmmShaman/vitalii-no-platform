@@ -71,7 +71,7 @@ const SidebarClaim: React.FC = () => {
       }}
     >
       <div style={{ position: "absolute", left: 28, top: 36, fontSize: 13, fontWeight: 800, letterSpacing: 2, color: P.accent }}>
-        DIABET
+        DIABETES
       </div>
       <div style={{ position: "absolute", left: 28, top: 58, fontSize: 15, fontWeight: 700, color: P.muted }}>
         Type 1 Diabetes Toolkit
@@ -98,6 +98,38 @@ const SidebarClaim: React.FC = () => {
         ))}
       </div>
     </div>
+  );
+};
+
+/** b1 — one-line product plate naming the real app, so "TV clock" isn't a
+ * bare metaphor; sits in the stage window's clear top strip, above
+ * keywordCaption's own bottom-third text. */
+const ProductPlate: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (cut(frame, B1, B2) !== 1) return null;
+  const box = { x: SIDEBAR_W + 40, y: 130, w: 540, h: 72 };
+  return (
+    <Arrive at={B1 + 4} kind="rise" box={box}>
+      <div
+        style={{
+          position: "absolute",
+          left: box.x,
+          top: box.y,
+          maxWidth: box.w,
+          padding: "10px 18px",
+          background: "rgba(8,8,8,0.82)",
+          border: `1.5px solid ${P.accentEdge}`,
+          borderRadius: 4,
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 15, fontWeight: 800, letterSpacing: 1, color: P.accent }}>TV CLOCK BRIDGE</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "#F5F5F5", opacity: 0.9, marginTop: 2, lineHeight: 1.35 }}>
+          kitchen kiosk clock for a type 1 diabetes household — syncs sugar + weather
+        </div>
+      </div>
+    </Arrive>
   );
 };
 
@@ -226,8 +258,14 @@ const ForecastCellPanel: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
   if (frame < B4 + 50 || frame >= B5) return null;
-  const box = { x: 360, y: 520, w: 860, h: 160 };
-  const hours = ["+1h", "+2h", "+3h", "+4h", "+5h"];
+  const box = { x: 360, y: 520, w: 860, h: 170 };
+  const hours = [
+    { h: "+1h", icon: "☀️", temp: "14°" },
+    { h: "+2h", icon: "⛅", temp: "13°" },
+    { h: "+3h", icon: "⛅", temp: "12°" },
+    { h: "+4h", icon: "🌧", temp: "11°" },
+    { h: "+5h", icon: "🌧", temp: "10°" },
+  ];
   return (
     <Arrive at={B4 + 50} kind="rise" box={box}>
       <div
@@ -252,24 +290,25 @@ const ForecastCellPanel: React.FC = () => {
           WEATHER CELL — HOUR BY HOUR
         </div>
         <div style={{ display: "flex", gap: 14 }}>
-          {hours.map((h) => (
+          {hours.map((c) => (
             <div
-              key={h}
+              key={c.h}
               style={{
                 flex: 1,
-                height: 64,
+                height: 84,
                 background: P.accentBg,
                 border: `2px solid ${P.accentEdge}`,
                 borderRadius: 6,
                 display: "flex",
+                flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 20,
-                fontWeight: 800,
-                color: P.ink,
+                gap: 2,
               }}
             >
-              {h}
+              <div style={{ fontSize: 13, fontWeight: 800, color: P.muted }}>{c.h}</div>
+              <div style={{ fontSize: 22 }}>{c.icon}</div>
+              <div style={{ fontSize: 18, fontWeight: 800, color: P.ink }}>{c.temp}</div>
             </div>
           ))}
         </div>
@@ -301,9 +340,10 @@ const Inner: React.FC = () => {
         from={B1}
         dur={B2 - B1}
         accent={ACCENT}
-        plate={0.55}
+        plate={0.72}
         data={{ line1: "No sense of climbing", line2: "falling, or what's coming", keywords: ["climbing", "falling"] }}
       />
+      <ProductPlate />
 
       {/* b2 — the stakes: a snapshot isn't enough to plan around */}
       {cut(frame, B2, B3) === 1 && (
@@ -322,7 +362,7 @@ const Inner: React.FC = () => {
         from={B2}
         dur={B3 - B2}
         accent={ACCENT}
-        plate={0.55}
+        plate={0.72}
         data={{ title: "Not Enough To Plan", kicker: "Type 1 Diabetes" }}
       />
 
