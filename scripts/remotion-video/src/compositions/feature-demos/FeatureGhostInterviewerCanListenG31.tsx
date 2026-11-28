@@ -42,13 +42,21 @@ void END;
 const ACCENT = "#36D9A4";
 const STAGE = "#0F1F18";
 
-// Card-deck lower third geometry (1280x720, below the effects' safe band at y~600).
-const DECK = { x: 40, y: 598, w: 1200, h: 110 };
-const CARD_W = 270;
-const CARD_H = 84;
-const SLOT_Y = DECK.y + 13;
-const SLOT_X = [60, 348, 636, 924];
+// Card-deck lower third geometry (1280x720). Tall enough that the piled cards
+// (offset diagonally, see STACK_DX/DY) read as a multi-card hand, not one card.
+const DECK = { x: 40, y: 540, w: 1200, h: 155 };
+const CARD_W = 280;
+const CARD_H = 120;
+const SLOT_Y = DECK.y + 15;
+const SLOT_X = [60, 350, 640, 930];
 const STACK_X = 60;
+// Piled (pre-fan) offsets for cards 0-2, stepping diagonally up-right so all three
+// are visible at once instead of fully overlapping at one point.
+const STACK_DX = [0, 50, 100];
+const STACK_DY = [0, -35, -70];
+// Fan happens in a short window ending at FLIP[i] — before that the card sits in
+// its static piled pose (jittered), matching "pile forms, then fans out on cue".
+const FAN_WINDOW = 90;
 
 const sec = (frame: number, at: number, fps: number) => (frame - at) / fps;
 
@@ -75,18 +83,19 @@ const CardDeck: React.FC = () => {
         const lit = frame >= FLIP[i];
         const stacked = i < 3;
         const p = stacked
-          ? tween(sec(frame, APPEAR[i], fps), 0, sec(FLIP[i], APPEAR[i], fps), ease.power3InOut)
+          ? tween(sec(frame, FLIP[i] - FAN_WINDOW, fps), 0, FAN_WINDOW / fps, ease.power3InOut)
           : 1;
-        const x = stacked ? mix(p, STACK_X, SLOT_X[i]) : SLOT_X[i];
+        const x = stacked ? mix(p, STACK_X + STACK_DX[i], SLOT_X[i]) : SLOT_X[i];
+        const y = stacked ? mix(p, SLOT_Y + STACK_DY[i], SLOT_Y) : SLOT_Y;
         const rot = stacked ? mix(p, 6 + i * 3, 0) : 0;
         const zIndex = stacked ? 10 - i + (p > 0.98 ? 0 : 20) : 10;
         return (
-          <Arrive key={i} at={APPEAR[i]} kind="rise" box={{ x, y: SLOT_Y, w: CARD_W, h: CARD_H }}>
+          <Arrive key={i} at={APPEAR[i]} kind="rise" box={{ x, y, w: CARD_W, h: CARD_H }}>
             <div
               style={{
                 position: "absolute",
                 left: x,
-                top: SLOT_Y,
+                top: y,
                 width: CARD_W,
                 height: CARD_H,
                 borderRadius: 6,
@@ -102,10 +111,10 @@ const CardDeck: React.FC = () => {
                 gap: 10,
               }}
             >
-              <div style={{ fontSize: 22 }}>{c.icon}</div>
+              <div style={{ fontSize: 30 }}>{c.icon}</div>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.1, color: P.ink }}>{c.label}</div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: lit ? P.success : P.danger, marginTop: 4 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: 1.1, color: P.ink }}>{c.label}</div>
+                <div style={{ fontSize: 20, fontWeight: 800, color: lit ? P.success : P.danger, marginTop: 6 }}>
                   {lit ? c.after : c.before}
                 </div>
               </div>

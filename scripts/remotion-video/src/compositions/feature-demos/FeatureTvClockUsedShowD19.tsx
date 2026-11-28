@@ -182,6 +182,102 @@ const ResultCard: React.FC = () => {
   );
 };
 
+/** b3's LineTrend (shared catalog effect) centers its chart across the full
+ * canvas and a line chart is naturally thin ink — the real empty space is the
+ * margin strip below the chart. Fills it with the reading the line is drawing
+ * toward. */
+const SugarNowCard: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B3 + 50 || frame >= B4) return null;
+  const box = { x: 360, y: 612, w: 860, h: 86 };
+  return (
+    <Arrive at={B3 + 50} kind="rise" box={box}>
+      <div
+        style={{
+          position: "absolute",
+          left: box.x,
+          top: box.y,
+          width: box.w,
+          height: box.h,
+          background: P.card,
+          border: `2px solid ${P.border}`,
+          borderRadius: 8,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.35)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 20,
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.5, color: P.muted }}>RIGHT NOW</div>
+        <div style={{ fontSize: 34, fontWeight: 800, color: P.accent }}>128 mg/dL</div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: P.ink }}>rising from the last dip ↗</div>
+      </div>
+    </Arrive>
+  );
+};
+
+/** b4's PipelineFlow compacts the step chain into a thin horizontal band
+ * (vertically centered), leaving large empty top/bottom margins — fills the
+ * bottom one with the weather cell the strip actually feeds. */
+const ForecastCellPanel: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B4 + 50 || frame >= B5) return null;
+  const box = { x: 360, y: 520, w: 860, h: 160 };
+  const hours = ["+1h", "+2h", "+3h", "+4h", "+5h"];
+  return (
+    <Arrive at={B4 + 50} kind="rise" box={box}>
+      <div
+        style={{
+          position: "absolute",
+          left: box.x,
+          top: box.y,
+          width: box.w,
+          height: box.h,
+          background: P.card,
+          border: `2px solid ${P.border}`,
+          borderRadius: 10,
+          boxShadow: "8px 8px 0 rgba(0,0,0,0.35)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "16px 28px",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1.5, color: P.muted, marginBottom: 12 }}>
+          WEATHER CELL — HOUR BY HOUR
+        </div>
+        <div style={{ display: "flex", gap: 14 }}>
+          {hours.map((h) => (
+            <div
+              key={h}
+              style={{
+                flex: 1,
+                height: 64,
+                background: P.accentBg,
+                border: `2px solid ${P.accentEdge}`,
+                borderRadius: 6,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 20,
+                fontWeight: 800,
+                color: P.ink,
+              }}
+            >
+              {h}
+            </div>
+          ))}
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 const STAGE_WIN = { x: SIDEBAR_W + 40, y: 110, w: 1280 - SIDEBAR_W - 80, h: 500 };
 
 const Inner: React.FC = () => {
@@ -250,6 +346,7 @@ const Inner: React.FC = () => {
         }}
       />
       <JargonGloss />
+      <SugarNowCard />
 
       {/* b4 — the forecast strip, hour by hour */}
       <MotionInsert
@@ -260,6 +357,7 @@ const Inner: React.FC = () => {
         base={STAGE}
         data={{ steps: ["+1h", "+2h", "+3h", "+4h", "+5h"], result: "Forecast strip", system: "Weather cell" }}
       />
+      <ForecastCellPanel />
 
       {/* b5 — drawn result only: never the feature page or hub (gate 2) */}
       {frame >= B5 && (

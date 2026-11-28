@@ -103,6 +103,17 @@ const ZoomFrame: React.FC = () => {
 
   return (
     <div style={{ position: "absolute", left: 0, top: 0, width: 1280, height: 720, pointerEvents: "none", fontFamily }}>
+      <div
+        style={{
+          position: "absolute",
+          left,
+          top,
+          width: right - left,
+          height: bottom - top,
+          border: `1px solid ${P.accent}`,
+          opacity: 0.35,
+        }}
+      />
       <CornerMark x={left} y={top} corner="tl" color={P.accent} />
       <CornerMark x={right} y={top} corner="tr" color={P.accent} />
       <CornerMark x={left} y={bottom} corner="bl" color={P.accent} />
@@ -149,6 +160,46 @@ const ProductNamePlate: React.FC = () => {
         }}
       >
         <div style={{ fontSize: 16, fontWeight: 800, color: P.ink }}>Ghost Interviewer AI</div>
+      </div>
+    </Arrive>
+  );
+};
+
+/** b2 has no backdrop (deliberately — the old door is an absence, not a page), which
+ * leaves the right two-thirds of the frame empty next to the statusFocus claims card.
+ * Fills that space with the concrete cost: anyone, any account, live credits. */
+const OpenDoorPanel: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B2 || frame >= B3) return null;
+  return (
+    <Arrive at={B2 + 10} kind="rise" box={{ x: 760, y: 220, w: 460, h: 300 }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 760,
+          top: 220,
+          width: 460,
+          height: 300,
+          background: P.dangerBg,
+          border: `2px solid ${P.dangerEdge}`,
+          borderRadius: 10,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.35)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily,
+          padding: "0 24px",
+        }}
+      >
+        <div style={{ fontSize: 64 }}>🔓</div>
+        <div style={{ fontSize: 22, fontWeight: 800, color: P.danger, marginTop: 14, textAlign: "center" }}>
+          ANY GOOGLE ACCOUNT
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: P.ink, marginTop: 8, textAlign: "center" }}>
+          could open a session and start spending real credits
+        </div>
       </div>
     </Arrive>
   );
@@ -237,6 +288,7 @@ const Inner: React.FC = () => {
           ],
         }}
       />
+      <OpenDoorPanel />
 
       {/* b3 — the fix: Google OAuth checked against an explicit allow-list */}
       {cut(frame, B3, B4) === 1 && (
@@ -286,7 +338,7 @@ const Inner: React.FC = () => {
         dur={B5 - B4}
         accent={ACCENT}
         base={STAGE}
-        plate={0.7}
+        plate={0.3}
         data={{
           inputs: ["Sign-in check", "Token exchange check", "Every request check"],
           result: "Same allow-list, enforced three times",

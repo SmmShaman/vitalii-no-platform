@@ -276,6 +276,124 @@ const ResultCard: React.FC = () => {
   );
 };
 
+/** b3's PipelineFlow (shared catalog effect) compacts its 3-step chain into a
+ * thin band with no backdrop behind it — fills the empty lower strip with the
+ * concrete chapters the history effect strings together. */
+const ChapterPreview: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B3 + 50 || frame >= B4) return null;
+  const box = { x: 300, y: 580, w: 860, h: 130 };
+  const chapters = [
+    { n: "01", label: "Baby" },
+    { n: "02", label: "Toddler" },
+    { n: "03", label: "Today" },
+  ];
+  return (
+    <Arrive at={B3 + 50} kind="rise" box={box}>
+      <div
+        style={{
+          position: "absolute",
+          left: box.x,
+          top: box.y,
+          width: box.w,
+          height: box.h,
+          background: P.card,
+          border: `2px solid ${P.border}`,
+          borderRadius: 8,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.35)",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "12px 24px",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: 1.5, color: P.muted, marginBottom: 10 }}>
+          HISTORY EFFECT — ONE PORTRAIT PER CHAPTER
+        </div>
+        <div style={{ display: "flex", gap: 16 }}>
+          {chapters.map((c) => (
+            <div
+              key={c.n}
+              style={{
+                flex: 1,
+                height: 56,
+                background: P.accentBg,
+                border: `2px solid ${P.accentEdge}`,
+                borderRadius: 6,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+                fontSize: 18,
+                fontWeight: 800,
+                color: P.ink,
+              }}
+            >
+              <span style={{ fontSize: 13, fontWeight: 700, color: P.muted }}>{c.n}</span>
+              {c.label}
+            </div>
+          ))}
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
+/** b4's RatioBars (shared catalog effect) centers a thin pair-of-bars band with
+ * no backdrop — fills the empty strip below it with the actual 7x4 square grid
+ * the "counted, not formula" claim is about. */
+const SquareGridPanel: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B4 + 50 || frame >= B5) return null;
+  const box = { x: 560, y: 540, w: 660, h: 140 };
+  const cols = 7;
+  const rows = 4;
+  const cell = 22;
+  const gap = 5;
+  return (
+    <Arrive at={B4 + 50} kind="rise" box={box}>
+      <div
+        style={{
+          position: "absolute",
+          left: box.x,
+          top: box.y,
+          width: box.w,
+          height: box.h,
+          background: P.card,
+          border: `2px solid ${P.border}`,
+          borderRadius: 8,
+          boxShadow: "6px 6px 0 rgba(0,0,0,0.35)",
+          display: "flex",
+          alignItems: "center",
+          gap: 24,
+          padding: "0 24px",
+          fontFamily,
+        }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: `repeat(${cols}, ${cell}px)`,
+            gridTemplateRows: `repeat(${rows}, ${cell}px)`,
+            gap,
+          }}
+        >
+          {Array.from({ length: cols * rows }).map((_, i) => (
+            <div key={i} style={{ width: cell, height: cell, background: P.accent, borderRadius: 3 }} />
+          ))}
+        </div>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 800, color: P.ink }}>7 × 4 = 28 squares</div>
+          <div style={{ fontSize: 14, fontWeight: 700, color: P.muted, marginTop: 4 }}>counted one by one</div>
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 const STAGE_WIN = { x: 520, y: 110, w: 720, h: 500 };
 
 const Inner: React.FC = () => {
@@ -339,6 +457,7 @@ const Inner: React.FC = () => {
         data={{ steps: ["Chapter 1", "Chapter 2", "Chapter 3"], result: "One continuous story", system: "History effect" }}
       />
       <JargonGloss />
+      <ChapterPreview />
 
       {/* b4 — the fix: geometry effect fills a rectangle, folds a triangle, proves half */}
       <MotionInsert
@@ -349,6 +468,7 @@ const Inner: React.FC = () => {
         base={STAGE}
         data={{ a: { label: "Rectangle", value: 28 }, b: { label: "Triangle (half)", value: 14 }, unit: "m²" }}
       />
+      <SquareGridPanel />
 
       {/* b5 — drawn result only: never the feature page or hub (gate 2) */}
       {frame >= B5 && (

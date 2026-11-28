@@ -198,7 +198,7 @@ const Inner: React.FC = () => {
         from={B4}
         dur={B5 - B4}
         accent={ACCENT}
-        plate={0.7}
+        plate={0.35}
         data={{
           from: "Quota pause blocks jobs",
           to: "Scans need no AI call",
