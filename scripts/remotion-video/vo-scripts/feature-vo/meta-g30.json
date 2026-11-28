@@ -1,0 +1,7 @@
+{
+  "id": "g30",
+  "file": "yt-feature-g30.mp4",
+  "title": "Ghost Interviewer Locks the Door to Its API Key | vitalii.no",
+  "description": "How a single shared API key behind a live AI interview tool went from \"anyone who finds the URL\" to a strict email allow-list, checked three times over.\n\nGhost Interviewer runs on one shared API key, and the only thing standing between a stranger and that key was knowing the sign-in URL. Any Google account could open a session and start spending real API credits, with no list of who was actually allowed in.\n\nThe app now checks every Google sign-in against an explicit allow-list before a session is ever created, rejecting anyone not on it. The same list is checked again on the raw token exchange, and once more on every later request carrying an already-issued session token — a leaked or forged token from an unlisted address is worthless at every layer.\n\nTested by signing in with a second personal Google account not on the list: all three checks rejected it.\n\n🔗 Full write-up: https://vitalii.no/features/ghost-interviewer-locks-its-door-only-the-emails-on-the-list-get-through-g30\n📚 All 418 features: https://vitalii.no/features\n👨‍💻 Built by Vitalii Berbeha — https://vitalii.no\n\n#oauth #apisecurity #accesscontrol #cloudflareworkers #webdevelopment",
+  "tags": ["google oauth", "access control", "cloudflare workers", "api security", "allowlist", "session tokens", "typescript", "authentication", "api key protection", "edge computing", "vitalii berbeha"]
+}

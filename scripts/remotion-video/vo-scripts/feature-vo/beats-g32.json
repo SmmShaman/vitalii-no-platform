@@ -1,0 +1,7 @@
+{"id": "g32", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "When a live interview translation went wrong, there was no way to check why afterward."],
+ ["b2", "No record of what it heard, the rough draft, or how long each step took."],
+ ["b3", "Now every session keeps its own paper trail, stored in Cloudflare D1."],
+ ["b4", "Lose your connection mid-interview? Nothing is lost — it waits on your device and sends itself once you're back online."],
+ ["b5", "The whole session syncs to the cloud every 3 seconds."]
+]}

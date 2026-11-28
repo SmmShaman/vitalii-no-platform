@@ -1,0 +1,57 @@
+{
+ "id": "g30",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 8.47,
+  "b2": 4.327,
+  "b3": 5.985,
+  "b4": 5.523,
+  "b5": 4.687
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Ghost Interviewer runs on one shared API key, and the only thing standing between a stranger and that key was knowing the sign-in URL.",
+   "start_s": 0.5,
+   "end_s": 8.97,
+   "start_f": 15,
+   "end_f": 269
+  },
+  {
+   "beat": "b2",
+   "text": "Any Google account could open a session and start spending real credits.",
+   "start_s": 9.27,
+   "end_s": 13.597,
+   "start_f": 278,
+   "end_f": 408
+  },
+  {
+   "beat": "b3",
+   "text": "Now Google OAuth checks every sign-in against an explicit allow-list before it lets anyone in.",
+   "start_s": 13.897,
+   "end_s": 19.882,
+   "start_f": 417,
+   "end_f": 596
+  },
+  {
+   "beat": "b4",
+   "text": "The same check runs again on the token exchange, and again on every request after that.",
+   "start_s": 20.182,
+   "end_s": 25.705,
+   "start_f": 605,
+   "end_f": 771
+  },
+  {
+   "beat": "b5",
+   "text": "Tried a second personal account to break it \u2014 all three checks rejected it.",
+   "start_s": 26.005,
+   "end_s": 30.692,
+   "start_f": 780,
+   "end_f": 921
+  }
+ ],
+ "total_s": 32.192,
+ "durationInFrames": 966,
+ "measured_track_s": 30.744,
+ "track": "/root/feature-demos/vo-g30/vo-g30.mp3"
+}

@@ -1,0 +1,7 @@
+{"id": "g30", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Ghost Interviewer runs on one shared API key, and the only thing standing between a stranger and that key was knowing the sign-in URL."],
+ ["b2", "Any Google account could open a session and start spending real credits."],
+ ["b3", "Now Google OAuth checks every sign-in against an explicit allow-list before it lets anyone in."],
+ ["b4", "The same check runs again on the token exchange, and again on every request after that."],
+ ["b5", "Tried a second personal account to break it — all three checks rejected it."]
+]}

@@ -1,0 +1,48 @@
+{
+ "id": "g31",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.704,
+  "b2": 6.304,
+  "b3": 6.695,
+  "b4": 6.197
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Transcribing someone in a video call meant one odd trick: let their voice play through your speakers, then catch it again with the mic.",
+   "start_s": 0.5,
+   "end_s": 8.204,
+   "start_f": 15,
+   "end_f": 246
+  },
+  {
+   "beat": "b2",
+   "text": "That round trip added echo and noise, and failed outright on laptops with no mic path from the call.",
+   "start_s": 8.504,
+   "end_s": 14.808,
+   "start_f": 255,
+   "end_f": 444
+  },
+  {
+   "beat": "b3",
+   "text": "Now the Web Speech API listens straight to the shared tab \u2014 like headphones beating a re-recorded speaker.",
+   "start_s": 15.108,
+   "end_s": 21.803,
+   "start_f": 453,
+   "end_f": 654
+  },
+  {
+   "beat": "b4",
+   "text": "A fresh listener needs a moment to wake up, so the restart timer stretched from 6 to 12 seconds.",
+   "start_s": 22.103,
+   "end_s": 28.3,
+   "start_f": 663,
+   "end_f": 849
+  }
+ ],
+ "total_s": 29.8,
+ "durationInFrames": 894,
+ "measured_track_s": 28.368,
+ "track": "/root/feature-demos/vo-g31/vo-g31.mp3"
+}

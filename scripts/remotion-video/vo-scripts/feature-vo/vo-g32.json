@@ -1,0 +1,57 @@
+{
+ "id": "g32",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.086,
+  "b2": 4.591,
+  "b3": 5.044,
+  "b4": 7.395,
+  "b5": 3.347
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "When a live interview translation went wrong, there was no way to check why afterward.",
+   "start_s": 0.5,
+   "end_s": 5.586,
+   "start_f": 15,
+   "end_f": 168
+  },
+  {
+   "beat": "b2",
+   "text": "No record of what it heard, the rough draft, or how long each step took.",
+   "start_s": 5.886,
+   "end_s": 10.477,
+   "start_f": 177,
+   "end_f": 314
+  },
+  {
+   "beat": "b3",
+   "text": "Now every session keeps its own paper trail, stored in Cloudflare D1.",
+   "start_s": 10.777,
+   "end_s": 15.821,
+   "start_f": 323,
+   "end_f": 475
+  },
+  {
+   "beat": "b4",
+   "text": "Lose your connection mid-interview? Nothing is lost \u2014 it waits on your device and sends itself once you're back online.",
+   "start_s": 16.121,
+   "end_s": 23.516,
+   "start_f": 484,
+   "end_f": 705
+  },
+  {
+   "beat": "b5",
+   "text": "The whole session syncs to the cloud every 3 seconds.",
+   "start_s": 23.816,
+   "end_s": 27.163,
+   "start_f": 714,
+   "end_f": 815
+  }
+ ],
+ "total_s": 28.663,
+ "durationInFrames": 860,
+ "measured_track_s": 27.216,
+ "track": "/root/feature-demos/vo-g32/vo-g32.mp3"
+}

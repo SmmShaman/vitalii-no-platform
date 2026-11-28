@@ -1,0 +1,6 @@
+{"id": "g31", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Transcribing someone in a video call meant one odd trick: let their voice play through your speakers, then catch it again with the mic."],
+ ["b2", "That round trip added echo and noise, and failed outright on laptops with no mic path from the call."],
+ ["b3", "Now the Web Speech API listens straight to the shared tab — like headphones beating a re-recorded speaker."],
+ ["b4", "A fresh listener needs a moment to wake up, so the restart timer stretched from 6 to 12 seconds."]
+]}
