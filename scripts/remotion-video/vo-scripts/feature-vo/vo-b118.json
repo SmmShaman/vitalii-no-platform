@@ -1,0 +1,57 @@
+{
+ "id": "b118",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 5.958,
+  "b2": 4.791,
+  "b3": 5.96,
+  "b4": 6.634,
+  "b5": 5.819
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "A crowned emoji stood in for a real king \u2014 kids read a label instead of recognizing a face.",
+   "start_s": 0.5,
+   "end_s": 6.458,
+   "start_f": 15,
+   "end_f": 194
+  },
+  {
+   "beat": "b2",
+   "text": "Area was just a formula too \u2014 never a rectangle you could watch get built.",
+   "start_s": 6.758,
+   "end_s": 11.549,
+   "start_f": 203,
+   "end_f": 346
+  },
+  {
+   "beat": "b3",
+   "text": "Now a history effect, built in Remotion, strings together real portraits chapter by chapter.",
+   "start_s": 11.849,
+   "end_s": 17.809,
+   "start_f": 355,
+   "end_f": 534
+  },
+  {
+   "beat": "b4",
+   "text": "A matching geometry effect fills a rectangle with counted squares, then folds a triangle to prove it's half.",
+   "start_s": 18.109,
+   "end_s": 24.743,
+   "start_f": 543,
+   "end_f": 742
+  },
+  {
+   "beat": "b5",
+   "text": "Seven rows of four squares, counted one by one, land on 28 square meters.",
+   "start_s": 25.043,
+   "end_s": 30.862,
+   "start_f": 751,
+   "end_f": 926
+  }
+ ],
+ "total_s": 32.362,
+ "durationInFrames": 971,
+ "measured_track_s": 30.912,
+ "track": "/root/feature-demos/vo-b118/vo-b118.mp3"
+}

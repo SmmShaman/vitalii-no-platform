@@ -1,0 +1,7 @@
+{"id": "k07", "voice": "en-US-AndrewNeural", "beats": [
+ ["b1", "Working a list of leads meant bouncing between a map popup and a tab to see one lead's contacts or next step."],
+ ["b2", "Now a 'Client' tab is the default view — one big card holds the whole picture."],
+ ["b3", "J and K jump to the next or previous lead on the Leaflet map, no back and forth."],
+ ["b4", "A background scan, no longer blocked by a quota pause, pulls in real photos."],
+ ["b5", "One card, two keys, up to 16 photos per lead."]
+]}

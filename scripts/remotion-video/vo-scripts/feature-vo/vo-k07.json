@@ -1,0 +1,57 @@
+{
+ "id": "k07",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 6.643,
+  "b2": 5.546,
+  "b3": 5.415,
+  "b4": 5.361,
+  "b5": 4.256
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "Working a list of leads meant bouncing between a map popup and a tab to see one lead's contacts or next step.",
+   "start_s": 0.5,
+   "end_s": 7.143,
+   "start_f": 15,
+   "end_f": 214
+  },
+  {
+   "beat": "b2",
+   "text": "Now a 'Client' tab is the default view \u2014 one big card holds the whole picture.",
+   "start_s": 7.443,
+   "end_s": 12.989,
+   "start_f": 223,
+   "end_f": 390
+  },
+  {
+   "beat": "b3",
+   "text": "J and K jump to the next or previous lead on the Leaflet map, no back and forth.",
+   "start_s": 13.289,
+   "end_s": 18.704,
+   "start_f": 399,
+   "end_f": 561
+  },
+  {
+   "beat": "b4",
+   "text": "A background scan, no longer blocked by a quota pause, pulls in real photos.",
+   "start_s": 19.004,
+   "end_s": 24.365,
+   "start_f": 570,
+   "end_f": 731
+  },
+  {
+   "beat": "b5",
+   "text": "One card, two keys, up to 16 photos per lead.",
+   "start_s": 24.665,
+   "end_s": 28.921,
+   "start_f": 740,
+   "end_f": 868
+  }
+ ],
+ "total_s": 30.421,
+ "durationInFrames": 913,
+ "measured_track_s": 28.992,
+ "track": "/root/feature-demos/vo-k07/vo-k07.mp3"
+}

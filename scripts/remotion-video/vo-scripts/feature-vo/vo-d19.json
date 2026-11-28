@@ -1,0 +1,57 @@
+{
+ "id": "d19",
+ "voice": "en-US-Neural2-J",
+ "beat_durations": {
+  "b1": 7.48,
+  "b2": 5.083,
+  "b3": 4.928,
+  "b4": 4.191,
+  "b5": 5.013
+ },
+ "timeline": [
+  {
+   "beat": "b1",
+   "text": "The kitchen TV clock only ever showed sugar right now and weather right now \u2014 no sense of climbing, falling, or what's coming.",
+   "start_s": 0.5,
+   "end_s": 7.98,
+   "start_f": 15,
+   "end_f": 239
+  },
+  {
+   "beat": "b2",
+   "text": "For a child with type 1 diabetes, that snapshot wasn't enough to plan around.",
+   "start_s": 8.28,
+   "end_s": 13.363,
+   "start_f": 248,
+   "end_f": 401
+  },
+  {
+   "beat": "b3",
+   "text": "Now an SVG chart draws the last 24 hours of sugar as one line.",
+   "start_s": 13.663,
+   "end_s": 18.591,
+   "start_f": 410,
+   "end_f": 558
+  },
+  {
+   "beat": "b4",
+   "text": "Above it, the next 5 hours of weather line up hour by hour.",
+   "start_s": 18.891,
+   "end_s": 23.082,
+   "start_f": 567,
+   "end_f": 692
+  },
+  {
+   "beat": "b5",
+   "text": "One glance across the room now shows a full day behind and five hours ahead.",
+   "start_s": 23.382,
+   "end_s": 28.395,
+   "start_f": 701,
+   "end_f": 852
+  }
+ ],
+ "total_s": 29.895,
+ "durationInFrames": 897,
+ "measured_track_s": 28.464,
+ "track": "/root/feature-demos/vo-d19/vo-d19.mp3"
+}
