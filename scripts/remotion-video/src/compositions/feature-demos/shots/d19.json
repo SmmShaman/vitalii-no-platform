@@ -1,0 +1,14 @@
+{
+  "id": "d19",
+  "viewport": { "width": 1120, "height": 700 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/the-tv-clock-used-to-show-todays-weather-and-sugar-now-it-shows-the-next-5-hours-d19",
+      "frames": 395,
+      "scroll": [[0, 0], [150, 380], [394, 900]],
+      "mouse": [[0, 560, 300], [200, 520, 420], [394, 560, 380]]
+    }
+  ]
+}

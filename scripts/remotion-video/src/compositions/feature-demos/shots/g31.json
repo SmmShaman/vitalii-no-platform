@@ -1,0 +1,28 @@
+{
+  "id": "g31",
+  "viewport": { "width": 1120, "height": 466 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "product",
+      "url": "https://ghost.vitalii.no",
+      "frames": 240,
+      "scroll": [[0, 0], [120, 30], [239, 60]],
+      "mouse": [[0, 300, 150], [80, 450, 180], [160, 380, 160], [239, 420, 140]]
+    },
+    {
+      "name": "commit",
+      "url": "https://github.com/SmmShaman/Ghost-Interviewer-AI/commit/399456abf8e734a3fc013bfa1fd2a5a2b4b5e923",
+      "frames": 210,
+      "scroll": [[0, 0], [100, 650], [209, 750]],
+      "mouse": [[0, 520, 160], [90, 520, 300], [209, 520, 220]]
+    },
+    {
+      "name": "commit2",
+      "url": "https://github.com/SmmShaman/Ghost-Interviewer-AI/commit/399456abf8e734a3fc013bfa1fd2a5a2b4b5e923",
+      "frames": 231,
+      "scroll": [[0, 1200], [115, 1600], [230, 1700]],
+      "mouse": [[0, 520, 200], [115, 520, 320], [230, 520, 240]]
+    }
+  ]
+}

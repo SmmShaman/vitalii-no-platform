@@ -1,0 +1,40 @@
+{
+  "id": "k07",
+  "composition": "FeatureKlientsMapUsedBeK07",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "Map Popup + Tab", "kicker": "The Old Way" }
+    },
+    {
+      "beat": "b2",
+      "effect": "copyCorrection",
+      "backdrop": "page",
+      "data": { "wrong": "Split: popup + Analiz tab", "right": "One Client tab", "label": "Now" }
+    },
+    {
+      "beat": "b3",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": { "line1": "J and K jump between leads", "line2": "right on the Leaflet map", "keywords": ["J", "K"] }
+    },
+    {
+      "beat": "b4",
+      "effect": "handoffExplain",
+      "backdrop": "page",
+      "data": {
+        "from": "Quota pause blocks jobs",
+        "to": "Scans need no AI call",
+        "points": ["Full analyses still pause", "Photo scans run free"]
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": "none",
+      "data": { "note": "LogWindow of real facts + hand-drawn 2-to-1 / 16-photos stat card" }
+    }
+  ]
+}

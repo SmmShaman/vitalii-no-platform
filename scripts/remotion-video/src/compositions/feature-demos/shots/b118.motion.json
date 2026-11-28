@@ -1,0 +1,52 @@
+{
+  "id": "b118",
+  "composition": "FeatureAfterCrownedEmojiStoodB118",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "A crowned emoji stood in",
+        "line2": "for a real king",
+        "keywords": ["emoji", "king"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "handoffExplain",
+      "backdrop": "page",
+      "data": {
+        "from": "Area was just a formula",
+        "to": "A rectangle you watch get built",
+        "points": ["Squares counted one by one", "Proof you can see"]
+      }
+    },
+    {
+      "beat": "b3",
+      "effect": "pipelineFlow",
+      "backdrop": "none",
+      "data": {
+        "steps": ["Chapter 1", "Chapter 2", "Chapter 3"],
+        "result": "One continuous story",
+        "system": "History effect"
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "ratioBars",
+      "backdrop": "none",
+      "data": {
+        "a": { "label": "Rectangle", "value": 28 },
+        "b": { "label": "Triangle (half)", "value": 14 },
+        "unit": "m²"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": "none",
+      "data": { "note": "LogWindow of real facts + hand-drawn 7x4=28 m2 result card" }
+    }
+  ]
+}

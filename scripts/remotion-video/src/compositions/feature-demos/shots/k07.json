@@ -1,0 +1,14 @@
+{
+  "id": "k07",
+  "viewport": { "width": 1120, "height": 700 },
+  "dsf": 1.25,
+  "shots": [
+    {
+      "name": "page",
+      "url": "https://vitalii.no/features/klients-map-used-to-be-the-homepage-now-a-client-workspace-tab-is-with-jk-keys-t-k07",
+      "frames": 716,
+      "scroll": [[0, 0], [250, 420], [450, 820], [715, 1200]],
+      "mouse": [[0, 560, 300], [250, 520, 420], [450, 600, 500], [715, 560, 460]]
+    }
+  ]
+}

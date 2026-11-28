@@ -1,0 +1,6 @@
+{"id": "g31", "composition": "FeatureGhostInterviewerCanListenG31", "beats": [
+  {"beat": "b1", "effect": "titleTakeover", "backdrop": "product", "data": {"title": "The Speaker-To-Mic Trick", "kicker": "How video-call transcription used to work"}},
+  {"beat": "b2", "effect": "statusFocus", "backdrop": null, "data": {"title": "The round trip", "claims": [{"text": "No echo", "verdict": "no"}, {"text": "Clean audio", "verdict": "no"}, {"text": "Works on laptops", "verdict": "no"}]}},
+  {"beat": "b3", "effect": "funnelAbsorption", "backdrop": "commit", "data": {"inputs": ["Echo", "Background noise", "No mic path"], "result": "Clean tab audio, direct"}},
+  {"beat": "b4", "effect": "copyCorrection", "backdrop": "commit2", "data": {"wrong": "Restart timer: 6 seconds", "right": "Restart timer: 12 seconds", "label": "A fresh listener needs to wake up"}}
+]}

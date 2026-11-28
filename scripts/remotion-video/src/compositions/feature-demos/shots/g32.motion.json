@@ -1,0 +1,7 @@
+{"id": "g32", "composition": "FeatureEveryInterviewSessionLeavesG32", "beats": [
+  {"beat": "b1", "effect": "titleTakeover", "backdrop": null, "data": {"title": "No record, no way to check", "kicker": "When a live interview answer came out wrong"}},
+  {"beat": "b2", "effect": "cornerTags", "backdrop": null, "data": {"statement": "Three things vanished with the session", "tags": ["What it heard", "The rough draft", "Step timings"]}},
+  {"beat": "b3", "effect": "handoffExplain", "backdrop": null, "data": {"fromLabel": "BEFORE", "from": "Nothing kept", "toLabel": "NOW", "to": "Logged automatically", "points": ["Every hypothesis", "The rough draft", "Every Q&A pair"]}},
+  {"beat": "b4", "effect": "copyCorrection", "backdrop": null, "data": {"wrong": "A dropped connection loses it all", "right": "It waits on the device, then sends itself", "label": "Offline-safe, no duplicates"}},
+  {"beat": "b5", "effect": "drawn", "backdrop": null, "note": "Ledger closes: LogWindow + lower-third hold on \"SYNCS EVERY 3s\" at full brightness. No feature page, no hub."}
+]}

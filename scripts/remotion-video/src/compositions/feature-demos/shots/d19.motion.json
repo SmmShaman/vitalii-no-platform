@@ -1,0 +1,54 @@
+{
+  "id": "d19",
+  "composition": "FeatureTvClockUsedShowD19",
+  "beats": [
+    {
+      "beat": "b1",
+      "effect": "keywordCaption",
+      "backdrop": "page",
+      "data": {
+        "line1": "No sense of climbing",
+        "line2": "falling, or what's coming",
+        "keywords": ["climbing", "falling"]
+      }
+    },
+    {
+      "beat": "b2",
+      "effect": "titleTakeover",
+      "backdrop": "page",
+      "data": { "title": "Not Enough To Plan", "kicker": "Type 1 Diabetes" }
+    },
+    {
+      "beat": "b3",
+      "effect": "lineTrend",
+      "backdrop": "none",
+      "data": {
+        "title": "Sugar — Last 24h",
+        "unit": "mg/dL",
+        "points": [
+          { "label": "-24h", "value": 118 },
+          { "label": "-18h", "value": 95 },
+          { "label": "-12h", "value": 142 },
+          { "label": "-6h", "value": 110 },
+          { "label": "now", "value": 128 }
+        ]
+      }
+    },
+    {
+      "beat": "b4",
+      "effect": "pipelineFlow",
+      "backdrop": "none",
+      "data": {
+        "steps": ["+1h", "+2h", "+3h", "+4h", "+5h"],
+        "result": "Forecast strip",
+        "system": "Weather cell"
+      }
+    },
+    {
+      "beat": "b5",
+      "effect": "drawn",
+      "backdrop": "none",
+      "data": { "note": "LogWindow of real facts + hand-drawn 24h/5h result card" }
+    }
+  ]
+}

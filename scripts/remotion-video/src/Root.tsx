@@ -236,6 +236,8 @@ import { FeatureUnknownFaceUsedMeanB66 } from "./compositions/feature-demos/Feat
 import { FeatureOneKidFinishesEveryoneB65 } from "./compositions/feature-demos/FeatureOneKidFinishesEveryoneB65";
 import { FeatureFirst20SecondsUsedP75 } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75";
 import { FeatureFirst20SecondsUsedP75Motion } from "./compositions/feature-demos/FeatureFirst20SecondsUsedP75Motion";
+import { FeatureGhostInterviewerCanListenG31 } from "./compositions/feature-demos/FeatureGhostInterviewerCanListenG31";
+import { FeatureGhostInterviewerLocksDoorG30 } from "./compositions/feature-demos/FeatureGhostInterviewerLocksDoorG30";
 import { FeatureHubCrawlableListingRealV19 } from "./compositions/feature-demos/FeatureHubCrawlableListingRealV19";
 import { FeatureBankedTimeResetTimeB36 } from "./compositions/feature-demos/FeatureBankedTimeResetTimeB36";
 import { FeatureVerifyBeforeYouShowV21 } from "./compositions/feature-demos/FeatureVerifyBeforeYouShowV21";
@@ -343,6 +345,9 @@ import { FeatureFilmingLiveSiteInsteadD01 } from "./compositions/feature-demos/F
 import { FeatureNoMoreGoogleRoundG29 } from "./compositions/feature-demos/FeatureNoMoreGoogleRoundG29";
 import { FeatureGhostInterviewerInstallsLikeG28 } from "./compositions/feature-demos/FeatureGhostInterviewerInstallsLikeG28";
 import { FeatureNightRunnerWritesMathB117 } from "./compositions/feature-demos/FeatureNightRunnerWritesMathB117";
+import { FeatureKlientsMapUsedBeK07 } from "./compositions/feature-demos/FeatureKlientsMapUsedBeK07";
+import { FeatureTvClockUsedShowD19 } from "./compositions/feature-demos/FeatureTvClockUsedShowD19";
+import { FeatureAfterCrownedEmojiStoodB118 } from "./compositions/feature-demos/FeatureAfterCrownedEmojiStoodB118";
 
 // Load Comfortaa globally — must happen at module level before any render
 const { fontFamily } = loadFont();
@@ -2429,6 +2434,25 @@ export const RemotionRoot: React.FC = () => {
         height={720}
       />
 
+
+      <Composition
+        id="FeatureGhostInterviewerCanListenG31"
+        component={FeatureGhostInterviewerCanListenG31}
+        durationInFrames={894}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureGhostInterviewerLocksDoorG30"
+        component={FeatureGhostInterviewerLocksDoorG30}
+        durationInFrames={966}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
       <Composition
         id="FeatureHubCrawlableListingRealV19"
         component={FeatureHubCrawlableListingRealV19}
@@ -3392,6 +3416,33 @@ export const RemotionRoot: React.FC = () => {
         id="FeatureNightRunnerWritesMathB117"
         component={FeatureNightRunnerWritesMathB117}
         durationInFrames={1078}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureKlientsMapUsedBeK07"
+        component={FeatureKlientsMapUsedBeK07}
+        durationInFrames={913}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureTvClockUsedShowD19"
+        component={FeatureTvClockUsedShowD19}
+        durationInFrames={897}
+        fps={30}
+        width={1280}
+        height={720}
+      />
+
+      <Composition
+        id="FeatureAfterCrownedEmojiStoodB118"
+        component={FeatureAfterCrownedEmojiStoodB118}
+        durationInFrames={971}
         fps={30}
         width={1280}
         height={720}

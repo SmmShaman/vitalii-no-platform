@@ -1,0 +1,7 @@
+{"id": "g30", "composition": "FeatureGhostInterviewerLocksDoorG30", "beats": [
+  {"beat": "b1", "effect": "titleTakeover", "backdrop": "product", "data": {"title": "One Shared API Key", "kicker": "Only the sign-in URL stood in the way"}},
+  {"beat": "b2", "effect": "statusFocus", "backdrop": null, "data": {"title": "Before the fix", "claims": [{"text": "Sign-in restricted", "verdict": "no"}, {"text": "Credits protected", "verdict": "no"}]}},
+  {"beat": "b3", "effect": "copyCorrection", "backdrop": "commit", "data": {"wrong": "Any Google account could sign in", "right": "Only allow-listed emails get through", "label": "Checked on every sign-in"}},
+  {"beat": "b4", "effect": "funnelAbsorption", "backdrop": "commit2", "data": {"inputs": ["Sign-in check", "Token exchange check", "Every request check"], "result": "Same allow-list, enforced three times"}},
+  {"beat": "b5", "effect": "drawn", "backdrop": null, "note": "LogWindow: a second personal account rejected at sign-in, token exchange, and request — three checks, three 403s. Result card '3/3 REJECTED' holds at full brightness to END, no fade."}
+]}
