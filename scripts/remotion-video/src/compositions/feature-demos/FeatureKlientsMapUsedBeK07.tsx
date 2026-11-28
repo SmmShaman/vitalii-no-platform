@@ -64,6 +64,127 @@ const ProductPlate: React.FC = () => {
   );
 };
 
+/** b1 — the two old screens, shown as drawn cards (no CRM screenshot exists to film). */
+const BeforeSchematic: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B1 + 60 || frame >= B2) return null;
+  const box = { x: 40, y: 520, w: 1200, h: 150 };
+  return (
+    <Arrive at={B1 + 60} kind="rise" box={box}>
+      <div style={{ position: "absolute", left: box.x, top: box.y, width: box.w, height: box.h, display: "flex", alignItems: "center", justifyContent: "center", gap: 36, fontFamily }}>
+        <div style={{ width: 360, height: 110, background: P.card, borderRadius: 6, boxShadow: "6px 6px 0 rgba(0,0,0,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
+          <div style={{ fontSize: 28 }}>🗺️</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: P.ink }}>Map popup</div>
+        </div>
+        <div style={{ fontSize: 32, color: P.muted, fontWeight: 800 }}>⇄</div>
+        <div style={{ width: 360, height: 110, background: P.card, borderRadius: 6, boxShadow: "6px 6px 0 rgba(0,0,0,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6 }}>
+          <div style={{ fontSize: 28 }}>📑</div>
+          <div style={{ fontSize: 14, fontWeight: 800, color: P.ink }}>Analiz tab</div>
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
+/** b2 — the fix, drawn as one card: sidebar filters + the merged client card. */
+const MergeSchematic: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B2 + 60 || frame >= B3) return null;
+  const box = { x: 290, y: 520, w: 700, h: 130 };
+  return (
+    <Arrive at={B2 + 60} kind="rise" box={box}>
+      <div
+        style={{
+          position: "absolute",
+          left: box.x,
+          top: box.y,
+          width: box.w,
+          height: box.h,
+          background: P.accentBg,
+          border: `2px solid ${P.accentEdge}`,
+          borderRadius: 6,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 14,
+          padding: "0 24px",
+          fontFamily,
+        }}
+      >
+        <div style={{ fontSize: 28 }}>🗂️</div>
+        <div style={{ fontSize: 17, fontWeight: 800, color: P.ink, textAlign: "center" }}>
+          sidebar (kommune, status, category) + card: stage, contacts, next step, photos
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
+/** b3 — an actual map with two lead pins, one highlighted, cycling like J/K would move it. */
+const MapSchematic: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B3 + 10 || frame >= B4) return null;
+  const box = { x: 40, y: 120, w: 460, h: 260 };
+  const current = Math.floor((frame - B3) / 40) % 2;
+  const pins = [
+    { x: 110, y: 90, label: "Lead A" },
+    { x: 300, y: 170, label: "Lead B" },
+  ];
+  return (
+    <Arrive at={B3 + 10} kind="rise" box={box}>
+      <div style={{ position: "absolute", left: box.x, top: box.y, width: box.w, height: box.h, background: "#1A2444", border: `2px solid ${P.border}`, borderRadius: 6, overflow: "hidden", fontFamily }}>
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage:
+              "linear-gradient(0deg, rgba(255,255,255,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.07) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <div style={{ position: "absolute", left: 14, top: 10, fontSize: 12, fontWeight: 800, letterSpacing: 1.5, color: P.muted }}>LEAFLET MAP</div>
+        {pins.map((p, i) => (
+          <div key={i} style={{ position: "absolute", left: p.x, top: p.y, display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <div style={{ width: 18, height: 18, borderRadius: "50%", background: current === i ? P.accent : P.muted, boxShadow: current === i ? `0 0 0 6px ${P.accentBg}` : "none" }} />
+            <div style={{ fontSize: 11, fontWeight: 700, color: P.ink, marginTop: 4, whiteSpace: "nowrap" }}>
+              {p.label}
+              {current === i ? " · current" : ""}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Arrive>
+  );
+};
+
+/** b4 — a drawn photo grid: the real "up to 16" figure and the real skip-rule, not an abstract panel. */
+const PhotoGridPanel: React.FC = () => {
+  const frame = useCurrentFrame();
+  const P = usePalette();
+  if (frame < B4 + 15 || frame >= B5) return null;
+  const box = { x: 40, y: 540, w: 1200, h: 150 };
+  const cells = Array.from({ length: 16 });
+  return (
+    <Arrive at={B4 + 15} kind="rise" box={box}>
+      <div style={{ position: "absolute", left: box.x, top: box.y, width: box.w, height: box.h, display: "flex", alignItems: "center", gap: 28, fontFamily }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(8, 28px)", gridTemplateRows: "repeat(2, 28px)", gap: 5 }}>
+          {cells.map((_, i) => (
+            <div key={i} style={{ width: 28, height: 28, borderRadius: 3, background: P.card, border: `1px solid ${P.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13 }}>
+              📷
+            </div>
+          ))}
+        </div>
+        <div style={{ fontSize: 16, fontWeight: 700, color: P.ink, maxWidth: 620, lineHeight: 1.3 }}>
+          up to 16 real photos per lead — skips logos, tiny images, duplicates
+        </div>
+      </div>
+    </Arrive>
+  );
+};
+
 const JargonGloss: React.FC = () => {
   const frame = useCurrentFrame();
   const P = usePalette();
@@ -161,6 +282,7 @@ const Inner: React.FC = () => {
         data={{ title: "Map Popup + Tab", kicker: "The Old Way" }}
       />
       <ProductPlate />
+      <BeforeSchematic />
 
       {/* b2 — the fix: one Client tab, camera pushes a little closer */}
       {cut(frame, B2, B3) === 1 && (
@@ -174,6 +296,7 @@ const Inner: React.FC = () => {
         plate={0.7}
         data={{ wrong: "Split: popup + Analiz tab", right: "One Client tab", label: "Now" }}
       />
+      <MergeSchematic />
 
       {/* b3 — J/K navigation, closer still toward the card */}
       {cut(frame, B3, B4) === 1 && (
@@ -185,9 +308,10 @@ const Inner: React.FC = () => {
         dur={B4 - B3}
         accent={ACCENT}
         plate={0.7}
-        data={{ line1: "J and K jump between leads", line2: "right on the Leaflet map", keywords: ["J", "K"] }}
+        data={{ line1: "J and K jump between leads", line2: "right on the map", keywords: ["J", "K"] }}
       />
       <JargonGloss />
+      <MapSchematic />
 
       {/* b4 — the scan no longer blocked by the quota pause, tightest zoom */}
       {cut(frame, B4, B5) === 1 && (
@@ -207,6 +331,7 @@ const Inner: React.FC = () => {
           points: ["Full analyses still pause", "Photo scans run free"],
         }}
       />
+      <PhotoGridPanel />
 
       {/* b5 — drawn result only: never the feature page or hub (gate 2) */}
       {frame >= B5 && (
